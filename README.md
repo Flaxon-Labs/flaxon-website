@@ -1,7 +1,7 @@
 # Flaxon Website
 
 <p align="center">
-  <img src="assets/images/logo/flaxon-icon.svg" alt="Flaxon Logo" width="200"/>
+  <img src="assets/images/logo/flaxon.png" alt="Flaxon Logo" width="200"/>
 </p>
 
 # Flaxon — Simple Python. Serious Applications.
