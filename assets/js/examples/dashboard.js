@@ -1,4 +1,3 @@
-// assets/js/examples/dashboard.js
 /**
  * Flaxon Website - Live Data Dashboard Demo
  * Real-time charts with Server-Sent Events
@@ -37,6 +36,7 @@
     // Chart Setup
     // ============================================================
     function initChart() {
+        if (!chartCanvas) return;
         const ctx = chartCanvas.getContext('2d');
         chart = new Chart(ctx, {
             type: 'line',
@@ -124,16 +124,19 @@
     function resetData() {
         dataPoints = [];
         updateCount = 0;
-        chart.data.labels = [];
-        chart.data.datasets[0].data = [];
-        chart.update();
+        
+        if (chart) {
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.update();
+        }
 
-        statPrice.textContent = '$0.00';
-        statChange.textContent = '+0.00%';
-        statVolume.textContent = '0';
-        statHigh.textContent = '$0.00';
-        metricUpdates.textContent = '0';
-        metricPoints.textContent = '0';
+        if (statPrice) statPrice.textContent = '$0.00';
+        if (statChange) statChange.textContent = '+0.00%';
+        if (statVolume) statVolume.textContent = '0';
+        if (statHigh) statHigh.textContent = '$0.00';
+        if (metricUpdates) metricUpdates.textContent = '0';
+        if (metricPoints) metricPoints.textContent = '0';
 
         // Add initial data
         for (let i = 0; i < 20; i++) {
@@ -145,6 +148,8 @@
     // UI Updates
     // ============================================================
     function updateChart(point) {
+        if (!chart) return;
+        
         chart.data.labels.push(point.timestamp);
         chart.data.datasets[0].data.push(point.price);
 
@@ -157,33 +162,41 @@
     }
 
     function updateStats(point) {
-        statPrice.textContent = '$' + point.price.toFixed(2);
+        if (statPrice) statPrice.textContent = '$' + point.price.toFixed(2);
 
         const change = point.change;
-        const sign = change >= 0 ? '+' : '';
-        statChange.textContent = sign + change.toFixed(2) + '%';
-        statChange.style.color = change >= 0 ? '#22c55e' : '#ef4444';
+        if (statChange) {
+            const sign = change >= 0 ? '+' : '';
+            statChange.textContent = sign + change.toFixed(2) + '%';
+            statChange.style.color = change >= 0 ? '#22c55e' : '#ef4444';
+        }
 
-        statVolume.textContent = point.volume;
+        if (statVolume) statVolume.textContent = point.volume;
 
-        const currentHigh = dataPoints.reduce(function(max, p) {
-            return Math.max(max, p.price);
-        }, 0);
-        statHigh.textContent = '$' + currentHigh.toFixed(2);
+        if (statHigh) {
+            const currentHigh = dataPoints.reduce(function(max, p) {
+                return Math.max(max, p.price);
+            }, 0);
+            statHigh.textContent = '$' + currentHigh.toFixed(2);
+        }
     }
 
     function updateMetrics() {
         updateCount++;
-        metricUpdates.textContent = updateCount;
-        metricPoints.textContent = dataPoints.length;
+        if (metricUpdates) metricUpdates.textContent = updateCount;
+        if (metricPoints) metricPoints.textContent = dataPoints.length;
 
         // Simulate latency
-        const latency = Math.floor(Math.random() * 50) + 10;
-        metricLatency.textContent = latency + 'ms';
+        if (metricLatency) {
+            const latency = Math.floor(Math.random() * 50) + 10;
+            metricLatency.textContent = latency + 'ms';
+        }
 
         // Simulate memory usage
-        const memory = (dataPoints.length * 0.01 + Math.random() * 0.5).toFixed(1);
-        metricMemory.textContent = memory + 'MB';
+        if (metricMemory) {
+            const memory = (dataPoints.length * 0.01 + Math.random() * 0.5).toFixed(1);
+            metricMemory.textContent = memory + 'MB';
+        }
     }
 
     // ============================================================
@@ -224,22 +237,34 @@
         // Interval buttons
         intervalBtns.forEach(function(btn) {
             btn.addEventListener('click', function() {
-                const interval = parseInt(this.dataset.interval);
+                const interval = parseInt(this.dataset.interval, 10);
+                const isPauseBtn = interval === 0 || this.textContent.includes('Pause') || this.textContent.includes('Play');
 
-                intervalBtns.forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-
-                if (interval === 0) {
-                    isPaused = true;
-                    stopStreaming();
-                    this.textContent = '▶ Play';
-                    this.dataset.interval = '0';
-                } else {
-                    if (isPaused) {
+                if (isPauseBtn) {
+                    if (!isPaused) {
+                        // Pause stream
+                        isPaused = true;
+                        stopStreaming();
+                        this.textContent = '▶ Play';
+                    } else {
+                        // Resume stream
                         isPaused = false;
                         this.textContent = 'Pause';
-                        this.dataset.interval = '0';
+                        // Fall back to 1000ms if no prior speed interval was stored
+                        const currentInterval = updateInterval || 1000;
+                        setIntervalSpeed(currentInterval);
                     }
+                } else {
+                    // Changing speed
+                    isPaused = false;
+                    intervalBtns.forEach(function(b) {
+                        // Reset play/pause button label if present
+                        if (b.dataset.interval === '0') {
+                            b.textContent = 'Pause';
+                        }
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
                     setIntervalSpeed(interval);
                 }
             });
