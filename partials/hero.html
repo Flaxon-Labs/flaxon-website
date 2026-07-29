@@ -1,0 +1,76 @@
+<!-- partials/hero.html -->
+<section class="gradient-hero relative overflow-hidden pt-24 pb-16 md:pt-32 md:pb-24">
+    <!-- Background decorative blobs -->
+    <div class="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-400/5 rounded-full blur-3xl"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left: Text -->
+            <div>
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white/80 border border-white/10 mb-6">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span>v0.1.5 · MIT License</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight">
+                    Simple Python.<br>
+                    <span class="gradient-text">Serious Applications.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-white/70 mt-4 max-w-lg leading-relaxed">
+                    A technology-neutral, async-first Python backend framework that combines Flask-like ease with production-grade power.
+                </p>
+                <div class="flex flex-wrap gap-4 mt-8">
+                    <a href="/installation.html" class="gradient-btn text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 hover:-translate-y-0.5">
+                        <i class="fas fa-rocket mr-2"></i> Get Started
+                    </a>
+                    <a href="/docs.html" class="border border-white/30 text-white hover:bg-white/10 px-6 py-3 rounded-xl font-medium transition-all duration-300">
+                        <i class="fas fa-book mr-2"></i> Read Docs
+                    </a>
+                    <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" target="_blank" class="border border-white/20 text-white/80 hover:text-white hover:bg-white/5 px-6 py-3 rounded-xl font-medium transition-all duration-300">
+                        <i class="fab fa-github mr-2"></i> GitHub
+                    </a>
+                </div>
+                <div class="flex items-center gap-6 mt-8 text-sm text-white/50">
+                    <span><i class="fas fa-check-circle text-emerald-400 mr-1.5"></i> MIT License</span>
+                    <span><i class="fas fa-star text-amber-400 mr-1.5"></i> Open Source</span>
+                    <span><i class="fas fa-bolt text-cyan-400 mr-1.5"></i> Async-First</span>
+                </div>
+            </div>
+
+            <!-- Right: Code Snippet -->
+            <div class="relative">
+                <div class="glass-card rounded-2xl p-1 shadow-2xl shadow-blue-500/10">
+                    <div class="bg-slate-900/95 rounded-xl overflow-hidden">
+                        <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span class="ml-3 text-xs text-white/30 font-mono">app.py</span>
+                        </div>
+                        <div class="code-block rounded-none border-0">
+                            <pre><code class="language-python">
+from flaxon import Flaxon
+
+app = Flaxon("my-api", debug=True)
+
+@app.get("/")
+async def home():
+    return {"message": "Hello from Flaxon"}
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id, "name": f"User {user_id}"}
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -bottom-4 -right-4 bg-slate-800/90 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10 shadow-lg animate-float hidden md:flex items-center gap-2 text-sm text-white/80">
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                    <span>Ready to run</span>
+                    <kbd class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono text-white/60">flaxon run app:app</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

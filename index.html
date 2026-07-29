@@ -1,0 +1,179 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Flaxon – Simple Python. Serious Applications.</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js (light + dark) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #0891b2);
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .glass-card-dark {
+            background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .code-block {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            border: 1px solid #1e293b;
+        }
+        .code-block code {
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .code-block .hljs {
+            background: transparent !important;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+        .animate-pulse-slow {
+            animation: pulseSlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseSlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: {
+                            blue: '#3776AB',
+                            electric: '#00D4FF',
+                            dark: '#0F172A',
+                            light: '#F8FAFC',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- HEADER                                                         -->
+    <!-- ============================================================ -->
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <!-- ============================================================ -->
+    <!-- PARTIALS - Loaded via fetch                                   -->
+    <!-- ============================================================ -->
+    <div id="hero"></div>
+    <div id="features"></div>
+    <div id="stats"></div>
+    <div id="testimonials"></div>
+    <div id="cta"></div>
+    <div id="newsletter"></div>
+
+    <!-- ============================================================ -->
+    <!-- FOOTER                                                         -->
+    <!-- ============================================================ -->
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPTS                                                       -->
+    <!-- ============================================================ -->
+    <script>
+        // Load all partials
+        document.addEventListener('DOMContentLoaded', function() {
+            const partials = [
+                { id: 'hero', path: '/partials/hero.html' },
+                { id: 'features', path: '/partials/features.html' },
+                { id: 'stats', path: '/partials/stats.html' },
+                { id: 'testimonials', path: '/partials/testimonials.html' },
+                { id: 'cta', path: '/partials/cta.html' },
+                { id: 'newsletter', path: '/partials/newsletter.html' },
+            ];
+
+            partials.forEach(function(partial) {
+                fetch(partial.path)
+                    .then(r => r.text())
+                    .then(html => document.getElementById(partial.id).innerHTML = html)
+                    .catch(err => console.error('Failed to load partial:', partial.path, err));
+            });
+
+            // Init Highlight.js
+            hljs.highlightAll();
+        });
+
+        // Dark mode toggle (persistent)
+        if (localStorage.getItem('dark-mode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+</body>
+</html>

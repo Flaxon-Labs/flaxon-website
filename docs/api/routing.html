@@ -1,0 +1,250 @@
+<!-- docs/api/routing.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Routing API – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html" class="active">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Routing API</h1>
+
+                        <h2>Router</h2>
+                        <p>The main router class.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Router(prefix: str = "")</code></pre>
+                        </div>
+
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Parameter</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Type</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border px-4 py-2"><code>prefix</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">Optional URL prefix</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Methods</h3>
+
+                        <h4>add_route</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">add_route(path: str, endpoint: Callable, *, methods: set[str] | list[str] | tuple[str, ...] = ("GET",), name: str | None = None) -> Route</code></pre>
+                        </div>
+                        <p>Add an HTTP route.</p>
+
+                        <h4>add_websocket</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">add_websocket(path: str, endpoint: Callable, *, name: str | None = None) -> WebSocketRoute</code></pre>
+                        </div>
+                        <p>Add a WebSocket route.</p>
+
+                        <h4>route</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">route(path: str, *, methods: set[str] | list[str] | tuple[str, ...] = ("GET",), name: str | None = None) -> Callable</code></pre>
+                        </div>
+                        <p>Decorator for registering an HTTP route.</p>
+
+                        <h4>get</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">get(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>post</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">post(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>put</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">put(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>patch</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">patch(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>delete</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">delete(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>head</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">head(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>options</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">options(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>websocket</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">websocket(path: str, *, name: str | None = None) -> Callable</code></pre>
+                        </div>
+
+                        <h4>include_router</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">include_router(other: Router) -> None</code></pre>
+                        </div>
+
+                        <h4>match</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">match(path: str, method: str) -> RouteMatch</code></pre>
+                        </div>
+                        <p>Match an HTTP request to a route.</p>
+
+                        <h4>match_websocket</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">match_websocket(path: str) -> WebSocketMatch</code></pre>
+                        </div>
+                        <p>Match a WebSocket connection to a route.</p>
+
+                        <h4>url_for</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">url_for(name: str, **params: Any) -> str</code></pre>
+                        </div>
+                        <p>Generate a URL for a named route.</p>
+
+                        <h3>Properties</h3>
+                        <ul>
+                            <li><code>routes</code> — All HTTP routes</li>
+                            <li><code>websocket_routes</code> — All WebSocket routes</li>
+                            <li><code>route_count</code> — Number of HTTP routes</li>
+                            <li><code>websocket_count</code> — Number of WebSocket routes</li>
+                            <li><code>total_count</code> — Total routes</li>
+                        </ul>
+
+                        <h2>Route</h2>
+                        <p>HTTP route definition.</p>
+
+                        <h3>Attributes</h3>
+                        <ul>
+                            <li><code>path</code> — The URL path pattern</li>
+                            <li><code>endpoint</code> — The endpoint function</li>
+                            <li><code>methods</code> — HTTP methods allowed</li>
+                            <li><code>name</code> — Route name</li>
+                            <li><code>regex</code> — Compiled regex</li>
+                            <li><code>parameters</code> — Parameter names</li>
+                        </ul>
+
+                        <h4>match_path</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">match_path(path: str) -> dict[str, Any] | None</code></pre>
+                        </div>
+
+                        <h2>WebSocketRoute</h2>
+                        <p>WebSocket route definition.</p>
+
+                        <h3>Attributes</h3>
+                        <ul>
+                            <li><code>path</code> — WebSocket URL path pattern</li>
+                            <li><code>endpoint</code> — The endpoint function</li>
+                            <li><code>name</code> — Route name</li>
+                            <li><code>regex</code> — Compiled regex</li>
+                            <li><code>parameters</code> — Parameter names</li>
+                        </ul>
+
+                        <h4>match_path</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">match_path(path: str) -> dict[str, Any] | None</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Supported Converters</strong>
+                            <p class="mb-0 mt-1"><code>str</code>, <code>int</code>, <code>float</code>, <code>path</code>, <code>uuid</code>, <code>slug</code></p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

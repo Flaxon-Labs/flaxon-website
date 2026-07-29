@@ -1,0 +1,43 @@
+<!-- components/search-modal.html -->
+<div id="search-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-start justify-center pt-20">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl mx-4 shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden" @click.outside="closeSearch()">
+        <!-- Search Input -->
+        <div class="flex items-center border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+            <i class="fas fa-search text-slate-400 mr-3"></i>
+            <input
+                id="search-input"
+                type="text"
+                placeholder="Search documentation..."
+                class="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white text-lg placeholder-slate-400"
+                autofocus
+            />
+            <span class="text-xs text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">ESC</span>
+        </div>
+
+        <!-- Search Results -->
+        <div id="search-results-container" class="max-h-[60vh] overflow-y-auto p-2">
+            <div class="search-hint text-center text-slate-400 py-8">
+                <i class="fas fa-search text-2xl mb-2 block"></i>
+                <p>Type at least 2 characters to search...</p>
+                <p class="text-sm mt-1">Search across documentation, guides, and API references.</p>
+            </div>
+        </div>
+
+        <!-- Search Footer -->
+        <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-2 flex justify-between text-xs text-slate-400">
+            <span>
+                <kbd class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">↑</kbd>
+                <kbd class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">↓</kbd>
+                to navigate
+            </span>
+            <span>
+                <kbd class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">Enter</kbd>
+                to select
+            </span>
+            <span>
+                <kbd class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">ESC</kbd>
+                to close
+            </span>
+        </div>
+    </div>
+</div>

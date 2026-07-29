@@ -1,0 +1,228 @@
+<!-- examples/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Live Data Dashboard – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/examples.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-8">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-3 mb-6">
+                <a href="/examples.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <i class="fas fa-arrow-left"></i> Back to Examples
+                </a>
+                <span class="text-slate-300 dark:text-slate-600">|</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">Live Data Dashboard</h1>
+                <span class="ml-auto text-xs bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 px-3 py-1 rounded-full">SSE / WebSocket</span>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 mb-6">
+                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                    <i class="fas fa-info-circle text-flaxon-blue mr-2"></i>
+                    A real-time dashboard powered by Flaxon's streaming data capabilities with live chart updates.
+                </p>
+            </div>
+
+            <!-- Controls -->
+            <div class="dashboard-controls">
+                <button class="active" data-interval="1000">1s</button>
+                <button data-interval="3000">3s</button>
+                <button data-interval="5000">5s</button>
+                <button data-interval="0">Pause</button>
+                <button id="reset-data" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 border-red-500/20">Reset</button>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Chart -->
+                <div class="dashboard-chart">
+                    <h4><i class="fas fa-chart-line text-flaxon-blue mr-2"></i> Live Price Chart</h4>
+                    <canvas id="price-chart" height="250"></canvas>
+                </div>
+
+                <!-- Stats -->
+                <div class="dashboard-stats">
+                    <div class="dashboard-stat">
+                        <div class="value" id="stat-price">$0.00</div>
+                        <div class="label">Current Price</div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="value" id="stat-change">+0.00%</div>
+                        <div class="label">24h Change</div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="value" id="stat-volume">0</div>
+                        <div class="label">Volume</div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="value" id="stat-high">$0.00</div>
+                        <div class="label">24h High</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-center">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Updates</span>
+                    <div class="font-bold text-slate-900 dark:text-white" id="metric-updates">0</div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-center">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Avg Latency</span>
+                    <div class="font-bold text-slate-900 dark:text-white" id="metric-latency">0ms</div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-center">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Data Points</span>
+                    <div class="font-bold text-slate-900 dark:text-white" id="metric-points">0</div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-center">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Memory Usage</span>
+                    <div class="font-bold text-slate-900 dark:text-white" id="metric-memory">0MB</div>
+                </div>
+            </div>
+
+            <!-- Backend Code Showcase -->
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fab fa-python text-flaxon-blue mr-2"></i> Flaxon Server-Sent Events
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-python">from flaxon import Flaxon, StreamingResponse
+import asyncio
+import json
+import random
+import time
+
+app = Flaxon("dashboard-backend")
+
+@app.get("/api/stream")
+async def stream_data():
+    async def generate():
+        while True:
+            data = {
+                "price": round(random.uniform(100, 200), 2),
+                "timestamp": time.time(),
+                "volume": random.randint(50, 500),
+            }
+            yield f"data: {json.dumps(data)}\n\n"
+            await asyncio.sleep(1)
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+@app.get("/api/stats")
+async def get_stats():
+    return {
+        "updates": 0,
+        "latency": "0ms",
+        "points": 0,
+        "memory": "0MB",
+    }</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fas fa-chart-bar text-flaxon-blue mr-2"></i> Chart.js Integration
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-javascript">// Live chart with Chart.js
+const ctx = document.getElementById('price-chart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Price',
+            data: [],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            fill: true,
+            tension: 0.4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+    }
+});
+
+// EventSource connection
+const eventSource = new EventSource('/api/stream');
+eventSource.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    chart.data.labels.push(new Date(data.timestamp).toLocaleTimeString());
+    chart.data.datasets[0].data.push(data.price);
+
+    if (chart.data.labels.length > 60) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+
+    chart.update('none');
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script src="/assets/js/examples/dashboard.js"></script>
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

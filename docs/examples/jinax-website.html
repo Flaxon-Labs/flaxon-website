@@ -1,0 +1,265 @@
+<!-- docs/examples/jinax-website.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Jinax Website Example – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+
+                        <div class="section-title">Examples</div>
+                        <a href="/docs/examples/basic-api.html">Basic API</a>
+                        <a href="/docs/examples/react-backend.html">React Backend</a>
+                        <a href="/docs/examples/android-backend.html">Android Backend</a>
+                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
+                        <a href="/docs/examples/jinax-website.html" class="active">Jinax Website</a>
+                        <a href="/docs/examples/large-application.html">Large Application</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Jinax Website Example</h1>
+                        <p>A server-rendered website using Jinax templates with custom filters, global functions, and template inheritance.</p>
+
+                        <h2>Application Code</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># app.py
+from datetime import datetime
+from pathlib import Path
+from flaxon import Flaxon
+from flaxon.jinax import Jinax
+
+app = Flaxon("website", debug=True)
+
+# Configure Jinax templates
+app.use_templates(Jinax("templates", auto_reload=True))
+
+# Custom filter
+jinax = app.jinax
+
+def currency_filter(value, symbol="$"):
+    try:
+        amount = float(value)
+        return f"{symbol}{amount:,.2f}"
+    except (TypeError, ValueError):
+        return value
+
+jinax.add_filter("currency", currency_filter)
+
+# Custom function
+def get_year():
+    return datetime.now().year
+
+jinax.add_global("current_year", get_year)
+
+# Routes
+@app.get("/")
+async def home(request):
+    products = [
+        {"id": 1, "name": "Flaxon T-Shirt", "price": 29.99, "in_stock": True},
+        {"id": 2, "name": "Flaxon Mug", "price": 14.99, "in_stock": True},
+        {"id": 3, "name": "Flaxon Sticker Pack", "price": 9.99, "in_stock": False},
+        {"id": 4, "name": "Flaxon Developer Guide", "price": 49.99, "in_stock": True},
+    ]
+
+    return await request.render("home.html", {
+        "title": "Flaxon Store",
+        "products": products,
+    })
+
+@app.get("/about")
+async def about(request):
+    return await request.render("about.html", {
+        "title": "About Us",
+        "description": "Flaxon is a technology-neutral, async-first Python backend framework.",
+        "features": [
+            "Async-first ASGI architecture",
+            "Flask-style route decorators",
+            "Optional modular structure",
+            "Request validation",
+            "WebSocket support",
+            "Middleware stack",
+            "Readable debugger",
+        ],
+    })
+
+@app.get("/product/&lt;int:product_id&gt;")
+async def product_detail(request, product_id: int):
+    products = [
+        {"id": 1, "name": "Flaxon T-Shirt", "price": 29.99, "in_stock": True, "description": "Premium cotton t-shirt with Flaxon logo."},
+        {"id": 2, "name": "Flaxon Mug", "price": 14.99, "in_stock": True, "description": "Ceramic mug with Flaxon branding."},
+        {"id": 3, "name": "Flaxon Sticker Pack", "price": 9.99, "in_stock": False, "description": "Pack of 5 Flaxon stickers."},
+        {"id": 4, "name": "Flaxon Developer Guide", "price": 49.99, "in_stock": True, "description": "Complete guide to building with Flaxon."},
+    ]
+
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if not product:
+        return await request.render("404.html", {"title": "Product Not Found"}), 404
+
+    return await request.render("product.html", {
+        "title": product["name"],
+        "product": product,
+    })</code></pre>
+                        </div>
+
+                        <h2>Template Files</h2>
+
+                        <h3>templates/base.html</h3>
+                        <div class="code-block">
+                            <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;{% block title %}Flaxon{% endblock %}&lt;/title&gt;
+    &lt;style&gt;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+        nav { background: #0f172a; color: #e2e8f0; padding: 1rem 2rem; display: flex; gap: 2rem; align-items: center; }
+        nav a { color: #e2e8f0; text-decoration: none; }
+        nav a:hover { color: #7dd3fc; }
+        nav .brand { font-weight: bold; font-size: 1.2rem; }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        footer { text-align: center; padding: 2rem; color: #94a3b8; border-top: 1px solid #e2e8f0; margin-top: 2rem; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav&gt;
+        &lt;span class="brand"&gt;Flaxon&lt;/span&gt;
+        &lt;a href="/"&gt;Home&lt;/a&gt;
+        &lt;a href="/about"&gt;About&lt;/a&gt;
+    &lt;/nav&gt;
+
+    &lt;main&gt;
+        {% block content %}{% endblock %}
+    &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;&copy; {{ current_year() }} Flaxon. All rights reserved.&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+
+                        <h3>templates/home.html</h3>
+                        <div class="code-block">
+                            <pre><code class="language-html">{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    &lt;h1&gt;Welcome to the Flaxon Store&lt;/h1&gt;
+    &lt;p&gt;Explore our collection of Flaxon merchandise and resources.&lt;/p&gt;
+
+    &lt;div class="grid"&gt;
+        {% for product in products %}
+            &lt;div class="card"&gt;
+                &lt;h3&gt;{{ product.name }}&lt;/h3&gt;
+                &lt;p class="price"&gt;{{ product.price|currency("USD") }}&lt;/p&gt;
+                {% if product.in_stock %}
+                    &lt;span class="in-stock"&gt;✓ In Stock&lt;/span&gt;
+                {% else %}
+                    &lt;span class="out-of-stock"&gt;✗ Out of Stock&lt;/span&gt;
+                {% endif %}
+                &lt;br&gt;
+                &lt;a href="/product/{{ product.id }}" class="btn"&gt;View Details&lt;/a&gt;
+            &lt;/div&gt;
+        {% endfor %}
+    &lt;/div&gt;
+{% endblock %}</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
+                            <ul class="mb-0 mt-1">
+                                <li><strong>Template Inheritance:</strong> Base template with blocks</li>
+                                <li><strong>Custom Filters:</strong> Currency formatting</li>
+                                <li><strong>Global Functions:</strong> Current year</li>
+                                <li><strong>Async Rendering:</strong> Request.render()</li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

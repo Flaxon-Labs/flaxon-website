@@ -1,0 +1,225 @@
+<!-- docs/api/websocket.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WebSocket API – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html" class="active">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>WebSocket API</h1>
+
+                        <h2>WebSocket</h2>
+                        <p>WebSocket connection.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">WebSocket(scope: dict[str, Any], receive: Any, send: Any, manager: Any = None)</code></pre>
+                        </div>
+
+                        <h3>Properties</h3>
+                        <ul>
+                            <li><code>path_params</code> — Path parameters</li>
+                            <li><code>state</code> — Connection state (<code>CONNECTING</code>, <code>CONNECTED</code>, <code>CLOSING</code>, <code>CLOSED</code>)</li>
+                            <li><code>accepted</code> — Whether accepted</li>
+                            <li><code>closed</code> — Whether closed</li>
+                        </ul>
+
+                        <h3>Methods</h3>
+
+                        <h4>accept</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def accept(subprotocol: str | None = None, headers: list[tuple[bytes, bytes]] | None = None) -> None</code></pre>
+                        </div>
+
+                        <h4>receive</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def receive() -> dict[str, Any]</code></pre>
+                        </div>
+
+                        <h4>receive_text</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def receive_text() -> str</code></pre>
+                        </div>
+
+                        <h4>receive_bytes</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def receive_bytes() -> bytes</code></pre>
+                        </div>
+
+                        <h4>receive_json</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def receive_json() -> Any</code></pre>
+                        </div>
+
+                        <h4>send_text</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def send_text(value: str) -> None</code></pre>
+                        </div>
+
+                        <h4>send_bytes</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def send_bytes(value: bytes) -> None</code></pre>
+                        </div>
+
+                        <h4>send_json</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def send_json(value: Any) -> None</code></pre>
+                        </div>
+
+                        <h4>close</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def close(code: int = 1000, reason: str = "") -> None</code></pre>
+                        </div>
+
+                        <h4>join</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def join(room: str) -> None</code></pre>
+                        </div>
+
+                        <h4>leave</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def leave(room: str) -> None</code></pre>
+                        </div>
+
+                        <h4>broadcast_json</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def broadcast_json(room: str, value: Any) -> None</code></pre>
+                        </div>
+
+                        <h4>broadcast_text</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def broadcast_text(room: str, value: str) -> None</code></pre>
+                        </div>
+
+                        <h4>iter_json</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">def iter_json(self) -> AsyncIterator[Any]</code></pre>
+                        </div>
+
+                        <h4>iter_text</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">def iter_text(self) -> AsyncIterator[str]</code></pre>
+                        </div>
+
+                        <h2>WebSocketManager</h2>
+                        <p>WebSocket connection manager.</p>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>async join(room, socket)</code> — Add connection to room</li>
+                            <li><code>async leave(room, socket)</code> — Remove connection from room</li>
+                            <li><code>async leave_all(socket)</code> — Remove from all rooms</li>
+                            <li><code>async broadcast_text(room, message)</code> — Broadcast text</li>
+                            <li><code>async broadcast_json(room, data)</code> — Broadcast JSON</li>
+                            <li><code>async broadcast_bytes(room, data)</code> — Broadcast bytes</li>
+                            <li><code>get_room_size(room)</code> — Get number of connections</li>
+                            <li><code>get_rooms()</code> — Get all room names</li>
+                            <li><code>get_connection_rooms(socket)</code> — Get rooms a connection is in</li>
+                            <li><code>clear()</code> — Clear all rooms and connections</li>
+                        </ul>
+
+                        <h2>WebSocketDisconnect</h2>
+                        <p>WebSocket disconnect exception.</p>
+
+                        <div class="code-block">
+                            <pre><code class="language-python">WebSocketDisconnect(code: int = 1000, reason: str = "")</code></pre>
+                        </div>
+
+                        <h3>Attributes</h3>
+                        <ul>
+                            <li><code>code</code> — Close code</li>
+                            <li><code>reason</code> — Close reason</li>
+                        </ul>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Close Codes</strong>
+                            <p class="mb-0 mt-1"><code>1000</code> Normal, <code>1001</code> Going away, <code>1011</code> Internal error</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

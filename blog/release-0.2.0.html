@@ -1,0 +1,154 @@
+<!-- blog/release-0.2.0.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Release v0.2.0 – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <a href="/blog.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center gap-2 mb-6">
+                    <i class="fas fa-arrow-left"></i> Back to Blog
+                </a>
+
+                <div class="mb-8">
+                    <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full font-semibold">Release</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-3">Flaxon v0.2.0 — Protocol Hardening</h1>
+                    <div class="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        <span><i class="far fa-calendar mr-1"></i> August 2026</span>
+                        <span><i class="far fa-user mr-1"></i> Aldane Hutchinson</span>
+                        <span><i class="far fa-clock mr-1"></i> 4 min read</span>
+                    </div>
+                </div>
+
+                <div class="doc-content bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800">
+
+                    <p class="text-lg font-medium text-slate-700 dark:text-slate-300">We're excited to announce Flaxon v0.2.0 — the Protocol Hardening release.</p>
+
+                    <p>This release focuses on making Flaxon more robust, production-ready, and compliant with ASGI standards. While 0.1.0 established the foundation, 0.2.0 strengthens the core with protocol conformance, better error handling, and improved middleware.</p>
+
+                    <h2>What's New</h2>
+
+                    <h3>ASGI Protocol Conformance</h3>
+                    <p>Flaxon now passes comprehensive ASGI conformance tests, ensuring compatibility with all major ASGI servers including Uvicorn, Daphne, and Hypercorn.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python"># Now fully ASGI 3.0 compliant
+async def __call__(self, scope, receive, send):
+    if scope["type"] == "http":
+        await self._handle_http(scope, receive, send)
+    elif scope["type"] == "websocket":
+        await self._handle_websocket(scope, receive, send)
+    elif scope["type"] == "lifespan":
+        await self._handle_lifespan(receive, send)</code></pre>
+                    </div>
+
+                    <h3>Multipart Uploads</h3>
+                    <p>File uploads are now fully supported with streaming multipart parsing, validation, and storage adapters.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python">from flaxon.files import FileUpload, FileStorage
+
+upload = FileUpload(max_size=100 * 1024 * 1024)
+storage = FileStorage("uploads")
+
+@app.post("/upload")
+async def upload_file(request):
+    files = await upload.parse(request)
+    for file in files:
+        path = storage.save(file)
+    return {"uploaded": True}</code></pre>
+                    </div>
+
+                    <h3>Improved Middleware</h3>
+                    <ul>
+                        <li><strong>RecoveryMiddleware</strong> — Catches exceptions and returns safe responses</li>
+                        <li><strong>BodyLimitMiddleware</strong> — Limits request body sizes</li>
+                        <li><strong>TimeoutMiddleware</strong> — Sets request timeouts</li>
+                        <li><strong>ProxyHeadersMiddleware</strong> — Handles X-Forwarded-* headers</li>
+                    </ul>
+
+                    <h3>Better Error Handling</h3>
+                    <p>Error responses are now more consistent with standardized error codes and improved redaction of sensitive data.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "success": false,
+  "error": {
+    "code": "FX-HTTP-404",
+    "message": "User not found",
+    "request_id": "fx_abc123def456"
+  }
+}</code></pre>
+                    </div>
+
+                    <h3>Enhanced Testing Utilities</h3>
+                    <ul>
+                        <li>WebSocket test client with full message support</li>
+                        <li>Assertion helpers for common test patterns</li>
+                        <li>Database test mixins</li>
+                        <li>Factory and fixture support</li>
+                    </ul>
+
+                    <h2>Upgrade Guide</h2>
+                    <div class="code-block">
+                        <pre><code class="language-bash">pip install --upgrade flaxon</code></pre>
+                    </div>
+
+                    <div class="note warning">
+                        <strong><i class="fas fa-exclamation-triangle mr-2"></i> Breaking Changes</strong>
+                        <ul class="mb-0 mt-1">
+                            <li>Field classes renamed: <code>String</code> → <code>StrField</code>, <code>Integer</code> → <code>IntField</code></li>
+                            <li>Static file serving now requires explicit route</li>
+                            <li>Session cookie handling improved with secure defaults</li>
+                        </ul>
+                    </div>
+
+                    <h2>What's Next</h2>
+                    <p>Flaxon 0.3.0 will focus on sessions, OpenAPI documentation, health checks, and structured logging. We're also working on the plugin system for 0.4.0.</p>
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">— Aldane Hutchinson, Creator & Maintainer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

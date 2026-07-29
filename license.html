@@ -1,0 +1,82 @@
+<!-- license.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>License – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <!-- License Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fas fa-file-contract text-3xl text-flaxon-blue"></i>
+                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">MIT License</h1>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm prose prose-slate dark:prose-invert max-w-none">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Copyright (c) 2026 Aldane Hutchinson and Flaxon Contributors</p>
+
+                    <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+                    <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+                    <div class="note danger">
+                        <strong><i class="fas fa-exclamation-triangle mr-2"></i> Disclaimer</strong>
+                        <p class="mb-0 mt-1">THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+                    </div>
+
+                    <hr>
+
+                    <h2>Summary</h2>
+                    <ul>
+                        <li>✅ <strong>Commercial use</strong> — You can use Flaxon in commercial projects.</li>
+                        <li>✅ <strong>Modification</strong> — You can modify the source code.</li>
+                        <li>✅ <strong>Distribution</strong> — You can distribute the software.</li>
+                        <li>✅ <strong>Private use</strong> — You can use it privately.</li>
+                        <li>⚠️ <strong>No warranty</strong> — The software is provided "as is".</li>
+                    </ul>
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        This license applies to the Flaxon framework and all associated source code.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

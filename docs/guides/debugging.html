@@ -1,0 +1,191 @@
+<!-- docs/guides/debugging.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Debugging – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html" class="active">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Debugging</h1>
+                        <p>Flaxon provides a comprehensive debugging system that helps you identify and fix issues quickly.</p>
+
+                        <h2>Debug Mode</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("my-app", debug=True)
+
+# Or via configuration
+app = Flaxon("my-app", config={"DEBUG": True})</code></pre>
+                        </div>
+
+                        <div class="note warning">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Warning</strong>
+                            <p class="mb-0 mt-1">Never enable <code>debug=True</code> in production.</p>
+                        </div>
+
+                        <h2>Development vs Production Errors</h2>
+
+                        <h3>Development Mode</h3>
+                        <div class="code-block">
+                            <pre><code class="language-json">{
+  "success": false,
+  "error": {
+    "code": "FX-DEV-500",
+    "message": "division by zero",
+    "request_id": "fx_abc123def456",
+    "debug": {
+      "type": "ZeroDivisionError",
+      "traceback": "...",
+      "method": "GET",
+      "path": "/divide",
+      "query": {}
+    }
+  }
+}</code></pre>
+                        </div>
+
+                        <h3>Production Mode</h3>
+                        <div class="code-block">
+                            <pre><code class="language-json">{
+  "success": false,
+  "error": {
+    "code": "FX-SRV-500",
+    "message": "The request could not be completed.",
+    "request_id": "fx_abc123def456"
+  }
+}</code></pre>
+                        </div>
+
+                        <h2>Raising HTTP Exceptions</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import HTTPException
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    if user_id < 0:
+        raise HTTPException(400, "Invalid user ID", code="FX-INVALID-ID")
+
+    user = await get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(404, "User not found", code="FX-USER-404")
+
+    return user</code></pre>
+                        </div>
+
+                        <h2>Error Codes</h2>
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Code</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Status</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border px-4 py-2">FX-HTTP-400</td><td class="border px-4 py-2">400</td><td class="border px-4 py-2">Bad Request</td></tr>
+                                <tr><td class="border px-4 py-2">FX-HTTP-401</td><td class="border px-4 py-2">401</td><td class="border px-4 py-2">Unauthorized</td></tr>
+                                <tr><td class="border px-4 py-2">FX-HTTP-403</td><td class="border px-4 py-2">403</td><td class="border px-4 py-2">Forbidden</td></tr>
+                                <tr><td class="border px-4 py-2">FX-HTTP-404</td><td class="border px-4 py-2">404</td><td class="border px-4 py-2">Not Found</td></tr>
+                                <tr><td class="border px-4 py-2">FX-HTTP-405</td><td class="border px-4 py-2">405</td><td class="border px-4 py-2">Method Not Allowed</td></tr>
+                                <tr><td class="border px-4 py-2">FX-VAL-001</td><td class="border px-4 py-2">422</td><td class="border px-4 py-2">Validation Error</td></tr>
+                                <tr><td class="border px-4 py-2">FX-RATE-001</td><td class="border px-4 py-2">429</td><td class="border px-4 py-2">Rate Limit Exceeded</td></tr>
+                                <tr><td class="border px-4 py-2">FX-SRV-500</td><td class="border px-4 py-2">500</td><td class="border px-4 py-2">Server Error</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h2>Redaction</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.debugging import redact
+
+data = {
+    "username": "alice",
+    "password": "secret123",
+    "api_key": "key456",
+}
+
+safe_data = redact(data)
+# {"username": "alice", "password": "[REDACTED]", "api_key": "[REDACTED]"}</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Use <code>/debug/dashboard</code> in development to view error history.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

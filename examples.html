@@ -1,0 +1,131 @@
+<!-- examples.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Examples – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <!-- Examples Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Examples</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">Real-world examples demonstrating Flaxon's capabilities.</p>
+            </div>
+
+            <!-- Example Cards -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Basic API -->
+                <a href="/docs/examples/basic-api.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon blue group-hover:scale-110 transition"><i class="fas fa-code"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Basic API</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">RESTful CRUD operations with validation.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+                <!-- React Backend -->
+                <a href="/docs/examples/react-backend.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon purple group-hover:scale-110 transition"><i class="fab fa-react"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">React Backend</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">CORS-enabled API for React applications.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+                <!-- Android Backend -->
+                <a href="/docs/examples/android-backend.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon emerald group-hover:scale-110 transition"><i class="fab fa-android"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Android Backend</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Mobile-optimized API with JWT authentication.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+                <!-- WebSocket Chat -->
+                <a href="/docs/examples/websocket-chat.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon rose group-hover:scale-110 transition"><i class="fas fa-comments"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">WebSocket Chat</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Real-time chat with room broadcasting.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+                <!-- Jinax Website -->
+                <a href="/docs/examples/jinax-website.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon amber group-hover:scale-110 transition"><i class="fas fa-globe"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Jinax Website</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Server-rendered HTML with Jinax templates.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+                <!-- Large Application -->
+                <a href="/docs/examples/large-application.html" class="card hover:shadow-lg transition group">
+                    <div class="feature-icon teal group-hover:scale-110 transition"><i class="fas fa-layer-group"></i></div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Large Application</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Structured app with routers, services, repositories.</p>
+                    <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View →</span>
+                </a>
+
+            </div>
+
+            <!-- Interactive Examples Section -->
+            <div class="mt-16">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white text-center">Interactive Demos</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-center mt-2">Try Flaxon in action with these live demos.</p>
+
+                <div class="grid md:grid-cols-2 gap-6 mt-8">
+
+                    <a href="/examples/canvas.html" class="card hover:shadow-lg transition group">
+                        <div class="feature-icon indigo group-hover:scale-110 transition"><i class="fas fa-paint-brush"></i></div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Real-Time Collaborative Canvas</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">WebSocket-powered multi-user drawing.</p>
+                        <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">Try Demo →</span>
+                    </a>
+
+                    <a href="/examples/dashboard.html" class="card hover:shadow-lg transition group">
+                        <div class="feature-icon cyan group-hover:scale-110 transition"><i class="fas fa-chart-line"></i></div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4">Live Data Dashboard</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Real-time streaming charts and metrics.</p>
+                        <span class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">Try Demo →</span>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

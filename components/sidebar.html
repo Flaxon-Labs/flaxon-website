@@ -1,0 +1,107 @@
+<!-- components/sidebar.html -->
+<aside class="doc-sidebar" x-data="{ open: null }">
+    <div class="lg:hidden mb-4">
+        <button @click="open = open === 'mobile' ? null : 'mobile'" class="w-full flex items-center justify-between px-4 py-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+            <span>Navigation</span>
+            <i class="fas fa-chevron-down" :class="open === 'mobile' ? 'rotate-180' : ''"></i>
+        </button>
+        <div x-show="open === 'mobile'" x-collapse class="mt-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-2">
+            <!-- Mobile sidebar content - same as desktop below -->
+            <div class="space-y-1">
+                <!-- Getting Started -->
+                <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-2 pb-1">Getting Started</div>
+                <a href="/docs/getting-started/" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Overview</a>
+                <a href="/docs/getting-started/installation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Installation</a>
+                <a href="/docs/getting-started/quickstart.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Quick Start</a>
+
+                <!-- Core Concepts -->
+                <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Core Concepts</div>
+                <a href="/docs/core-concepts/routing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Routing</a>
+                <a href="/docs/core-concepts/requests.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Requests</a>
+                <a href="/docs/core-concepts/responses.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Responses</a>
+                <a href="/docs/core-concepts/middleware.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Middleware</a>
+                <a href="/docs/core-concepts/validation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Validation</a>
+
+                <!-- Guides -->
+                <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Guides</div>
+                <a href="/docs/guides/databases.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Databases</a>
+                <a href="/docs/guides/authentication.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Authentication</a>
+                <a href="/docs/guides/authorization.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Authorization</a>
+                <a href="/docs/guides/websockets.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSockets</a>
+                <a href="/docs/guides/tasks.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tasks</a>
+                <a href="/docs/guides/jinax.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax Templates</a>
+                <a href="/docs/guides/testing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Testing</a>
+                <a href="/docs/guides/debugging.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Debugging</a>
+                <a href="/docs/guides/plugins.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Plugins</a>
+                <a href="/docs/guides/mobile-backends.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Mobile Backends</a>
+
+                <!-- API Reference -->
+                <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">API Reference</div>
+                <a href="/docs/api/application.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Application</a>
+                <a href="/docs/api/routing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Routing</a>
+                <a href="/docs/api/http.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">HTTP</a>
+                <a href="/docs/api/websocket.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSocket</a>
+                <a href="/docs/api/validation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Validation</a>
+                <a href="/docs/api/security.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Security</a>
+                <a href="/docs/api/jinax.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax</a>
+                <a href="/docs/api/tasks.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tasks</a>
+                <a href="/docs/api/testing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Testing</a>
+
+                <!-- Examples -->
+                <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Examples</div>
+                <a href="/docs/examples/basic-api.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Basic API</a>
+                <a href="/docs/examples/react-backend.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">React Backend</a>
+                <a href="/docs/examples/android-backend.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Android Backend</a>
+                <a href="/docs/examples/websocket-chat.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSocket Chat</a>
+                <a href="/docs/examples/jinax-website.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax Website</a>
+                <a href="/docs/examples/large-application.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Large Application</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar (hidden on mobile) -->
+    <div class="hidden lg:block">
+        <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-1 pb-1">Getting Started</div>
+        <a href="/docs/getting-started/" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Overview</a>
+        <a href="/docs/getting-started/installation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Installation</a>
+        <a href="/docs/getting-started/quickstart.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Quick Start</a>
+
+        <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Core Concepts</div>
+        <a href="/docs/core-concepts/routing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Routing</a>
+        <a href="/docs/core-concepts/requests.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Requests</a>
+        <a href="/docs/core-concepts/responses.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Responses</a>
+        <a href="/docs/core-concepts/middleware.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Middleware</a>
+        <a href="/docs/core-concepts/validation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Validation</a>
+
+        <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Guides</div>
+        <a href="/docs/guides/databases.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Databases</a>
+        <a href="/docs/guides/authentication.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Authentication</a>
+        <a href="/docs/guides/authorization.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Authorization</a>
+        <a href="/docs/guides/websockets.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSockets</a>
+        <a href="/docs/guides/tasks.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tasks</a>
+        <a href="/docs/guides/jinax.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax Templates</a>
+        <a href="/docs/guides/testing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Testing</a>
+        <a href="/docs/guides/debugging.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Debugging</a>
+        <a href="/docs/guides/plugins.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Plugins</a>
+        <a href="/docs/guides/mobile-backends.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Mobile Backends</a>
+
+        <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">API Reference</div>
+        <a href="/docs/api/application.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Application</a>
+        <a href="/docs/api/routing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Routing</a>
+        <a href="/docs/api/http.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">HTTP</a>
+        <a href="/docs/api/websocket.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSocket</a>
+        <a href="/docs/api/validation.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Validation</a>
+        <a href="/docs/api/security.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Security</a>
+        <a href="/docs/api/jinax.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax</a>
+        <a href="/docs/api/tasks.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tasks</a>
+        <a href="/docs/api/testing.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Testing</a>
+
+        <div class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-3 pt-3 pb-1">Examples</div>
+        <a href="/docs/examples/basic-api.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Basic API</a>
+        <a href="/docs/examples/react-backend.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">React Backend</a>
+        <a href="/docs/examples/android-backend.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Android Backend</a>
+        <a href="/docs/examples/websocket-chat.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">WebSocket Chat</a>
+        <a href="/docs/examples/jinax-website.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Jinax Website</a>
+        <a href="/docs/examples/large-application.html" class="block px-3 py-1.5 rounded text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Large Application</a>
+    </div>
+</aside>

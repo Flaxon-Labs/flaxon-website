@@ -1,0 +1,213 @@
+<!-- docs/api/security.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Security API – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html" class="active">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Security API</h1>
+
+                        <h2>JWTBackend</h2>
+                        <p>JWT authentication backend.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">JWTBackend(secret_key: str, algorithm: str = "HS256")</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>async authenticate(request: Request) -> User | None</code> — Authenticate a request</li>
+                            <li><code>async create_token(user: User, expires_in: int | None = None) -> str</code> — Create a JWT token</li>
+                            <li><code>async validate_token(token: str) -> User | None</code> — Validate a JWT token</li>
+                            <li><code>async revoke_token(token: str) -> None</code> — Revoke a token</li>
+                        </ul>
+
+                        <h2>SessionBackend</h2>
+                        <p>Session authentication backend.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">SessionBackend(session_store: dict[str, dict[str, Any]] | None = None)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>async authenticate(request: Request) -> User | None</code></li>
+                            <li><code>async create_token(user: User, expires_in: int | None = None) -> str</code></li>
+                            <li><code>async validate_token(token: str) -> User | None</code></li>
+                            <li><code>async revoke_token(token: str) -> None</code></li>
+                        </ul>
+
+                        <h2>User</h2>
+                        <p>User object.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">User(id: str | int, username: str | None = None, email: str | None = None, roles: list[str] | None = None, permissions: list[str] | None = None, metadata: dict[str, Any] | None = None)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>has_role(role: str) -> bool</code> — Check if user has a role</li>
+                            <li><code>has_permission(permission: str) -> bool</code> — Check if user has a permission</li>
+                            <li><code>to_dict() -> dict[str, Any]</code> — Convert to dictionary</li>
+                        </ul>
+
+                        <h2>Decorators</h2>
+
+                        <h4>login_required</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">login_required(func: Callable) -> Callable</code></pre>
+                        </div>
+                        <p>Require authentication.</p>
+
+                        <h4>permission_required</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">permission_required(permission: str) -> Callable</code></pre>
+                        </div>
+                        <p>Require a permission.</p>
+
+                        <h4>role_required</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">role_required(role: str) -> Callable</code></pre>
+                        </div>
+                        <p>Require a role.</p>
+
+                        <h4>authorize</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">authorize(permission: str | None = None, role: str | None = None) -> Callable</code></pre>
+                        </div>
+                        <p>Require both permission and role.</p>
+
+                        <h2>CSRF</h2>
+                        <p>CSRF protection.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">CSRF(secret_key: str, cookie_name: str = "_csrf", header_name: str = "x-csrf-token")</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>generate_token() -> str</code> — Generate a CSRF token</li>
+                            <li><code>verify_token(token: str) -> bool</code> — Verify a CSRF token</li>
+                            <li><code>get_token_from_request(request: Request) -> str | None</code></li>
+                            <li><code>validate_request(request: Request) -> None</code></li>
+                        </ul>
+
+                        <h2>RateLimiter</h2>
+                        <p>Rate limiter.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">RateLimiter(requests: int = 60, window_seconds: int = 60, key_func: Callable[[dict[str, Any]], str] | None = None)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>async check(scope) -> bool</code> — Check if rate limit is exceeded</li>
+                            <li><code>get_remaining(scope) -> int</code> — Get remaining requests</li>
+                            <li><code>get_retry_after(scope) -> int</code> — Get retry-after seconds</li>
+                        </ul>
+
+                        <h2>Password Hashing</h2>
+                        <ul>
+                            <li><code>hash_password(password: str) -> str</code> — Hash a password</li>
+                            <li><code>verify_password(password: str, hashed: str) -> bool</code> — Verify a password</li>
+                            <li><code>needs_rehash(hashed: str) -> bool</code> — Check if rehash is needed</li>
+                        </ul>
+
+                        <div class="note warning">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Security Reminder</strong>
+                            <p class="mb-0 mt-1">Always store <code>SECRET_KEY</code> in environment variables, never in code.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

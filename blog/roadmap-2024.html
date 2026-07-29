@@ -1,0 +1,185 @@
+<!-- blog/roadmap-2024.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Roadmap 2026-2027 – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <a href="/blog.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center gap-2 mb-6">
+                    <i class="fas fa-arrow-left"></i> Back to Blog
+                </a>
+
+                <div class="mb-8">
+                    <span class="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-3 py-1 rounded-full font-semibold">Roadmap</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-3">Flaxon Roadmap 2026-2027</h1>
+                    <div class="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        <span><i class="far fa-calendar mr-1"></i> June 2026</span>
+                        <span><i class="far fa-user mr-1"></i> Aldane Hutchinson</span>
+                        <span><i class="far fa-clock mr-1"></i> 6 min read</span>
+                    </div>
+                </div>
+
+                <div class="doc-content bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800">
+
+                    <p class="text-lg font-medium text-slate-700 dark:text-slate-300">Flaxon is on an exciting journey from alpha to a stable 1.0 release. Here's our vision for the future.</p>
+
+                    <p>This roadmap outlines the major milestones we plan to achieve. It's ambitious but grounded in our commitment to building a world-class Python backend framework.</p>
+
+                    <h2>Version 0.1.0 — Core Prototype ✅</h2>
+                    <p><strong>Released:</strong> July 2026</p>
+                    <ul>
+                        <li>✅ ASGI application with HTTP, WebSocket, lifespan</li>
+                        <li>✅ Flask-style decorators with typed parameters</li>
+                        <li>✅ Request validation with declarative schemas</li>
+                        <li>✅ WebSocket support with room broadcasting</li>
+                        <li>✅ Jinax template integration (optional Jinja2)</li>
+                        <li>✅ Middleware: CORS, request ID, security headers, rate limiting</li>
+                        <li>✅ CLI: run, routes, doctor, new</li>
+                        <li>✅ Testing: sync and async test clients</li>
+                        <li>✅ Debugger with development/production modes</li>
+                        <li>✅ Sensitive data redaction</li>
+                    </ul>
+
+                    <h2>Version 0.2.0 — Protocol Hardening ⏳</h2>
+                    <p><strong>Target:</strong> Q3 2026</p>
+                    <ul>
+                        <li>⏳ ASGI protocol conformance tests</li>
+                        <li>⏳ HTTP/1.1 and HTTP/2 improvements</li>
+                        <li>⏳ Multipart/form-data uploads</li>
+                        <li>⏳ Streaming request body handling</li>
+                        <li>⏳ WebSocket disconnect and backpressure handling</li>
+                        <li>⏳ Graceful shutdown improvements</li>
+                        <li>⏳ Request and response timeouts</li>
+                        <li>⏳ Trusted host middleware</li>
+                        <li>⏳ Body size limit middleware</li>
+                        <li>⏳ Improved middleware error recovery</li>
+                    </ul>
+
+                    <h2>Version 0.3.0 — Production Services ⏳</h2>
+                    <p><strong>Target:</strong> Q4 2026</p>
+                    <ul>
+                        <li>⏳ Session management (signed cookies + backends)</li>
+                        <li>⏳ OpenAPI/Swagger documentation generation</li>
+                        <li>⏳ Structured logging (JSON logs with request context)</li>
+                        <li>⏳ Health check endpoints (liveness, readiness)</li>
+                        <li>⏳ Prometheus metrics integration</li>
+                        <li>⏳ Better configuration management (settings classes)</li>
+                        <li>⏳ Environment-specific configuration</li>
+                        <li>⏳ .env file support</li>
+                        <li>⏳ Email sending (SMTP, console)</li>
+                        <li>⏳ Static file serving</li>
+                    </ul>
+
+                    <h2>Version 0.4.0 — Plugins and Ecosystem ⏳</h2>
+                    <p><strong>Target:</strong> Q1 2027</p>
+                    <ul>
+                        <li>⏳ Formal plugin system with discovery</li>
+                        <li>⏳ flaxon-sqlalchemy: SQLAlchemy integration</li>
+                        <li>⏳ flaxon-redis: Redis caching and rate limiting</li>
+                        <li>⏳ flaxon-auth: Authentication (JWT, OAuth, sessions)</li>
+                        <li>⏳ flaxon-storage: File storage (local, S3)</li>
+                        <li>⏳ flaxon-observability: OpenTelemetry integration</li>
+                        <li>⏳ flaxon-tasks: Background task queue</li>
+                        <li>⏳ Plugin hooks for: startup, shutdown, routes, CLI commands, health checks</li>
+                    </ul>
+
+                    <h2>Version 0.5.0 — Distributed Systems ⏳</h2>
+                    <p><strong>Target:</strong> Q2 2027</p>
+                    <ul>
+                        <li>⏳ Distributed task queues (Redis, RabbitMQ)</li>
+                        <li>⏳ Scheduled tasks and cron jobs</li>
+                        <li>⏳ Redis-backed WebSocket broadcaster</li>
+                        <li>⏳ Distributed rate limiting</li>
+                        <li>⏳ Distributed caching</li>
+                        <li>⏳ Database connection pooling</li>
+                        <li>⏳ Transaction management</li>
+                        <li>⏳ Migration tooling</li>
+                        <li>⏳ Deployment guides (Docker, Kubernetes)</li>
+                    </ul>
+
+                    <h2>Version 0.9.0 — Release Candidate ⏳</h2>
+                    <p><strong>Target:</strong> Q3 2027</p>
+                    <ul>
+                        <li>⏳ API freeze</li>
+                        <li>⏳ Security audit</li>
+                        <li>⏳ Performance benchmarks</li>
+                        <li>⏳ Migration guide from 0.x</li>
+                        <li>⏳ Broad CI and compatibility testing</li>
+                        <li>⏳ Documentation complete</li>
+                        <li>⏳ Example applications comprehensive</li>
+                    </ul>
+
+                    <h2>Version 1.0.0 — Stable Release ⏳</h2>
+                    <p><strong>Target:</strong> Q4 2027</p>
+                    <ul>
+                        <li>⏳ Documented compatibility policy</li>
+                        <li>⏳ Signed releases</li>
+                        <li>⏳ Governance model</li>
+                        <li>⏳ Long-term support (LTS) policy</li>
+                        <li>⏳ Production-ready certification</li>
+                    </ul>
+
+                    <h2>Future Ideas (1.1+)</h2>
+                    <ul>
+                        <li>GraphQL support</li>
+                        <li>gRPC support</li>
+                        <li>Server-Sent Events (SSE)</li>
+                        <li>WebSockets over HTTP/3 (QUIC)</li>
+                        <li>Real-time collaboration features</li>
+                        <li>Admin dashboard</li>
+                        <li>Code generation from OpenAPI</li>
+                        <li>Database migration tools</li>
+                    </ul>
+
+                    <div class="note">
+                        <strong><i class="fas fa-hands-helping mr-2"></i> Contribution Wanted!</strong>
+                        <p class="mb-0 mt-1">We welcome contributions at any stage. Check our <a href="/contributing.html" class="text-flaxon-blue hover:underline">Contributing Guide</a> to get started.</p>
+                    </div>
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">— The Flaxon Team</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

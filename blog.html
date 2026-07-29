@@ -1,0 +1,109 @@
+<!-- blog.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Blog – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <!-- Blog Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Blog</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">News, updates, and announcements from the Flaxon team.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- Blog Post 1 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded text-xs font-medium">Release</span>
+                        <span>•</span>
+                        <span>July 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/release-0.1.0.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon v0.1.0 — Alpha Release
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">The first public release of Flaxon is here! Learn about the features, philosophy, and what's coming next.</p>
+                    <a href="/blog/release-0.1.0.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+                <!-- Blog Post 2 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-2 py-0.5 rounded text-xs font-medium">Roadmap</span>
+                        <span>•</span>
+                        <span>June 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/roadmap-2024.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon Roadmap 2024-2025
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">A look at the future of Flaxon — from protocol hardening to distributed tasks and the 1.0 stable release.</p>
+                    <a href="/blog/roadmap-2024.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+                <!-- Blog Post 3 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded text-xs font-medium">Philosophy</span>
+                        <span>•</span>
+                        <span>May 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/why-flaxon.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Why Flaxon? The Philosophy Behind the Framework
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">Understanding the design decisions that make Flaxon different — simplicity, structure, and technology neutrality.</p>
+                    <a href="/blog/why-flaxon.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

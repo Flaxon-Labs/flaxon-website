@@ -1,0 +1,271 @@
+/* ============================================================
+   DOCUMENTATION STYLES – Flaxon Website
+   ============================================================ */
+
+/* ----- Sidebar ----- */
+.doc-sidebar {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.doc-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.doc-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.doc-sidebar::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+.doc-sidebar .section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    padding: 0.75rem 0.75rem 0.5rem;
+    font-weight: 700;
+}
+
+.dark .doc-sidebar .section-title {
+    color: #64748b;
+}
+
+.doc-sidebar .section-title:not(:first-child) {
+    margin-top: 0.5rem;
+}
+
+.doc-sidebar a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #64748b;
+    transition: all 0.2s ease;
+    border-left: 2px solid transparent;
+}
+
+.doc-sidebar a:hover {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.dark .doc-sidebar a:hover {
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.doc-sidebar a.active {
+    color: #2563eb;
+    border-left-color: #2563eb;
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.dark .doc-sidebar a.active {
+    color: #60a5fa;
+    border-left-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.08);
+}
+
+/* ----- Documentation Content ----- */
+.doc-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.dark .doc-content {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.doc-content h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 1rem;
+}
+
+.dark .doc-content h1 {
+    color: #f1f5f9;
+}
+
+.doc-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dark .doc-content h2 {
+    color: #f1f5f9;
+}
+
+.doc-content h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.dark .doc-content h3 {
+    color: #f1f5f9;
+}
+
+.doc-content p {
+    color: #334155;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.dark .doc-content p {
+    color: #cbd5e1;
+}
+
+.doc-content ul,
+.doc-content ol {
+    color: #334155;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+.dark .doc-content ul,
+.dark .doc-content ol {
+    color: #cbd5e1;
+}
+
+.doc-content li {
+    margin-bottom: 0.25rem;
+}
+
+.doc-content hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
+}
+
+.dark .doc-content hr {
+    border-color: #334155;
+}
+
+/* ----- Notes / Callouts ----- */
+.doc-content .note {
+    background: #f1f5f9;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin: 1.25rem 0;
+}
+
+.doc-content .note.warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.doc-content .note.danger {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.doc-content .note.success {
+    border-left-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.doc-content .note code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.dark .doc-content .note {
+    background: #1e293b;
+}
+.dark .doc-content .note.warning {
+    background: #422006;
+}
+.dark .doc-content .note.danger {
+    background: #450a0a;
+}
+.dark .doc-content .note.success {
+    background: #052e16;
+}
+.dark .doc-content .note code {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ----- Inline Code ----- */
+.doc-content code:not(.hljs) {
+    background: #e2e8f0;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.dark .doc-content code:not(.hljs) {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+/* ----- Table of Contents (TOC) ----- */
+.doc-toc {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+.dark .doc-toc {
+    background: #0f172a;
+    border-color: #1e293b;
+}
+
+.doc-toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-toc ul li {
+    margin-bottom: 0.25rem;
+}
+
+.doc-toc ul li a {
+    font-size: 0.9rem;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 1024px) {
+    .doc-sidebar {
+        position: static;
+        max-height: none;
+        margin-bottom: 1.5rem;
+    }
+    .doc-content {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .doc-content h1 {
+        font-size: 1.75rem;
+    }
+    .doc-content h2 {
+        font-size: 1.25rem;
+    }
+    .doc-content {
+        padding: 1rem;
+    }
+}

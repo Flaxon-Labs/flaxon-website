@@ -1,0 +1,222 @@
+<!-- docs/guides/authorization.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Authorization – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html" class="active">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Authorization</h1>
+                        <p>Flaxon provides role-based and permission-based authorization through decorators and utility functions.</p>
+
+                        <h2>Defining Roles</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import Role, register_role
+
+admin_role = register_role(
+    name="admin",
+    permissions=["read", "write", "delete", "manage_users"],
+    description="Administrator with full access",
+)
+
+moderator_role = register_role(
+    name="moderator",
+    permissions=["read", "write", "delete"],
+    description="Moderator with limited access",
+)
+
+user_role = register_role(
+    name="user",
+    permissions=["read"],
+    description="Regular user with read-only access",
+)</code></pre>
+                        </div>
+
+                        <h2>Role Hierarchy</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">moderator = register_role(
+    name="moderator",
+    permissions=["write", "delete"],
+    parent=user_role,  # Inherits all user permissions
+)
+
+admin = register_role(
+    name="admin",
+    permissions=["manage_users"],
+    parent=moderator,  # Inherits all moderator permissions
+)</code></pre>
+                        </div>
+
+                        <h2>Permission-Based Authorization</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import permission_required, Permission
+
+register_permission("read", "Read data")
+register_permission("write", "Write data")
+register_permission("delete", "Delete data")
+
+@app.get("/api/users")
+@permission_required("read")
+async def list_users():
+    return [{"id": 1, "name": "Alice"}]
+
+@app.post("/api/users")
+@permission_required("write")
+async def create_user():
+    return {"created": True}
+
+@app.delete("/api/users/&lt;int:user_id&gt;")
+@permission_required("delete")
+async def delete_user(user_id: int):
+    return {"deleted": True}</code></pre>
+                        </div>
+
+                        <h2>Role-Based Authorization</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import role_required
+
+@app.get("/admin/dashboard")
+@role_required("admin")
+async def admin_dashboard():
+    return {"admin": True}
+
+@app.get("/moderator/reports")
+@role_required("moderator")
+async def moderator_reports():
+    return {"reports": []}</code></pre>
+                        </div>
+
+                        <h2>Combining Roles and Permissions</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import authorize
+
+@app.delete("/api/users/&lt;int:user_id&gt;")
+@authorize(permission="delete", role="admin")
+async def delete_user(user_id: int):
+    return {"deleted": True}</code></pre>
+                        </div>
+
+                        <h2>Permission Checking in Functions</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import AuthorizationChecker
+
+async def get_user_data(request):
+    checker = AuthorizationChecker(getattr(request, "user", None))
+
+    if checker.has_permission("read"):
+        return await db.fetch_all("SELECT * FROM users")
+
+    raise HTTPException(403, "Insufficient permissions")</code></pre>
+                        </div>
+
+                        <h2>Multiple Permissions</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/api/bulk")
+@login_required
+async def bulk_operation(request):
+    user = getattr(request, "user")
+    checker = AuthorizationChecker(user)
+
+    # Require any of the specified permissions
+    checker.require_any_permission("write", "admin")
+
+    # Or require all permissions
+    checker.require_all_permissions("write", "read")
+
+    return {"success": True}</code></pre>
+                        </div>
+
+                        <h2>Resource-Level Authorization</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(request, user_id: int):
+    user = getattr(request, "user")
+
+    # Check if user owns the resource or is admin
+    if user.id != user_id and "admin" not in user.roles:
+        raise HTTPException(403, "Cannot access this user")
+
+    return await db.fetch_one("SELECT * FROM users WHERE id = $1", user_id)</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Use <code>AuthorizationChecker</code> for complex permission logic inside functions.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

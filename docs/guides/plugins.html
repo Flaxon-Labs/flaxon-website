@@ -1,0 +1,188 @@
+<!-- docs/guides/plugins.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Plugins – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html" class="active">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Plugins</h1>
+                        <p>Flaxon provides a plugin system that allows you to extend the framework with modular components.</p>
+
+                        <h2>Creating a Plugin</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.plugins import Plugin
+
+class MyPlugin(Plugin):
+    name = "my-plugin"
+    version = "1.0.0"
+    description = "A custom Flaxon plugin"
+
+    def setup(self, app):
+        @app.get("/plugin")
+        async def plugin_route():
+            return {"plugin": "MyPlugin"}
+
+        app.add_middleware(MyPluginMiddleware)
+        app.state.plugin_loaded = True</code></pre>
+                        </div>
+
+                        <h2>Simple Plugin</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.plugins import SimplePlugin
+
+def setup_plugin(app):
+    @app.get("/simple")
+    async def simple_route():
+        return {"plugin": "Simple"}
+
+plugin = SimplePlugin("simple-plugin", setup_plugin)</code></pre>
+                        </div>
+
+                        <h2>Plugin Lifecycle</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">class LifecyclePlugin(Plugin):
+    name = "lifecycle-plugin"
+    version = "1.0.0"
+
+    def on_load(self):
+        print("Plugin loaded")
+
+    def setup(self, app):
+        print("Plugin setup")
+
+    def on_startup(self):
+        print("Plugin startup")
+
+    def on_shutdown(self):
+        print("Plugin shutdown")
+
+    def on_unload(self):
+        print("Plugin unloaded")</code></pre>
+                        </div>
+
+                        <h2>Plugin Dependencies</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">class CorePlugin(Plugin):
+    name = "core-plugin"
+    version = "1.0.0"
+    provides = ["database", "cache"]
+
+class DatabasePlugin(Plugin):
+    name = "database-plugin"
+    version = "1.0.0"
+    requires = ["core-plugin"]
+    provides = ["postgres"]</code></pre>
+                        </div>
+
+                        <h2>Plugin Discovery</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.plugins import PluginManager
+
+manager = PluginManager(app)
+
+# Load from directory
+await manager.load_plugins_from_path("plugins")
+
+# Load from module
+await manager.load_plugins_from_module("myapp.plugins")
+
+# Load all
+await manager.load_all_plugins()</code></pre>
+                        </div>
+
+                        <h2>Plugin Hooks</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">class HookPlugin(Plugin):
+    name = "hook-plugin"
+    version = "1.0.0"
+
+    def setup(self, app):
+        app.plugin_hooks.register("before_response", self.before_response)
+
+    def before_response(self, response):
+        response.headers["X-Hook"] = "processed"
+        return response</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Plugins can add routes, middleware, CLI commands, health checks, and lifecycle hooks.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!-- docs/guides/mobile-backends.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mobile Backends – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html" class="active">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Mobile Backends</h1>
+                        <p>Flaxon is designed to be an excellent backend for mobile applications with JSON APIs, WebSocket support, and technology neutrality.</p>
+
+                        <h2>Android (Kotlin) Backend</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.validation import Schema, fields
+
+app = Flaxon("android-backend")
+
+class DeviceRegistration(Schema):
+    device_id = fields.String(required=True, min_length=8)
+    platform = fields.Choice(["android", "ios"], required=True)
+    notification_token = fields.String(required=True, min_length=16)
+
+@app.post("/api/v1/devices")
+async def register_device(data: DeviceRegistration):
+    return {"success": True, "device": data.to_dict()}
+
+@app.post("/api/v1/auth/login")
+async def login(request):
+    data = await request.json()
+    user = await auth_service.authenticate(data["email"], data["password"])
+    token = await jwt_backend.create_token(user)
+    return {"access_token": token, "user": user.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Real-Time Features (WebSocket)</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.websocket("/ws/mobile")
+async def mobile_websocket(socket: WebSocket):
+    user = getattr(socket.scope, "user", None)
+    if not user:
+        await socket.close(code=4001)
+        return
+
+    await socket.accept()
+    await socket.join(f"user_{user.id}")
+
+    try:
+        async for message in socket.iter_json():
+            event = message.get("event")
+            if event == "ping":
+                await socket.send_json({"event": "pong"})
+            elif event == "message":
+                await handle_mobile_message(user, message["data"])
+            elif event == "location":
+                await update_user_location(user.id, message["data"])
+    except WebSocketDisconnect:
+        pass</code></pre>
+                        </div>
+
+                        <h2>Push Notifications (FCM)</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">import firebase_admin
+from firebase_admin import messaging
+
+firebase_admin.initialize_app()
+
+@app.post("/api/v1/notifications/send")
+async def send_notification(request):
+    data = await request.json()
+    user_id = data["user_id"]
+    tokens = await device_service.get_tokens(user_id)
+
+    for token in tokens:
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=data["title"],
+                body=data["message"],
+            ),
+            token=token,
+        )
+        await messaging.send_async(message)
+
+    return {"sent": len(tokens)}</code></pre>
+                        </div>
+
+                        <h2>Offline-First Synchronization</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/api/v1/sync")
+async def sync_data(request):
+    data = await request.json()
+    last_sync = data.get("last_sync", 0)
+
+    changes = {
+        "users": await user_service.get_changes_since(last_sync),
+        "posts": await post_service.get_changes_since(last_sync),
+    }
+
+    if data.get("local_changes"):
+        await process_local_changes(data["local_changes"])
+
+    return {"server_time": time.time(), "changes": changes}</code></pre>
+                        </div>
+
+                        <h2>File Uploads</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.files import FileUpload, FileStorage
+
+upload_handler = FileUpload(max_size=50 * 1024 * 1024)
+storage = FileStorage("uploads")
+
+@app.post("/api/v1/upload")
+async def upload_file(request):
+    files = await upload_handler.parse(request)
+    uploaded = []
+
+    for file in files:
+        path = storage.save(file)
+        uploaded.append({
+            "filename": file.filename,
+            "url": storage.get_url(path),
+            "size": file.size,
+        })
+
+    return {"files": uploaded}</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Best Practices</strong>
+                            <ul class="mb-0 mt-1">
+                                <li>Use JWT with short expiration (15-30 minutes)</li>
+                                <li>Implement refresh token rotation</li>
+                                <li>Use pagination for all list endpoints</li>
+                                <li>Support offline-first synchronization</li>
+                                <li>Use chunked uploads for large files</li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

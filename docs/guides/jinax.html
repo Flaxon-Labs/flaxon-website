@@ -1,0 +1,203 @@
+<!-- docs/guides/jinax.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Jinax Templates – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html" class="active">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Jinax Templates</h1>
+                        <p>Jinax is Flaxon's optional Jinja2 template integration with autoescaping, inheritance, filters, and async support.</p>
+
+                        <h2>Installation</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">pip install flaxon[templates]</code></pre>
+                        </div>
+
+                        <h2>Setup</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.jinax import Jinax
+
+app = Flaxon("website")
+app.use_templates(Jinax("templates", auto_reload=True))</code></pre>
+                        </div>
+
+                        <h2>Basic Template</h2>
+                        <p><strong>templates/home.html</strong></p>
+                        <div class="code-block">
+                            <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;{{ title }}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Welcome, {{ name }}!&lt;/h1&gt;
+    &lt;ul&gt;
+    {% for item in items %}
+        &lt;li&gt;{{ item }}&lt;/li&gt;
+    {% endfor %}
+    &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+
+                        <p><strong>Route</strong></p>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/")
+async def home(request):
+    return await request.render("home.html", {
+        "title": "Home",
+        "name": "World",
+        "items": ["Routing", "Validation", "Templates"],
+    })</code></pre>
+                        </div>
+
+                        <h2>Template Inheritance</h2>
+                        <p><strong>templates/base.html</strong></p>
+                        <div class="code-block">
+                            <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;{% block title %}Flaxon{% endblock %}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;{% block header %}Default Header{% endblock %}&lt;/header&gt;
+    &lt;main&gt;{% block content %}{% endblock %}&lt;/main&gt;
+    &lt;footer&gt;{% block footer %}Default Footer{% endblock %}&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+
+                        <p><strong>templates/page.html</strong></p>
+                        <div class="code-block">
+                            <pre><code class="language-html">{% extends "base.html" %}
+
+{% block title %}My Page{% endblock %}
+
+{% block header %}Welcome to My Page{% endblock %}
+
+{% block content %}
+    &lt;h1&gt;{{ heading }}&lt;/h1&gt;
+    &lt;p&gt;{{ description }}&lt;/p&gt;
+{% endblock %}</code></pre>
+                        </div>
+
+                        <h2>Filters</h2>
+                        <div class="code-block">
+                            <pre><code class="language-html">{{ value|capitalize }}
+{{ value|lower }}
+{{ value|upper }}
+{{ value|title }}
+{{ value|trim }}
+{{ value|escape }}
+{{ value|safe }}
+{{ value|json }}
+{{ value|length }}
+{{ value|reverse }}
+{{ value|join(", ") }}
+{{ value|replace(old, new) }}
+{{ value|date("%Y-%m-%d") }}
+{{ value|datetime("%Y-%m-%d %H:%M:%S") }}
+{{ value|currency("USD") }}
+{{ value|truncate(100, "...") }}
+{{ value|default("N/A") }}</code></pre>
+                        </div>
+
+                        <h2>Custom Filters</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">jinax = Jinax("templates")
+
+def currency_filter(value, symbol="$"):
+    return f"{symbol}{value:.2f}"
+
+jinax.add_filter("currency", currency_filter)
+
+@app.get("/")
+async def home(request):
+    return await request.render("product.html", {
+        "price": 99.99,
+    })</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Jinax templates are lazily loaded. If you don't use them, Jinja2 is never imported.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

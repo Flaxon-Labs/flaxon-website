@@ -1,0 +1,263 @@
+<!-- docs/core-concepts/validation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Validation – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html" class="active">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/databases.html">Databases</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Validation</h1>
+                        <p>Flaxon provides declarative validation schemas that automatically validate request data.</p>
+
+                        <h2>Basic Schema</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+
+class CreateUser(Schema):
+    name = fields.String(required=True, min_length=2, max_length=80)
+    email = fields.Email(required=True)
+    age = fields.Integer(required=False, minimum=13, maximum=120)</code></pre>
+                        </div>
+
+                        <h2>Using Schemas in Routes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/users")
+async def create_user(data: CreateUser):
+    # data is automatically validated
+    # Invalid data returns 422
+    return {"success": True, "user": data.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Field Types</h2>
+
+                        <h3>String</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class UserSchema(Schema):
+    name = fields.String(
+        required=True,
+        min_length=2,
+        max_length=80,
+        strip=True,
+        pattern=r"^[a-zA-Z\s]+$",
+    )</code></pre>
+                        </div>
+
+                        <h3>Integer</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class ProductSchema(Schema):
+    price = fields.Integer(
+        required=True,
+        minimum=0,
+        maximum=999999,
+    )</code></pre>
+                        </div>
+
+                        <h3>Float</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class PriceSchema(Schema):
+    amount = fields.Float(
+        required=True,
+        minimum=0.0,
+        maximum=9999.99,
+    )</code></pre>
+                        </div>
+
+                        <h3>Boolean</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class SettingsSchema(Schema):
+    active = fields.Boolean(required=True)
+    notifications = fields.Boolean(default=True)</code></pre>
+                        </div>
+
+                        <h3>Choice</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class StatusSchema(Schema):
+    status = fields.Choice(
+        ["pending", "active", "suspended", "deleted"],
+        required=True,
+    )</code></pre>
+                        </div>
+
+                        <h3>Email</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class ContactSchema(Schema):
+    email = fields.Email(required=True)</code></pre>
+                        </div>
+
+                        <h3>Date</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class EventSchema(Schema):
+    date = fields.Date(required=True, format="%Y-%m-%d")</code></pre>
+                        </div>
+
+                        <h3>DateTime</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class ScheduleSchema(Schema):
+    datetime = fields.DateTime(required=True, format="%Y-%m-%dT%H:%M:%S")</code></pre>
+                        </div>
+
+                        <h3>UUID</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class TokenSchema(Schema):
+    token = fields.UUID(required=True)</code></pre>
+                        </div>
+
+                        <h3>List</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class BulkCreateSchema(Schema):
+    users = fields.List(
+        item_field=fields.String(min_length=2),
+        min_items=1,
+        max_items=100,
+    )</code></pre>
+                        </div>
+
+                        <h3>Nested</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class AddressSchema(Schema):
+    street = fields.String(required=True)
+    city = fields.String(required=True)
+    zipcode = fields.String(required=True, pattern=r"^\d{5}$")
+
+class UserSchema(Schema):
+    name = fields.String(required=True)
+    address = fields.Nested(AddressSchema)</code></pre>
+                        </div>
+
+                        <h2>Validation Errors</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/users")
+async def create_user(data: CreateUser):
+    # If validation fails, Flaxon automatically returns:
+    # {
+    #   "success": false,
+    #   "error": {
+    #     "code": "FX-VAL-001",
+    #     "message": "Request validation failed.",
+    #     "fields": {
+    #       "email": ["Enter a valid email address."],
+    #       "age": ["Must be at least 13."]
+    #     }
+    #   }
+    # }
+    return {"user": data.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Custom Validators</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation.validators import custom_validator
+
+def validate_unique_email(value, field):
+    if email_exists(value):
+        raise ValueError("Email already registered")
+
+class CreateUser(Schema):
+    email = fields.Email(
+        required=True,
+        validators=[custom_validator(validate_unique_email)],
+    )</code></pre>
+                        </div>
+
+                        <h2>Combining Validators</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation.validators import and_validators, or_validators, email_validator, pattern_validator, length_validator
+
+class UserSchema(Schema):
+    # Must meet all conditions
+    username = fields.String(
+        validators=[and_validators(
+            length_validator(3, 20),
+            pattern_validator(r"^[a-zA-Z0-9_]+$"),
+        )],
+    )
+
+    # Must meet at least one condition
+    contact = fields.String(
+        validators=[or_validators(
+            email_validator(),
+            pattern_validator(r"^\+\d{10,15}$"),
+        )],
+    )</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Schemas also have a <code>.validate()</code> method for manual validation and <code>.to_json()</code> for serialization.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

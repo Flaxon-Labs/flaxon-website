@@ -1,0 +1,205 @@
+<!-- blog/why-flaxon.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Why Flaxon? – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <!-- Back -->
+                <a href="/blog.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center gap-2 mb-6">
+                    <i class="fas fa-arrow-left"></i> Back to Blog
+                </a>
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full font-semibold">Philosophy</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-3">Why Flaxon? The Philosophy Behind the Framework</h1>
+                    <div class="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        <span><i class="far fa-calendar mr-1"></i> May 2026</span>
+                        <span><i class="far fa-user mr-1"></i> Aldane Hutchinson</span>
+                        <span><i class="far fa-clock mr-1"></i> 7 min read</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="doc-content bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800">
+
+                    <p class="text-lg font-medium text-slate-700 dark:text-slate-300">Every framework starts with a "why." For Flaxon, the answer is rooted in a simple observation: Python developers shouldn't have to choose between simplicity and power.</p>
+
+                    <p>After years of building web applications with Flask, Django, FastAPI, and Node.js, I noticed a recurring pattern. Developers would start with a simple framework, only to find themselves fighting against its limitations as their application grew. Or they would choose a batteries-included framework, only to feel constrained by its opinions on how things should be done.</p>
+
+                    <p>Flaxon is my attempt to solve this problem. Here's the philosophy that guides its development.</p>
+
+                    <h2>The Core Problem</h2>
+                    <p>Python web development faces three practical choices:</p>
+
+                    <ul>
+                        <li><strong>Start with a minimal framework</strong> (like Flask) and assemble architecture manually. It's easy to start, but large applications require significant manual structure.</li>
+                        <li><strong>Adopt a batteries-included framework</strong> (like Django) with strong conventions. It provides structure, but controls many technical decisions.</li>
+                        <li><strong>Switch to a different runtime</strong> (like Node.js) when concurrency and real-time communication become central.</li>
+                    </ul>
+
+                    <p>None of these options are wrong. But they all involve a trade-off that I believe developers shouldn't have to make.</p>
+
+                    <h2>Flaxon's Answer: The Fourth Option</h2>
+                    <p>Flaxon explores a fourth option: <strong>retain Python while combining a small entry experience with optional production structure and async-first networking.</strong></p>
+
+                    <p>This is guided by five core principles.</p>
+
+                    <h3>1. Simple Applications Remain Simple</h3>
+                    <p>Small applications should start in one file without generators or mandatory architecture. Flaxon provides a minimal entry point that lets you get started quickly.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("my-app")
+
+@app.get("/")
+async def home():
+    return {"message": "Hello"}</code></pre>
+                    </div>
+
+                    <p>No configuration files. No folder structure. No mandatory ORM or database setup. Just code.</p>
+
+                    <h3>2. Large Applications Gain Structure</h3>
+                    <p>As your application grows, Flaxon provides optional structure without requiring a complete rewrite. You can introduce routers, services, middleware, and plugins incrementally.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python">from flaxon import Router
+
+api = Router(prefix="/api/v1")
+
+@api.get("/users")
+async def list_users():
+    return [{"id": 1, "name": "Alice"}]
+
+app.include_router(api)</code></pre>
+                    </div>
+
+                    <p>The structure grows with your application, not before it.</p>
+
+                    <h3>3. HTML Rendering is Optional</h3>
+                    <p>Flaxon treats JSON APIs as a first-class default. HTML rendering through Jinax is optional and lazily loaded. If you're building an API, you don't pay the cost of template rendering.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python"># API-only - no template dependencies
+@app.get("/api/users")
+async def get_users():
+    return [{"id": 1, "name": "Alice"}]
+
+# With templates (optional)
+from flaxon.jinax import Jinax
+app.use_templates(Jinax("templates"))</code></pre>
+                    </div>
+
+                    <h3>4. Technology Neutrality</h3>
+                    <p>Flaxon does not care about your frontend, database, ORM, or client technology. Use React, Vue, Angular, Kotlin, Java, Flutter, or plain API clients. Use PostgreSQL, MongoDB, Redis, or custom storage.</p>
+
+                    <div class="note">
+                        <strong><i class="fas fa-lightbulb mr-2"></i> Key Insight</strong>
+                        <p class="mb-0 mt-1">The framework owns transport and developer ergonomics. It does not own the product's user-interface language.</p>
+                    </div>
+
+                    <h3>5. Explicit and Debuggable</h3>
+                    <p>Framework APIs should be explicit enough to debug and profile without hidden magic. Flaxon's debugger explains failures in plain language with request context.</p>
+
+                    <div class="code-block">
+                        <pre><code class="language-python"># Clear, explicit error messages
+from flaxon import HTTPException
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    if user_id == 0:
+        raise HTTPException(400, "Invalid user ID", code="FX-INVALID-ID")
+    if user_id == 404:
+        raise HTTPException(404, "User not found", code="FX-USER-404")
+    return {"id": user_id, "name": f"User {user_id}"}</code></pre>
+                    </div>
+
+                    <h2>Why ASGI?</h2>
+                    <p>ASGI (Asynchronous Server Gateway Interface) is the modern standard for Python web servers. It supports HTTP, WebSocket, and lifespan events in a single interface, making it ideal for async-first applications.</p>
+
+                    <p>By building on ASGI, Flaxon gains:</p>
+                    <ul>
+                        <li><strong>High concurrency</strong> — Handle thousands of simultaneous connections efficiently</li>
+                        <li><strong>WebSocket support</strong> — Built-in, not an afterthought</li>
+                        <li><strong>Lifespan events</strong> — Clean startup and shutdown handling</li>
+                        <li><strong>Future-proof</strong> — ASGI is the future of Python web servers</li>
+                    </ul>
+
+                    <h2>What Flaxon Is Not</h2>
+                    <ul>
+                        <li><strong>Not a full-stack framework</strong> — Flaxon handles the backend only</li>
+                        <li><strong>Not a replacement for Node.js</strong> — Flaxon is for Python teams</li>
+                        <li><strong>Not faster than Go or Rust</strong> — Flaxon optimizes for developer productivity</li>
+                        <li><strong>Not a compiled language</strong> — Flaxon is Python, with all the benefits and tradeoffs</li>
+                    </ul>
+
+                    <h2>When to Use Flaxon</h2>
+                    <ul>
+                        <li>Building APIs for React, Vue, or Angular applications</li>
+                        <li>Developing mobile backends for Android or iOS</li>
+                        <li>Creating real-time applications with WebSockets</li>
+                        <li>Building microservices with Python</li>
+                        <li>When you want technology freedom</li>
+                        <li>When you want clear debugging and error messages</li>
+                        <li>When you want to start simple and scale up</li>
+                    </ul>
+
+                    <h2>The Bigger Picture</h2>
+                    <p>Flaxon represents a belief that Python developers deserve a framework that grows with them. A framework that doesn't force them to choose between simplicity and power, between structure and freedom, between ease of use and high performance.</p>
+
+                    <p>It's a framework for the modern web — where backends serve many clients, where real-time communication is expected, and where developers should be able to focus on building great applications, not fighting their tools.</p>
+
+                    <div class="note success">
+                        <strong><i class="fas fa-quote-left mr-2"></i> Simple Python. Serious Applications.</strong>
+                        <p class="mb-0 mt-1">That's Flaxon. And we're just getting started.</p>
+                    </div>
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">— Aldane Hutchinson, Creator & Maintainer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

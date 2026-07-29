@@ -1,0 +1,190 @@
+<!-- examples/ecommerce.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>E-Commerce with Offline Mode – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/examples.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-8">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-3 mb-6">
+                <a href="/examples.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <i class="fas fa-arrow-left"></i> Back to Examples
+                </a>
+                <span class="text-slate-300 dark:text-slate-600">|</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">E-Commerce with Offline Mode</h1>
+                <span class="ml-auto text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-3 py-1 rounded-full">REST API + Cache</span>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 mb-6">
+                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                    <i class="fas fa-info-circle text-flaxon-blue mr-2"></i>
+                    A full e-commerce experience with offline support powered by Flaxon REST APIs and client-side caching.
+                </p>
+            </div>
+
+            <!-- Demo Layout -->
+            <div class="ecommerce-container">
+                <!-- Products -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Products</h2>
+                        <span id="sync-status" class="text-sm text-emerald-500"><i class="fas fa-check-circle mr-1"></i> Synced</span>
+                    </div>
+                    <div id="product-grid" class="grid grid-cols-2 gap-3">
+                        <!-- Products rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Cart -->
+                <div class="ecommerce-cart">
+                    <h3><i class="fas fa-shopping-cart mr-2"></i> Cart</h3>
+                    <div id="cart-items">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Your cart is empty.</p>
+                    </div>
+                    <div class="ecommerce-cart-total">
+                        <span>Total</span>
+                        <span id="cart-total">$0.00</span>
+                    </div>
+                    <button id="checkout-btn" class="w-full mt-3 gradient-btn text-white font-medium py-2 rounded-xl text-sm transition hover:shadow-lg">
+                        <i class="fas fa-credit-card mr-2"></i> Checkout
+                    </button>
+                    <button id="clear-cart-btn" class="w-full mt-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-medium py-2 rounded-xl text-sm transition">
+                        <i class="fas fa-trash mr-2"></i> Clear Cart
+                    </button>
+                </div>
+            </div>
+
+            <!-- Backend Code Showcase -->
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fab fa-python text-flaxon-blue mr-2"></i> Flaxon REST API
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.validation import Schema, fields
+
+app = Flaxon("ecommerce-backend")
+
+products = [
+    {"id": 1, "name": "Laptop", "price": 999.99, "stock": 10},
+    {"id": 2, "name": "Mouse", "price": 29.99, "stock": 25},
+]
+
+class CartItem(Schema):
+    product_id = fields.Integer(required=True)
+    quantity = fields.Integer(required=True, minimum=1)
+
+@app.get("/api/products")
+async def get_products():
+    return {"products": products}
+
+@app.post("/api/cart")
+async def add_to_cart(data: CartItem):
+    product = next((p for p in products if p["id"] == data.product_id), None)
+    if not product:
+        return {"error": "Product not found"}, 404
+    if product["stock"] < data.quantity:
+        return {"error": "Insufficient stock"}, 400
+    return {"success": True, "item": data.to_dict()}
+
+@app.post("/api/checkout")
+async def checkout(request):
+    data = await request.json()
+    # Process order
+    return {"order_id": "ORD-123", "total": data.get("total", 0)}</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fas fa-database text-flaxon-blue mr-2"></i> Offline Sync Strategy
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-javascript">// Client-side offline storage
+const CART_KEY = 'flaxon_cart';
+
+function saveCartToLocal(cart) {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+function loadCartFromLocal() {
+    const data = localStorage.getItem(CART_KEY);
+    return data ? JSON.parse(data) : [];
+}
+
+// Sync when online
+async function syncCart() {
+    const cart = loadCartFromLocal();
+    if (cart.length === 0) return;
+
+    for (const item of cart) {
+        try {
+            const res = await fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item)
+            });
+            if (res.ok) {
+                // Remove synced items
+                const updated = cart.filter(i => i.id !== item.id);
+                saveCartToLocal(updated);
+            }
+        } catch (e) {
+            // Offline - keep in local storage
+            console.log('Offline, waiting for sync');
+        }
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+    <script src="/assets/js/examples/ecommerce.js"></script>
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>
