@@ -1,0 +1,298 @@
+{
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "url": "/",
+      "content": "Flaxon Simple Python Serious Applications technology-neutral async-first Python backend framework Flask-like ease production-grade power",
+      "section": "Home"
+    },
+    {
+      "id": "docs",
+      "title": "Documentation",
+      "url": "/docs.html",
+      "content": "Documentation Flaxon installation quick start philosophy architecture routing requests responses middleware validation",
+      "section": "Documentation"
+    },
+    {
+      "id": "installation",
+      "title": "Installation",
+      "url": "/installation.html",
+      "content": "Installation pip install flaxon optional dependencies standard server templates dev docs verify installation",
+      "section": "Getting Started"
+    },
+    {
+      "id": "quickstart",
+      "title": "Quick Start",
+      "url": "/docs/getting-started/quickstart.html",
+      "content": "Quick Start build your first Flaxon application create app py run flaxon run app app reload",
+      "section": "Getting Started"
+    },
+    {
+      "id": "philosophy",
+      "title": "Philosophy",
+      "url": "/docs/getting-started/philosophy.html",
+      "content": "Philosophy Flaxon design principles simple applications remain simple large applications gain structure HTML rendering optional technology neutral explicit debuggable",
+      "section": "Getting Started"
+    },
+    {
+      "id": "architecture",
+      "title": "Architecture",
+      "url": "/docs/getting-started/architecture.html",
+      "content": "Architecture ASGI application layered architecture request lifecycle components router request response middleware validation WebSocket Jinax",
+      "section": "Getting Started"
+    },
+    {
+      "id": "routing",
+      "title": "Routing",
+      "url": "/docs/core-concepts/routing.html",
+      "content": "Routing define routes using decorators Flask-style parameters path parameters route groups routers nested routers named routes URL generation",
+      "section": "Core Concepts"
+    },
+    {
+      "id": "requests",
+      "title": "Requests",
+      "url": "/docs/core-concepts/requests.html",
+      "content": "Requests access request data headers cookies query parameters body JSON text form validation schemas",
+      "section": "Core Concepts"
+    },
+    {
+      "id": "responses",
+      "title": "Responses",
+      "url": "/docs/core-concepts/responses.html",
+      "content": "Responses JSON HTML text redirect streaming status codes custom headers custom response classes automatic conversion",
+      "section": "Core Concepts"
+    },
+    {
+      "id": "middleware",
+      "title": "Middleware",
+      "url": "/docs/core-concepts/middleware.html",
+      "content": "Middleware CORS request ID security headers rate limiting compression body limit timeout trusted hosts logging recovery custom middleware",
+      "section": "Core Concepts"
+    },
+    {
+      "id": "validation",
+      "title": "Validation",
+      "url": "/docs/core-concepts/validation.html",
+      "content": "Validation declarative schemas fields String Integer Float Boolean Choice Email Date DateTime UUID List Nested custom validators",
+      "section": "Core Concepts"
+    },
+    {
+      "id": "databases",
+      "title": "Databases",
+      "url": "/docs/guides/databases.html",
+      "content": "Databases SQLAlchemy asyncpg PostgreSQL SQLite aiosqlite MongoDB Motor Redis database agnostic transactions health checks",
+      "section": "Guides"
+    },
+    {
+      "id": "authentication",
+      "title": "Authentication",
+      "url": "/docs/guides/authentication.html",
+      "content": "Authentication JWT sessions OAuth2 API keys password hashing login required JWTBackend SessionBackend User",
+      "section": "Guides"
+    },
+    {
+      "id": "authorization",
+      "title": "Authorization",
+      "url": "/docs/guides/authorization.html",
+      "content": "Authorization roles permissions permission_required role_required authorize AuthorizationChecker resource-level authorization",
+      "section": "Guides"
+    },
+    {
+      "id": "websockets",
+      "title": "WebSockets",
+      "url": "/docs/guides/websockets.html",
+      "content": "WebSockets real-time communication room broadcasting WebSocket events heartbeat authentication multiple rooms WebSocketManager",
+      "section": "Guides"
+    },
+    {
+      "id": "tasks",
+      "title": "Tasks",
+      "url": "/docs/guides/tasks.html",
+      "content": "Tasks background job processing task queue worker scheduler retry policies timeouts priorities TaskQueue Worker Scheduler",
+      "section": "Guides"
+    },
+    {
+      "id": "jinax",
+      "title": "Jinax Templates",
+      "url": "/docs/guides/jinax.html",
+      "content": "Jinax templates Jinja2 integration template inheritance filters functions macros async rendering hot reload caching",
+      "section": "Guides"
+    },
+    {
+      "id": "testing",
+      "title": "Testing",
+      "url": "/docs/guides/testing.html",
+      "content": "Testing TestClient AsyncTestClient WebSocketClient assertions fixtures factories mocks database test mixin",
+      "section": "Guides"
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging",
+      "url": "/docs/guides/debugging.html",
+      "content": "Debugging debug mode development errors production errors error codes redaction request snapshots suggestions error store dashboard",
+      "section": "Guides"
+    },
+    {
+      "id": "plugins",
+      "title": "Plugins",
+      "url": "/docs/guides/plugins.html",
+      "content": "Plugins extend Flaxon modular components plugin discovery plugin hooks lifecycle dependencies SimplePlugin PluginManager",
+      "section": "Guides"
+    },
+    {
+      "id": "mobile-backends",
+      "title": "Mobile Backends",
+      "url": "/docs/guides/mobile-backends.html",
+      "content": "Mobile backends Android iOS Flutter React Native push notifications FCM offline-first synchronization file uploads JWT authentication",
+      "section": "Guides"
+    },
+    {
+      "id": "api-application",
+      "title": "Application API",
+      "url": "/docs/api/application.html",
+      "content": "Application API Flaxon class Config State routing methods middleware lifecycle server run properties",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-routing",
+      "title": "Routing API",
+      "url": "/docs/api/routing.html",
+      "content": "Routing API Router Route WebSocketRoute match url_for add_route add_websocket include_router",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-http",
+      "title": "HTTP API",
+      "url": "/docs/api/http.html",
+      "content": "HTTP API Request Response JSONResponse HTMLResponse TextResponse RedirectResponse StreamingResponse Headers Cookies QueryParams",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-websocket",
+      "title": "WebSocket API",
+      "url": "/docs/api/websocket.html",
+      "content": "WebSocket API WebSocket WebSocketManager WebSocketDisconnect accept receive send join leave broadcast iter_json",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-validation",
+      "title": "Validation API",
+      "url": "/docs/api/validation.html",
+      "content": "Validation API Schema fields validators ValidationError FieldError StrField IntField FloatField BoolField ChoiceField EmailField",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-security",
+      "title": "Security API",
+      "url": "/docs/api/security.html",
+      "content": "Security API JWTBackend SessionBackend User login_required permission_required role_required CSRF RateLimiter password hashing",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-jinax",
+      "title": "Jinax API",
+      "url": "/docs/api/jinax.html",
+      "content": "Jinax API Jinax Environment Loader filters functions TemplateNotFound currency capitalize lower upper title trim escape safe json",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-tasks",
+      "title": "Tasks API",
+      "url": "/docs/api/tasks.html",
+      "content": "Tasks API Task TaskStatus TaskQueue Worker Scheduler RetryPolicy TaskResult retry policies",
+      "section": "API Reference"
+    },
+    {
+      "id": "api-testing",
+      "title": "Testing API",
+      "url": "/docs/api/testing.html",
+      "content": "Testing API TestClient AsyncTestClient WebSocketClient TestResponse Assertions assert_status assert_json assert_success assert_error",
+      "section": "API Reference"
+    },
+    {
+      "id": "examples-basic-api",
+      "title": "Basic API Example",
+      "url": "/docs/examples/basic-api.html",
+      "content": "Basic API example RESTful CRUD operations validation error handling users endpoints GET POST PUT DELETE",
+      "section": "Examples"
+    },
+    {
+      "id": "examples-react-backend",
+      "title": "React Backend Example",
+      "url": "/docs/examples/react-backend.html",
+      "content": "React backend example CORS product API categories stats CRUD operations React integration",
+      "section": "Examples"
+    },
+    {
+      "id": "examples-android-backend",
+      "title": "Android Backend Example",
+      "url": "/docs/examples/android-backend.html",
+      "content": "Android backend example JWT authentication device registration profile management mobile-optimized API",
+      "section": "Examples"
+    },
+    {
+      "id": "examples-websocket-chat",
+      "title": "WebSocket Chat Example",
+      "url": "/docs/examples/websocket-chat.html",
+      "content": "WebSocket chat example real-time chat rooms user presence message history typing indicators",
+      "section": "Examples"
+    },
+    {
+      "id": "examples-jinax-website",
+      "title": "Jinax Website Example",
+      "url": "/docs/examples/jinax-website.html",
+      "content": "Jinax website example server-rendered HTML templates custom filters global functions template inheritance",
+      "section": "Examples"
+    },
+    {
+      "id": "examples-large-application",
+      "title": "Large Application Example",
+      "url": "/docs/examples/large-application.html",
+      "content": "Large application example routers services repositories schemas middleware dependency injection configuration",
+      "section": "Examples"
+    },
+    {
+      "id": "faq",
+      "title": "Frequently Asked Questions",
+      "url": "/faq.html",
+      "content": "FAQ frequently asked questions Flaxon Flask Django FastAPI differences production ready databases license contribute",
+      "section": "FAQ"
+    },
+    {
+      "id": "community",
+      "title": "Community",
+      "url": "/community.html",
+      "content": "Community GitHub issues discussions contributing code of conduct sponsor core team",
+      "section": "Community"
+    },
+    {
+      "id": "blog-release-0-1-0",
+      "title": "Release v0.1.0",
+      "url": "/blog/release-0.1.0.html",
+      "content": "Flaxon v0.1.0 alpha release announcement features installation hello world community contribution",
+      "section": "Blog"
+    },
+    {
+      "id": "blog-release-0-2-0",
+      "title": "Release v0.2.0",
+      "url": "/blog/release-0.2.0.html",
+      "content": "Flaxon v0.2.0 protocol hardening release ASGI conformance multipart uploads middleware improvements",
+      "section": "Blog"
+    },
+    {
+      "id": "blog-roadmap",
+      "title": "Roadmap 2026-2027",
+      "url": "/blog/roadmap-2024.html",
+      "content": "Flaxon roadmap 2026 2027 version 0.1.0 0.2.0 0.3.0 0.4.0 0.5.0 0.9.0 1.0.0 stable release",
+      "section": "Blog"
+    },
+    {
+      "id": "blog-why-flaxon",
+      "title": "Why Flaxon?",
+      "url": "/blog/why-flaxon.html",
+      "content": "Why Flaxon philosophy behind the framework core principles simplicity structure technology neutrality ASGI",
+      "section": "Blog"
+    }
+  ]
+}
