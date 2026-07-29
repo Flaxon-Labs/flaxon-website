@@ -86,54 +86,367 @@
 </div>
 
 
+
+<!-- Search Modal Container -->
 <div id="search-modal-container"></div>
-<script>
-    fetch('/components/search-modal.html')
-        .then(r => r.text())
-        .then(html => document.getElementById('search-modal-container').innerHTML = html);
-</script>
-
 
 <!-- ============================================================ -->
-<!-- BREADCRUMB LOGIC                                             -->
+<!-- SEARCH MODAL + BREADCRUMB LOGIC                               -->
 <!-- ============================================================ -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const breadcrumbContainer = document.getElementById('breadcrumb-container');
-        const breadcrumbCurrent = document.getElementById('breadcrumb-current');
-        const currentPath = window.location.pathname;
+    (function() {
+        'use strict';
 
-        // Check if we're on a docs page
-        const isDocsPage = currentPath === '/docs.html' || 
-                          currentPath.startsWith('/docs/') ||
-                          currentPath.startsWith('/docs/getting-started/') ||
-                          currentPath.startsWith('/docs/core-concepts/') ||
-                          currentPath.startsWith('/docs/guides/') ||
-                          currentPath.startsWith('/docs/api/') ||
-                          currentPath.startsWith('/docs/examples/');
+        // ============================================================
+        // LOAD SEARCH MODAL
+        // ============================================================
+        function loadSearchModal() {
+            fetch('/components/search-modal.html')
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Failed to load search modal');
+                    return response.text();
+                })
+                .then(function(html) {
+                    document.getElementById('search-modal-container').innerHTML = html;
+                    initSearch();
+                })
+                .catch(function(err) {
+                    console.error('Search modal error:', err);
+                });
+        }
 
-        if (isDocsPage && breadcrumbContainer) {
-            breadcrumbContainer.classList.remove('hidden');
-            
-            // Update breadcrumb text based on current page
-            if (currentPath === '/docs.html' || currentPath === '/docs/') {
-                breadcrumbCurrent.textContent = 'Documentation';
-            } else if (currentPath.includes('/getting-started/')) {
-                breadcrumbCurrent.textContent = 'Getting Started';
-            } else if (currentPath.includes('/core-concepts/')) {
-                breadcrumbCurrent.textContent = 'Core Concepts';
-            } else if (currentPath.includes('/guides/')) {
-                breadcrumbCurrent.textContent = 'Guides';
-            } else if (currentPath.includes('/api/')) {
-                breadcrumbCurrent.textContent = 'API Reference';
-            } else if (currentPath.includes('/examples/')) {
-                breadcrumbCurrent.textContent = 'Examples';
-            } else {
-                // Extract page name from URL
-                const fileName = currentPath.split('/').pop() || 'Documentation';
-                const pageName = fileName.replace('.html', '').replace(/-/g, ' ');
-                breadcrumbCurrent.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+        // ============================================================
+        // INITIALIZE SEARCH
+        // ============================================================
+        function initSearch() {
+            const searchModal = document.getElementById('search-modal');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results-container');
+            const searchTrigger = document.getElementById('search-trigger');
+            const searchClose = document.getElementById('search-close');
+
+            if (!searchModal || !searchInput || !searchResults) {
+                console.warn('Search elements not found');
+                return;
+            }
+
+            // ============================================================
+            // OPEN SEARCH
+            // ============================================================
+            function openSearch() {
+                searchModal.classList.remove('hidden');
+                searchModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                setTimeout(function() {
+                    searchInput.focus();
+                }, 100);
+                // Build search index when opened
+                if (typeof buildSearchIndex === 'function') {
+                    buildSearchIndex();
+                }
+            }
+
+            // ============================================================
+            // CLOSE SEARCH
+            // ============================================================
+            function closeSearch() {
+                searchModal.classList.add('hidden');
+                searchModal.classList.remove('flex');
+                document.body.style.overflow = '';
+                searchInput.value = '';
+                searchResults.innerHTML = '';
+                clearHighlights();
+            }
+
+            // ============================================================
+            // CLEAR HIGHLIGHTS
+            // ============================================================
+            function clearHighlights() {
+                document.querySelectorAll('.search-highlight').forEach(function(el) {
+                    var parent = el.parentNode;
+                    parent.replaceChild(document.createTextNode(el.textContent), el);
+                    parent.normalize();
+                });
+            }
+
+            // ============================================================
+            // BUILD SEARCH INDEX
+            // ============================================================
+            function buildSearchIndex() {
+                var index = [];
+                var contentElements = document.querySelectorAll(
+                    '.doc-content h1, .doc-content h2, .doc-content h3, .doc-content p, .doc-content li, .doc-content .code-block'
+                );
+
+                contentElements.forEach(function(el) {
+                    var text = el.textContent.trim();
+                    if (text && text.length > 3) {
+                        var section = 'General';
+                        var parent = el.parentElement;
+                        while (parent) {
+                            var heading = parent.querySelector('h1, h2, h3');
+                            if (heading) {
+                                section = heading.textContent.trim();
+                                break;
+                            }
+                            parent = parent.parentElement;
+                        }
+                        var id = el.id || '';
+                        index.push({
+                            text: text,
+                            section: section,
+                            id: id,
+                            type: el.tagName.toLowerCase()
+                        });
+                    }
+                });
+
+                window._searchIndex = index;
+                return index;
+            }
+
+            // ============================================================
+            // SEARCH FUNCTION
+            // ============================================================
+            function search(query) {
+                var index = window._searchIndex || buildSearchIndex();
+                var terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+
+                if (terms.length === 0) return [];
+
+                var results = index.filter(function(item) {
+                    var text = item.text.toLowerCase();
+                    return terms.every(function(term) {
+                        return text.includes(term);
+                    });
+                });
+
+                return results.map(function(item) {
+                    var score = 0;
+                    var text = item.text.toLowerCase();
+                    terms.forEach(function(term) {
+                        var count = (text.match(new RegExp(term, 'g')) || []).length;
+                        score += count;
+                        if (item.type === 'h1' || item.type === 'h2' || item.type === 'h3') {
+                            score += 2;
+                        }
+                    });
+                    return { ...item, score: score };
+                }).sort(function(a, b) {
+                    return b.score - a.score;
+                });
+            }
+
+            // ============================================================
+            // SEARCH INPUT HANDLER
+            // ============================================================
+            searchInput.addEventListener('input', function() {
+                var query = this.value.trim();
+                searchResults.innerHTML = '';
+
+                if (query.length < 2) {
+                    var hint = document.createElement('div');
+                    hint.className = 'search-hint';
+                    hint.style.cssText = 'padding: 2rem; text-align: center; color: #94a3b8;';
+                    hint.textContent = 'Type at least 2 characters to search...';
+                    searchResults.appendChild(hint);
+                    return;
+                }
+
+                var results = search(query);
+
+                if (results.length === 0) {
+                    var empty = document.createElement('div');
+                    empty.style.cssText = 'padding: 2rem; text-align: center; color: #94a3b8;';
+                    empty.textContent = 'No results found. Try different keywords.';
+                    searchResults.appendChild(empty);
+                    return;
+                }
+
+                // Group by section
+                var grouped = {};
+                results.forEach(function(item) {
+                    if (!grouped[item.section]) grouped[item.section] = [];
+                    grouped[item.section].push(item);
+                });
+
+                Object.keys(grouped).forEach(function(section) {
+                    var sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'search-section';
+                    sectionDiv.style.cssText = 'margin-bottom: 1rem;';
+
+                    var title = document.createElement('div');
+                    title.style.cssText = 'font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.05em; padding: 0.5rem 0.75rem;';
+                    title.textContent = section;
+                    sectionDiv.appendChild(title);
+
+                    grouped[section].slice(0, 5).forEach(function(item) {
+                        var resultDiv = document.createElement('div');
+                        resultDiv.className = 'search-result';
+                        resultDiv.style.cssText = 'padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 6px; transition: background 0.2s; font-size: 0.9rem;';
+                        resultDiv.addEventListener('mouseenter', function() {
+                            this.style.background = 'rgba(37, 99, 235, 0.06)';
+                        });
+                        resultDiv.addEventListener('mouseleave', function() {
+                            this.style.background = 'transparent';
+                        });
+
+                        var text = item.text;
+                        if (text.length > 100) {
+                            text = text.substring(0, 100) + '...';
+                        }
+
+                        resultDiv.innerHTML = '<div style="color: #0f172a; dark:text-white;">' + text + '</div><div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">' + item.type + '</div>';
+
+                        resultDiv.addEventListener('click', function() {
+                            if (item.id) {
+                                var target = document.getElementById(item.id);
+                                if (target) {
+                                    closeSearch();
+                                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    highlightText(target, query);
+                                }
+                            }
+                        });
+
+                        sectionDiv.appendChild(resultDiv);
+                    });
+
+                    searchResults.appendChild(sectionDiv);
+                });
+            });
+
+            // ============================================================
+            // HIGHLIGHT TEXT
+            // ============================================================
+            function highlightText(element, query) {
+                var terms = query.split(/\s+/).filter(Boolean);
+                var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+                var nodes = [];
+                var node;
+
+                while (node = walker.nextNode()) {
+                    nodes.push(node);
+                }
+
+                nodes.forEach(function(node) {
+                    var text = node.textContent;
+                    var modified = false;
+                    terms.forEach(function(term) {
+                        var regex = new RegExp(term, 'gi');
+                        if (regex.test(text)) {
+                            text = text.replace(regex, function(match) {
+                                modified = true;
+                                return '<mark class="search-highlight">' + match + '</mark>';
+                            });
+                        }
+                    });
+                    if (modified) {
+                        var span = document.createElement('span');
+                        span.innerHTML = text;
+                        node.parentNode.replaceChild(span, node);
+                    }
+                });
+            }
+
+            // ============================================================
+            // EVENT LISTENERS
+            // ============================================================
+
+            // Search trigger button
+            if (searchTrigger) {
+                searchTrigger.addEventListener('click', openSearch);
+            }
+
+            // Close button
+            if (searchClose) {
+                searchClose.addEventListener('click', closeSearch);
+            }
+
+            // Click outside to close
+            searchModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSearch();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // ⌘K or Ctrl+K to open
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    if (searchModal.classList.contains('hidden')) {
+                        openSearch();
+                    } else {
+                        closeSearch();
+                    }
+                }
+                // ESC to close
+                if (e.key === 'Escape') {
+                    if (!searchModal.classList.contains('hidden')) {
+                        closeSearch();
+                    }
+                }
+            });
+
+            // ============================================================
+            // EXPOSE SEARCH FOR DEBUGGING
+            // ============================================================
+            window.flaxonSearch = {
+                search: search,
+                buildIndex: buildSearchIndex,
+                index: function() { return window._searchIndex || []; }
+            };
+
+            console.log('🔍 Flaxon search initialized!');
+        }
+
+        // ============================================================
+        // BREADCRUMB LOGIC
+        // ============================================================
+        function initBreadcrumb() {
+            var breadcrumbContainer = document.getElementById('breadcrumb-container');
+            var breadcrumbCurrent = document.getElementById('breadcrumb-current');
+            var currentPath = window.location.pathname;
+
+            var isDocsPage = currentPath === '/docs.html' ||
+                            currentPath.startsWith('/docs/') ||
+                            currentPath.startsWith('/docs/getting-started/') ||
+                            currentPath.startsWith('/docs/core-concepts/') ||
+                            currentPath.startsWith('/docs/guides/') ||
+                            currentPath.startsWith('/docs/api/') ||
+                            currentPath.startsWith('/docs/examples/');
+
+            if (isDocsPage && breadcrumbContainer) {
+                breadcrumbContainer.classList.remove('hidden');
+
+                if (currentPath === '/docs.html' || currentPath === '/docs/') {
+                    breadcrumbCurrent.textContent = 'Documentation';
+                } else if (currentPath.includes('/getting-started/')) {
+                    breadcrumbCurrent.textContent = 'Getting Started';
+                } else if (currentPath.includes('/core-concepts/')) {
+                    breadcrumbCurrent.textContent = 'Core Concepts';
+                } else if (currentPath.includes('/guides/')) {
+                    breadcrumbCurrent.textContent = 'Guides';
+                } else if (currentPath.includes('/api/')) {
+                    breadcrumbCurrent.textContent = 'API Reference';
+                } else if (currentPath.includes('/examples/')) {
+                    breadcrumbCurrent.textContent = 'Examples';
+                } else {
+                    var fileName = currentPath.split('/').pop() || 'Documentation';
+                    var pageName = fileName.replace('.html', '').replace(/-/g, ' ');
+                    breadcrumbCurrent.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+                }
             }
         }
-    });
+
+        // ============================================================
+        // INIT ON DOM READY
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSearchModal();
+            initBreadcrumb();
+        });
+
+    })();
 </script>
