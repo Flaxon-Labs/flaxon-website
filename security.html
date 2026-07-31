@@ -246,6 +246,7 @@
     </a>
 </div>
 </header>
+    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
 
 <!-- Hero -->
 <section class="max-w-6xl mx-auto mt-16 md:mt-24">
