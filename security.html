@@ -2,30 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flaxon Security</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="google-site-verification" content="l5zab0NHk3lbRe6HAabq8PNIt4BbzaHUr1Sao5YM5yc" />
+    <title>Flaxon – Security</title>
 
-    <!-- Tailwind CSS via CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Three.js via CDN -->
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js (light + dark) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
     </script>
 
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .gradient-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
-            color: #e0e0e0;
-            overflow-x: hidden;
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #0891b2);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-dark {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         /* Three.js canvas */
@@ -44,64 +76,31 @@
             position: relative;
             z-index: 1;
             min-height: 100vh;
-            padding: 2rem 1.5rem;
-            background: rgba(10, 10, 15, 0.7);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(4px);
-        }
-
-        .glass-card {
-            background: rgba(20, 20, 35, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            border-color: rgba(0, 200, 255, 0.2);
-            box-shadow: 0 8px 40px rgba(0, 200, 255, 0.05);
-            transform: translateY(-4px);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #00c8ff, #7b61ff, #00c8ff);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shimmer 4s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
+            -webkit-backdrop-filter: blur(4px);
         }
 
         .security-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.4rem 1rem;
+            padding: 0.3rem 1rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            border: 1px solid rgba(0, 200, 255, 0.15);
-            background: rgba(0, 200, 255, 0.05);
-            color: #00c8ff;
+            border: 1px solid rgba(96, 165, 250, 0.15);
+            background: rgba(96, 165, 250, 0.05);
+            color: #60a5fa;
         }
 
         .security-badge .dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #00c8ff;
+            background: #60a5fa;
             animation: pulse-dot 2s ease-in-out infinite;
         }
 
@@ -118,36 +117,59 @@
         }
 
         .feature-icon {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 0.75rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
-            background: rgba(0, 200, 255, 0.06);
-            border: 1px solid rgba(0, 200, 255, 0.08);
             flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .feature-icon.green {
-            background: rgba(0, 230, 118, 0.06);
-            border-color: rgba(0, 230, 118, 0.08);
+            background: rgba(16, 185, 129, 0.06);
+            border-color: rgba(16, 185, 129, 0.08);
         }
-
         .feature-icon.purple {
-            background: rgba(123, 97, 255, 0.06);
-            border-color: rgba(123, 97, 255, 0.08);
+            background: rgba(139, 92, 246, 0.06);
+            border-color: rgba(139, 92, 246, 0.08);
         }
-
         .feature-icon.orange {
-            background: rgba(255, 152, 0, 0.06);
-            border-color: rgba(255, 152, 0, 0.08);
+            background: rgba(251, 146, 60, 0.06);
+            border-color: rgba(251, 146, 60, 0.08);
+        }
+        .feature-icon.red {
+            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.08);
+        }
+        .feature-icon.cyan {
+            background: rgba(34, 211, 238, 0.06);
+            border-color: rgba(34, 211, 238, 0.08);
+        }
+        .feature-icon.blue {
+            background: rgba(96, 165, 250, 0.06);
+            border-color: rgba(96, 165, 250, 0.08);
         }
 
-        .feature-icon.red {
-            background: rgba(244, 67, 54, 0.06);
-            border-color: rgba(244, 67, 54, 0.08);
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(96, 165, 250, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 40px rgba(96, 165, 250, 0.05);
         }
 
         /* Scrollbar */
@@ -155,26 +177,26 @@
             width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0a0a0f;
+            background: #0f172a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1a1a2e;
+            background: #1e293b;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #2a2a4e;
+            background: #334155;
         }
 
         .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.7rem 1.5rem;
+            padding: 0.6rem 1.5rem;
             border-radius: 0.75rem;
             font-weight: 600;
             font-size: 0.9rem;
             color: #fff;
-            background: linear-gradient(135deg, #00c8ff, #7b61ff);
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -183,18 +205,18 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.2);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.25);
         }
 
         .btn-outline {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.7rem 1.5rem;
+            padding: 0.6rem 1.5rem;
             border-radius: 0.75rem;
             font-weight: 600;
             font-size: 0.9rem;
-            color: #e0e0e0;
+            color: #e2e8f0;
             border: 1px solid rgba(255, 255, 255, 0.08);
             background: rgba(255, 255, 255, 0.02);
             cursor: pointer;
@@ -203,8 +225,8 @@
         }
 
         .btn-outline:hover {
-            border-color: rgba(0, 200, 255, 0.2);
-            background: rgba(0, 200, 255, 0.04);
+            border-color: rgba(96, 165, 250, 0.2);
+            background: rgba(96, 165, 250, 0.04);
         }
 
         @media (max-width: 768px) {
@@ -213,241 +235,278 @@
             }
         }
     </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: {
+                            blue: '#3776AB',
+                            electric: '#00D4FF',
+                            dark: '#0F172A',
+                            light: '#F8FAFC',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <!-- Three.js Canvas -->
+    <!-- ============================================================ -->
+    <!-- THREE.JS CANVAS                                               -->
+    <!-- ============================================================ -->
     <div id="three-canvas"></div>
 
-    <!-- Main Content -->
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT                                                  -->
+    <!-- ============================================================ -->
     <div class="content">
 
-        <!-- Header -->
-        <header class="max-w-6xl mx-auto flex items-center justify-between py-4">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl font-bold text-white">Flaxon</span>
-                <span class="text-xs text-gray-500 bg-gray-800/50 px-2 py-0.5 rounded-full">v0.1.5</span>
+        <!-- ============================================================ -->
+        <!-- HEADER                                                         -->
+        <!-- ============================================================ -->
+        <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+        <!-- ============================================================ -->
+        <!-- SECURITY HERO                                                 -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-8">
+            <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+                <span class="security-badge">
+                    <span class="dot"></span>
+                    Security First
+                </span>
+                <span class="text-gray-600">/</span>
+                <span class="text-gray-500">Zero-Trust Architecture</span>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" target="_blank"
-                class="text-sm text-gray-400 hover:text-white transition-colors hidden sm:inline">
-                GitHub
+
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight">
+                Security at the
+                <span class="gradient-text">Core</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mt-4 leading-relaxed">
+                Built-in security from the ground up. Flaxon implements industry-standard
+                security practices so you can focus on building your application.
+            </p>
+
+            <div class="flex flex-wrap gap-4 mt-6">
+                <a href="#features" class="btn-primary">
+                    Explore Features
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security" target="_blank" class="btn-outline">
+                    <i class="fas fa-shield-alt"></i>
+                    Security Policy
+                </a>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- STATS                                                         -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number">100%</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Open Source</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number text-[#60a5fa]">MIT</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">License</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number">22</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">GitHub Stars</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number text-[#a78bfa]">11</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">PyPI Downloads</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- FEATURES                                                      -->
+        <!-- ============================================================ -->
+        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Security Features</h2>
+                <p class="text-gray-400 mt-2">Built-in protections that work out of the box</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+
+                <!-- Feature 1 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon">🛡️</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Autoescaping</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Jinja2 templates automatically escape content to prevent XSS attacks.
+                                Raw HTML requires explicit opt-in.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon green">✅</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Request Validation</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Declarative schemas validate all incoming data with automatic
+                                422 responses for invalid requests.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon purple">🔐</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Security Headers</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and
+                                Permissions-Policy headers set by default.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon orange">🚫</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Rate Limiting</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Configurable rate limiting to prevent abuse and DoS attacks.
+                                Distributed rate limiting support via Redis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon red">🔍</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Data Redaction</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Passwords, tokens, and secrets are automatically redacted from
+                                debug output and error responses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon cyan">🔑</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">CSRF Protection</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Built-in CSRF token validation for state-changing operations.
+                                Seamless integration with forms and APIs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECURITY POLICY SECTION                                       -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="glass-card rounded-2xl p-8 md:p-12 text-center">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h2 class="text-2xl font-bold text-white">Security Policy</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mt-2">
+                    Flaxon follows responsible disclosure. We take security seriously and
+                    respond to vulnerability reports promptly.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mt-6">
+                    <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/policy" target="_blank"
+                    class="btn-primary">
+                    <i class="fas fa-shield-alt"></i>
+                    View Security Policy
+                </a>
+                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/advisories" target="_blank"
+                class="btn-outline">
+                <i class="fas fa-exclamation-triangle"></i>
+                Security Advisories
             </a>
-            <a href="https://flaxon-website.vercel.app/docs" target="_blank"
-            class="text-sm text-gray-400 hover:text-white transition-colors hidden sm:inline">
-            Docs
-        </a>
-        <a href="https://pypi.org/project/flaxon/" target="_blank"
-        class="btn-primary text-sm py-1.5 px-4">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Install
-    </a>
-</div>
-</header>
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
-
-<!-- Hero -->
-<section class="max-w-6xl mx-auto mt-16 md:mt-24">
-    <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
-        <span class="security-badge">
-            <span class="dot"></span>
-            Security First
-        </span>
-        <span class="text-gray-600">/</span>
-        <span class="text-gray-500">Zero-Trust Architecture</span>
-    </div>
-
-    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight">
-        Security at the
-        <span class="gradient-text">Core</span>
-    </h1>
-    <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mt-4 leading-relaxed">
-        Built-in security from the ground up. Flaxon implements industry-standard
-        security practices so you can focus on building your application.
-    </p>
-
-    <div class="flex flex-wrap gap-4 mt-6">
-        <a href="#features" class="btn-primary">
-            Explore Features
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-        </a>
-        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security" target="_blank" class="btn-outline">
-            Security Policy
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-        </a>
+        </div>
     </div>
 </section>
 
-<!-- Stats -->
-<section class="max-w-6xl mx-auto mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="glass-card p-5 text-center">
-        <div class="text-2xl font-bold text-white">100%</div>
-        <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Open Source</div>
-    </div>
-    <div class="glass-card p-5 text-center">
-        <div class="text-2xl font-bold text-[#00c8ff]">MIT</div>
-        <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">License</div>
-    </div>
-    <div class="glass-card p-5 text-center">
-        <div class="text-2xl font-bold text-white">22</div>
-        <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">GitHub Stars</div>
-    </div>
-    <div class="glass-card p-5 text-center">
-        <div class="text-2xl font-bold text-[#7b61ff]">11</div>
-        <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">PyPI Downloads</div>
-    </div>
-</section>
+<!-- ============================================================ -->
+<!-- CTA                                                            -->
+<!-- ============================================================ -->
+<div id="cta" x-data="{}" x-init="fetch('/partials/cta.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
 
-<!-- Features -->
-<section id="features" class="max-w-6xl mx-auto mt-20">
-    <div class="text-center mb-12">
-        <h2 class="text-2xl sm:text-3xl font-bold text-white">Security Features</h2>
-        <p class="text-gray-400 mt-2">Built-in protections that work out of the box</p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-
-        <!-- Feature 1 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon">🛡️</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Autoescaping</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        Jinja2 templates automatically escape content to prevent XSS attacks.
-                        Raw HTML requires explicit opt-in.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature 2 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon green">✅</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Request Validation</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        Declarative schemas validate all incoming data with automatic
-                        422 responses for invalid requests.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature 3 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon purple">🔐</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Security Headers</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and
-                        Permissions-Policy headers set by default.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature 4 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon orange">🚫</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Rate Limiting</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        Configurable rate limiting to prevent abuse and DoS attacks.
-                        Distributed rate limiting support via Redis.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature 5 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon red">🔍</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Data Redaction</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        Passwords, tokens, and secrets are automatically redacted from
-                        debug output and error responses.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature 6 -->
-        <div class="glass-card p-6 md:p-8">
-            <div class="flex items-start gap-4">
-                <div class="feature-icon green">🔑</div>
-                <div>
-                    <h3 class="text-lg font-semibold text-white">CSRF Protection</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                        Built-in CSRF token validation for state-changing operations.
-                        Seamless integration with forms and APIs.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<!-- Security Policy Section -->
-<section class="max-w-6xl mx-auto mt-20">
-    <div class="glass-card p-8 md:p-12 text-center">
-        <div class="text-4xl mb-4">🛡️</div>
-        <h2 class="text-2xl font-bold text-white">Security Policy</h2>
-        <p class="text-gray-400 max-w-2xl mx-auto mt-2">
-            Flaxon follows responsible disclosure. We take security seriously and
-            respond to vulnerability reports promptly.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4 mt-6">
-            <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/policy" target="_blank"
-            class="btn-primary">
-            View Security Policy
-        </a>
-        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/advisories" target="_blank"
-        class="btn-outline">
-        Security Advisories
-    </a>
-</div>
-</div>
-</section>
-
-<!-- Footer -->
-<footer class="max-w-6xl mx-auto mt-20 pt-8 border-t border-gray-800/50 text-sm text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-4">
-    <div>
-        Built with ❤️ using
-        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" class="text-gray-400 hover:text-white transition-colors" target="_blank">
-            Flaxon
-        </a>
-    </div>
-    <div class="flex items-center gap-6">
-        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" class="hover:text-gray-300 transition-colors" target="_blank">GitHub</a>
-        <a href="https://flaxon-website.vercel.app/docs" class="hover:text-gray-300 transition-colors" target="_blank">Docs</a>
-        <a href="https://pypi.org/project/flaxon/" class="hover:text-gray-300 transition-colors" target="_blank">PyPI</a>
-        <span class="text-gray-600">|</span>
-        <span>MIT License</span>
-    </div>
-</footer>
+<!-- ============================================================ -->
+<!-- FOOTER                                                         -->
+<!-- ============================================================ -->
+<div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
 
 </div>
+<!-- END content -->
 
-<!-- Three.js Security Animation -->
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    // Load partials
+    document.addEventListener('DOMContentLoaded', function() {
+        const partials = [
+            { id: 'cta', path: '/partials/cta.html' },
+        ];
+
+        partials.forEach(function(partial) {
+            fetch(partial.path)
+                .then(r => r.text())
+                .then(html => {
+                    const el = document.getElementById(partial.id);
+                    if (el) el.innerHTML = html;
+                })
+                .catch(err => console.error('Failed to load partial:', partial.path, err));
+        });
+
+        // Init Highlight.js
+        hljs.highlightAll();
+    });
+
+    // Dark mode toggle (persistent)
+    if (localStorage.getItem('dark-mode') === 'true') {
+        document.documentElement.classList.add('dark');
+    }
+</script>
+
+<!-- ============================================================ -->
+<!-- THREE.JS SECURITY ANIMATION                                   -->
+<!-- ============================================================ -->
 <script>
     (function() {
-        // Scene setup
         const container = document.getElementById('three-canvas');
+        if (!container) return;
+
+        // Scene setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a0f);
+        scene.background = new THREE.Color(0x0f172a);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 4, 14);
@@ -455,29 +514,29 @@
 
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
-            alpha: true
+            alpha: false,
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
         // --- Lights ---
-        const ambientLight = new THREE.AmbientLight(0x222244, 0.4);
+        const ambientLight = new THREE.AmbientLight(0x1a2a4a, 0.5);
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0x00c8ff, 0.6);
+        const directionalLight = new THREE.DirectionalLight(0x60a5fa, 0.6);
         directionalLight.position.set(5, 10, 7);
         scene.add(directionalLight);
 
-        const pointLight = new THREE.PointLight(0x7b61ff, 0.4);
+        const pointLight = new THREE.PointLight(0x8b5cf6, 0.4);
         pointLight.position.set(-4, 6, 4);
         scene.add(pointLight);
 
         // --- Main Ring (Shield) ---
         const ringGeo = new THREE.TorusGeometry(3.2, 0.06, 32, 64);
         const ringMat = new THREE.MeshStandardMaterial({
-            color: 0x00c8ff,
-            emissive: 0x00c8ff,
+            color: 0x60a5fa,
+            emissive: 0x2563eb,
             emissiveIntensity: 0.15,
             metalness: 0.8,
             roughness: 0.2,
@@ -492,8 +551,8 @@
         // Secondary ring
         const ringGeo2 = new THREE.TorusGeometry(3.8, 0.03, 24, 64);
         const ringMat2 = new THREE.MeshStandardMaterial({
-            color: 0x7b61ff,
-            emissive: 0x7b61ff,
+            color: 0x8b5cf6,
+            emissive: 0x7c3aed,
             emissiveIntensity: 0.1,
             metalness: 0.6,
             roughness: 0.3,
@@ -519,15 +578,14 @@
 
         const hexGeo = new THREE.ShapeGeometry(hexShape);
         const hexMat = new THREE.MeshStandardMaterial({
-            color: 0x00c8ff,
-            emissive: 0x00c8ff,
+            color: 0x60a5fa,
+            emissive: 0x2563eb,
             emissiveIntensity: 0.05,
             metalness: 0.9,
             roughness: 0.3,
             transparent: true,
             opacity: 0.15,
             side: THREE.DoubleSide,
-            wireframe: false,
         });
         const hexMesh = new THREE.Mesh(hexGeo, hexMat);
         hexMesh.position.z = 0.05;
@@ -536,7 +594,7 @@
         // Hex wireframe overlay
         const hexWire = new THREE.ShapeGeometry(hexShape);
         const wireMat = new THREE.MeshBasicMaterial({
-            color: 0x00c8ff,
+            color: 0x60a5fa,
             wireframe: true,
             transparent: true,
             opacity: 0.2,
@@ -579,10 +637,10 @@
         const particles = new THREE.Points(particleGeo, particleMat);
         scene.add(particles);
 
-        // --- Glow Ring (Security Shield aura) ---
+        // --- Glow Ring ---
         const glowGeo = new THREE.RingGeometry(3.0, 4.5, 64);
         const glowMat = new THREE.MeshBasicMaterial({
-            color: 0x00c8ff,
+            color: 0x60a5fa,
             transparent: true,
             opacity: 0.04,
             side: THREE.DoubleSide,
@@ -593,11 +651,11 @@
         glow.position.y = -0.5;
         scene.add(glow);
 
-        // --- Security Lock Icons (as small spheres) ---
+        // --- Security Lock Icons ---
         const lockGroup = new THREE.Group();
         const lockMat = new THREE.MeshStandardMaterial({
-            color: 0x7b61ff,
-            emissive: 0x7b61ff,
+            color: 0x8b5cf6,
+            emissive: 0x7c3aed,
             emissiveIntensity: 0.1,
             metalness: 0.7,
             roughness: 0.3,
@@ -612,11 +670,11 @@
         }
         scene.add(lockGroup);
 
-        // --- Floating Security Badge Text (3D Text alternative: small cubes) ---
+        // --- Floating Security Badge ---
         const badgeGroup = new THREE.Group();
         const badgeMat = new THREE.MeshStandardMaterial({
-            color: 0x00c8ff,
-            emissive: 0x00c8ff,
+            color: 0x60a5fa,
+            emissive: 0x2563eb,
             emissiveIntensity: 0.05,
             metalness: 0.5,
             roughness: 0.4,
@@ -644,7 +702,7 @@
             mouseY = y * 0.1;
         });
 
-        // --- Resize handler ---
+        // --- Resize ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -661,7 +719,7 @@
             targetRotationX += (mouseX * 0.3 - targetRotationX) * 0.03;
             targetRotationY += (mouseY * 0.3 - targetRotationY) * 0.03;
 
-            // Rotate ring
+            // Rotate rings
             ring.rotation.y += 0.003;
             ring2.rotation.y -= 0.004;
             ring.rotation.x = Math.PI / 3 + Math.sin(time * 0.2) * 0.05;
@@ -685,7 +743,7 @@
             // Pulse hex opacity
             hexMat.opacity = 0.12 + Math.sin(time * 0.5) * 0.06;
 
-            // Parallax effect on whole scene
+            // Parallax effect
             const group = scene;
             group.rotation.x = targetRotationY * 0.05;
             group.rotation.y = targetRotationX * 0.05;
@@ -695,7 +753,6 @@
 
         animate();
 
-        // --- Three.js load error fallback (show static content) ---
         console.log('Flaxon Security page loaded with Three.js animations.');
     })();
 </script>
