@@ -6,7 +6,7 @@
             <!-- Brand -->
             <div class="col-span-2 md:col-span-1">
                 <div class="flex items-center gap-2 mb-4">
-                    <img src="/assets/images/logo/flaxon-icon.svg" alt="Flaxon" class="h-8 w-8" onerror="this.style.display='none'">
+                    <img src="/assets/images/logo/flaxon.png" alt="Flaxon" class="h-8 w-8" onerror="this.style.display='none'">
                     <span class="text-xl font-bold text-white">Flaxon</span>
                 </div>
                 <p class="text-sm text-slate-400 max-w-xs">Simple Python. Serious Applications.</p>
@@ -86,15 +86,28 @@
 
 <!-- ============================================================ -->
 <!-- JAVASCRIPT FILES - Loaded on every page via footer           -->
+<!--                                                                -->
+<!-- footer.html (like header.html) is injected with                -->
+<!-- el.innerHTML = html, and browsers never execute <script>       -->
+<!-- tags inserted that way - so plain <script src="..."> tags      -->
+<!-- here never ran. This SVG's onload event *does* fire even when  -->
+<!-- injected via innerHTML, so we use it to create real script     -->
+<!-- tags that do execute.                                          -->
+<!--                                                                -->
+<!-- Note: search.js and docs.js are intentionally NOT loaded here  -->
+<!-- anymore - header-search.js (loaded by header.html) already     -->
+<!-- implements search + breadcrumbs, and loading these older files  -->
+<!-- alongside it caused duplicate/conflicting behavior.            -->
 <!-- ============================================================ -->
-<script src="/assets/js/main.js"></script>
-<script src="/assets/js/docs.js"></script>
-<script src="/assets/js/search.js"></script>
-<script src="/assets/js/dark-mode.js"></script>
+<svg style="display:none" onload="
+    this.onload=null;
 
-<!-- Initialization script -->
-<script>
-    // Initialize dark mode
+    ['/assets/js/main.js', '/assets/js/dark-mode.js'].forEach(function(src) {
+        var s = document.createElement('script');
+        s.src = src;
+        document.body.appendChild(s);
+    });
+
     if (localStorage.getItem('flaxon-dark-mode') === 'true') {
         document.documentElement.classList.add('dark');
     } else if (localStorage.getItem('flaxon-dark-mode') === 'false') {
@@ -103,12 +116,9 @@
         document.documentElement.classList.add('dark');
     }
 
-    // Initialize Highlight.js
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof hljs !== 'undefined') {
-            hljs.highlightAll();
-        }
-    });
+    if (typeof hljs !== 'undefined') {
+        hljs.highlightAll();
+    }
 
     console.log('Flaxon website initialized successfully! 🚀');
-</script>
+"></svg>

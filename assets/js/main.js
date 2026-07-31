@@ -8,9 +8,26 @@
     'use strict';
 
     // ============================================================
+    // ready() - like DOMContentLoaded, but safe to use even after
+    // the page has already fully loaded. main.js is now loaded from
+    // footer.html *after* header/footer are injected into the page,
+    // which is always after the real DOMContentLoaded event has
+    // already fired - so a plain DOMContentLoaded listener here
+    // would never run. A short delay also gives the async-loaded
+    // header/footer/page content a moment to finish landing.
+    // ============================================================
+    function ready(fn) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fn);
+        } else {
+            setTimeout(fn, 50);
+        }
+    }
+
+    // ============================================================
     // Mobile Menu Toggle
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
 
@@ -29,7 +46,7 @@
     // ============================================================
     // Smooth Scroll for Anchor Links
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
             anchor.addEventListener('click', function(e) {
                 const target = document.querySelector(this.getAttribute('href'));
@@ -47,9 +64,9 @@
     // ============================================================
     // Active Navigation Link Highlighting
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('nav a, .sidebar a');
+        const navLinks = document.querySelectorAll('nav a, .sidebar a, .doc-sidebar a');
 
         navLinks.forEach(function(link) {
             const href = link.getAttribute('href');
@@ -67,7 +84,7 @@
     // ============================================================
     // Copy Code Button
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         document.querySelectorAll('.code-block').forEach(function(block) {
             const copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
@@ -130,7 +147,7 @@
         requestAnimationFrame(update);
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         const stats = document.querySelectorAll('.stat-number');
         stats.forEach(function(stat) {
             const target = parseInt(stat.getAttribute('data-target')) || parseInt(stat.textContent) || 0;
@@ -152,7 +169,7 @@
     // ============================================================
     // Scroll to Top Button
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         const scrollBtn = document.createElement('button');
         scrollBtn.id = 'scroll-top-btn';
         scrollBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
@@ -194,7 +211,7 @@
     // ============================================================
     // Feature Card Hover Effect (Tilt)
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+    ready(function() {
         const cards = document.querySelectorAll('.feature-card, .card');
         cards.forEach(function(card) {
             card.addEventListener('mousemove', function(e) {

@@ -74,13 +74,32 @@
     // ============================================================
     // Initialize
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set initial theme
+    // NOTE: header.html and footer.html are fetched independently and
+    // injected asynchronously, so this file can start running before
+    // the toggle button (which lives in header.html) exists yet, and
+    // DOMContentLoaded has already fired by the time we get here.
+    // So instead of a one-shot DOMContentLoaded listener, retry until
+    // the button actually shows up.
+    let systemThemeListenerAttached = false;
+
+    function init(attemptsLeft) {
+        // Set initial theme (safe to call repeatedly)
         const initialTheme = getPreferredTheme();
         setTheme(initialTheme);
 
-        // Attach toggle events
-        document.querySelectorAll(TOGGLE_SELECTOR).forEach(function(toggle) {
+        const toggles = document.querySelectorAll(TOGGLE_SELECTOR);
+
+        if (toggles.length === 0) {
+            if (attemptsLeft > 0) {
+                setTimeout(function() { init(attemptsLeft - 1); }, 100);
+            }
+            return;
+        }
+
+        // Attach toggle events (guard against double-binding on retry)
+        toggles.forEach(function(toggle) {
+            if (toggle.dataset.darkModeBound === 'true') return;
+            toggle.dataset.darkModeBound = 'true';
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 const newTheme = toggleTheme();
@@ -91,16 +110,22 @@
             });
         });
 
-        // Listen for system theme changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-            if (localStorage.getItem(STORAGE_KEY) === null) {
-                setTheme(e.matches);
-            }
-        });
+        // Listen for system theme changes (only once)
+        if (!systemThemeListenerAttached) {
+            systemThemeListenerAttached = true;
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (localStorage.getItem(STORAGE_KEY) === null) {
+                    setTheme(e.matches);
+                }
+            });
+        }
 
         // Log current state
         console.log('Dark mode initialized:', getCurrentTheme() ? 'dark' : 'light');
-    });
+    }
+
+    // Try for up to ~5 seconds (50 x 100ms) in case header.html is slow to load
+    init(50);
 
     // ============================================================
     // Expose API
