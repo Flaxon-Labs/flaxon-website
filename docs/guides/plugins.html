@@ -6,16 +6,219 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Plugins – Flaxon Documentation</title>
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/docs.css">
+
+    <style>
+        /* ============================================================ */
+        /* Three.js Background                                           */
+        /* ============================================================ */
+        #three-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        /* ============================================================ */
+        /* Plugin Cards                                                  */
+        /* ============================================================ */
+        .plugin-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .plugin-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(96, 165, 250, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .plugin-card .scene-container {
+            height: 160px;
+            background: rgba(5, 8, 15, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plugin-card .scene-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .plugin-status {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .plugin-status.alpha {
+            background: rgba(251, 146, 60, 0.15);
+            color: #fb923c;
+            border: 1px solid rgba(251, 146, 60, 0.2);
+        }
+
+        .plugin-status.beta {
+            background: rgba(250, 204, 21, 0.15);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .plugin-status.stable {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .plugin-status.planned {
+            background: rgba(96, 165, 250, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .install-cmd {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .install-cmd:hover {
+            border-color: rgba(96, 165, 250, 0.3);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .install-cmd .copy-icon {
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .install-cmd:hover .copy-icon {
+            opacity: 1;
+        }
+
+        .plugin-link {
+            color: #60a5fa;
+            transition: color 0.3s ease;
+        }
+
+        .plugin-link:hover {
+            color: #93c5fd;
+        }
+
+        /* ============================================================ */
+        /* Content Overlay                                               */
+        /* ============================================================ */
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        .doc-sidebar a.active {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a12;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .bg-slate-50 {
+            background: transparent !important;
+        }
+
+        .doc-content {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .doc-sidebar {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .code-block {
+            background: #0a0f1a !important;
+            border-color: #1e293b !important;
+        }
+    </style>
 
     <script>
         tailwind.config = {
@@ -32,48 +235,279 @@
 </head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <!-- ============================================================ -->
+    <!-- THREE.JS BACKGROUND                                           -->
+    <!-- ============================================================ -->
+    <div id="three-bg"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+    <!-- ============================================================ -->
+    <!-- CONTENT OVERLAY                                              -->
+    <!-- ============================================================ -->
+    <div class="content-overlay">
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+        <!-- HEADER -->
+        <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+        <!-- MAIN CONTENT -->
+        <section class="pt-8 pb-16">
+            <div class="container mx-auto px-4">
+                <div class="grid lg:grid-cols-4 gap-8">
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html" class="active">Plugins</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+                    <!-- SIDEBAR -->
+                    <aside class="lg:col-span-1">
+                        <div class="doc-sidebar">
+                            <div class="section-title">Getting Started</div>
+                            <a href="/docs/getting-started/index.html">Overview</a>
+                            <a href="/docs/getting-started/installation.html">Installation</a>
+                            <a href="/docs/getting-started/quickstart.html">Quick Start</a>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Plugins</h1>
-                        <p>Flaxon provides a plugin system that allows you to extend the framework with modular components.</p>
+                            <div class="section-title">Core Concepts</div>
+                            <a href="/docs/core-concepts/routing.html">Routing</a>
+                            <a href="/docs/core-concepts/requests.html">Requests</a>
+                            <a href="/docs/core-concepts/responses.html">Responses</a>
+                            <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                            <a href="/docs/core-concepts/validation.html">Validation</a>
 
-                        <h2>Creating a Plugin</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.plugins import Plugin
+                            <div class="section-title">Guides</div>
+                            <a href="/docs/guides/databases.html">Databases</a>
+                            <a href="/docs/guides/authentication.html">Authentication</a>
+                            <a href="/docs/guides/authorization.html">Authorization</a>
+                            <a href="/docs/guides/websockets.html">WebSockets</a>
+                            <a href="/docs/guides/tasks.html">Tasks</a>
+                            <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                            <a href="/docs/guides/testing.html">Testing</a>
+                            <a href="/docs/guides/debugging.html">Debugging</a>
+                            <a href="/docs/guides/plugins.html" class="active">Plugins</a>
+                            <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                        </div>
+                    </aside>
+
+                    <!-- MAIN CONTENT -->
+                    <main class="lg:col-span-3">
+                        <div class="doc-content">
+
+                            <!-- Page Title -->
+                            <h1 class="text-3xl font-bold text-white">Plugins</h1>
+                            <p class="text-gray-400 mt-2">Flaxon provides a plugin system that allows you to extend the framework with modular components.</p>
+
+                            <!-- ============================================================ -->
+                            <!-- PLUGIN GRID                                                 -->
+                            <!-- ============================================================ -->
+                            <h2 class="mt-10 text-xl font-semibold text-white">Available Plugins</h2>
+                            <p class="text-gray-400 text-sm">Official Flaxon plugins with Three.js powered previews.</p>
+
+                            <div class="grid md:grid-cols-2 gap-4 mt-6">
+
+                                <!-- Plugin 1: flaxon-ai -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="ai"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🧠 flaxon-ai</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-ai/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-ai" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/ai" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">AI/LLM integration with Gemini, OpenAI, and local Flax/JAX models.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-ai[all]')">
+                                                <code>pip install flaxon-ai[all]</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 2: flaxon-mobile -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="mobile"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">📱 flaxon-mobile</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-mobile/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-mobile" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/mobile" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Mobile backend services with push notifications and Android/iOS support.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-mobile[all]')">
+                                                <code>pip install flaxon-mobile[all]</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 3: flaxon-oauth-google -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="oauth"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🔐 flaxon-oauth-google</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-oauth-google/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-oauth-google" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/oauth-google" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Google OAuth 2.0 authentication for Flaxon applications.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-oauth-google')">
+                                                <code>pip install flaxon-oauth-google</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 4: flaxon-inertia -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="inertia"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🔗 flaxon-inertia</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-inertia/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-inertia" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/inertia" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Inertia.js integration for Vue, React, and Svelte frontends.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-inertia')">
+                                                <code>pip install flaxon-inertia</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 5: flaxon-fyr -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="fyr"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🔥 flaxon-fyr</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-fyr/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-fyr" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/fyr" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Fyr.js CDN-only reactive framework integration.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-fyr')">
+                                                <code>pip install flaxon-fyr</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 6: flaxon-debug-toolbar -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="debug"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🐛 flaxon-debug-toolbar</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-debug-toolbar/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-debug-toolbar" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/debug-toolbar" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Debug toolbar with Three.js 3D visualizations.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-debug-toolbar')">
+                                                <code>pip install flaxon-debug-toolbar</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 7: flaxon-sentry -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="sentry"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">📡 flaxon-sentry</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-sentry/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-sentry" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/sentry" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Sentry error tracking and performance monitoring.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-sentry')">
+                                                <code>pip install flaxon-sentry</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plugin 8: flaxon-pytest -->
+                                <div class="plugin-card">
+                                    <div class="scene-container" data-plugin="pytest"></div>
+                                    <div class="p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <span class="text-lg font-semibold text-white">🧪 flaxon-pytest</span>
+                                                <span class="plugin-status alpha ml-2">Alpha</span>
+                                            </div>
+                                            <div class="flex gap-2 text-xs">
+                                                <a href="https://pypi.org/project/flaxon-pytest/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                <a href="https://github.com/aldanedev-create/flaxon-pytest" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                <a href="/docs/plugins/pytest" class="plugin-link"><i class="fas fa-book"></i></a>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mt-1">Pytest fixtures and utilities for testing Flaxon applications.</p>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            <span class="install-cmd" onclick="copyCommand('pip install flaxon-pytest')">
+                                                <code>pip install flaxon-pytest</code>
+                                                <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- ============================================================ -->
+                            <!-- CREATING A PLUGIN                                            -->
+                            <!-- ============================================================ -->
+                            <h2 class="mt-12 text-xl font-semibold text-white">Creating a Plugin</h2>
+                            <p class="text-gray-400 text-sm">Flaxon plugins are simple Python classes that extend the framework.</p>
+
+                            <div class="code-block mt-4">
+                                <pre><code class="language-python">from flaxon.plugins import Plugin
 
 class MyPlugin(Plugin):
     name = "my-plugin"
@@ -87,11 +521,11 @@ class MyPlugin(Plugin):
 
         app.add_middleware(MyPluginMiddleware)
         app.state.plugin_loaded = True</code></pre>
-                        </div>
+                            </div>
 
-                        <h2>Simple Plugin</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.plugins import SimplePlugin
+                            <h3 class="mt-6 text-lg font-semibold text-white">Simple Plugin</h3>
+                            <div class="code-block mt-2">
+                                <pre><code class="language-python">from flaxon.plugins import SimplePlugin
 
 def setup_plugin(app):
     @app.get("/simple")
@@ -99,11 +533,11 @@ def setup_plugin(app):
         return {"plugin": "Simple"}
 
 plugin = SimplePlugin("simple-plugin", setup_plugin)</code></pre>
-                        </div>
+                            </div>
 
-                        <h2>Plugin Lifecycle</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">class LifecyclePlugin(Plugin):
+                            <h3 class="mt-6 text-lg font-semibold text-white">Plugin Lifecycle</h3>
+                            <div class="code-block mt-2">
+                                <pre><code class="language-python">class LifecyclePlugin(Plugin):
     name = "lifecycle-plugin"
     version = "1.0.0"
 
@@ -121,11 +555,11 @@ plugin = SimplePlugin("simple-plugin", setup_plugin)</code></pre>
 
     def on_unload(self):
         print("Plugin unloaded")</code></pre>
-                        </div>
+                            </div>
 
-                        <h2>Plugin Dependencies</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">class CorePlugin(Plugin):
+                            <h3 class="mt-6 text-lg font-semibold text-white">Plugin Dependencies</h3>
+                            <div class="code-block mt-2">
+                                <pre><code class="language-python">class CorePlugin(Plugin):
     name = "core-plugin"
     version = "1.0.0"
     provides = ["database", "cache"]
@@ -135,53 +569,651 @@ class DatabasePlugin(Plugin):
     version = "1.0.0"
     requires = ["core-plugin"]
     provides = ["postgres"]</code></pre>
+                            </div>
+
+                            <div class="note mt-6">
+                                <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                                <p class="mb-0 mt-1">Plugins can add routes, middleware, CLI commands, health checks, and lifecycle hooks.</p>
+                            </div>
                         </div>
-
-                        <h2>Plugin Discovery</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.plugins import PluginManager
-
-manager = PluginManager(app)
-
-# Load from directory
-await manager.load_plugins_from_path("plugins")
-
-# Load from module
-await manager.load_plugins_from_module("myapp.plugins")
-
-# Load all
-await manager.load_all_plugins()</code></pre>
-                        </div>
-
-                        <h2>Plugin Hooks</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">class HookPlugin(Plugin):
-    name = "hook-plugin"
-    version = "1.0.0"
-
-    def setup(self, app):
-        app.plugin_hooks.register("before_response", self.before_response)
-
-    def before_response(self, response):
-        response.headers["X-Hook"] = "processed"
-        return response</code></pre>
-                        </div>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Plugins can add routes, middleware, CLI commands, health checks, and lifecycle hooks.</p>
-                        </div>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+        <!-- FOOTER -->
+        <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
 
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPTS                                                       -->
+    <!-- ============================================================ -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+        // Copy command to clipboard
+        function copyCommand(cmd) {
+            navigator.clipboard.writeText(cmd).then(() => {
+                const el = event.target.closest('.install-cmd');
+                const icon = el.querySelector('.copy-icon');
+                icon.innerHTML = '<i class="fas fa-check" style="color:#4ade80;"></i>';
+                setTimeout(() => {
+                    icon.innerHTML = '<i class="far fa-copy"></i>';
+                }, 2000);
+            });
+        }
+
+        // Dark mode
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+            hljs.highlightAll();
+        });
+    </script>
+
+    <!-- ============================================================ -->
+    <!-- THREE.JS PLUGIN SCENES                                        -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+            // --- Background Scene (cosmic) ---
+            const bgContainer = document.getElementById('three-bg');
+            if (bgContainer) {
+                const bgScene = new THREE.Scene();
+                bgScene.background = new THREE.Color(0x0a0a12);
+
+                const bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                bgCamera.position.z = 30;
+
+                const bgRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                bgRenderer.setSize(window.innerWidth, window.innerHeight);
+                bgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                bgContainer.appendChild(bgRenderer.domElement);
+
+                // Stars
+                const starGeo = new THREE.BufferGeometry();
+                const starCount = 1500;
+                const positions = new Float32Array(starCount * 3);
+                for (let i = 0; i < starCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 200;
+                }
+                starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const starMat = new THREE.PointsMaterial({
+                    color: 0x4466aa,
+                    size: 0.15,
+                    transparent: true,
+                    opacity: 0.4,
+                    blending: THREE.AdditiveBlending,
+                });
+                const stars = new THREE.Points(starGeo, starMat);
+                bgScene.add(stars);
+
+                function animateBg() {
+                    requestAnimationFrame(animateBg);
+                    stars.rotation.y += 0.0002;
+                    bgRenderer.render(bgScene, bgCamera);
+                }
+                animateBg();
+
+                window.addEventListener('resize', () => {
+                    bgCamera.aspect = window.innerWidth / window.innerHeight;
+                    bgCamera.updateProjectionMatrix();
+                    bgRenderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            // --- Plugin Card Scenes ---
+            const containers = document.querySelectorAll('.scene-container');
+
+            containers.forEach((container) => {
+                const plugin = container.dataset.plugin;
+                const width = container.clientWidth || 400;
+                const height = container.clientHeight || 160;
+
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x0a0a15);
+
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+                camera.position.z = 6;
+
+                const renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true,
+                });
+                renderer.setSize(width, height);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                container.appendChild(renderer.domElement);
+
+                // Lights
+                const ambient = new THREE.AmbientLight(0x333366, 0.5);
+                scene.add(ambient);
+
+                const dirLight = new THREE.DirectionalLight(0x4488ff, 0.8);
+                dirLight.position.set(5, 10, 7);
+                scene.add(dirLight);
+
+                const pointLight = new THREE.PointLight(0x22d3ee, 0.3);
+                pointLight.position.set(-3, 2, 4);
+                scene.add(pointLight);
+
+                let objects = [];
+                let animationFn = null;
+
+                // --- Plugin-specific scenes ---
+                switch (plugin) {
+                    case 'ai': {
+                        // Neural network nodes
+                        const nodeCount = 30;
+                        const nodeGroup = new THREE.Group();
+                        const nodeMat = new THREE.MeshStandardMaterial({
+                            color: 0x60a5fa,
+                            emissive: 0x2563eb,
+                            emissiveIntensity: 0.2,
+                            metalness: 0.3,
+                            roughness: 0.4,
+                        });
+
+                        for (let i = 0; i < nodeCount; i++) {
+                            const size = 0.08 + Math.random() * 0.15;
+                            const sphere = new THREE.Mesh(new THREE.SphereGeometry(size, 8, 8), nodeMat);
+                            sphere.position.set(
+                                (Math.random() - 0.5) * 8,
+                                (Math.random() - 0.5) * 4,
+                                (Math.random() - 0.5) * 3
+                            );
+                            sphere.userData = {
+                                speed: 0.005 + Math.random() * 0.01,
+                                phase: Math.random() * Math.PI * 2,
+                            };
+                            nodeGroup.add(sphere);
+                        }
+
+                        // Lines between nearby nodes
+                        const lineMat = new THREE.LineBasicMaterial({
+                            color: 0x2563eb,
+                            transparent: true,
+                            opacity: 0.15,
+                        });
+
+                        scene.add(nodeGroup);
+                        objects.push(nodeGroup);
+
+                        animationFn = (time) => {
+                            nodeGroup.children.forEach((child, i) => {
+                                const s = child.userData;
+                                child.position.y += Math.sin(time * s.speed + s.phase) * 0.002;
+                                child.position.x += Math.cos(time * s.speed * 0.7 + s.phase) * 0.002;
+                            });
+                            nodeGroup.rotation.y += 0.002;
+                            nodeGroup.rotation.x = Math.sin(time * 0.1) * 0.02;
+                        };
+                        break;
+                    }
+
+                    case 'mobile': {
+                        // Phone shape
+                        const phoneGroup = new THREE.Group();
+
+                        // Body
+                        const bodyMat = new THREE.MeshStandardMaterial({
+                            color: 0x1a1a2e,
+                            metalness: 0.9,
+                            roughness: 0.1,
+                        });
+                        const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 0.3), bodyMat);
+                        phoneGroup.add(body);
+
+                        // Screen
+                        const screenMat = new THREE.MeshStandardMaterial({
+                            color: 0x22d3ee,
+                            emissive: 0x0891b2,
+                            emissiveIntensity: 0.1,
+                        });
+                        const screen = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.05), screenMat);
+                        screen.position.z = 0.18;
+                        phoneGroup.add(screen);
+
+                        // Notification dots
+                        const dotMat = new THREE.MeshStandardMaterial({
+                            color: 0xf43f5e,
+                            emissive: 0xe11d48,
+                            emissiveIntensity: 0.3,
+                        });
+                        for (let i = 0; i < 3; i++) {
+                            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), dotMat);
+                            dot.position.set(-0.3 + i * 0.3, -0.6, 0.2);
+                            phoneGroup.add(dot);
+                        }
+
+                        scene.add(phoneGroup);
+                        objects.push(phoneGroup);
+
+                        animationFn = (time) => {
+                            phoneGroup.rotation.x = Math.sin(time * 0.3) * 0.05;
+                            phoneGroup.rotation.y = Math.sin(time * 0.2) * 0.3;
+                            // Pulse screen
+                            screenMat.emissiveIntensity = 0.05 + Math.sin(time * 2) * 0.05;
+                        };
+                        break;
+                    }
+
+                    case 'oauth': {
+                        // Security shield
+                        const shieldGroup = new THREE.Group();
+
+                        // Shield shape
+                        const shieldMat = new THREE.MeshStandardMaterial({
+                            color: 0x60a5fa,
+                            emissive: 0x2563eb,
+                            emissiveIntensity: 0.1,
+                            metalness: 0.5,
+                            roughness: 0.3,
+                            transparent: true,
+                            opacity: 0.8,
+                        });
+
+                        const shieldShape = new THREE.Shape();
+                        shieldShape.moveTo(0, 1.2);
+                        shieldShape.quadraticCurveTo(0.8, 1.0, 1.0, 0.4);
+                        shieldShape.quadraticCurveTo(1.2, -0.4, 0.8, -0.8);
+                        shieldShape.quadraticCurveTo(0.4, -1.2, 0, -1.4);
+                        shieldShape.quadraticCurveTo(-0.4, -1.2, -0.8, -0.8);
+                        shieldShape.quadraticCurveTo(-1.2, -0.4, -1.0, 0.4);
+                        shieldShape.quadraticCurveTo(-0.8, 1.0, 0, 1.2);
+
+                        const shieldGeo = new THREE.ShapeGeometry(shieldShape);
+                        const shield = new THREE.Mesh(shieldGeo, shieldMat);
+                        shield.position.z = 0;
+                        shieldGroup.add(shield);
+
+                        // Lock icon
+                        const lockMat = new THREE.MeshStandardMaterial({
+                            color: 0x22d3ee,
+                            emissive: 0x0891b2,
+                            emissiveIntensity: 0.2,
+                        });
+                        const lockBase = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), lockMat);
+                        lockBase.position.set(0, -0.1, 0.1);
+                        shieldGroup.add(lockBase);
+
+                        const lockArc = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 8, 8, Math.PI), lockMat);
+                        lockArc.position.set(0, 0.15, 0.1);
+                        lockArc.rotation.x = Math.PI / 2;
+                        shieldGroup.add(lockArc);
+
+                        scene.add(shieldGroup);
+                        objects.push(shieldGroup);
+
+                        animationFn = (time) => {
+                            shieldGroup.rotation.y = Math.sin(time * 0.3) * 0.1;
+                            shieldGroup.rotation.z = Math.sin(time * 0.2) * 0.05;
+                            shieldMat.emissiveIntensity = 0.05 + Math.sin(time * 1.5) * 0.05;
+                        };
+                        break;
+                    }
+
+                    case 'inertia': {
+                        // Router/connection nodes
+                        const routerGroup = new THREE.Group();
+
+                        const nodeMat = new THREE.MeshStandardMaterial({
+                            color: 0x8b5cf6,
+                            emissive: 0x6d28d9,
+                            emissiveIntensity: 0.2,
+                            metalness: 0.3,
+                            roughness: 0.4,
+                        });
+
+                        const positions = [
+                            [-1.5, 0, 0],
+                            [0, 1.2, 0],
+                            [1.5, 0, 0],
+                            [0, -1.2, 0],
+                            [-1.0, 0.6, 0],
+                            [1.0, -0.6, 0]
+                        ];
+
+                        positions.forEach((pos) => {
+                            const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), nodeMat);
+                            sphere.position.set(pos[0], pos[1], pos[2]);
+                            routerGroup.add(sphere);
+                        });
+
+                        // Connection lines
+                        const lineMat = new THREE.LineBasicMaterial({
+                            color: 0x8b5cf6,
+                            transparent: true,
+                            opacity: 0.2,
+                        });
+
+                        for (let i = 0; i < positions.length; i++) {
+                            for (let j = i + 1; j < positions.length; j++) {
+                                if (Math.random() > 0.5) {
+                                    const geo = new THREE.BufferGeometry().setFromPoints([
+                                        new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2]),
+                                        new THREE.Vector3(positions[j][0], positions[j][1], positions[j][2])
+                                    ]);
+                                    const line = new THREE.Line(geo, lineMat);
+                                    routerGroup.add(line);
+                                }
+                            }
+                        }
+
+                        // Glow ring
+                        const ringMat = new THREE.MeshBasicMaterial({
+                            color: 0x8b5cf6,
+                            transparent: true,
+                            opacity: 0.1,
+                            side: THREE.DoubleSide,
+                        });
+                        const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.8, 32), ringMat);
+                        ring.rotation.x = -Math.PI / 2;
+                        ring.position.z = -0.1;
+                        routerGroup.add(ring);
+
+                        scene.add(routerGroup);
+                        objects.push(routerGroup);
+
+                        animationFn = (time) => {
+                            routerGroup.rotation.z = Math.sin(time * 0.2) * 0.05;
+                            routerGroup.rotation.x = Math.sin(time * 0.15) * 0.05;
+                            ringMat.opacity = 0.05 + Math.sin(time * 0.5) * 0.05;
+                        };
+                        break;
+                    }
+
+                    case 'fyr': {
+                        // Fire/flame particles
+                        const particleCount = 200;
+                        const fireGeo = new THREE.BufferGeometry();
+                        const firePos = new Float32Array(particleCount * 3);
+                        const fireSizes = new Float32Array(particleCount);
+                        const fireSpeeds = new Float32Array(particleCount);
+
+                        for (let i = 0; i < particleCount; i++) {
+                            firePos[i * 3] = (Math.random() - 0.5) * 4;
+                            firePos[i * 3 + 1] = (Math.random() - 0.5) * 3;
+                            firePos[i * 3 + 2] = (Math.random() - 0.5) * 1;
+                            fireSizes[i] = 0.02 + Math.random() * 0.06;
+                            fireSpeeds[i] = 0.5 + Math.random() * 1.5;
+                        }
+
+                        fireGeo.setAttribute('position', new THREE.BufferAttribute(firePos, 3));
+                        fireGeo.setAttribute('size', new THREE.BufferAttribute(fireSizes, 1));
+
+                        const fireMat = new THREE.PointsMaterial({
+                            color: 0xff6633,
+                            size: 0.08,
+                            transparent: true,
+                            opacity: 0.6,
+                            blending: THREE.AdditiveBlending,
+                            sizeAttenuation: true,
+                        });
+
+                        const fire = new THREE.Points(fireGeo, fireMat);
+                        scene.add(fire);
+                        objects.push(fire);
+
+                        const firePosAttr = fire.geometry.attributes.position;
+
+                        animationFn = (time) => {
+                            const positions = firePosAttr.array;
+                            for (let i = 0; i < particleCount; i++) {
+                                positions[i * 3 + 1] += 0.005 * fireSpeeds[i];
+                                positions[i * 3] += Math.sin(time + i) * 0.002;
+                                if (positions[i * 3 + 1] > 1.8) {
+                                    positions[i * 3 + 1] = -1.8;
+                                    positions[i * 3] = (Math.random() - 0.5) * 4;
+                                }
+                            }
+                            firePosAttr.needsUpdate = true;
+
+                            // Color shift
+                            const hue = 0.05 + Math.sin(time * 0.1) * 0.02;
+                            fireMat.color.setHSL(hue, 1, 0.5);
+
+                            fire.rotation.y += 0.001;
+                        };
+                        break;
+                    }
+
+                    case 'debug': {
+                        // Terminal/code lines
+                        const codeGroup = new THREE.Group();
+
+                        const lineMat = new THREE.MeshBasicMaterial({
+                            color: 0x4ade80,
+                            transparent: true,
+                            opacity: 0.3,
+                        });
+
+                        for (let i = 0; i < 20; i++) {
+                            const length = 0.3 + Math.random() * 0.8;
+                            const y = -1.2 + i * 0.12;
+                            const line = new THREE.Mesh(
+                                new THREE.BoxGeometry(length, 0.02, 0.02),
+                                lineMat
+                            );
+                            line.position.set(-0.8 + Math.random() * 0.2, y, 0);
+                            codeGroup.add(line);
+
+                            // cursor blink
+                            if (i === 10) {
+                                const cursor = new THREE.Mesh(
+                                    new THREE.BoxGeometry(0.02, 0.08, 0.02),
+                                    new THREE.MeshBasicMaterial({ color: 0x4ade80 })
+                                );
+                                cursor.position.set(0.1, y, 0);
+                                cursor.userData.isCursor = true;
+                                codeGroup.add(cursor);
+                            }
+                        }
+
+                        scene.add(codeGroup);
+                        objects.push(codeGroup);
+
+                        // Glow box
+                        const glowBoxMat = new THREE.MeshBasicMaterial({
+                            color: 0x4ade80,
+                            transparent: true,
+                            opacity: 0.02,
+                            side: THREE.DoubleSide,
+                        });
+                        const glowBox = new THREE.Mesh(new THREE.BoxGeometry(3, 2.6, 0.5), glowBoxMat);
+                        glowBox.position.z = -0.2;
+                        scene.add(glowBox);
+
+                        animationFn = (time) => {
+                            codeGroup.children.forEach((child) => {
+                                if (child.userData.isCursor) {
+                                    child.visible = Math.sin(time * 3) > 0;
+                                }
+                            });
+                            glowBoxMat.opacity = 0.01 + Math.sin(time * 0.5) * 0.01;
+                        };
+                        break;
+                    }
+
+                    case 'sentry': {
+                        // Radar scanner
+                        const radarGroup = new THREE.Group();
+
+                        // Radar disc
+                        const discMat = new THREE.MeshBasicMaterial({
+                            color: 0x60a5fa,
+                            transparent: true,
+                            opacity: 0.1,
+                            side: THREE.DoubleSide,
+                        });
+                        const disc = new THREE.Mesh(new THREE.RingGeometry(0.5, 2.0, 32), discMat);
+                        disc.rotation.x = -Math.PI / 2;
+                        radarGroup.add(disc);
+
+                        // Rings
+                        for (let i = 1; i <= 3; i++) {
+                            const ringMat = new THREE.MeshBasicMaterial({
+                                color: 0x60a5fa,
+                                transparent: true,
+                                opacity: 0.08,
+                                side: THREE.DoubleSide,
+                            });
+                            const ring = new THREE.Mesh(
+                                new THREE.RingGeometry(i * 0.6 - 0.05, i * 0.6 + 0.05, 32),
+                                ringMat
+                            );
+                            ring.rotation.x = -Math.PI / 2;
+                            radarGroup.add(ring);
+                        }
+
+                        // Sweep line
+                        const sweepMat = new THREE.MeshBasicMaterial({
+                            color: 0x60a5fa,
+                            transparent: true,
+                            opacity: 0.2,
+                        });
+                        const sweep = new THREE.Mesh(new THREE.PlaneGeometry(0.04, 2.0), sweepMat);
+                        sweep.position.z = 0.01;
+                        radarGroup.add(sweep);
+
+                        // Dots
+                        const dotMat = new THREE.MeshBasicMaterial({
+                            color: 0x22d3ee,
+                            transparent: true,
+                            opacity: 0.6,
+                        });
+                        for (let i = 0; i < 5; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const radius = 0.5 + Math.random() * 1.4;
+                            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), dotMat);
+                            dot.position.set(radius * Math.cos(angle), radius * Math.sin(angle), 0.02);
+                            dot.userData = { angle, radius, speed: 0.5 + Math.random() * 0.5 };
+                            radarGroup.add(dot);
+                        }
+
+                        scene.add(radarGroup);
+                        objects.push(radarGroup);
+
+                        animationFn = (time) => {
+                            sweep.rotation.z = time * 0.5;
+
+                            radarGroup.children.forEach((child) => {
+                                if (child.userData && child.userData.angle !== undefined) {
+                                    child.userData.angle += 0.005 * child.userData.speed;
+                                    child.position.x = child.userData.radius * Math.cos(child.userData.angle);
+                                    child.position.y = child.userData.radius * Math.sin(child.userData.angle);
+                                }
+                            });
+
+                            discMat.opacity = 0.05 + Math.sin(time * 0.3) * 0.05;
+                        };
+                        break;
+                    }
+
+                    case 'pytest': {
+                        // Checkmark + gear
+                        const testGroup = new THREE.Group();
+
+                        // Checkmark
+                        const checkShape = new THREE.Shape();
+                        checkShape.moveTo(-0.3, 0);
+                        checkShape.lineTo(0, 0.5);
+                        checkShape.lineTo(0.6, -0.4);
+
+                        const checkMat = new THREE.MeshStandardMaterial({
+                            color: 0x4ade80,
+                            emissive: 0x22c55e,
+                            emissiveIntensity: 0.2,
+                            metalness: 0.3,
+                            roughness: 0.4,
+                        });
+                        const checkGeo = new THREE.ShapeGeometry(checkShape);
+                        const check = new THREE.Mesh(checkGeo, checkMat);
+                        check.position.z = 0.1;
+                        testGroup.add(check);
+
+                        // Gear (torus)
+                        const gearMat = new THREE.MeshStandardMaterial({
+                            color: 0x60a5fa,
+                            emissive: 0x2563eb,
+                            emissiveIntensity: 0.1,
+                            metalness: 0.5,
+                            roughness: 0.3,
+                        });
+                        const gear = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.06, 8, 16), gearMat);
+                        gear.rotation.x = Math.PI / 3;
+                        gear.rotation.z = Math.PI / 4;
+                        testGroup.add(gear);
+
+                        // Small dots around gear
+                        const dotMat = new THREE.MeshBasicMaterial({
+                            color: 0x60a5fa,
+                            transparent: true,
+                            opacity: 0.3,
+                        });
+                        for (let i = 0; i < 8; i++) {
+                            const angle = (i / 8) * Math.PI * 2;
+                            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), dotMat);
+                            dot.position.set(0.7 * Math.cos(angle), 0.7 * Math.sin(angle), 0);
+                            testGroup.add(dot);
+                        }
+
+                        scene.add(testGroup);
+                        objects.push(testGroup);
+
+                        animationFn = (time) => {
+                            gear.rotation.z += 0.01;
+                            gear.rotation.x = Math.PI / 3 + Math.sin(time * 0.2) * 0.05;
+                            checkMat.emissiveIntensity = 0.1 + Math.sin(time * 1.5) * 0.1;
+                            testGroup.rotation.z = Math.sin(time * 0.1) * 0.03;
+                        };
+                        break;
+                    }
+
+                    default: {
+                        // Fallback: rotating cube
+                        const cubeMat = new THREE.MeshStandardMaterial({
+                            color: 0x60a5fa,
+                            emissive: 0x2563eb,
+                            emissiveIntensity: 0.1,
+                            metalness: 0.5,
+                            roughness: 0.3,
+                        });
+                        const cube = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), cubeMat);
+                        scene.add(cube);
+                        objects.push(cube);
+
+                        animationFn = (time) => {
+                            cube.rotation.x += 0.01;
+                            cube.rotation.y += 0.02;
+                        };
+                    }
+                }
+
+                // --- Resize ---
+                function resizeScene() {
+                    const w = container.clientWidth || 400;
+                    const h = container.clientHeight || 160;
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(w, h);
+                }
+
+                const resizeObserver = new ResizeObserver(resizeScene);
+                resizeObserver.observe(container);
+
+                // --- Animation ---
+                function animatePlugin() {
+                    requestAnimationFrame(animatePlugin);
+                    const time = Date.now() * 0.001;
+                    if (animationFn) animationFn(time);
+                    renderer.render(scene, camera);
+                }
+                animatePlugin();
+
+                // Store for cleanup
+                container._resizeObserver = resizeObserver;
+            });
+        })();
     </script>
 
 </body>

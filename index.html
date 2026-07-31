@@ -32,6 +32,48 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 
     <style>
+        /* ============================================================ */
+        /* SOLAR SYSTEM BACKGROUND LAYER                                */
+        /* ============================================================ */
+        #solar-system {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;  /* Allows clicking through to content */
+        }
+
+        /* Content overlay - sits ON TOP of the solar system */
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            background: rgba(5, 8, 15, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* Ensure all content sections are visible */
+        .content-overlay > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============================================================ */
+        /* OVERRIDE: Glass cards on dark background                    */
+        /* ============================================================ */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* ============================================================ */
+        /* EXISTING STYLES FROM YOUR style.css                         */
+        /* ============================================================ */
         .gradient-hero {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
         }
@@ -43,21 +85,33 @@
         }
         .gradient-btn {
             background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         .gradient-btn:hover {
             background: linear-gradient(135deg, #1d4ed8, #0891b2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
         }
-        .glass-card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
-        .glass-card-dark {
-            background: rgba(15,23,42,0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.06);
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .code-block {
             background: #0f172a;
@@ -66,10 +120,6 @@
             overflow-x: auto;
             font-size: 0.85rem;
             border: 1px solid #1e293b;
-        }
-        .code-block code {
-            color: #e2e8f0;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
         }
         .code-block .hljs {
             background: transparent !important;
@@ -88,44 +138,6 @@
             0%, 100% { opacity: 0.4; }
             50% { opacity: 0.8; }
         }
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Three.js canvas */
-        #solar-system {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Content overlay */
-        .content-overlay {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-        }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
@@ -140,6 +152,19 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #334155;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #05080f;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e2e8f0;
+            line-height: 1.6;
         }
     </style>
 
@@ -164,12 +189,12 @@
 <body>
 
     <!-- ============================================================ -->
-    <!-- THREE.JS SOLAR SYSTEM                                          -->
+    <!-- THREE.JS SOLAR SYSTEM (BACKGROUND LAYER)                      -->
     <!-- ============================================================ -->
     <div id="solar-system"></div>
 
     <!-- ============================================================ -->
-    <!-- MAIN CONTENT OVERLAY                                          -->
+    <!-- MAIN CONTENT OVERLAY (SITS ON TOP)                           -->
     <!-- ============================================================ -->
     <div class="content-overlay">
 
@@ -222,7 +247,7 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- THREE.JS SOLAR SYSTEM ANIMATION                               -->
+    <!-- THREE.JS SOLAR SYSTEM ANIMATION (BACKGROUND)                  -->
     <!-- ============================================================ -->
     <script>
         (function() {
@@ -315,8 +340,7 @@
                 { radius: 11.0, size: 0.28, color: 0x4488aa, speed: 0.0015, name: 'Neptune' },
             ];
 
-            planetData.forEach((data, index) => {
-                // Planet mesh
+            planetData.forEach((data) => {
                 const geo = new THREE.SphereGeometry(data.size, 16, 16);
                 const mat = new THREE.MeshStandardMaterial({
                     color: data.color,
@@ -327,7 +351,6 @@
                 });
                 const mesh = new THREE.Mesh(geo, mat);
 
-                // Random starting angle
                 const startAngle = Math.random() * Math.PI * 2;
                 mesh.position.x = data.radius * Math.cos(startAngle);
                 mesh.position.z = data.radius * Math.sin(startAngle);
@@ -371,11 +394,10 @@
                 });
             });
 
-            // --- Asteroid Belt (between Mars and Jupiter) ---
+            // --- Asteroid Belt ---
             const asteroidCount = 300;
             const astGeo = new THREE.BufferGeometry();
             const astPos = new Float32Array(asteroidCount * 3);
-            const astSizes = new Float32Array(asteroidCount);
             for (let i = 0; i < asteroidCount; i++) {
                 const theta = Math.random() * Math.PI * 2;
                 const r = 5.6 + Math.random() * 0.8;
@@ -383,10 +405,8 @@
                 astPos[i * 3] = r * Math.cos(theta);
                 astPos[i * 3 + 1] = y;
                 astPos[i * 3 + 2] = r * Math.sin(theta);
-                astSizes[i] = 0.02 + Math.random() * 0.04;
             }
             astGeo.setAttribute('position', new THREE.BufferAttribute(astPos, 3));
-            astGeo.setAttribute('size', new THREE.BufferAttribute(astSizes, 1));
             const astMat = new THREE.PointsMaterial({
                 color: 0x888888,
                 size: 0.04,
@@ -396,7 +416,7 @@
             const asteroids = new THREE.Points(astGeo, astMat);
             scene.add(asteroids);
 
-            // --- Stars (distant background) ---
+            // --- Stars ---
             const starCount = 2000;
             const starGeo = new THREE.BufferGeometry();
             const starPos = new Float32Array(starCount * 3);
@@ -489,7 +509,7 @@
 
             animate();
 
-            console.log('Flaxon Solar System animation loaded!');
+            console.log('🌌 Flaxon Solar System background animation loaded!');
         })();
     </script>
 
