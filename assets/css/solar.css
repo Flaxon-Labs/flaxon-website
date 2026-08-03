@@ -1,0 +1,288 @@
+ /* ============================================================ */
+        /* LOADING OVERLAY                                              */
+        /* ============================================================ */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #05080f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #loading-overlay .loading-content {
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* Typing animation */
+        .typing-container {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(96, 165, 250, 0.15);
+            margin-top: 1.5rem;
+            text-align: left;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .typing-container .line-number {
+            color: #475569;
+            user-select: none;
+            margin-right: 1rem;
+            display: inline-block;
+            width: 1.5rem;
+        }
+
+        .typing-container .keyword {
+            color: #c084fc;
+        }
+        .typing-container .function {
+            color: #60a5fa;
+        }
+        .typing-container .string {
+            color: #34d399;
+        }
+        .typing-container .comment {
+            color: #475569;
+            font-style: italic;
+        }
+        .typing-container .decorator {
+            color: #fbbf24;
+        }
+        .typing-container .variable {
+            color: #f472b6;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: #60a5fa;
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Loading spinner (solar system placeholder) */
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .loading-spinner .orbit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(96, 165, 250, 0.1);
+            border-radius: 50%;
+            animation: spin 3s linear infinite;
+        }
+
+        .loading-spinner .orbit:nth-child(2) {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+            animation-duration: 2s;
+            border-color: rgba(167, 139, 250, 0.1);
+        }
+
+        .loading-spinner .orbit:nth-child(3) {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+            animation-duration: 1.5s;
+            border-color: rgba(34, 211, 238, 0.1);
+        }
+
+        .loading-spinner .core {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            letter-spacing: 2px;
+        }
+
+        .loading-title span {
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* ============================================================ */
+        /* SOLAR SYSTEM BACKGROUND LAYER                                */
+        /* ============================================================ */
+        #solar-system {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            background: rgba(5, 8, 15, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .content-overlay > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #0891b2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .code-block {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            border: 1px solid #1e293b;
+        }
+        .code-block .hljs {
+            background: transparent !important;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+        .animate-pulse-slow {
+            animation: pulseSlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseSlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #05080f;
+        }
+
+      
+        /* Flaxon logo pulse during loading */
+        .logo-pulse {
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
