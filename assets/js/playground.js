@@ -2,67 +2,33 @@
 (function () {
     "use strict";
 
-    const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js";
-    let pyodidePromise;
-
-    function loadPyodide() {
-        if (pyodidePromise) return pyodidePromise;
-        pyodidePromise = new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = PYODIDE_URL;
-            script.onload = async () => {
-                try {
-                    resolve(await window.loadPyodide());
-                } catch (error) {
-                    reject(error);
-                }
-            };
-            script.onerror = () => reject(new Error("Could not load the Python runtime."));
-            document.head.appendChild(script);
-        });
-        return pyodidePromise;
-    }
-
     function setOutput(element, message, isError) {
         element.textContent = message;
         element.classList.toggle("playground-error", Boolean(isError));
     }
 
-    async function run(code, output) {
-        const pyodide = await loadPyodide();
-        pyodide.globals.set("user_code", code);
-        const runner = `
-import json
-import sys
-import types
+    function parseRoutes(code) {
+        if (!/\bapp\s*=\s*Flaxon\s*\(/.test(code)) {
+            throw new Error('Create an application with app = Flaxon("my-app").');
+        }
 
-class Flaxon:
-    def __init__(self, name, **options):
-        self.name = name
-        self.options = options
-        self.routes = []
-    def route(self, path, methods=None):
-        methods = methods or {"GET"}
-        def register(handler):
-            self.routes.append({"path": path, "methods": sorted(methods), "name": handler.__name__})
-            return handler
-        return register
-    def get(self, path):
-        return self.route(path, {"GET"})
-    def post(self, path):
-        return self.route(path, {"POST"})
+        const appName = (code.match(/\bapp\s*=\s*Flaxon\s*\(\s*["']([^"']+)["']/) || [])[1] || "app";
+        const routes = [];
+        const decorator = /^\s*@app\.(get|post|put|patch|delete)\(\s*(["'])(.*?)\2\s*\)\s*\r?\n\s*(?:async\s+)?def\s+([A-Za-z_]\w*)/gm;
+        const genericRoute = /^\s*@app\.route\(\s*(["'])(.*?)\1\s*,\s*methods\s*=\s*\{([^}]+)\}\s*\)\s*\r?\n\s*(?:async\s+)?def\s+([A-Za-z_]\w*)/gm;
+        let match;
 
-flaxon_module = types.ModuleType("flaxon")
-flaxon_module.Flaxon = Flaxon
-sys.modules["flaxon"] = flaxon_module
-namespace = {"Flaxon": Flaxon}
-exec(user_code, namespace)
-app = namespace.get("app")
-if not isinstance(app, Flaxon):
-    raise RuntimeError("Create an app with app = Flaxon(\"my-app\")")
-json.dumps({"application": app.name, "routes": app.routes}, indent=2)
-`;
-        return await pyodide.runPythonAsync(runner);
+        while ((match = decorator.exec(code)) !== null) {
+            routes.push({ path: match[3], methods: [match[1].toUpperCase()], name: match[4] });
+        }
+        while ((match = genericRoute.exec(code)) !== null) {
+            const methods = Array.from(match[3].matchAll(/["']([A-Za-z]+)["']/g), item => item[1].toUpperCase());
+            routes.push({ path: match[2], methods: methods.length ? methods : ["GET"], name: match[4] });
+        }
+        if (!routes.length) {
+            throw new Error("No Flaxon route decorators were found. Try @app.get(\"/\") above a function.");
+        }
+        return JSON.stringify({ application: appName, routes: routes }, null, 2);
     }
 
     function initialize() {
@@ -73,15 +39,11 @@ json.dumps({"application": app.name, "routes": app.routes}, indent=2)
         if (!editor || !runButton || !resetButton || !output) return;
 
         const starter = editor.value;
-        runButton.addEventListener("click", async () => {
-            runButton.disabled = true;
-            setOutput(output, "Starting the browser Python runtime…", false);
+        runButton.addEventListener("click", () => {
             try {
-                setOutput(output, await run(editor.value, output), false);
+                setOutput(output, parseRoutes(editor.value), false);
             } catch (error) {
                 setOutput(output, `Error: ${error.message || error}`, true);
-            } finally {
-                runButton.disabled = false;
             }
         });
         resetButton.addEventListener("click", () => {

@@ -13,6 +13,11 @@
         'use strict';
 
         var searchIndex = [];
+        var initialized = false;
+
+        function siteUrl(path) {
+            return window.flaxonSiteUrl ? window.flaxonSiteUrl(path) : path;
+        }
 
         function escapeRegExp(value) {
             return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -22,7 +27,7 @@
         // LOAD SEARCH INDEX FROM JSON
         // ============================================================
         function loadSearchIndex() {
-            return fetch('/data/search-index.json')
+            return fetch(siteUrl('/data/search-index.json'))
                 .then(function(response) {
                     if (!response.ok) throw new Error('Failed to load search index');
                     return response.json();
@@ -43,7 +48,7 @@
         function loadSearchModal() {
             var container = document.getElementById('search-modal-container');
             if (!container) return;
-            fetch('/components/search-modal.html')
+            fetch(siteUrl('/components/search-modal.html'))
                 .then(function(response) {
                     if (!response.ok) throw new Error('Failed to load search modal');
                     return response.text();
@@ -96,6 +101,7 @@
         // INITIALIZE SEARCH
         // ============================================================
         function initSearch() {
+            if (initialized) return;
             var searchModal = document.getElementById('search-modal');
             var searchInput = document.getElementById('search-input');
             var searchResults = document.getElementById('search-results-container');
@@ -106,6 +112,7 @@
                 console.warn('Search elements not found');
                 return;
             }
+            initialized = true;
 
             // ============================================================
             // OPEN SEARCH
@@ -273,9 +280,15 @@
         // Run immediately: this file is only loaded (via the bootstrap
         // in header.html) after header.html's markup already exists in
         // the DOM, so there is no DOMContentLoaded event left to wait for.
-        document.addEventListener('flaxon:header-ready', function () {
+        function initializeSearch() {
             loadSearchModal();
             initBreadcrumb();
-        }, { once: true });
+        }
+
+        document.addEventListener('flaxon:header-ready', initializeSearch, { once: true });
+        // Covers cached components or pages that already have a static header.
+        if (document.getElementById('search-trigger')) {
+            initializeSearch();
+        }
 
     })();
