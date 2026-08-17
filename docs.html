@@ -45,11 +45,16 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
     <!-- Header -->
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <!-- Documentation Layout -->
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
@@ -83,6 +88,11 @@
                             <p class="mb-0 mt-1">Start with the <a href="/docs/getting-started/quickstart.html" class="text-flaxon-blue hover:underline">Quick Start</a> guide to build your first application in minutes.</p>
                         </div>
 
+                        <div class="note">
+                            <strong><i class="fas fa-terminal mr-2"></i> Try the route syntax</strong>
+                            <p class="mb-0 mt-1">Use the small <a href="/playground.html">Flaxon playground</a> to inspect registered routes in your browser, then run the same code locally with <code>flaxon run app:app --reload</code>.</p>
+                        </div>
+
                         <!-- ============================================================ -->
                         <!-- GETTING STARTED                                             -->
                         <!-- ============================================================ -->
@@ -104,7 +114,7 @@
                                 <span class="inline-block mt-2 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">Learn more →</span>
                             </a>
 
-                            <a href="/docs/getting-started/philosophy.html" class="card hover:shadow-md transition group">
+                            <a href="/blog/why-flaxon.html" class="card hover:shadow-md transition group">
                                 <div class="feature-icon emerald group-hover:scale-110 transition"><i class="fas fa-lightbulb"></i></div>
                                 <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Philosophy</h3>
                                 <p class="text-slate-600 dark:text-slate-400 text-sm">Understand the principles behind Flaxon.</p>
@@ -223,6 +233,13 @@
                                 <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Plugins</h3>
                                 <p class="text-slate-600 dark:text-slate-400 text-sm">Extend Flaxon with modular plugins.</p>
                                 <span class="inline-block mt-2 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">Learn more →</span>
+                            </a>
+
+                            <a href="/docs/guides/ecosystem.html" class="card hover:shadow-md transition group">
+                                <div class="feature-icon emerald group-hover:scale-110 transition"><i class="fas fa-cubes"></i></div>
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Ecosystem</h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">Use SQLAlchemy, Stripe, S3, and PostgreSQL integrations.</p>
+                                <span class="inline-block mt-2 text-flaxon-blue dark:text-flaxon-electric text-sm font-medium">View integrations →</span>
                             </a>
 
                             <a href="/docs/guides/mobile-backends.html" class="card hover:shadow-md transition group">
@@ -362,7 +379,7 @@
     </section>
 
     <!-- Footer -->
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <!-- Scripts -->
     <script>

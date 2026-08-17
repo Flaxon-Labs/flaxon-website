@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -57,6 +62,7 @@
                         <a href="/docs/guides/websockets.html">WebSockets</a>
                         <a href="/docs/guides/authentication.html">Authentication</a>
                         <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
 
                         <div class="section-title">API Reference</div>
                         <a href="/docs/api/application.html">Application</a>
@@ -253,7 +259,7 @@ app.add_middleware(CustomMiddleware)          # Executed last (innermost)</code>
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

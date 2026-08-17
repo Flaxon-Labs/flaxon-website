@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -62,6 +67,7 @@
                         <a href="/docs/guides/testing.html">Testing</a>
                         <a href="/docs/guides/debugging.html">Debugging</a>
                         <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
                         <a href="/docs/guides/mobile-backends.html" class="active">Mobile Backends</a>
                     </div>
                 </aside>
@@ -79,9 +85,9 @@ from flaxon.validation import Schema, fields
 app = Flaxon("android-backend")
 
 class DeviceRegistration(Schema):
-    device_id = fields.String(required=True, min_length=8)
-    platform = fields.Choice(["android", "ios"], required=True)
-    notification_token = fields.String(required=True, min_length=16)
+    device_id = fields.StrField(required=True, min_length=8)
+    platform = fields.ChoiceField(["android", "ios"], required=True)
+    notification_token = fields.StrField(required=True, min_length=16)
 
 @app.post("/api/v1/devices")
 async def register_device(data: DeviceRegistration):
@@ -203,7 +209,7 @@ async def upload_file(request):
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

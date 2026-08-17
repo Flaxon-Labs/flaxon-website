@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>Playground – Flaxon</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script>
+    <script defer src="/assets/js/playground.js"></script>
+    <style>
+        .playground-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr); gap:1.25rem; }
+        .playground-editor, .playground-output { width:100%; min-height:23rem; border-radius:.75rem; padding:1rem; font: .9rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+        .playground-editor { color:#e2e8f0; background:#0f172a; border:1px solid #334155; resize:vertical; tab-size:4; }
+        .playground-output { white-space:pre-wrap; color:#cbd5e1; background:#0f172a; border:1px solid #334155; }
+        .playground-error { color:#fecaca; border-color:#ef4444; }
+        @media (max-width: 800px) { .playground-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div id="header"></div>
+    <main class="container mx-auto max-w-6xl px-4 py-12">
+        <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">Flaxon playground</p>
+        <h1 class="mt-2 text-4xl font-extrabold tracking-tight">Try a route definition</h1>
+        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">This small browser playground executes Python with a minimal Flaxon route shim and displays the routes it registers. It does not start an HTTP server, install packages, connect to databases, or run untrusted code on the Flaxon website.</p>
+        <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+            Use it to learn decorator and path syntax. Test a real application locally with <code>flaxon run app:app --reload</code> and the test client.
+        </div>
+        <div class="playground-grid mt-8">
+            <section>
+                <label class="mb-2 block text-sm font-semibold" for="playground-editor">Python</label>
+                <textarea id="playground-editor" class="playground-editor" spellcheck="false">from flaxon import Flaxon
+
+app = Flaxon("playground")
+
+
+@app.get("/")
+async def home():
+    return {"message": "Hello from Flaxon"}
+
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id}</textarea>
+                <div class="mt-3 flex gap-3">
+                    <button id="playground-run" class="gradient-btn rounded-lg px-4 py-2 font-semibold"><i class="fas fa-play mr-2"></i>Run</button>
+                    <button id="playground-reset" class="rounded-lg border border-slate-300 px-4 py-2 font-semibold dark:border-slate-600">Reset</button>
+                </div>
+            </section>
+            <section>
+                <p class="mb-2 text-sm font-semibold">Registered routes</p>
+                <output id="playground-output" class="playground-output">Run the example to inspect its registered routes.</output>
+            </section>
+        </div>
+    </main>
+    <div id="footer"></div>
+</body>
+</html>

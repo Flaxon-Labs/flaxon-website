@@ -28,10 +28,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <!-- Examples Page -->
     <section class="bg-slate-50 dark:bg-slate-950 py-16">
@@ -137,7 +142,7 @@
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

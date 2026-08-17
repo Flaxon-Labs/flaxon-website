@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>Flaxon Ecosystem – Documentation</title>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { flaxon: { blue: '#3776AB', electric: '#00D4FF' } } } } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 py-10">
+        <div class="grid gap-8 lg:grid-cols-4">
+            <aside class="lg:col-span-1">
+                <nav class="doc-sidebar" aria-label="Documentation navigation">
+                    <div class="section-title">Getting Started</div>
+                    <a href="/docs/getting-started/index.html">Overview</a>
+                    <a href="/docs/getting-started/installation.html">Installation</a>
+                    <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+                    <div class="section-title">Core Concepts</div>
+                    <a href="/docs/core-concepts/routing.html">Routing</a>
+                    <a href="/docs/core-concepts/requests.html">Requests</a>
+                    <a href="/docs/core-concepts/responses.html">Responses</a>
+                    <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                    <a href="/docs/core-concepts/validation.html">Validation</a>
+                    <div class="section-title">Guides</div>
+                    <a href="/docs/guides/databases.html">Databases</a>
+                    <a href="/docs/guides/authentication.html">Authentication</a>
+                    <a href="/docs/guides/websockets.html">WebSockets</a>
+                    <a href="/docs/guides/testing.html">Testing</a>
+                    <a href="/docs/guides/plugins.html">Plugins</a>
+                    <a class="active" href="/docs/guides/ecosystem.html">Ecosystem</a>
+                </nav>
+            </aside>
+
+            <article class="doc-content lg:col-span-3">
+                <p class="text-sm font-semibold text-flaxon-blue dark:text-flaxon-electric">Flaxon ecosystem</p>
+                <h1>Integration packages</h1>
+                <p>Flaxon keeps integrations outside the core package. Each package is a normal Flaxon plugin: it is loaded once during startup, exposes a focused service on <code>app.state</code>, and leaves routes, authorization, and business rules in your application.</p>
+
+                <div class="note warning">
+                    <strong>Release status</strong>
+                    <p class="mb-0 mt-1">The four packages below are source-ready and pending their first PyPI release. Until then, install from their GitHub repository. Replace the Git URL with the named PyPI package once it is published.</p>
+                </div>
+
+                <h2>Load plugins at startup</h2>
+                <p><code>PluginManager.load_plugin()</code> is asynchronous. Register plugins from an <code>@app.on_startup</code> handler; request handlers can then safely access the service through <code>app.state</code>.</p>
+                <div class="code-block"><pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("store")
+
+@app.on_startup
+async def load_integrations():
+    # await app.plugins.load_plugin(...)
+    pass</code></pre></div>
+
+                <h2 id="sqlalchemy">flaxon-sqlalchemy</h2>
+                <p>Provides one async SQLAlchemy engine and async session factory at <code>app.state.sqlalchemy</code>. It creates the engine at startup and disposes it at shutdown.</p>
+                <div class="code-block"><pre><code class="language-bash">pip install "flaxon-sqlalchemy[postgresql] @ git+https://github.com/aldanedev-create/flaxon-sqlalchemy.git"
+# For SQLite instead: "flaxon-sqlalchemy[sqlite] @ git+https://github.com/aldanedev-create/flaxon-sqlalchemy.git"</code></pre></div>
+                <div class="code-block"><pre><code class="language-python">import os
+
+from flaxon import Flaxon
+from flaxon_sqlalchemy import SQLAlchemyPlugin
+from sqlalchemy import text
+
+app = Flaxon("store")
+
+@app.on_startup
+async def load_database():
+    await app.plugins.load_plugin(
+        SQLAlchemyPlugin(os.environ["DATABASE_URL"])
+    )
+
+@app.get("/orders")
+async def list_orders():
+    async with app.state.sqlalchemy.session() as session:
+        result = await session.execute(text("SELECT id FROM orders"))
+        return {"orders": list(result.scalars())}</code></pre></div>
+                <p>Use an async SQLAlchemy URL such as <code>postgresql+asyncpg://…</code> or <code>sqlite+aiosqlite:///./app.db</code>. Models, migrations, and transaction boundaries remain application responsibilities.</p>
+
+                <h2 id="stripe">flaxon-stripe</h2>
+                <p>Provides a configured Stripe gateway at <code>app.state.stripe</code>. It exposes the SDK as <code>app.state.stripe.client</code> and verifies incoming webhook signatures with <code>verify_webhook()</code>.</p>
+                <div class="code-block"><pre><code class="language-bash">pip install git+https://github.com/aldanedev-create/flaxon-stripe.git</code></pre></div>
+                <div class="code-block"><pre><code class="language-python">import os
+
+from flaxon import Flaxon
+from flaxon.exceptions import BadRequest
+from flaxon_stripe import StripePlugin
+
+app = Flaxon("billing")
+
+@app.on_startup
+async def load_stripe():
+    await app.plugins.load_plugin(
+        StripePlugin(
+            api_key=os.environ["STRIPE_SECRET_KEY"],
+            webhook_secret=os.environ["STRIPE_WEBHOOK_SECRET"],
+        )
+    )
+
+@app.post("/stripe/webhook")
+async def stripe_webhook(request):
+    signature = request.headers.get("stripe-signature")
+    if signature is None:
+        raise BadRequest("Missing Stripe signature")
+    event = app.state.stripe.verify_webhook(await request.body(), signature)
+    return {"received": event["id"]}</code></pre></div>
+                <p>Keep Stripe keys outside source control. Make webhook handling idempotent and record or queue the event before returning success.</p>
+
+                <h2 id="s3">flaxon-s3</h2>
+                <p>Provides Amazon S3-compatible object storage at <code>app.state.s3</code>, including custom endpoints such as MinIO, R2, or other S3-compatible services.</p>
+                <div class="code-block"><pre><code class="language-bash">pip install git+https://github.com/aldanedev-create/flaxon-s3.git</code></pre></div>
+                <div class="code-block"><pre><code class="language-python">import asyncio
+import os
+
+from flaxon import Flaxon
+from flaxon_s3 import S3Plugin
+
+app = Flaxon("uploads")
+
+@app.on_startup
+async def load_storage():
+    await app.plugins.load_plugin(
+        S3Plugin(
+            bucket=os.environ["S3_BUCKET"],
+            region_name=os.environ.get("AWS_REGION"),
+            endpoint_url=os.environ.get("S3_ENDPOINT_URL"),
+        )
+    )
+
+@app.post("/files")
+async def upload_file(request):
+    body = await request.body()
+    await asyncio.to_thread(
+        app.state.s3.upload_bytes,
+        "incoming/report.pdf",
+        body,
+        content_type="application/pdf",
+    )
+    return {"key": "incoming/report.pdf"}</code></pre></div>
+                <p>The S3 client is synchronous, so offload network calls with <code>asyncio.to_thread()</code> in async routes. Use server-controlled object keys, constrained IAM permissions, and content limits before reading uploads.</p>
+
+                <h2 id="postsql">flaxon-postsql</h2>
+                <p>Provides an <code>asyncpg</code> PostgreSQL pool at <code>app.state.postsql</code>. The pool opens at startup and closes at shutdown.</p>
+                <div class="code-block"><pre><code class="language-bash">pip install git+https://github.com/aldanedev-create/flaxon-postsql.git</code></pre></div>
+                <div class="code-block"><pre><code class="language-python">import os
+
+from flaxon import Flaxon
+from flaxon_postsql import PostSQLPlugin
+
+app = Flaxon("catalog")
+
+@app.on_startup
+async def load_postgres():
+    await app.plugins.load_plugin(
+        PostSQLPlugin(os.environ["DATABASE_URL"], min_size=2, max_size=10)
+    )
+
+@app.get("/products")
+async def list_products():
+    rows = await app.state.postsql.fetch(
+        "SELECT id, name FROM products WHERE category = $1 ORDER BY id",
+        "books",
+    )
+    return {"products": [dict(row) for row in rows]}</code></pre></div>
+                <p>Use <code>$1</code>, <code>$2</code>, and later positional parameters with <code>asyncpg</code>; never interpolate user input into SQL. Despite its package name, PostSQL is a PostgreSQL integration.</p>
+
+                <h2>Choose one database layer</h2>
+                <p>Use <code>flaxon-sqlalchemy</code> when you want SQLAlchemy models, sessions, or SQLAlchemy's database portability. Use <code>flaxon-postsql</code> for direct, asyncpg-native PostgreSQL queries. Do not load both for the same database unless you intentionally manage separate pools and connection limits.</p>
+
+                <h2>Deployment checklist</h2>
+                <ul>
+                    <li>Load credentials and URLs from the deployment environment or a secret manager.</li>
+                    <li>Use the exact package version you have tested after the first PyPI release.</li>
+                    <li>Start the application through <code>flaxon run app:app</code> so lifespan startup and shutdown run.</li>
+                    <li>Keep authorization, validation, retries, observability, and error handling in the application layer.</li>
+                </ul>
+            </article>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+</body>
+</html>

@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -57,6 +62,7 @@
                         <a href="/docs/guides/websockets.html">WebSockets</a>
                         <a href="/docs/guides/authentication.html">Authentication</a>
                         <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
 
                         <div class="section-title">API Reference</div>
                         <a href="/docs/api/application.html">Application</a>
@@ -76,9 +82,9 @@
                             <pre><code class="language-python">from flaxon.validation import Schema, fields
 
 class CreateUser(Schema):
-    name = fields.String(required=True, min_length=2, max_length=80)
-    email = fields.Email(required=True)
-    age = fields.Integer(required=False, minimum=13, maximum=120)</code></pre>
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    age = fields.IntField(required=False, minimum=13, maximum=120)</code></pre>
                         </div>
 
                         <h2>Using Schemas in Routes</h2>
@@ -95,7 +101,7 @@ async def create_user(data: CreateUser):
                         <h3>String</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class UserSchema(Schema):
-    name = fields.String(
+    name = fields.StrField(
         required=True,
         min_length=2,
         max_length=80,
@@ -107,7 +113,7 @@ async def create_user(data: CreateUser):
                         <h3>Integer</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class ProductSchema(Schema):
-    price = fields.Integer(
+    price = fields.IntField(
         required=True,
         minimum=0,
         maximum=999999,
@@ -117,7 +123,7 @@ async def create_user(data: CreateUser):
                         <h3>Float</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class PriceSchema(Schema):
-    amount = fields.Float(
+    amount = fields.FloatField(
         required=True,
         minimum=0.0,
         maximum=9999.99,
@@ -127,14 +133,14 @@ async def create_user(data: CreateUser):
                         <h3>Boolean</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class SettingsSchema(Schema):
-    active = fields.Boolean(required=True)
-    notifications = fields.Boolean(default=True)</code></pre>
+    active = fields.BoolField(required=True)
+    notifications = fields.BoolField(default=True)</code></pre>
                         </div>
 
                         <h3>Choice</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class StatusSchema(Schema):
-    status = fields.Choice(
+    status = fields.ChoiceField(
         ["pending", "active", "suspended", "deleted"],
         required=True,
     )</code></pre>
@@ -143,32 +149,32 @@ async def create_user(data: CreateUser):
                         <h3>Email</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class ContactSchema(Schema):
-    email = fields.Email(required=True)</code></pre>
+    email = fields.EmailField(required=True)</code></pre>
                         </div>
 
                         <h3>Date</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class EventSchema(Schema):
-    date = fields.Date(required=True, format="%Y-%m-%d")</code></pre>
+    date = fields.DateField(required=True, format="%Y-%m-%d")</code></pre>
                         </div>
 
                         <h3>DateTime</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class ScheduleSchema(Schema):
-    datetime = fields.DateTime(required=True, format="%Y-%m-%dT%H:%M:%S")</code></pre>
+    datetime = fields.DateTimeField(required=True, format="%Y-%m-%dT%H:%M:%S")</code></pre>
                         </div>
 
                         <h3>UUID</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class TokenSchema(Schema):
-    token = fields.UUID(required=True)</code></pre>
+    token = fields.UUIDField(required=True)</code></pre>
                         </div>
 
                         <h3>List</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class BulkCreateSchema(Schema):
-    users = fields.List(
-        item_field=fields.String(min_length=2),
+    users = fields.ListField(
+        item_field=fields.StrField(min_length=2),
         min_items=1,
         max_items=100,
     )</code></pre>
@@ -177,13 +183,13 @@ async def create_user(data: CreateUser):
                         <h3>Nested</h3>
                         <div class="code-block">
                             <pre><code class="language-python">class AddressSchema(Schema):
-    street = fields.String(required=True)
-    city = fields.String(required=True)
-    zipcode = fields.String(required=True, pattern=r"^\d{5}$")
+    street = fields.StrField(required=True)
+    city = fields.StrField(required=True)
+    zipcode = fields.StrField(required=True, pattern=r"^\d{5}$")
 
 class UserSchema(Schema):
-    name = fields.String(required=True)
-    address = fields.Nested(AddressSchema)</code></pre>
+    name = fields.StrField(required=True)
+    address = fields.NestedField(AddressSchema)</code></pre>
                         </div>
 
                         <h2>Validation Errors</h2>
@@ -214,7 +220,7 @@ def validate_unique_email(value, field):
         raise ValueError("Email already registered")
 
 class CreateUser(Schema):
-    email = fields.Email(
+    email = fields.EmailField(
         required=True,
         validators=[custom_validator(validate_unique_email)],
     )</code></pre>
@@ -226,7 +232,7 @@ class CreateUser(Schema):
 
 class UserSchema(Schema):
     # Must meet all conditions
-    username = fields.String(
+    username = fields.StrField(
         validators=[and_validators(
             length_validator(3, 20),
             pattern_validator(r"^[a-zA-Z0-9_]+$"),
@@ -234,7 +240,7 @@ class UserSchema(Schema):
     )
 
     # Must meet at least one condition
-    contact = fields.String(
+    contact = fields.StrField(
         validators=[or_validators(
             email_validator(),
             pattern_validator(r"^\+\d{10,15}$"),
@@ -252,7 +258,7 @@ class UserSchema(Schema):
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

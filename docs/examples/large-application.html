@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -62,6 +67,7 @@
                         <a href="/docs/guides/testing.html">Testing</a>
                         <a href="/docs/guides/debugging.html">Debugging</a>
                         <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
                         <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
 
                         <div class="section-title">API Reference</div>
@@ -182,17 +188,17 @@ class User:
 from flaxon.validation import Schema, fields
 
 class CreateUser(Schema):
-    name = fields.String(required=True, min_length=2, max_length=80)
-    email = fields.Email(required=True)
-    password = fields.String(required=True, min_length=8)
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)
 
 class UpdateUser(Schema):
-    name = fields.String(required=False, min_length=2, max_length=80)
-    email = fields.Email(required=False)
+    name = fields.StrField(required=False, min_length=2, max_length=80)
+    email = fields.EmailField(required=False)
 
 class LoginRequest(Schema):
-    email = fields.Email(required=True)
-    password = fields.String(required=True, min_length=8)</code></pre>
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)</code></pre>
                         </div>
 
                         <h2>Repository</h2>
@@ -596,7 +602,7 @@ if __name__ == "__main__":
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

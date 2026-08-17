@@ -15,6 +15,20 @@
       "section": "Documentation"
     },
     {
+      "id": "playground",
+      "title": "Flaxon Playground",
+      "url": "/playground.html",
+      "content": "Browser route playground write Flaxon route decorators inspect registered GET and POST routes Python scratchpad simulation",
+      "section": "Tools"
+    },
+    {
+      "id": "ecosystem",
+      "title": "Flaxon Ecosystem",
+      "url": "/docs/guides/ecosystem.html",
+      "content": "Flaxon ecosystem integrations plugins SQLAlchemy async database sessions Stripe webhooks S3 compatible object storage PostgreSQL asyncpg PostSQL install and startup configuration",
+      "section": "Guides"
+    },
+    {
       "id": "installation",
       "title": "Installation",
       "url": "/installation.html",
@@ -31,14 +45,14 @@
     {
       "id": "philosophy",
       "title": "Philosophy",
-      "url": "/docs/getting-started/philosophy.html",
+      "url": "/blog/why-flaxon.html",
       "content": "Philosophy Flaxon design principles simple applications remain simple large applications gain structure HTML rendering optional technology neutral explicit debuggable",
       "section": "Getting Started"
     },
     {
       "id": "architecture",
       "title": "Architecture",
-      "url": "/docs/getting-started/architecture.html",
+      "url": "/docs/api/application.html",
       "content": "Architecture ASGI application layered architecture request lifecycle components router request response middleware validation WebSocket Jinax",
       "section": "Getting Started"
     },
@@ -74,7 +88,7 @@
       "id": "validation",
       "title": "Validation",
       "url": "/docs/core-concepts/validation.html",
-      "content": "Validation declarative schemas fields String Integer Float Boolean Choice Email Date DateTime UUID List Nested custom validators",
+      "content": "Validation declarative schemas fields StrField IntField FloatField BoolField ChoiceField EmailField DateField DateTimeField UUIDField ListField NestedField custom validators",
       "section": "Core Concepts"
     },
     {

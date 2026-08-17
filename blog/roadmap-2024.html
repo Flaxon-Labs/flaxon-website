@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 py-16">
         <div class="container mx-auto px-4">
@@ -165,7 +170,7 @@
 
                     <div class="note">
                         <strong><i class="fas fa-hands-helping mr-2"></i> Contribution Wanted!</strong>
-                        <p class="mb-0 mt-1">We welcome contributions at any stage. Check our <a href="/contributing.html" class="text-flaxon-blue hover:underline">Contributing Guide</a> to get started.</p>
+                        <p class="mb-0 mt-1">We welcome contributions at any stage. Read the <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/blob/main/CONTRIBUTING.md" class="text-flaxon-blue hover:underline" target="_blank" rel="noopener">Contributing Guide</a> to get started.</p>
                     </div>
 
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">— The Flaxon Team</p>
@@ -174,7 +179,7 @@
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

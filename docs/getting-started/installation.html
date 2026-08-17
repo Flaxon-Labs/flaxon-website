@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -43,6 +48,8 @@
                         <a href="/docs/getting-started/index.html">Overview</a>
                         <a href="/docs/getting-started/installation.html" class="active">Installation</a>
                         <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+                        <div class="section-title">More</div>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
                     </div>
                 </aside>
 
@@ -59,19 +66,19 @@
                         <h2>Optional Dependencies</h2>
                         <div class="code-block">
                             <pre><code class="language-bash"># With server (Uvicorn)
-pip install flaxon[server]
+pip install "flaxon[server]"
 
 # With templates (Jinja2)
-pip install flaxon[templates]
+pip install "flaxon[templates]"
 
 # Standard (server + templates)
-pip install flaxon[standard]
+pip install "flaxon[standard]"
 
 # Development tools
-pip install flaxon[dev]
+pip install "flaxon[dev]"
 
 # All extras
-pip install flaxon[standard,dev,server]</code></pre>
+pip install "flaxon[standard,dev,server]"</code></pre>
                         </div>
 
                         <h2>Install from GitHub</h2>
@@ -98,7 +105,7 @@ pip install -e ".[standard,dev]"</code></pre>
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

@@ -29,10 +29,15 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
-    <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="header"></div>
 
     <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
         <div class="container mx-auto px-4">
@@ -62,6 +67,7 @@
                         <a href="/docs/guides/testing.html">Testing</a>
                         <a href="/docs/guides/debugging.html">Debugging</a>
                         <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
                         <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
 
                         <div class="section-title">API Reference</div>
@@ -93,7 +99,7 @@
                         <h2>Application Code</h2>
                         <div class="code-block">
                             <pre><code class="language-python"># app.py
-from flaxon import Flaxon
+from flaxon import Flaxon, JSONResponse, NotFound
 from flaxon.validation import Schema, fields
 
 app = Flaxon("basic-api", debug=True)
@@ -120,15 +126,15 @@ async def home():
 
 # Schema for user creation
 class CreateUser(Schema):
-    name = fields.String(required=True, min_length=2, max_length=80)
-    email = fields.Email(required=True)
-    age = fields.Integer(required=False, minimum=13, maximum=120)
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    age = fields.IntField(required=False, minimum=13, maximum=120)
 
 # Schema for user update
 class UpdateUser(Schema):
-    name = fields.String(required=False, min_length=2, max_length=80)
-    email = fields.Email(required=False)
-    age = fields.Integer(required=False, minimum=13, maximum=120)
+    name = fields.StrField(required=False, min_length=2, max_length=80)
+    email = fields.EmailField(required=False)
+    age = fields.IntField(required=False, minimum=13, maximum=120)
 
 # In-memory storage
 users = []
@@ -143,7 +149,7 @@ async def get_user(user_id: int):
     for user in users:
         if user["id"] == user_id:
             return user
-    return {"error": "User not found"}, 404
+    raise NotFound("User not found")
 
 @app.post("/users")
 async def create_user(data: CreateUser):
@@ -152,15 +158,16 @@ async def create_user(data: CreateUser):
     user["id"] = user_id_counter
     user_id_counter += 1
     users.append(user)
-    return {"created": True, "user": user}, 201
+    return JSONResponse({"created": True, "user": user}, status_code=201)
 
 @app.put("/users/&lt;int:user_id&gt;")
 async def update_user(user_id: int, data: UpdateUser):
     for user in users:
         if user["id"] == user_id:
-            user.update(data.to_dict())
+            updates = {key: value for key, value in data.to_dict().items() if value is not None}
+            user.update(updates)
             return {"updated": True, "user": user}
-    return {"error": "User not found"}, 404
+    raise NotFound("User not found")
 
 @app.delete("/users/&lt;int:user_id&gt;")
 async def delete_user(user_id: int):
@@ -168,13 +175,13 @@ async def delete_user(user_id: int):
         if user["id"] == user_id:
             users.pop(i)
             return {"deleted": True, "id": user_id}
-    return {"error": "User not found"}, 404</code></pre>
+    raise NotFound("User not found")</code></pre>
                         </div>
 
                         <h2>Running the Application</h2>
                         <div class="code-block">
                             <pre><code class="language-bash"># Install dependencies
-pip install flaxon[standard]
+pip install "flaxon[standard]"
 
 # Run the application
 flaxon run app:app --reload</code></pre>
@@ -231,7 +238,7 @@ flaxon run app:app --reload</code></pre>
         </div>
     </section>
 
-    <div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+    <div id="footer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });

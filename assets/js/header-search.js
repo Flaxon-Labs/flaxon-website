@@ -14,6 +14,10 @@
 
         var searchIndex = [];
 
+        function escapeRegExp(value) {
+            return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
         // ============================================================
         // LOAD SEARCH INDEX FROM JSON
         // ============================================================
@@ -37,13 +41,15 @@
         // LOAD SEARCH MODAL
         // ============================================================
         function loadSearchModal() {
+            var container = document.getElementById('search-modal-container');
+            if (!container) return;
             fetch('/components/search-modal.html')
                 .then(function(response) {
                     if (!response.ok) throw new Error('Failed to load search modal');
                     return response.text();
                 })
                 .then(function(html) {
-                    document.getElementById('search-modal-container').innerHTML = html;
+                    container.innerHTML = html;
                     // Load search index first, then init
                     loadSearchIndex().then(function() {
                         initSearch();
@@ -73,7 +79,7 @@
                 var score = 0;
                 var content = (page.title + ' ' + page.content + ' ' + page.section).toLowerCase();
                 terms.forEach(function(term) {
-                    var count = (content.match(new RegExp(term, 'g')) || []).length;
+                var count = (content.match(new RegExp(escapeRegExp(term), 'g')) || []).length;
                     score += count;
                     // Boost if term is in title
                     if (page.title.toLowerCase().includes(term)) score += 5;
@@ -267,7 +273,9 @@
         // Run immediately: this file is only loaded (via the bootstrap
         // in header.html) after header.html's markup already exists in
         // the DOM, so there is no DOMContentLoaded event left to wait for.
-        loadSearchModal();
-        initBreadcrumb();
+        document.addEventListener('flaxon:header-ready', function () {
+            loadSearchModal();
+            initBreadcrumb();
+        }, { once: true });
 
     })();

@@ -31,7 +31,8 @@
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
 
-        if (mobileMenuBtn && mobileMenu) {
+        if (mobileMenuBtn && mobileMenu && !mobileMenuBtn.dataset.menuBound) {
+            mobileMenuBtn.dataset.menuBound = 'true';
             mobileMenuBtn.addEventListener('click', function() {
                 mobileMenu.classList.toggle('hidden');
                 const icon = this.querySelector('i');
@@ -41,6 +42,32 @@
                 }
             });
         }
+    });
+
+    // Header markup is loaded asynchronously by site-shell.js. Bind these
+    // controls again when it becomes available, without double-binding.
+    document.addEventListener('flaxon:header-ready', function() {
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu && !mobileMenuBtn.dataset.menuBound) {
+            mobileMenuBtn.dataset.menuBound = 'true';
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+        }
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('nav a, .sidebar a, .doc-sidebar a').forEach(function(link) {
+            const href = link.getAttribute('href');
+            if (href === '/' ? currentPath === '/' : href && (currentPath === href || currentPath === href + '/')) {
+                link.classList.add('active');
+            }
+        });
     });
 
     // ============================================================

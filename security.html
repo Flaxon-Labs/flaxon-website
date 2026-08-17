@@ -253,7 +253,12 @@
             }
         }
     </script>
-</head>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
 <body>
 
     <!-- ============================================================ -->
@@ -269,7 +274,7 @@
         <!-- ============================================================ -->
         <!-- HEADER                                                         -->
         <!-- ============================================================ -->
-        <div id="header" x-data="{}" x-init="fetch('/components/header.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+        <div id="header"></div>
 
         <!-- ============================================================ -->
         <!-- SECURITY HERO                                                 -->
@@ -461,7 +466,7 @@
 <!-- ============================================================ -->
 <!-- FOOTER                                                         -->
 <!-- ============================================================ -->
-<div id="footer" x-data="{}" x-init="fetch('/components/footer.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+<div id="footer"></div>
 
 </div>
 <!-- END content -->
