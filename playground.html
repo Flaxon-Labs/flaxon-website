@@ -20,27 +20,63 @@
     <script defer src="/assets/js/main.js"></script>
     <script defer src="/assets/js/playground.js"></script>
     <style>
-        .playground-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr); gap:1.25rem; }
-        .playground-editor, .playground-output { width:100%; min-height:23rem; border-radius:.75rem; padding:1rem; font: .9rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
-        .playground-editor { color:#e2e8f0; background:#0f172a; border:1px solid #334155; resize:vertical; tab-size:4; }
-        .playground-output { white-space:pre-wrap; color:#cbd5e1; background:#0f172a; border:1px solid #334155; }
-        .playground-error { color:#fecaca; border-color:#ef4444; }
-        @media (max-width: 800px) { .playground-grid { grid-template-columns:1fr; } }
+        .playground-page { background: radial-gradient(circle at 10% 0%, rgba(0,212,255,.12), transparent 28rem), radial-gradient(circle at 90% 8%, rgba(55,118,171,.15), transparent 26rem); }
+        .playground-hero { position:relative; overflow:hidden; border:1px solid rgba(148,163,184,.23); border-radius:1.25rem; padding:clamp(1.5rem, 4vw, 3rem); color:#e2e8f0; background:linear-gradient(125deg, #0b1220, #14233b 60%, #0f2740); box-shadow:0 22px 50px rgba(15,23,42,.18); }
+        .playground-hero::after { content:""; position:absolute; width:18rem; height:18rem; border-radius:999px; right:-7rem; top:-10rem; background:rgba(0,212,255,.15); filter:blur(8px); }
+        .playground-eyebrow { display:inline-flex; align-items:center; gap:.5rem; padding:.38rem .75rem; border:1px solid rgba(125,211,252,.32); border-radius:999px; color:#a5f3fc; background:rgba(14,116,144,.18); font-size:.78rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+        .playground-grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(19rem,.85fr); gap:1.25rem; }
+        .playground-panel { min-width:0; overflow:hidden; border:1px solid #cbd5e1; border-radius:1rem; background:#fff; box-shadow:0 14px 32px rgba(15,23,42,.08); }
+        .dark .playground-panel { border-color:#334155; background:#111c30; }
+        .playground-panel-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.85rem 1rem; border-bottom:1px solid #e2e8f0; background:linear-gradient(90deg, #f8fafc, #eef6ff); }
+        .dark .playground-panel-header { border-color:#334155; background:linear-gradient(90deg, #17233a, #132943); }
+        .playground-file { display:flex; align-items:center; gap:.55rem; font:700 .82rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; color:#1e3a5f; }
+        .dark .playground-file { color:#bae6fd; }
+        .playground-dot { width:.55rem; height:.55rem; border-radius:50%; background:#22c55e; box-shadow:0 0 0 .22rem rgba(34,197,94,.14); }
+        .playground-badge { padding:.35rem .6rem; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-size:.72rem; font-weight:800; white-space:nowrap; }
+        .dark .playground-badge { color:#bae6fd; background:#0c4a6e; }
+        .playground-editor, .playground-output { box-sizing:border-box; display:block; width:100%; min-height:25rem; margin:0; border:0; border-radius:0; padding:1.25rem; font:.9rem/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size:4; }
+        .playground-editor { color:#e2e8f0; background:#0f172a; resize:vertical; outline:none; }
+        .playground-editor:focus { box-shadow:inset 0 0 0 2px #38bdf8; }
+        .playground-output { overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:#dbeafe; background:#0b1324; }
+        .playground-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem; border-top:1px solid #e2e8f0; }
+        .dark .playground-actions { border-color:#334155; }
+        .playground-button { display:inline-flex; align-items:center; gap:.55rem; border-radius:.65rem; padding:.68rem 1rem; font-weight:800; transition:transform .2s, box-shadow .2s; }
+        .playground-button:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(2,132,199,.2); }
+        .playground-secondary { border:1px solid #cbd5e1; color:#334155; background:white; }
+        .dark .playground-secondary { color:#e2e8f0; border-color:#475569; background:#17233a; }
+        .playground-status { color:#64748b; font-size:.78rem; }
+        .dark .playground-status { color:#94a3b8; }
+        .playground-error { color:#fecaca; box-shadow:inset 0 0 0 2px #ef4444; }
+        @media (max-width: 850px) { .playground-grid { grid-template-columns:1fr; } .playground-editor, .playground-output { min-height:20rem; } }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+<body class="playground-page min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
     <div id="header"></div>
     <main class="container mx-auto max-w-6xl px-4 py-12">
-        <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">Flaxon playground</p>
-        <h1 class="mt-2 text-4xl font-extrabold tracking-tight">Try a route definition</h1>
-        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">This small browser playground reads Flaxon route decorators and displays the routes they register. It does not start an HTTP server, install packages, connect to databases, or execute untrusted code on the Flaxon website.</p>
-        <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
-            Use it to learn decorator and path syntax. Test a real application locally with <code>flaxon run app:app --reload</code> and the test client.
+        <section class="playground-hero">
+            <div class="relative z-10 max-w-3xl">
+                <span class="playground-eyebrow"><i class="fas fa-flask"></i> Interactive route explorer</span>
+                <h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Build your route map.</h1>
+                <p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Write real Flaxon decorators, then inspect the routes your application exposes. It is a fast syntax explorer—not a hosted server or code executor.</p>
+                <div class="mt-6 flex flex-wrap gap-2 text-sm text-slate-200">
+                    <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="fas fa-bolt mr-1.5 text-cyan-300"></i>Instant route map</span>
+                    <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="fas fa-shield-halved mr-1.5 text-cyan-300"></i>No code execution</span>
+                    <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="fas fa-code mr-1.5 text-cyan-300"></i>Flaxon syntax</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="mt-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+            <i class="fas fa-circle-info mr-2"></i>For a real server, run <code>flaxon run app:app --reload</code> locally and use the Flaxon test client.
         </div>
+
         <div class="playground-grid mt-8">
-            <section>
-                <label class="mb-2 block text-sm font-semibold" for="playground-editor">Python</label>
-                <textarea id="playground-editor" class="playground-editor" spellcheck="false">from flaxon import Flaxon
+            <section class="playground-panel">
+                <div class="playground-panel-header">
+                    <label class="playground-file" for="playground-editor"><i class="fab fa-python text-blue-500"></i> app.py</label>
+                    <span class="playground-badge">Python</span>
+                </div>
+                <textarea id="playground-editor" class="playground-editor" spellcheck="false" aria-label="Flaxon route source code">from flaxon import Flaxon
 
 app = Flaxon("playground")
 
@@ -53,14 +89,20 @@ async def home():
 @app.get("/users/&lt;int:user_id&gt;")
 async def get_user(user_id: int):
     return {"id": user_id}</textarea>
-                <div class="mt-3 flex gap-3">
-                    <button id="playground-run" class="gradient-btn rounded-lg px-4 py-2 font-semibold"><i class="fas fa-play mr-2"></i>Run</button>
-                    <button id="playground-reset" class="rounded-lg border border-slate-300 px-4 py-2 font-semibold dark:border-slate-600">Reset</button>
+                <div class="playground-actions">
+                    <span id="playground-status" class="playground-status"><i class="fas fa-pen-nib mr-1"></i>Ready to inspect routes</span>
+                    <div class="flex gap-2">
+                        <button id="playground-reset" class="playground-button playground-secondary" type="button"><i class="fas fa-rotate-left"></i>Reset</button>
+                        <button id="playground-run" class="playground-button gradient-btn" type="button"><i class="fas fa-play"></i>Inspect routes</button>
+                    </div>
                 </div>
             </section>
-            <section>
-                <p class="mb-2 text-sm font-semibold">Registered routes</p>
-                <output id="playground-output" class="playground-output">Run the example to inspect its registered routes.</output>
+            <section class="playground-panel">
+                <div class="playground-panel-header">
+                    <span class="playground-file"><span class="playground-dot"></span>Route map</span>
+                    <span id="playground-route-count" class="playground-badge">Waiting</span>
+                </div>
+                <output id="playground-output" class="playground-output" aria-live="polite">Click “Inspect routes” to build a route map.</output>
             </section>
         </div>
     </main>
