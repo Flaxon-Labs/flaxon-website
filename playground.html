@@ -14,10 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="stylesheet" href="/assets/css/playloader.css">
     <script defer src="/assets/js/site-shell.js"></script>
     <script defer src="/assets/js/dark-mode.js"></script>
     <script defer src="/assets/js/header-search.js"></script>
     <script defer src="/assets/js/main.js"></script>
+    <script defer src="/assets/js/playloader.js"></script>
     <script defer src="/assets/js/playground.js"></script>
     <style>
         .playground-page { background: radial-gradient(circle at 10% 0%, rgba(0,212,255,.12), transparent 28rem), radial-gradient(circle at 90% 8%, rgba(55,118,171,.15), transparent 26rem); }
@@ -51,6 +53,69 @@
     </style>
 </head>
 <body class="playground-page min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+   
+   
+   
+   
+   
+   <!-- FLAXON LOADER OVERLAY -->
+<div id="loader" class="loader-overlay">
+    <div class="loader-inner">
+        <!-- Wordmark -->
+        <div class="loader-mark">
+            <span class="loader-mark-bracket">[</span>
+            <span class="loader-mark-text">flaxon</span>
+            <span class="loader-mark-bracket">]</span>
+        </div>
+
+        <!-- SVG Route Map -->
+        <svg class="loader-route" viewBox="0 0 400 50">
+            <defs>
+                <linearGradient id="loader-route-gradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#60a5fa" />
+                    <stop offset="100%" stop-color="#22d3ee" />
+                </linearGradient>
+            </defs>
+            <!-- Background track -->
+            <path class="loader-route-track" d="M 20 25 L 110 25 L 200 25 L 290 25 L 380 25" />
+            <!-- Animated path -->
+            <path id="loader-route-path" class="loader-route-path" d="M 20 25 L 110 25 L 200 25 L 290 25 L 380 25" />
+            
+            <!-- Nodes -->
+            <circle class="loader-node" cx="20" cy="25" r="5" />
+            <circle class="loader-node" cx="110" cy="25" r="5" />
+            <circle class="loader-node" cx="200" cy="25" r="5" />
+            <circle class="loader-node" cx="290" cy="25" r="5" />
+            <circle class="loader-node" cx="380" cy="25" r="5" />
+            
+            <!-- Pulse dot -->
+            <circle id="loader-pulse" class="loader-pulse" cx="20" cy="25" r="4" />
+        </svg>
+
+        <!-- Route Labels -->
+        <div class="loader-labels">
+            <span class="loader-label" style="left: 5%;">/</span>
+            <span class="loader-label" style="left: 27.5%;">/users</span>
+            <span class="loader-label" style="left: 50%;">/users/:id</span>
+            <span class="loader-label" style="left: 72.5%;">/health</span>
+            <span class="loader-label" style="left: 95%;">Ready</span>
+        </div>
+
+        <!-- Terminal Output -->
+        <div class="loader-terminal">
+            <span class="loader-terminal-prompt">$&nbsp;</span>
+            <span id="loader-terminal-text" class="loader-terminal-text"></span>
+            <span class="loader-terminal-cursor"></span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="loader-progress-track">
+            <div id="loader-progress-bar" class="loader-progress-bar"></div>
+        </div>
+        <div id="loader-progress-percent" class="loader-progress-percent">0%</div>
+    </div>
+</div>
+   
     <div id="header"></div>
     <main class="container mx-auto max-w-6xl px-4 py-12">
         <section class="playground-hero">
