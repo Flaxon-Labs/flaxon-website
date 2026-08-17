@@ -1,288 +1,192 @@
  /* ============================================================ */
-        /* LOADING OVERLAY                                              */
+        /* 2D SOLAR SYSTEM LOADING ANIMATION (replaces the old three.js  */
+        /* WebGL background). Namespaced under "solar2d-" so it doesn't  */
+        /* collide with anything already defined in solar.css.           */
         /* ============================================================ */
+
         #loading-overlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: #05080f;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 1.2s ease, visibility 1.2s ease;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 38%, #101c34 0%, #070b16 65%, #03050a 100%);
+            transition: opacity .6s ease, visibility .6s ease;
         }
-
         #loading-overlay.hidden {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        #loading-overlay .loading-content {
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
+        /* lightweight CSS-only starfield, no canvas / no three.js */
+        #loading-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.55) 50%, transparent 51%),
+                radial-gradient(1px 1px at 80% 12%, rgba(255,255,255,.4) 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 60% 72%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(1px 1px at 28% 85%, rgba(255,255,255,.35) 50%, transparent 51%),
+                radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,.45) 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 45% 34%, rgba(255,255,255,.55) 50%, transparent 51%),
+                radial-gradient(1px 1px at 15% 55%, rgba(255,255,255,.3) 50%, transparent 51%),
+                radial-gradient(1px 1px at 70% 92%, rgba(255,255,255,.4) 50%, transparent 51%),
+                radial-gradient(1px 1px at 6% 40%, rgba(255,255,255,.3) 50%, transparent 51%),
+                radial-gradient(1px 1px at 96% 30%, rgba(255,255,255,.35) 50%, transparent 51%);
+            background-repeat: no-repeat;
+            animation: solar2d-twinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes solar2d-twinkle {
+            from { opacity: .5; }
+            to   { opacity: 1; }
         }
 
-        /* Typing animation */
-        .typing-container {
-            background: rgba(15, 23, 42, 0.8);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(96, 165, 250, 0.15);
-            margin-top: 1.5rem;
-            text-align: left;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: #e2e8f0;
-            min-height: 120px;
+        .loading-content {
             position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        /* the 2D solar system itself */
+        .solar2d {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+
+        .solar2d-sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffe1b0, #ff8844 55%, #ff4400 100%);
+            box-shadow: 0 0 14px 4px rgba(255,136,68,.55), 0 0 34px 12px rgba(255,68,0,.25);
+            transform: translate(-50%, -50%);
+            animation: solar2d-pulse 2.6s ease-in-out infinite;
+        }
+        @keyframes solar2d-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50%      { transform: translate(-50%, -50%) scale(1.12); }
+        }
+
+        .solar2d-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(0, 212, 255, .16);
+            border-radius: 50%;
+        }
+        .solar2d-orbit-1 { width: 70px;  height: 70px;  animation: solar2d-spin 3s linear infinite; }
+        .solar2d-orbit-2 { width: 112px; height: 112px; animation: solar2d-spin 5.2s linear infinite; }
+        .solar2d-orbit-3 { width: 154px; height: 154px; animation: solar2d-spin-reverse 7.6s linear infinite; }
+        .solar2d-orbit-4 { width: 200px; height: 200px; animation: solar2d-spin 11s linear infinite; }
+
+        @keyframes solar2d-spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes solar2d-spin-reverse {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to   { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        .solar2d-planet {
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        .solar2d-planet-1 { background: #88aaff; box-shadow: 0 0 6px 1px rgba(136,170,255,.7); }
+        .solar2d-planet-2 { background: #00D4FF; box-shadow: 0 0 8px 2px rgba(0,212,255,.6); width: 10px; height: 10px; top: -5px; }
+        .solar2d-planet-3 { background: #3776AB; box-shadow: 0 0 6px 1px rgba(55,118,171,.6); width: 9px; height: 9px; top: -4.5px; }
+        .solar2d-planet-4 { background: #ddcc88; box-shadow: 0 0 6px 1px rgba(221,204,136,.6); }
+
+        /* small saturn-style ring on the outer planet, just for flavor */
+        .solar2d-planet-4::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 5px;
+            border: 1px solid rgba(221,204,136,.55);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+        }
+
+        .loading-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.75rem;
+            letter-spacing: .04em;
+            color: #ffffff;
+        }
+        .loading-title span {
+            background: linear-gradient(90deg, #00D4FF, #3776AB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .loading-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            color: #93a4c3;
+            letter-spacing: .02em;
+            margin-top: -.75rem;
+        }
+
+        .typing-container {
+            width: min(480px, 88vw);
+            min-height: 230px;
+            background: rgba(11, 18, 32, .8);
+            border: 1px solid rgba(0, 212, 255, .15);
+            border-radius: .75rem;
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+            font-size: .8rem;
+            line-height: 1.6;
+            color: #c9d6ee;
+            box-shadow: 0 20px 60px -20px rgba(0,0,0,.6);
             overflow: hidden;
-        }
-
-        .typing-container .line-number {
-            color: #475569;
-            user-select: none;
-            margin-right: 1rem;
-            display: inline-block;
-            width: 1.5rem;
-        }
-
-        .typing-container .keyword {
-            color: #c084fc;
-        }
-        .typing-container .function {
-            color: #60a5fa;
-        }
-        .typing-container .string {
-            color: #34d399;
-        }
-        .typing-container .comment {
-            color: #475569;
-            font-style: italic;
-        }
-        .typing-container .decorator {
-            color: #fbbf24;
-        }
-        .typing-container .variable {
-            color: #f472b6;
+            text-align: left;
         }
 
         .typing-cursor {
             display: inline-block;
-            width: 2px;
-            height: 1.1em;
-            background: #60a5fa;
-            animation: blink 0.8s step-end infinite;
-            vertical-align: text-bottom;
+            width: 7px;
+            height: 1em;
+            background: #00D4FF;
             margin-left: 2px;
+            vertical-align: middle;
+            animation: solar2d-blink 1s step-end infinite;
         }
+        @keyframes solar2d-blink { 50% { opacity: 0; } }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        .typing-container .keyword    { color: #ff79c6; }
+        .typing-container .decorator  { color: #00D4FF; }
+        .typing-container .function   { color: #8be9fd; }
+        .typing-container .string     { color: #f1fa8c; }
+        .typing-container .comment    { color: #6272a4; font-style: italic; }
 
-        /* Loading spinner (solar system placeholder) */
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            position: relative;
-            margin-bottom: 1rem;
-        }
-
-        .loading-spinner .orbit {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid rgba(96, 165, 250, 0.1);
-            border-radius: 50%;
-            animation: spin 3s linear infinite;
-        }
-
-        .loading-spinner .orbit:nth-child(2) {
-            width: 75%;
-            height: 75%;
-            top: 12.5%;
-            left: 12.5%;
-            animation-duration: 2s;
-            border-color: rgba(167, 139, 250, 0.1);
-        }
-
-        .loading-spinner .orbit:nth-child(3) {
-            width: 50%;
-            height: 50%;
-            top: 25%;
-            left: 25%;
-            animation-duration: 1.5s;
-            border-color: rgba(34, 211, 238, 0.1);
-        }
-
-        .loading-spinner .core {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, #fbbf24, #f59e0b);
-            border-radius: 50%;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #e2e8f0;
-            letter-spacing: 2px;
-        }
-
-        .loading-title span {
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .loading-subtitle {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-        }
-
-        /* ============================================================ */
-        /* SOLAR SYSTEM BACKGROUND LAYER                                */
-        /* ============================================================ */
-        #solar-system {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .content-overlay {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            background: rgba(5, 8, 15, 0.65);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .content-overlay > * {
-            position: relative;
-            z-index: 2;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .gradient-hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .gradient-btn {
-            background: linear-gradient(135deg, #2563eb, #06b6d4);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .gradient-btn:hover {
-            background: linear-gradient(135deg, #1d4ed8, #0891b2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
-        }
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .code-block {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 1.25rem;
-            overflow-x: auto;
-            font-size: 0.85rem;
-            border: 1px solid #1e293b;
-        }
-        .code-block .hljs {
-            background: transparent !important;
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
-        }
-        .animate-pulse-slow {
-            animation: pulseSlow 3s ease-in-out infinite;
-        }
-        @keyframes pulseSlow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: #05080f;
-        }
-
-      
-        /* Flaxon logo pulse during loading */
-        .logo-pulse {
-            animation: logoPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes logoPulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+        @media (max-width: 480px) {
+            .solar2d          { width: 160px; height: 160px; }
+            .solar2d-orbit-4  { width: 150px; height: 150px; }
+            .solar2d-orbit-3  { width: 112px; height: 112px; }
+            .solar2d-orbit-2  { width: 82px;  height: 82px; }
+            .solar2d-orbit-1  { width: 52px;  height: 52px; }
+            .typing-container { font-size: .7rem; padding: .75rem 1rem; min-height: 190px; }
         }
