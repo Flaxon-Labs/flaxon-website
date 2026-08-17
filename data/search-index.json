@@ -25,7 +25,7 @@
       "id": "ecosystem",
       "title": "Flaxon Ecosystem",
       "url": "/docs/guides/ecosystem.html",
-      "content": "Flaxon ecosystem integrations plugins SQLAlchemy async database sessions Stripe webhooks S3 compatible object storage PostgreSQL asyncpg PostSQL install and startup configuration",
+      "content": "Flaxon ecosystem integrations plugins SQLAlchemy async database sessions Stripe webhooks S3 compatible object storage PostgreSQL asyncpg PostSQL AI Gemini OpenAI mobile FCM Google OAuth Inertia Fyr debug toolbar Sentry pytest install and startup configuration",
       "section": "Guides"
     },
     {

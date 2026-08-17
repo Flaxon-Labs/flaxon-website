@@ -182,6 +182,33 @@ async def list_products():
     return {"products": [dict(row) for row in rows]}</code></pre></div>
                 <p>Use <code>$1</code>, <code>$2</code>, and later positional parameters with <code>asyncpg</code>; never interpolate user input into SQL. Despite its package name, PostSQL is a PostgreSQL integration.</p>
 
+                <h2>Additional official plugins</h2>
+                <p>These packages are also part of the Flaxon ecosystem. They are independently versioned; use the package repository as the source of truth for options and compatibility, and load plugin packages from an async startup handler in the same way as the integrations above.</p>
+
+                <h3 id="ai"><a href="https://github.com/aldanedev-create/flaxon-ai" target="_blank" rel="noopener">flaxon-ai</a></h3>
+                <p>AI and LLM integration for Gemini, OpenAI, and local Flax/JAX models. Install <code>pip install "flaxon-ai[all]"</code>, load <code>FlaxonAIPlugin</code>, then generate, chat, stream, or create embeddings through <code>app.state.ai</code>. Keep provider keys in environment variables and apply rate limits to public AI routes.</p>
+
+                <h3 id="mobile"><a href="https://github.com/aldanedev-create/flaxon-mobile" target="_blank" rel="noopener">flaxon-mobile</a></h3>
+                <p>Mobile device registration and FCM-oriented push notifications. Install <code>pip install "flaxon-mobile[all]"</code>, configure <code>FlaxonMobilePlugin</code> with the FCM settings you use, and work with device registration and push delivery through <code>app.state.mobile</code>. Authenticate device registration and do not expose push sends to untrusted clients.</p>
+
+                <h3 id="oauth-google"><a href="https://github.com/aldanedev-create/flaxon-oauth-google" target="_blank" rel="noopener">flaxon-oauth-google</a></h3>
+                <p>Google OAuth 2.0 authorization-code flow. Install <code>pip install flaxon-oauth-google</code>, configure <code>GoogleOAuthPlugin</code> with a client ID, client secret, and registered redirect URI, then direct users to <code>/auth/google/login</code>. The callback must exactly match the URI registered in Google Cloud, and secrets must stay outside the repository.</p>
+
+                <h3 id="inertia"><a href="https://github.com/aldanedev-create/flaxon-inertia" target="_blank" rel="noopener">flaxon-inertia</a></h3>
+                <p>Inertia.js integration for React, Vue, and Svelte frontends. Install <code>pip install flaxon-inertia</code>, load <code>InertiaPlugin</code> with the root template and asset version, and render an Inertia page using the integration's <code>inertia.render("Page", props)</code> interface. Pair it with the matching Inertia client adapter in your frontend project.</p>
+
+                <h3 id="fyr"><a href="https://github.com/aldanedev-create/flaxon-fyr" target="_blank" rel="noopener">flaxon-fyr</a></h3>
+                <p>Fyr.js frontend integration. Install <code>pip install flaxon-fyr</code>, load <code>FyrPlugin</code>, and render a Fyr application from a route with <code>request.app.state.fyr.render_app(...)</code>. The plugin supplies the Fyr CDN URL; your page still owns its JavaScript controller and HTML template.</p>
+
+                <h3 id="debug-toolbar"><a href="https://github.com/aldanedev-create/flaxon-debug-toolbar" target="_blank" rel="noopener">flaxon-debug-toolbar</a></h3>
+                <p>Development request inspection and optional Three.js visualizations. Install <code>pip install "flaxon-debug-toolbar[three]"</code> when you need its visuals, load <code>DebugToolbarPlugin</code> only for a debug environment, and never expose a debugging toolbar on a public production deployment.</p>
+
+                <h3 id="sentry"><a href="https://github.com/aldanedev-create/flaxon-sentry" target="_blank" rel="noopener">flaxon-sentry</a></h3>
+                <p>Sentry error and performance reporting. Install <code>pip install flaxon-sentry</code>, load <code>SentryPlugin</code> with the DSN, environment, and release, then use <code>app.state.sentry_plugin</code> for manual captures or breadcrumbs when needed. Use a non-development DSN only in the environment you intend to report from.</p>
+
+                <h3 id="pytest"><a href="https://github.com/aldanedev-create/flaxon-pytest" target="_blank" rel="noopener">flaxon-pytest</a></h3>
+                <p>Pytest fixtures and assertions for Flaxon applications. Install <code>pip install flaxon-pytest</code> in the test environment, then use fixtures such as <code>flaxon_client</code>, <code>flaxon_async_client</code>, and <code>flaxon_websocket_client</code> in test functions. It is a test helper package, not a runtime plugin to load on <code>app.plugins</code>.</p>
+
                 <h2>Choose one database layer</h2>
                 <p>Use <code>flaxon-sqlalchemy</code> when you want SQLAlchemy models, sessions, or SQLAlchemy's database portability. Use <code>flaxon-postsql</code> for direct, asyncpg-native PostgreSQL queries. Do not load both for the same database unless you intentionally manage separate pools and connection limits.</p>
 
