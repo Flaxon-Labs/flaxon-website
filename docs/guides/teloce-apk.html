@@ -33,7 +33,7 @@ async def index(request):
     return await request.render("index.html")
 
 # Run: flaxon run app:app --reload</code></pre><p>In <code>templates/index.html</code>, mount the generated module:</p><pre><code>&lt;div id="app"&gt;&lt;/div&gt;
-&lt;script type="module" src="/static/App.js"&gt;&lt;/script&gt;</code></pre><p>You can also compile from CI with <code>teloce build --out-dir dist --source-map --hash-assets</code>. Keep <code>.vel</code> source in Git and deploy generated assets from your chosen output directory.</p><h2>3. Package the web client</h2><pre><code>npm install @capacitor/core @capacitor/cli @capacitor/android
+&lt;script type="module"&gt;import { mount } from "/static/App.js"; mount("#app");&lt;/script&gt;</code></pre><p>You can also compile from CI with <code>teloce build --out-dir dist --source-map --hash-assets</code>. Keep <code>.vel</code> source in Git and deploy generated assets from your chosen output directory.</p><h2>3. Package the web client</h2><pre><code>npm install @capacitor/core @capacitor/cli @capacitor/android
 npx cap init "Flaxon Mobile" com.example.flaxonmobile --web-dir dist
 npx cap add android
 npx cap copy android
@@ -47,6 +47,8 @@ npx cap open android</code></pre><p>Configure the production API origin, Android
         setContentView(web)
     }
 }</code></pre><p>Use a release HTTPS origin, restrict navigation to approved hosts, avoid exposing an unnecessary JavaScript bridge, handle external links and back navigation, and follow Android WebView security guidance. A TWA uses a package tool such as Bubblewrap or PWABuilder output and normally requires Digital Asset Links at <code>/.well-known/assetlinks.json</code>.</p><h3>Choose the wrapper</h3><ul><li><strong>WebView:</strong> more native control, but you own lifecycle, navigation, permissions, and security hardening.</li><li><strong>TWA:</strong> a browser-based PWA experience with less native UI code; configure domain verification and browser requirements.</li><li><strong>Capacitor:</strong> useful when the web app needs selected native plugins and a generated Android project.</li></ul><p>After packaging, build a signed APK for device testing or a signed AAB for Google Play. Test cold start, offline state, API failures, cookies/tokens, deep links, external links, rotation, and updates.</p></article></main></div></div></section><div id="footer"></div><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+
+
 
 
 
