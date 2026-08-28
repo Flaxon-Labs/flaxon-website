@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flaxon Mobile Backend and Play Store</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flaxon Mobile Backend and Play Store</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head>
 <body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Mobile backend, APK, and Play Store release</h1><p>Flaxon is the mobile backend. It serves HTTPS JSON, GraphQL, WebSocket, uploads, authentication, and push-notification endpoints. It does not turn Python into an APK. The Android client is built separately with Kotlin, Flutter, React Native, or a web wrapper.</p><h2>1. Create the Flaxon API</h2><pre><code>from flaxon import Flaxon
 from flaxon.validation import Schema, fields
 
@@ -57,7 +57,9 @@ pkg install python
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install flaxon
-flaxon run app:app --host 0.0.0.0 --port 8000</code></pre><p>For Flask, install Flask and run the app with its development command only for local testing. Do not expose a development server to the public internet. On the phone, open <code>http://127.0.0.1:8000</code>; another device needs the phone's LAN address and firewall/network permission. Store data carefully and stop the process when it is not needed.</p></article></main></div></div></section><div id="footer"></div></body></html>
+flaxon run app:app --host 0.0.0.0 --port 8000</code></pre><p>For Flask, install Flask and run the app with its development command only for local testing. Do not expose a development server to the public internet. On the phone, open <code>http://127.0.0.1:8000</code>; another device needs the phone's LAN address and firewall/network permission. Store data carefully and stop the process when it is not needed.</p></article></main></div></div></section><div id="footer"></div><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+
+
 
 
 
