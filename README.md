@@ -43,7 +43,7 @@ Flaxon is a **technology-neutral, async-first Python backend framework** that co
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/aldanedev-create/flaxon-website.git
+   git clone https://github.com/Flaxon-Labs/flaxon-website.git
 cd flaxon-website
 ```
 
