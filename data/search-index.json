@@ -120,6 +120,13 @@
       "section": "Guides"
     },
     {
+      "id": "graphql",
+      "title": "GraphQL",
+      "url": "/docs/guides/graphql.html",
+      "content": "GraphQL schema ObjectType Field queries mutations variables nested resolvers scalars GraphiQL Altair IDE authentication authorization persistence transactions N+1 limits complexity testing clients deployment",
+      "section": "Guides"
+    },
+    {
       "id": "tasks",
       "title": "Tasks",
       "url": "/docs/guides/tasks.html",
