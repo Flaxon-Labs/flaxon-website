@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teloce-Py, .vel, and Android</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"></head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Teloce-Py: .vel to a mobile app</h1><p>Teloce-Py compiles Teloce Single File Components into browser JavaScript and CSS. A <code>.vel</code> file is source code, not an APK. Use it to build the UI, call Flaxon over HTTPS, and package the compiled web app with Capacitor or use a native client.</p><h2>1. Bootstrap</h2><pre><code>mkdir flaxon-mobile
+cd flaxon-mobile
+python -m pip install flaxon teloce-py
+mkdir static templates</code></pre><p>Create <code>static/App.vel</code>:</p><pre><code>&lt;template&gt;
+  &lt;main&gt;
+    &lt;h1&gt;{{ title }}&lt;/h1&gt;
+    &lt;button @click="load"&gt;{{ status }}&lt;/button&gt;
+  &lt;/main&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+  data() { return { title: "Flaxon Mobile", status: "Load health" }; },
+  methods: { async load() {
+    const response = await fetch("https://api.example.com/api/v1/health");
+    this.status = response.ok ? "API online" : "API unavailable";
+  }}
+};
+&lt;/script&gt;</code></pre><h2>2. Serve it from Flaxon</h2><pre><code>from pathlib import Path
+from flaxon import Flaxon
+from flaxon.jinax import Jinax
+from teloce.build import build_project
+
+ROOT = Path(__file__).parent
+build_project(ROOT, options={"dev": True, "source_maps": True})
+app = Flaxon("teloce-mobile")
+app.use_templates(Jinax(str(ROOT / "templates")))
+app.mount_static("/static", str(ROOT / "dist" / "static"))
+
+@app.get("/")
+async def index(request):
+    return await request.render("index.html")
+
+# Run: flaxon run app:app --reload</code></pre><p>In <code>templates/index.html</code>, mount the generated module:</p><pre><code>&lt;div id="app"&gt;&lt;/div&gt;
+&lt;script type="module" src="/static/App.js"&gt;&lt;/script&gt;</code></pre><p>You can also compile from CI with <code>teloce build --out-dir dist --source-map --hash-assets</code>. Keep <code>.vel</code> source in Git and deploy generated assets from your chosen output directory.</p><h2>3. Package the web client</h2><pre><code>npm install @capacitor/core @capacitor/cli @capacitor/android
+npx cap init "Flaxon Mobile" com.example.flaxonmobile --web-dir dist
+npx cap add android
+npx cap copy android
+npx cap open android</code></pre><p>Configure the production API origin, Android network policy, icons, splash screen, permissions, and deep links in the Android project. Then use Android Studio or <code>./gradlew bundleRelease</code> to create the signed AAB. Follow the <a href="/docs/guides/mobile-apk-play-store.html">Play Store checklist</a>.</p><div class="note"><strong>Important:</strong> Teloce-Py does not package Python or Flaxon into Android. The APK/AAB contains the client; Flaxon remains a separately deployed backend.</div><h2>References</h2><p><a href="https://github.com/flaxon-labs/teloce-py" target="_blank" rel="noopener">Teloce-Py repository</a> | <a href="/docs/teloce-py.html">Teloce-Py reference</a> | <a href="/docs/guides/jinax-flaxon-app.html">Jinax starter</a></p><h2>WebView and Trusted Web Activity</h2><p>When a Teloce-Py app is deployed as an HTTPS PWA, an Android wrapper can display it. A WebView embeds the page in a native Android activity. A Trusted Web Activity (TWA) opens the PWA using the browser engine and requires domain verification. Both package the client shell; the Flaxon backend remains deployed remotely.</p><h3>Minimal WebView shell</h3><pre><code>class MainActivity : Activity() {
+    override fun onCreate(state: Bundle?) {
+        super.onCreate(state)
+        val web = WebView(this)
+        web.settings.javaScriptEnabled = true
+        web.settings.domStorageEnabled = true
+        web.loadUrl("https://app.example.com/")
+        setContentView(web)
+    }
+}</code></pre><p>Use a release HTTPS origin, restrict navigation to approved hosts, avoid exposing an unnecessary JavaScript bridge, handle external links and back navigation, and follow Android WebView security guidance. A TWA uses a package tool such as Bubblewrap or PWABuilder output and normally requires Digital Asset Links at <code>/.well-known/assetlinks.json</code>.</p><h3>Choose the wrapper</h3><ul><li><strong>WebView:</strong> more native control, but you own lifecycle, navigation, permissions, and security hardening.</li><li><strong>TWA:</strong> a browser-based PWA experience with less native UI code; configure domain verification and browser requirements.</li><li><strong>Capacitor:</strong> useful when the web app needs selected native plugins and a generated Android project.</li></ul><p>After packaging, build a signed APK for device testing or a signed AAB for Google Play. Test cold start, offline state, API failures, cookies/tokens, deep links, external links, rotation, and updates.</p></article></main></div></div></section><div id="footer"></div></body></html>
+
+
+
+
+

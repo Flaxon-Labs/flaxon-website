@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flaxon Mobile Backend and Play Store</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"></head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Mobile backend, APK, and Play Store release</h1><p>Flaxon is the mobile backend. It serves HTTPS JSON, GraphQL, WebSocket, uploads, authentication, and push-notification endpoints. It does not turn Python into an APK. The Android client is built separately with Kotlin, Flutter, React Native, or a web wrapper.</p><h2>1. Create the Flaxon API</h2><pre><code>from flaxon import Flaxon
+from flaxon.validation import Schema, fields
+
+app = Flaxon("mobile-api")
+
+class Device(Schema):
+    device_id = fields.StrField(required=True, min_length=8)
+    platform = fields.ChoiceField(["android", "ios"], required=True)
+
+@app.post("/api/v1/devices")
+async def register_device(data: Device):
+    # Persist this record with your configured database.
+    return {"device": data.to_dict()}
+
+@app.get("/api/v1/health")
+async def health():
+    return {"ok": True}
+
+# Run with: flaxon run app:app --host 0.0.0.0 --port 8000</code></pre><h2>2. Call it from Android</h2><pre><code>interface FlaxonApi {
+    @GET("api/v1/health")
+    suspend fun health(): HealthResponse
+
+    @POST("api/v1/devices")
+    suspend fun register(@Body device: DeviceRequest): DeviceResponse
+}
+
+val retrofit = Retrofit.Builder()
+    .baseUrl("https://api.example.com/")
+    .addConverterFactory(MoshiConverterFactory.create())
+    .build()</code></pre><p>Keep the API URL configurable, use Android Network Security defaults, send bearer tokens through an interceptor, and never ship database credentials or signing keys in the client.</p><h2>3. Build an Android app bundle</h2><p>For a native Android client, open the Android project in Android Studio, set an application ID and version, configure a release keystore, then build an Android App Bundle. Google Play normally expects <code>.aab</code>; an APK is useful for local/device testing.</p><pre><code>./gradlew test
+./gradlew bundleRelease
+# optional device build
+./gradlew assembleRelease</code></pre><p>For a Teloce web client wrapped with Capacitor, see <a href="/docs/guides/teloce-apk.html">Teloce-Py to Android</a>. Capacitor is a client wrapper; it does not replace the Flaxon server.</p><h2>4. Submit to Google Play</h2><ol><li>Create the app in Play Console and reserve the package name.</li><li>Complete the store listing, app access instructions, privacy policy, data safety form, content rating, target API requirements, and screenshots.</li><li>Upload the signed <code>app-release.aab</code> to an internal test track first.</li><li>Invite testers, verify login, API failures, deep links, offline behavior, permissions, and production HTTPS.</li><li>Promote the tested release to closed/open testing, then production; provide release notes and staged rollout settings.</li></ol><div class="note"><strong>Release boundary:</strong> deploy Flaxon independently with migrations, backups, logs, rate limits, and health checks. Upload only the Android client bundle to Play Console.</div><h2>Chaquopy: embed Python in an Android app</h2><p>Chaquopy adds Python to a normal Android Studio project. Kotlin or Java remains the Android UI and lifecycle layer. Use this pattern when you need Python libraries on-device; do not place a production Flaxon server inside the APK unless you have a very specific offline/server-in-device design.</p><p>Start with the <a href="https://chaquo.com/chaquopy/doc/current/" target="_blank" rel="noopener">Chaquopy Android documentation</a> and add the current Chaquopy Gradle plugin version required by your project:</p><pre><code>plugins {
+    id "com.android.application"
+    id "com.chaquo.python" version "REPLACE_WITH_CURRENT_VERSION"
+}</code></pre><p>In the app module, declare Python requirements and source directories according to the Chaquopy setup guide:</p><pre><code>chaquopy {
+    defaultConfig {
+        version = "3.11"
+        pip {
+            install "requests"
+        }
+    }
+    sourceSets {
+        getByName("main") {
+            srcDir("src/main/python")
+        }
+    }
+}</code></pre><p>Place a small Python client in <code>app/src/main/python/mobile_api.py</code>:</p><pre><code>import requests
+
+def health(base_url):
+    response = requests.get(base_url + "/api/v1/health", timeout=10)
+    response.raise_for_status()
+    return response.json()</code></pre><p>Call that function through Chaquopy's Python API from Kotlin, or keep the network client in Kotlin with Retrofit. The Flaxon API remains remote at <code>https://api.example.com</code>; use HTTPS, authentication, timeouts, certificate policy, and server-side authorization.</p><div class="note"><strong>Important:</strong> Chaquopy embeds Python code in the client. It does not automatically make Flask or Flaxon a secure mobile server, and Python packages with native dependencies may need Chaquopy-compatible builds.</div><h2>Termux: run Flask or Flaxon locally for development</h2><p>Termux can run Python on an Android device. This is useful for learning, local demos, device-side tools, and testing a LAN service. It is not a replacement for a monitored HTTPS production deployment or a normal Play Store client.</p><pre><code>pkg update
+pkg install python
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install flaxon
+flaxon run app:app --host 0.0.0.0 --port 8000</code></pre><p>For Flask, install Flask and run the app with its development command only for local testing. Do not expose a development server to the public internet. On the phone, open <code>http://127.0.0.1:8000</code>; another device needs the phone's LAN address and firewall/network permission. Store data carefully and stop the process when it is not needed.</p></article></main></div></div></section><div id="footer"></div></body></html>
+
+
+
+
+
+

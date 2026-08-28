@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Build a Flaxon app with Jinax</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"></head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Build a Flaxon app with Jinax</h1><p>This is a complete server-rendered starter. Jinax renders HTML on the server; Flaxon owns routing and APIs. Add a database and authentication before deploying user data.</p><h2>1. Create the project</h2><pre><code>flaxon new store
+cd store
+python -m pip install "flaxon[standard,templates]"</code></pre><h2>2. Add <code>app.py</code></h2><pre><code>from datetime import datetime
+from flaxon import Flaxon
+from flaxon.jinax import Jinax
+
+app = Flaxon("store", debug=True)
+app.use_templates(Jinax("templates", auto_reload=True))
+
+@app.get("/")
+async def home(request):
+    products = [{"name": "Flaxon Mug", "price": 14.99}, {"name": "T-Shirt", "price": 29.99}]
+    return await request.render("home.html", {"title": "Flaxon Store", "products": products, "year": datetime.now().year})
+
+@app.get("/api/products")
+async def products():
+    return {"data": [{"name": "Flaxon Mug", "price": 14.99}]}
+
+# Run with: flaxon run app:app --reload</code></pre><h2>3. Add <code>templates/home.html</code></h2><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;&lt;head&gt;&lt;title&gt;{{ title }}&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{{ title }}&lt;/h1&gt;
+  {% for product in products %}
+    &lt;article&gt;&lt;h2&gt;{{ product.name }}&lt;/h2&gt;&lt;p&gt;&#36;{{ product.price }}&lt;/p&gt;&lt;/article&gt;
+  {% endfor %}
+  &lt;small&gt;{{ year }}&lt;/small&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre><h2>Run and deploy</h2><pre><code>flaxon run app:app --reload
+curl http://127.0.0.1:8000/api/products</code></pre><p>Use HTTPS, a production ASGI process, a persistent database, environment variables for secrets, CSRF protection for cookie-authenticated mutations, and authorization on every private route.</p><div class="note"><strong>Next:</strong> use the <a href="/docs/guides/mobile-apk-play-store.html">mobile API and Play Store guide</a> when a native client will consume the API.</div></article></main></div></div></section><div id="footer"></div></body></html>
+
+
+
+

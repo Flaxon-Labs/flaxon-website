@@ -307,6 +307,76 @@
       "url": "/blog/why-flaxon.html",
       "content": "Why Flaxon philosophy behind the framework core principles simplicity structure technology neutrality ASGI",
       "section": "Blog"
+    },
+    {
+      "id": "admin-cms-guide",
+      "title": "Admin and CMS",
+      "url": "/docs/guides/admin-cms.html",
+      "content": "AdminDashboard CMS authentication CSRF roles permissions media taxonomy comments revisions menus migrations workflows",
+      "section": "Guides"
+    },
+    {
+      "id": "jinax-flaxon-app",
+      "title": "Jinax App Starter",
+      "url": "/docs/guides/jinax-flaxon-app.html",
+      "content": "Jinax Flaxon app starter server rendered templates routes APIs deployment",
+      "section": "Guides"
+    },
+    {
+      "id": "mobile-apk-play-store",
+      "title": "APK and Play Store",
+      "url": "/docs/guides/mobile-apk-play-store.html",
+      "content": "Flaxon mobile backend Android Kotlin JSON API AAB APK Gradle Play Console release testing Chaquopy embedded Python WebView TWA Termux",
+      "section": "Guides"
+    },
+    {
+      "id": "teloce-apk",
+      "title": "Teloce Android",
+      "url": "/docs/guides/teloce-apk.html",
+      "content": "Teloce-Py vel components Flaxon Capacitor Android APK AAB build static assets WebView Trusted Web Activity TWA Bubblewrap Digital Asset Links",
+      "section": "Guides"
+    },
+    {
+      "id": "mail-guide",
+      "title": "Email",
+      "url": "/docs/guides/mail.html",
+      "content": "Mailer ConsoleAdapter SMTPAdapter EmailTemplate attachments testing bulk delivery",
+      "section": "Guides"
+    },
+    {
+      "id": "teloce-py-guide",
+      "title": "Teloce-Py with Flaxon",
+      "url": "/docs/teloce-py.html",
+      "content": "Teloce-Py vel components compiler runtime template script style reactivity signals imports npm Teloce Flaxon Jinax PWA service worker PWABuilder Android APK AAB MSIX Windows CLI production lessons",
+      "section": "Guides"
+    },
+    {
+      "id": "flaxon-cheatsheet",
+      "title": "Flaxon Cheatsheet",
+      "url": "/docs/cheatsheet.html",
+      "content": "Flaxon routes middleware validation database Admin CMS CLI operations",
+      "section": "Reference"
+    },
+    {
+      "id": "teloce-cheatsheet",
+      "title": "Teloce-Py Cheatsheet",
+      "url": "/docs/teloce-cheatsheet.html",
+      "content": "Teloce vel template script style compiler mount signals Flaxon",
+      "section": "Reference"
+    },
+    {
+      "id": "vscode-guide",
+      "title": "VS Code Extension",
+      "url": "/docs/guides/vscode.html",
+      "content": "VS Code Flaxon extension CLI routes doctor OpenAPI Teloce",
+      "section": "Guides"
+    },
+    {
+      "id": "changelog",
+      "title": "Changelog",
+      "url": "/docs/changelog.html",
+      "content": "Flaxon documentation release notes Admin CMS email Teloce Py",
+      "section": "Reference"
     }
   ]
 }

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teloce-Py and .vel - Flaxon Documentation</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"></head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Teloce-Py and <code>.vel</code></h1><p>Teloce-Py is the Python compiler and browser runtime for Teloce Single File Components. A <code>.vel</code> file combines a template, JavaScript component logic, and optional scoped CSS. Flaxon, Flask, FastAPI, Django, or a static server delivers the generated assets; Teloce does not replace the Python application layer.</p><p><a href="https://github.com/flaxon-labs/teloce-py" target="_blank" rel="noopener">Teloce-Py repository</a> | <a href="/docs/teloce-cheatsheet.html">Cheatsheet</a> | <a href="/docs/guides/teloce-apk.html">Android packaging</a></p>
+<h2>What Teloce-Py does</h2><ul><li>Discovers and compiles <code>.vel</code> components into JavaScript and CSS.</li><li>Supports templates, interpolation, conditions, loops, events, forms, bindings, components, slots, imports, filters, plugins, and scoped styles.</li><li>Provides reactive state, computed values, watchers, lifecycle hooks, props, emits, DOM mounting, and router/runtime utilities.</li><li>Works with Python backends while keeping authorization, validation, persistence, jobs, secrets, and integrations on the server.</li></ul><div class="note"><strong>Boundary:</strong> browsers receive generated <code>.js</code>/<code>.css</code>, never the source <code>.vel</code> file. Teloce-Py does not compile Python into an APK or MSIX.</div>
+<h2>Bootstrap a project</h2><pre><code>python -m pip install flaxon teloce-py
+mkdir my-app
+cd my-app
+mkdir static templates
+teloce doctor --verbose</code></pre><p>On Windows PowerShell, use <code>New-Item -ItemType Directory -Force static, templates</code>. Recommended layout:</p><pre><code>my-app/
+  app.py
+  templates/index.html
+  static/js/App.vel
+  static/js/components/
+  manifest.webmanifest
+  sw.js
+  dist/</code></pre>
+<h2>Write a component</h2><p>Create <code>static/js/App.vel</code>:</p><pre><code>&lt;template&gt;
+  &lt;main class="app"&gt;
+    &lt;h1&gt;{{ title }}&lt;/h1&gt;
+    &lt;p&gt;{{ message }}&lt;/p&gt;
+    &lt;input v-model="name" placeholder="Your name"&gt;
+    &lt;button @click="greet"&gt;Greet&lt;/button&gt;
+    &lt;ul&gt;&lt;li v-for="item in items" :key="item.id"&gt;{{ item.label }}&lt;/li&gt;&lt;/ul&gt;
+  &lt;/main&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+  data() { return { title: "Teloce", message: "Edit a .vel file", name: "", items: [{ id: 1, label: "Flaxon" }] }; },
+  computed: { greeting() { return "Hello " + this.name; } },
+  methods: { greet() { this.message = this.greeting; } },
+  mounted() { console.log("component mounted"); }
+};
+&lt;/script&gt;
+&lt;style scoped&gt;
+.app { max-width: 40rem; margin: 4rem auto; font-family: system-ui; }
+&lt;/style&gt;</code></pre><p>The original Teloce forms remain valid: <code>&lt;if condition="ready"&gt;</code>, <code>&lt;for each="item in items"&gt;</code>, <code>@click</code>, and <code>:model</code>. Familiar aliases such as <code>v-if</code>, <code>v-for</code>, <code>v-on:click</code>, and <code>v-model</code> are also supported. Use <code>v-text</code> for escaped text and only use <code>v-html</code> with trusted, sanitized HTML.</p>
+<h2>Components and imports</h2><p>Create <code>static/js/components/Message.vel</code>:</p><pre><code>&lt;template&gt;&lt;p class="message"&gt;{{ text }}&lt;/p&gt;&lt;/template&gt;
+&lt;script&gt;
+export default { props: { text: { type: String, default: "Hello" } } };
+&lt;/script&gt;</code></pre><p>Import it from <code>App.vel</code>:</p><pre><code>&lt;script&gt;
+import Message from "./components/Message.vel";
+export default { components: { Message }, data() { return { text: "Reusable UI" }; } };
+&lt;/script&gt;
+&lt;template&gt;&lt;Message :text="text" /&gt;&lt;/template&gt;</code></pre><p>Use stable prop and event contracts, keys for lists, semantic HTML, keyboard support, visible focus states, touch-sized controls, and responsive layouts. Test phone, tablet, desktop, and wide screens.</p>
+<h2>Mount from HTML</h2><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;&lt;body&gt;
+  &lt;div id="app"&gt;&lt;/div&gt;
+  &lt;script type="module" src="/static/js/App.js"&gt;&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+<h2>Run with Flaxon</h2><pre><code>from pathlib import Path
+from flaxon import Flaxon
+from flaxon.jinax import Jinax
+from teloce.build import build_project
+
+ROOT = Path(__file__).parent
+build_project(ROOT, options={"dev": True, "source_maps": True})
+app = Flaxon("teloce-flaxon")
+app.use_templates(Jinax(str(ROOT / "templates"), auto_reload=True))
+app.mount_static("/static", str(ROOT / "static"))
+
+@app.get("/")
+async def home(request):
+    return await request.render("index.html")
+
+# Development: flaxon run app:app --reload</code></pre><p>A component calls the backend with <code>fetch()</code> or WebSockets. The server validates every request and owns authentication, CSRF, authorization, database operations, and secrets.</p>
+<h2>CLI workflow</h2><pre><code>teloce create my-app
+teloce doctor --verbose
+teloce lint --strict
+teloce dev
+teloce watch
+teloce build --out-dir dist --source-map
+teloce build --out-dir dist --hash-assets --bundle
+teloce debug</code></pre><p>Use <code>teloce dev</code> or <code>teloce watch</code> for local iteration. Run lint and a clean production build in CI. Keep source maps available to your error pipeline but do not expose secrets in them.</p>
+<h2>npm Teloce connection</h2><p>Teloce-Py targets the same component ideas as Teloce on npm: <code>.vel</code> SFCs, reactive state, events, loops, conditions, components, styles, filters, plugins, and runtime mounting. Existing source can often be copied into a Python project because the original syntax and common <code>v-*</code> aliases are supported.</p><p>The workflows are different:</p><pre><code>npm Teloce: JavaScript package tooling -> browser assets
+Teloce-Py: Python compiler -> browser assets -> Flask/FastAPI/Django/Flaxon</code></pre><p>Node-only plugins are not automatically executable in Python. A syntax-only plugin may be ported to the Teloce-Py plugin system; a plugin that imports npm packages, starts Node, or uses Node APIs needs a replacement. Migrate one component at a time, keep the HTTP contract stable, compile it, and run browser tests.</p><h3>When to use npm tooling</h3><ul><li>Use npm Teloce when the frontend already depends on Node packages, bundlers, or Node-specific plugins.</li><li>Use Teloce-Py when the team wants a Python-only build workflow alongside Flask, FastAPI, Django, or Flaxon.</li><li>Use either runtime with the same component design, but do not assume generated output or third-party plugins are byte-for-byte compatible.</li></ul>
+<h2>Reactivity and browser runtime</h2><p>Component state is local to the browser. Teloce supports object-style <code>data</code>, <code>methods</code>, <code>computed</code>, <code>watch</code>, lifecycle hooks, props, and emits. The runtime also exposes signal primitives for fine-grained state when a larger application needs them. Use IndexedDB only for local browser drafts or offline cache; synchronization and conflict resolution belong in a server API.</p>
+<h2>PWA setup</h2><p>Create <code>manifest.webmanifest</code>:</p><pre><code>{
+  "name": "Flaxon Mobile",
+  "short_name": "Flaxon",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0f172a",
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}</code></pre><p>Link it in the HTML head and register <code>sw.js</code>:</p><pre><code>&lt;link rel="manifest" href="/manifest.webmanifest"&gt;
+&lt;script&gt;
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+&lt;/script&gt;</code></pre><pre><code>const CACHE = "flaxon-shell-v1";
+const ASSETS = ["/", "/static/js/App.js", "/manifest.webmanifest"];
+self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS))));
+self.addEventListener("fetch", event => event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request))));</code></pre><p>Serve the manifest, service worker, icons, and generated assets over HTTPS. Test install, offline fallback, updates, cache invalidation, API failures, and authentication expiry before packaging.</p>
+<h2>PWABuilder: Android package and MSIX</h2><p>PWABuilder packages a deployed PWA; it does not package the Flaxon Python server. First deploy the compiled frontend at a public HTTPS URL and verify the manifest, service worker, icons, responsive UI, and offline behavior.</p><ol><li>Open <a href="https://www.pwabuilder.com/" target="_blank" rel="noopener">PWABuilder</a> and enter the HTTPS PWA URL.</li><li>Fix manifest and service-worker diagnostics, then choose the Android package or Windows package option.</li><li>For Android, review the generated Trusted Web Activity/package settings, application ID, signing configuration, API origin, and icon set. Use the generated Android project to build a signed APK for testing or AAB for Google Play where required.</li><li>For Windows, review the generated Windows package and identity details, then build/sign the MSIX with the generated project or supported packaging workflow.</li><li>Test the installed package on clean devices. Confirm deep links, external links, back navigation, offline state, permissions, API connectivity, and update behavior.</li></ol><p>Follow platform signing and store rules. Google Play generally uses signed Android App Bundles for new releases; the Microsoft Store requires a correctly signed MSIX and package identity. Keep the Flaxon backend deployed separately.</p>
+<h2>Production checklist</h2><ul><li>Pin Python, Teloce-Py, and runtime versions.</li><li>Compile all <code>.vel</code> files in CI and deploy immutable hashed assets.</li><li>Use HTTPS, secure authentication, server-side authorization, request validation, rate limiting, and durable storage.</li><li>Do not place credentials, signing keys, or privileged operations in <code>.vel</code> or browser storage.</li><li>Test compiler diagnostics, generated asset paths, browser behavior, PWA install, package signing, and API error states.</li><li>Run <code>teloce doctor --verbose</code>, <code>teloce lint --strict</code>, Python tests, and browser end-to-end tests before release.</li></ul>
+<h2>Lesson map</h2><p>The full Teloce-Py lessons cover first components, building blocks, reusable design, Flaxon apps, OS-style interfaces, production delivery, Django/FastAPI/Flask integration, case studies, PWA/MSIX, search applications, animation and Three.js, plugins, compiler internals, CLI workflow, signals, runtime/router behavior, and a Vel IDE. Start with the <a href="https://github.com/flaxon-labs/teloce-py/tree/main/docs/lessons" target="_blank" rel="noopener">lesson directory</a> and use this page as the website reference.</p></article></main></div></div></section><div id="footer"></div></body></html>
