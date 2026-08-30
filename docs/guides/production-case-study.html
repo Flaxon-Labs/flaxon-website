@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Production Case Study - Flaxon Documentation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css">
+<script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content">
+<h1>Production Case Study</h1>
+<p>This lesson explains what the Flaxon Labs organization website proves and how to build a similar application. It is a working reference architecture: public Jinax pages, authenticated Admin, schema-driven CMS, persistent PostgreSQL data, Redis coordination, Blob media, SMTP account mail, and Vercel deployment.</p>
+<div class="note success"><strong>What this proves</strong><p class="mb-0 mt-1">Flaxon can support a real organization site with editable projects, documentation, releases, posts, community forms, custom Admin pages, authentication, migrations, health checks, and production service configuration. The external database, Redis, storage, mail provider, backups, monitoring, and worker platform remain deployment responsibilities.</p></div>
+<h2>1. Create the application</h2>
+<pre><code class="language-powershell">mkdir flaxon-labs-app
+cd flaxon-labs-app
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install "flaxon[standard,security]==2.4.0" psycopg[binary] redis
+flaxon init .</code></pre>
+<h2>2. Bootstrap Flaxon, Jinax, Admin, and CMS</h2>
+<pre><code class="language-python">import os
+from flaxon import Flaxon
+from flaxon.jinax import Jinax
+from flaxon.admin import AdminConfig, AdminDashboard
+from flaxon.admin.cms import CMS, CMSField, ContentType
+
+app = Flaxon("organization", debug=False)
+app.use_templates(Jinax("templates"))
+
+admin = AdminDashboard(
+    app,
+    config=AdminConfig(site_title="Organization Admin"),
+    database_url=os.environ["DATABASE_URL"],
+    redis_url=os.environ.get("REDIS_URL"),
+)
+
+cms = CMS(
+    app,
+    url_prefix="/admin/cms",
+    auth=admin.auth,
+    database=admin.store,
+    redis_url=os.environ.get("REDIS_URL"),
+)
+cms.register(ContentType(
+    "project",
+    fields=[
+        CMSField("title", required=True),
+        CMSField("summary", required=True),
+        CMSField("body", type="richtext"),
+        CMSField("status", type="select", choices=["draft", "published"]),
+    ],
+    list_display=["title", "status", "updated_at"],
+    list_filter=["status"],
+    search_fields=["title", "summary", "body"],
+))</code></pre>
+<h2>3. Add public pages</h2>
+<pre><code class="language-python">@app.get("/")
+async def home(request):
+    await cms._load_database()
+    projects = [
+        item for item in cms.content_types["project"].items.values()
+        if item.get("status") == "published"
+    ]
+    return await request.render("home.html", {"projects": projects})
+
+@app.get("/api/health")
+async def health(request):
+    return {"ok": True, "service": "organization"}</code></pre>
+<h2>4. Production environment</h2>
+<pre><code class="language-env">FLAXON_ENV=production
+FLAXON_SECRET_KEY=generate-a-random-value-at-least-32-characters
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+REDIS_URL=rediss://default:password@host:6379
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
+BLOB_PUBLIC_URL=https://...public.blob.vercel-storage.com
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USERNAME=mailer@example.com
+SMTP_PASSWORD=provider-app-password
+SMTP_FROM=Organization &lt;mailer@example.com&gt;
+SMTP_TLS=true
+FLAXON_ADMIN_USERNAME=admin
+FLAXON_ADMIN_PASSWORD=replace-with-a-strong-password
+FLAXON_ADMIN_EMAIL=admin@example.com</code></pre>
+<p>Keep secrets in Vercel, a CI secret store, or the host environment. Never commit an <code>.env</code> file. Use a pooled PostgreSQL URL for serverless workloads and configure Redis for shared sessions, rate limits, locks, and cross-worker events.</p>
+<h2>5. Migrate and create the first Admin user</h2>
+<pre><code class="language-powershell">flaxon migrate --database $env:DATABASE_URL --migrations-dir migrations
+python scripts/create_admin.py admin --email admin@example.com --password "use-a-unique-password"
+flaxon run app:app --host 0.0.0.0 --port 8000</code></pre>
+<p>Open <code>/admin/login</code> for the Admin dashboard and <code>/admin/cms/</code> for content editing. Add CSRF fields to every browser form and require permissions inside custom routes, even when the UI hides actions.</p>
+<h2>6. Deploy to Vercel</h2>
+<pre><code class="language-json">{
+  "builds": [{"src": "app.py", "use": "@vercel/python"}],
+  "routes": [{"src": "/(.*)", "dest": "app.py"}]
+}</code></pre>
+<pre><code class="language-powershell">vercel link
+vercel env add DATABASE_URL production
+vercel env add REDIS_URL production
+vercel env add FLAXON_SECRET_KEY production
+vercel --prod</code></pre>
+<h2>7. Verify the workflow</h2>
+<ul><li>Run migrations against the same database used by deployment.</li><li>Log in, create a project, publish it, and confirm the public page reads the record.</li><li>Upload media and confirm metadata is stored separately from the Blob object.</li><li>Test reset and verification mail using a real SMTP provider.</li><li>Run <code>python -m pytest --no-cov -q</code> and browser smoke tests before release.</li><li>Check health, error logs, backups, rate limits, and worker jobs from the hosting platform.</li></ul>
+<h2>Architecture decisions</h2>
+<p>Use Admin for authenticated operational data and CMS for editorial content. Keep public route handlers thin and read published content from the CMS store. Use durable database storage for users, settings, revisions, audit records, and forms. Use Redis when more than one process can serve requests. Run scheduled publishing, thumbnail work, and retries on a durable external worker rather than relying on a serverless request.</p>
+<h2>Next customization</h2>
+<p>Register a new <code>ContentType</code> for products, events, or releases; add a Jinax template under <code>templates/</code>; and add a permission-protected custom Admin route. This is the same extension pattern used by the Flaxon Labs reference site.</p>
+</article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded",function(){if(window.hljs)window.hljs.highlightAll();});</script></body></html>

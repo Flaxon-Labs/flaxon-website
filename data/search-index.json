@@ -323,6 +323,13 @@
       "section": "Guides"
     },
     {
+      "id": "production-case-study",
+      "title": "Production Case Study",
+      "url": "/docs/guides/production-case-study.html",
+      "content": "Production Flaxon Labs organization website Jinax Admin CMS Neon PostgreSQL Redis Vercel Blob SMTP Vercel deployment migrations custom pages health checks copy paste architecture",
+      "section": "Guides"
+    },
+    {
       "id": "jinax-flaxon-app",
       "title": "Jinax App Starter",
       "url": "/docs/guides/jinax-flaxon-app.html",
