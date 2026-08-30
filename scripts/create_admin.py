@@ -20,6 +20,7 @@ async def main() -> None:
     if not password:
         raise SystemExit("A password is required.")
     admin = app.flaxon_labs_admin
+    await app.database.initialize()
     await admin._load_database()
     record = admin.auth.add_user({"username": args.username, "email": args.email, "password": password, "roles": ["administrator"]})
     if admin.store:

@@ -56,5 +56,15 @@ def setup_admin(app: Any, settings: Settings, database: Any) -> AdminDashboard:
             }
         ],
     )
+
+    # Login can be the first request on a serverless worker. Load Neon-backed
+    # users before the framework authentication handler checks credentials.
+    async def login_with_persistent_state(request: Any) -> Any:
+        await admin._load_database()
+        return await admin.login(request)
+
+    for route in app.router.routes:
+        if route.path == "/admin/login":
+            route.endpoint = login_with_persistent_state
     admin.register_widget(lambda: {"title": "Organization", "value": "Open source technology for developers"})
     return admin
