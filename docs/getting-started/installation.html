@@ -1,0 +1,118 @@
+<!-- docs/getting-started/installation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Installation – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html" class="active">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+                        <div class="section-title">More</div>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Installation</h1>
+
+                        <h2>Install from PyPI</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">pip install flaxon</code></pre>
+                        </div>
+                        <p>Installs the core framework with no optional dependencies.</p>
+
+                        <h2>Optional Dependencies</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash"># With server (Uvicorn)
+pip install "flaxon[server]"
+
+# With templates (Jinja2)
+pip install "flaxon[templates]"
+
+# Standard (server + templates)
+pip install "flaxon[standard]"
+
+# Development tools
+pip install "flaxon[dev]"
+
+# All extras
+pip install "flaxon[standard,dev,server]"</code></pre>
+                        </div>
+
+                        <h2>Install from GitHub</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">git clone https://github.com/aldanedev-create/Flaxon-Backend-Framework.git
+cd Flaxon-Backend-Framework
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -e ".[standard,dev]"</code></pre>
+                        </div>
+
+                        <h2>Verify Installation</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">python -c "import flaxon; print(flaxon.__version__)"</code></pre>
+                        </div>
+
+                        <div class="note success">
+                            <strong><i class="fas fa-check-circle mr-2"></i> Success</strong>
+                            <p class="mb-0 mt-1">If you see the version number, Flaxon is installed correctly!</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

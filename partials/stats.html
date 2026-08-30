@@ -1,0 +1,68 @@
+<!-- partials/stats.html -->
+<section class="py-20 bg-slate-100 dark:bg-slate-900">
+    <div class="container mx-auto px-4">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left: Stats -->
+            <div>
+                <span class="text-flaxon-blue dark:text-cyan-400 font-semibold text-sm uppercase tracking-wider">
+                    <i class="fas fa-chart-simple mr-2"></i> Community
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">
+                    Join the Flaxon Community
+                </h2>
+                <p class="text-slate-600 dark:text-slate-400 mt-4 text-lg leading-relaxed">
+                    Built with ❤️ by a developer, for developers. Join us in building the future of Python backend development.
+                </p>
+                <div class="grid grid-cols-2 gap-6 mt-8">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                        <div class="stat-number" x-data="{}" x-init="setInterval(() => $el.textContent = Number($el.textContent) + 1, 50)" x-text="0">0</div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">GitHub Stars</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                        <div class="stat-number" x-data="{}" x-init="setInterval(() => $el.textContent = Number($el.textContent) + 1, 100)" x-text="0">0</div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">PyPI Downloads</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                        <div class="stat-number" x-data="{}" x-init="$el.textContent = '3'" x-text="'3'">3</div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Python Versions</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                        <div class="stat-number" x-data="{}" x-init="$el.textContent = 'MIT'" x-text="'MIT'">MIT</div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">License</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Quick Start Code -->
+            <div class="glass-card-dark rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+                <h3 class="text-white font-bold text-lg mb-4">
+                    <i class="fas fa-bolt text-cyan-400 mr-2"></i> Quick Start
+                </h3>
+                <div class="code-block">
+                    <pre><code class="language-bash"># Install
+pip install flaxon
+
+# Create app.py
+echo 'from flaxon import Flaxon
+app = Flaxon("hello")
+@app.get("/")
+async def home():
+    return {"message": "Hello!"}' > app.py
+
+# Run
+flaxon run app:app --reload
+
+# Open http://localhost:8000</code></pre>
+                </div>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <a href="/installation.html" class="gradient-btn text-white font-medium px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-blue-500/20 transition hover:shadow-blue-500/30">
+                        <i class="fas fa-download mr-2"></i> Install Now
+                    </a>
+                    <a href="/docs.html" class="border border-white/20 text-white/80 hover:text-white hover:bg-white/5 px-6 py-2.5 rounded-xl text-sm font-medium transition">
+                        <i class="fas fa-book mr-2"></i> Read Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

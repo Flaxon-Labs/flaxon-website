@@ -1,0 +1,208 @@
+<!-- docs/guides/authentication.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Authentication – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html" class="active">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Authentication</h1>
+                        <p>Flaxon provides flexible authentication through JWT, sessions, and custom backends.</p>
+
+                        <h2>JWT Authentication</h2>
+
+                        <h3>Setup</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.security import JWTBackend, AuthenticationMiddleware
+
+app = Flaxon("auth-app")
+backend = JWTBackend(secret_key="your-secret-key")
+
+app.add_middleware(AuthenticationMiddleware, backend=backend)</code></pre>
+                        </div>
+
+                        <h3>Login</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import User
+
+@app.post("/login")
+async def login(request):
+    data = await request.json()
+    user = await authenticate_user(data["username"], data["password"])
+
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    token = await backend.create_token(user)
+    return {"token": token, "user": user.to_dict()}</code></pre>
+                        </div>
+
+                        <h3>Protecting Routes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import login_required
+
+@app.get("/profile")
+@login_required
+async def profile(request):
+    user = getattr(request, "user")
+    return {"user": user.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Session Authentication</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import SessionBackend, AuthenticationMiddleware
+
+backend = SessionBackend()
+app.add_middleware(AuthenticationMiddleware, backend=backend)
+
+@app.post("/login")
+async def login(request):
+    user = await authenticate_user(data)
+    session_id = await backend.create_token(user)
+    response = JSONResponse({"success": True})
+    response.headers["set-cookie"] = f"session_id={session_id}; HttpOnly; Path=/"
+    return response</code></pre>
+                        </div>
+
+                        <h2>API Key Authentication</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import APIKeyManager, api_key_required
+
+manager = APIKeyManager()
+key, hashed = manager.generate_key()
+manager.register(key)
+
+app.state.api_key_manager = manager
+
+@app.get("/protected")
+@api_key_required
+async def protected(request):
+    return {"data": "secret"}</code></pre>
+                        </div>
+
+                        <h2>OAuth2</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import OAuth2Provider, OAuth2Backend
+
+provider = OAuth2Provider(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    authorization_endpoint="https://auth.example.com/authorize",
+    token_endpoint="https://auth.example.com/token",
+    redirect_uri="https://your-app.com/callback",
+)
+
+backend = OAuth2Backend()
+backend.register_provider("example", provider)
+
+@app.get("/auth/login")
+async def auth_login():
+    url = backend.get_authorization_url("example")
+    return RedirectResponse(url)</code></pre>
+                        </div>
+
+                        <h2>Password Hashing</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import hash_password, verify_password
+
+# Hash a password
+hashed = hash_password("my-password")
+
+# Verify a password
+is_valid = verify_password("my-password", hashed)
+
+# Check if rehash is needed
+if needs_rehash(hashed):
+    hashed = hash_password("my-password")</code></pre>
+                        </div>
+
+                        <div class="note warning">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Security Reminder</strong>
+                            <p class="mb-0 mt-1">Always store secret keys in environment variables, not in code. Use <code>FLAXON_SECRET_KEY</code> in production.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

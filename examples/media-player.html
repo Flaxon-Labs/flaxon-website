@@ -1,0 +1,200 @@
+<!-- examples/media-player.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Advanced Media Player – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/examples.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-8">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-3 mb-6">
+                <a href="/examples.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <i class="fas fa-arrow-left"></i> Back to Examples
+                </a>
+                <span class="text-slate-300 dark:text-slate-600">|</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">Advanced Media Player</h1>
+                <span class="ml-auto text-xs bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-3 py-1 rounded-full">Streaming</span>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 mb-6">
+                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                    <i class="fas fa-info-circle text-flaxon-blue mr-2"></i>
+                    A feature-rich media player powered by Flaxon's streaming responses and file serving capabilities.
+                </p>
+            </div>
+
+            <!-- Demo Layout -->
+            <div class="media-player">
+                <!-- Media Element -->
+                <audio id="media-element" controls style="display:none;"></audio>
+                <video id="video-element" controls style="display:none; width:100%; border-radius:8px;"></video>
+
+                <!-- Visualizer -->
+                <div class="media-visualizer" id="visualizer">
+                    <div class="bar" style="height:20%;"></div>
+                    <div class="bar" style="height:40%;"></div>
+                    <div class="bar" style="height:60%;"></div>
+                    <div class="bar" style="height:80%;"></div>
+                    <div class="bar" style="height:50%;"></div>
+                    <div class="bar" style="height:30%;"></div>
+                    <div class="bar" style="height:70%;"></div>
+                    <div class="bar" style="height:90%;"></div>
+                    <div class="bar" style="height:45%;"></div>
+                    <div class="bar" style="height:55%;"></div>
+                    <div class="bar" style="height:85%;"></div>
+                    <div class="bar" style="height:35%;"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="media-controls">
+                    <button id="play-btn"><i class="fas fa-play"></i></button>
+                    <button id="prev-btn"><i class="fas fa-backward"></i></button>
+                    <button id="next-btn"><i class="fas fa-forward"></i></button>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="fill" id="progress-fill" style="width:0%;"></div>
+                    </div>
+                    <span class="time-display" id="time-display">0:00 / 0:00</span>
+                    <button id="volume-btn"><i class="fas fa-volume-up"></i></button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="80" style="width:60px; accent-color:#3b82f6;">
+                    <button id="fullscreen-btn" style="display:none;"><i class="fas fa-expand"></i></button>
+                </div>
+
+                <!-- Playlist -->
+                <div class="playlist" id="playlist">
+                    <div class="playlist-item active" data-index="0">🎵 Sample Track 1</div>
+                    <div class="playlist-item" data-index="1">🎵 Sample Track 2</div>
+                    <div class="playlist-item" data-index="2">🎵 Sample Track 3</div>
+                </div>
+            </div>
+
+            <!-- Backend Code Showcase -->
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fab fa-python text-flaxon-blue mr-2"></i> Flaxon Streaming Response
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-python">from flaxon import Flaxon, StreamingResponse
+from pathlib import Path
+
+app = Flaxon("media-backend")
+
+async def stream_media(file_path: str):
+    """Stream media file in chunks."""
+    async with aiofiles.open(file_path, "rb") as f:
+        while chunk := await f.read(8192):
+            yield chunk
+
+@app.get("/media/<path:file_path>")
+async def serve_media(file_path: str):
+    path = Path("media") / file_path
+    if not path.exists():
+        return {"error": "File not found"}, 404
+
+    # Determine content type
+    ext = path.suffix.lower()
+    content_type = "audio/mpeg"
+    if ext == ".mp4":
+        content_type = "video/mp4"
+    elif ext == ".webm":
+        content_type = "video/webm"
+
+    return StreamingResponse(
+        stream_media(path),
+        media_type=content_type,
+        headers={
+            "Accept-Ranges": "bytes",
+            "Content-Disposition": f'inline; filename="{file_path}"',
+        }
+    )</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white text-sm">
+                            <i class="fas fa-music text-flaxon-blue mr-2"></i> Audio Visualization
+                        </h3>
+                    </div>
+                    <div class="code-block rounded-none border-0 max-h-64 overflow-y-auto">
+                        <pre><code class="language-javascript">// Web Audio API Visualizer
+const audioContext = new AudioContext();
+const analyser = audioContext.createAnalyser();
+analyser.fftSize = 256;
+
+// Connect audio to analyser
+const source = audioContext.createMediaElementSource(audioElement);
+source.connect(analyser);
+analyser.connect(audioContext.destination);
+
+function updateVisualizer() {
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(dataArray);
+
+    const bars = document.querySelectorAll('.visualizer-bar');
+    const bufferLength = analyser.frequencyBinCount;
+
+    for (let i = 0; i < bars.length; i++) {
+        const value = dataArray[i] || 0;
+        const percent = (value / 255) * 100;
+        bars[i].style.height = percent + '%';
+    }
+
+    requestAnimationFrame(updateVisualizer);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script src="/assets/js/examples/media-player.js"></script>
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

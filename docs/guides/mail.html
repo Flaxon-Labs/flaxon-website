@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Email - Flaxon Documentation</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head><body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1> Email</h1><p>Send mail through a small adapter interface. Use the console adapter locally and SMTP in production.</p><h2>Console development</h2><pre><code class="language-python">from flaxon.mail import Email, Mailer
+from flaxon.mail.adapters.console import ConsoleAdapter
+
+mailer = Mailer(ConsoleAdapter())
+
+await mailer.send(Email(
+    from_address="noreply@example.com",
+    to=["developer@example.com"],
+    subject="Welcome",
+    body="Your account is ready.",
+    html_body="&lt;h1&gt;Welcome&lt;/h1&gt;",
+))</code></pre><h2>SMTP production</h2><pre><code class="language-python">import os
+from flaxon.mail import Email, Mailer
+from flaxon.mail.adapters.smtp import SMTPAdapter
+
+mailer = Mailer(SMTPAdapter(
+    host=os.environ["MAIL_HOST"],
+    port=int(os.getenv("MAIL_PORT", "587")),
+    username=os.getenv("MAIL_USERNAME"),
+    password=os.getenv("MAIL_PASSWORD"),
+    use_tls=True,
+))
+
+await mailer.send(Email(
+    from_address=os.environ["MAIL_FROM"],
+    to=["user@example.com"],
+    subject="Invoice ready",
+    body="Your invoice is ready.",
+))</code></pre><p>Use port 587 with STARTTLS or port 465 with <code>use_ssl=True</code>. Do not enable both TLS modes. Put credentials in a secret manager or environment variables.</p><h2>Templates and attachments</h2><pre><code class="language-python">from flaxon.mail import Attachment, Email
+
+email = Email(
+    from_address="noreply@example.com",
+    to=["user@example.com"],
+    subject="Receipt",
+    body="Your receipt is attached.",
+    attachments=[Attachment("receipt.txt", b"Receipt contents")],
+)
+await mailer.send(email)</code></pre><p>For Jinja email templates, use <code>EmailTemplate</code> and <code>TemplateEngine</code>. Use <code>mailer.send_many([...])</code> for sequential bulk delivery. For high-volume mail, enqueue sends through a task worker.</p><h2>Testing</h2><pre><code class="language-python">class FakeMailAdapter:
+    def __init__(self): self.messages = []
+    async def send(self, email): self.messages.append(email)
+
+adapter = FakeMailAdapter()
+mailer = Mailer(adapter)
+await mailer.send(Email(from_address="test@example.com", to=["user@example.com"], subject="Test", body="Hello"))
+assert adapter.messages[0].subject == "Test"</code></pre></article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+
+

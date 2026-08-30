@@ -1,0 +1,271 @@
+<!-- docs/core-concepts/middleware.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Middleware – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html" class="active">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Middleware</h1>
+                        <p>Middleware wraps your ASGI application and can process requests before and after your route handlers.</p>
+
+                        <h2>Adding Middleware</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.middleware import CORSMiddleware, RequestIDMiddleware, SecurityHeadersMiddleware
+
+app = Flaxon("my-app")
+
+app.add_middleware(RequestIDMiddleware, header_name="x-request-id")
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allowed_origins=["https://example.com"],
+    allow_credentials=True,
+)</code></pre>
+                        </div>
+
+                        <h2>Built-in Middleware</h2>
+
+                        <h3>RequestIDMiddleware</h3>
+                        <p>Adds a unique request ID to each request and response.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import RequestIDMiddleware
+
+app.add_middleware(RequestIDMiddleware, header_name="x-request-id")</code></pre>
+                        </div>
+
+                        <h3>SecurityHeadersMiddleware</h3>
+                        <p>Adds security headers to all responses.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import SecurityHeadersMiddleware
+
+app.add_middleware(
+    SecurityHeadersMiddleware,
+    hsts=True,
+    csp="default-src 'self'",
+)</code></pre>
+                        </div>
+
+                        <h3>CORSMiddleware</h3>
+                        <p>Handles Cross-Origin Resource Sharing.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allowed_origins=["https://example.com"],
+    allowed_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_credentials=True,
+)</code></pre>
+                        </div>
+
+                        <h3>CompressionMiddleware</h3>
+                        <p>Compresses responses using gzip, deflate, or brotli.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import CompressionMiddleware
+
+app.add_middleware(
+    CompressionMiddleware,
+    minimum_size=1024,
+    level=6,
+)</code></pre>
+                        </div>
+
+                        <h3>RateLimitMiddleware</h3>
+                        <p>Limits the number of requests per client.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.security import RateLimitMiddleware
+
+app.add_middleware(
+    RateLimitMiddleware,
+    requests=60,
+    window_seconds=60,
+)</code></pre>
+                        </div>
+
+                        <h3>BodyLimitMiddleware</h3>
+                        <p>Limits the size of request bodies.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import BodyLimitMiddleware
+
+app.add_middleware(
+    BodyLimitMiddleware,
+    max_size=5 * 1024 * 1024,
+)</code></pre>
+                        </div>
+
+                        <h3>TimeoutMiddleware</h3>
+                        <p>Sets a timeout for request processing.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import TimeoutMiddleware
+
+app.add_middleware(
+    TimeoutMiddleware,
+    timeout=30,
+)</code></pre>
+                        </div>
+
+                        <h3>TrustedHostsMiddleware</h3>
+                        <p>Validates the Host header against allowed hosts.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import TrustedHostsMiddleware
+
+app.add_middleware(
+    TrustedHostsMiddleware,
+    allowed_hosts=["example.com", "api.example.com"],
+)</code></pre>
+                        </div>
+
+                        <h3>LoggingMiddleware</h3>
+                        <p>Logs requests and responses.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import LoggingMiddleware
+
+app.add_middleware(
+    LoggingMiddleware,
+    log_headers=True,
+    log_body=False,
+)</code></pre>
+                        </div>
+
+                        <h3>RecoveryMiddleware</h3>
+                        <p>Catches exceptions and returns safe error responses.</p>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import RecoveryMiddleware
+
+app.add_middleware(
+    RecoveryMiddleware,
+    debug=False,
+)</code></pre>
+                        </div>
+
+                        <h2>Custom Middleware</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.middleware import Middleware
+
+class CustomMiddleware(Middleware):
+    def __init__(self, app, header_name="x-custom"):
+        super().__init__(app)
+        self.header_name = header_name
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        # Pre-processing
+        scope["custom_value"] = "processed"
+
+        async def send_wrapper(message):
+            if message["type"] == "http.response.start":
+                headers = list(message.get("headers", []))
+                headers.append((self.header_name.encode(), b"custom-value"))
+                message["headers"] = headers
+            await send(message)
+
+        # Post-processing
+        await self.app(scope, receive, send_wrapper)</code></pre>
+                        </div>
+
+                        <h2>Middleware Order</h2>
+                        <div class="note warning">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Important</strong>
+                            <p class="mb-0 mt-1">Middleware is executed in the order it is added (first added = outermost).</p>
+                        </div>
+
+                        <div class="code-block">
+                            <pre><code class="language-python">app.add_middleware(RequestIDMiddleware)      # Executed first (outermost)
+app.add_middleware(SecurityHeadersMiddleware) # Executed second
+app.add_middleware(CORSMiddleware)            # Executed third
+app.add_middleware(CustomMiddleware)          # Executed last (innermost)</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-code mr-2"></i> Request Flow</strong>
+                            <p class="mb-0 mt-1">Request → Middleware1 → Middleware2 → Middleware3 → App → Response</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

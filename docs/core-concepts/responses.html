@@ -1,0 +1,240 @@
+<!-- docs/core-concepts/responses.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Responses – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html" class="active">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Responses</h1>
+                        <p>Flaxon automatically converts return values to appropriate HTTP responses.</p>
+
+                        <h2>Automatic Conversion</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/")
+async def home():
+    # Dictionary → JSON
+    return {"message": "Hello"}
+
+@app.get("/users")
+async def list_users():
+    # List → JSON
+    return [{"id": 1, "name": "Alice"}]
+
+@app.get("/text")
+async def text():
+    # String → Text
+    return "Hello, World!"
+
+@app.get("/empty")
+async def empty():
+    # None → 204 No Content
+    return None
+
+@app.get("/file")
+async def file():
+    # Bytes → Octet-Stream
+    return b"file content"</code></pre>
+                        </div>
+
+                        <h2>Response Classes</h2>
+
+                        <h3>JSONResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import JSONResponse
+
+@app.get("/json")
+async def json_response():
+    return JSONResponse(
+        {"status": "ok", "data": [1, 2, 3]},
+        status_code=201,
+        headers={"X-Custom": "value"},
+    )</code></pre>
+                        </div>
+
+                        <h3>HTMLResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import HTMLResponse
+
+@app.get("/html")
+async def html_response():
+    return HTMLResponse("&lt;h1&gt;Hello&lt;/h1&gt;", status_code=200)</code></pre>
+                        </div>
+
+                        <h3>TextResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import TextResponse
+
+@app.get("/text")
+async def text_response():
+    return TextResponse("Plain text", status_code=200)</code></pre>
+                        </div>
+
+                        <h3>RedirectResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import RedirectResponse
+
+@app.get("/old")
+async def redirect():
+    return RedirectResponse("/new", status_code=301)
+
+# Or use the Redirect helper
+from flaxon.http.redirects import Redirect
+
+@app.get("/temp")
+async def temp_redirect():
+    return Redirect.temporary("/new")</code></pre>
+                        </div>
+
+                        <h3>StreamingResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import StreamingResponse
+
+async def generate_data():
+    for i in range(10):
+        yield f"Data {i}\n".encode()
+
+@app.get("/stream")
+async def stream():
+    return StreamingResponse(
+        generate_data(),
+        media_type="text/plain",
+    )</code></pre>
+                        </div>
+
+                        <h2>Status Codes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.http.status import OK, CREATED, NO_CONTENT, BAD_REQUEST, NOT_FOUND
+
+@app.get("/ok")
+async def ok_response():
+    return {"status": "ok"}, OK
+
+@app.post("/users")
+async def create_user():
+    return {"created": True}, CREATED
+
+@app.delete("/users/&lt;int:user_id&gt;")
+async def delete_user(user_id: int):
+    return None, NO_CONTENT</code></pre>
+                        </div>
+
+                        <h2>Custom Headers</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/headers")
+async def custom_headers():
+    return JSONResponse(
+        {"data": "value"},
+        headers={
+            "X-Custom-Header": "custom-value",
+            "X-Rate-Limit": "100",
+        },
+    )</code></pre>
+                        </div>
+
+                        <h2>Custom Response Class</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Response
+
+class CSVResponse(Response):
+    media_type = "text/csv; charset=utf-8"
+
+    def __init__(self, data: list[list[str]], **kwargs):
+        content = "\n".join(",".join(row) for row in data)
+        super().__init__(content, **kwargs)
+
+@app.get("/export")
+async def export():
+    data = [["Name", "Email"], ["Alice", "alice@example.com"]]
+    return CSVResponse(data, status_code=200)</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">You can return tuples like <code>(data, status_code)</code> or <code>(data, headers)</code> for quick responses.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

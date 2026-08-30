@@ -1,0 +1,192 @@
+ /* ============================================================ */
+        /* 2D SOLAR SYSTEM LOADING ANIMATION (replaces the old three.js  */
+        /* WebGL background). Namespaced under "solar2d-" so it doesn't  */
+        /* collide with anything already defined in solar.css.           */
+        /* ============================================================ */
+
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 38%, #101c34 0%, #070b16 65%, #03050a 100%);
+            transition: opacity .6s ease, visibility .6s ease;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* lightweight CSS-only starfield, no canvas / no three.js */
+        #loading-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.55) 50%, transparent 51%),
+                radial-gradient(1px 1px at 80% 12%, rgba(255,255,255,.4) 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 60% 72%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(1px 1px at 28% 85%, rgba(255,255,255,.35) 50%, transparent 51%),
+                radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,.45) 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 45% 34%, rgba(255,255,255,.55) 50%, transparent 51%),
+                radial-gradient(1px 1px at 15% 55%, rgba(255,255,255,.3) 50%, transparent 51%),
+                radial-gradient(1px 1px at 70% 92%, rgba(255,255,255,.4) 50%, transparent 51%),
+                radial-gradient(1px 1px at 6% 40%, rgba(255,255,255,.3) 50%, transparent 51%),
+                radial-gradient(1px 1px at 96% 30%, rgba(255,255,255,.35) 50%, transparent 51%);
+            background-repeat: no-repeat;
+            animation: solar2d-twinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes solar2d-twinkle {
+            from { opacity: .5; }
+            to   { opacity: 1; }
+        }
+
+        .loading-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        /* the 2D solar system itself */
+        .solar2d {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+
+        .solar2d-sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffe1b0, #ff8844 55%, #ff4400 100%);
+            box-shadow: 0 0 14px 4px rgba(255,136,68,.55), 0 0 34px 12px rgba(255,68,0,.25);
+            transform: translate(-50%, -50%);
+            animation: solar2d-pulse 2.6s ease-in-out infinite;
+        }
+        @keyframes solar2d-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50%      { transform: translate(-50%, -50%) scale(1.12); }
+        }
+
+        .solar2d-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(0, 212, 255, .16);
+            border-radius: 50%;
+        }
+        .solar2d-orbit-1 { width: 70px;  height: 70px;  animation: solar2d-spin 3s linear infinite; }
+        .solar2d-orbit-2 { width: 112px; height: 112px; animation: solar2d-spin 5.2s linear infinite; }
+        .solar2d-orbit-3 { width: 154px; height: 154px; animation: solar2d-spin-reverse 7.6s linear infinite; }
+        .solar2d-orbit-4 { width: 200px; height: 200px; animation: solar2d-spin 11s linear infinite; }
+
+        @keyframes solar2d-spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes solar2d-spin-reverse {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to   { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        .solar2d-planet {
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        .solar2d-planet-1 { background: #88aaff; box-shadow: 0 0 6px 1px rgba(136,170,255,.7); }
+        .solar2d-planet-2 { background: #00D4FF; box-shadow: 0 0 8px 2px rgba(0,212,255,.6); width: 10px; height: 10px; top: -5px; }
+        .solar2d-planet-3 { background: #3776AB; box-shadow: 0 0 6px 1px rgba(55,118,171,.6); width: 9px; height: 9px; top: -4.5px; }
+        .solar2d-planet-4 { background: #ddcc88; box-shadow: 0 0 6px 1px rgba(221,204,136,.6); }
+
+        /* small saturn-style ring on the outer planet, just for flavor */
+        .solar2d-planet-4::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 5px;
+            border: 1px solid rgba(221,204,136,.55);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+        }
+
+        .loading-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.75rem;
+            letter-spacing: .04em;
+            color: #ffffff;
+        }
+        .loading-title span {
+            background: linear-gradient(90deg, #00D4FF, #3776AB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .loading-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            color: #93a4c3;
+            letter-spacing: .02em;
+            margin-top: -.75rem;
+        }
+
+        .typing-container {
+            width: min(480px, 88vw);
+            min-height: 230px;
+            background: rgba(11, 18, 32, .8);
+            border: 1px solid rgba(0, 212, 255, .15);
+            border-radius: .75rem;
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+            font-size: .8rem;
+            line-height: 1.6;
+            color: #c9d6ee;
+            box-shadow: 0 20px 60px -20px rgba(0,0,0,.6);
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 1em;
+            background: #00D4FF;
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: solar2d-blink 1s step-end infinite;
+        }
+        @keyframes solar2d-blink { 50% { opacity: 0; } }
+
+        .typing-container .keyword    { color: #ff79c6; }
+        .typing-container .decorator  { color: #00D4FF; }
+        .typing-container .function   { color: #8be9fd; }
+        .typing-container .string     { color: #f1fa8c; }
+        .typing-container .comment    { color: #6272a4; font-style: italic; }
+
+        @media (max-width: 480px) {
+            .solar2d          { width: 160px; height: 160px; }
+            .solar2d-orbit-4  { width: 150px; height: 150px; }
+            .solar2d-orbit-3  { width: 112px; height: 112px; }
+            .solar2d-orbit-2  { width: 82px;  height: 82px; }
+            .solar2d-orbit-1  { width: 52px;  height: 52px; }
+            .typing-container { font-size: .7rem; padding: .75rem 1rem; min-height: 190px; }
+        }

@@ -1,0 +1,279 @@
+<!-- docs/core-concepts/routing.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Routing – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html" class="active">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Routing</h1>
+                        <p>Define routes using decorators on your Flaxon application or routers.</p>
+
+                        <h2>Basic Routes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("my-app")
+
+@app.get("/")
+async def home():
+    return {"message": "Welcome"}
+
+@app.post("/users")
+async def create_user():
+    return {"created": True}
+
+@app.put("/users/&lt;int:user_id&gt;")
+async def update_user(user_id: int):
+    return {"updated": True, "id": user_id}
+
+@app.delete("/users/&lt;int:user_id&gt;")
+async def delete_user(user_id: int):
+    return {"deleted": True, "id": user_id}</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Supported Methods</strong>
+                            <p class="mb-0 mt-1"><code>@app.get()</code>, <code>@app.post()</code>, <code>@app.put()</code>, <code>@app.patch()</code>, and <code>@app.delete()</code>. For other methods, use <code>@app.route(..., methods={"HEAD", "OPTIONS"})</code>.</p>
+                        </div>
+
+                        <h2>Path Parameters</h2>
+                        <p>Flaxon supports both Flask-style and brace-style parameters.</p>
+
+                        <h3>Flask-Style</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id}
+
+@app.get("/posts/&lt;slug:post_slug&gt;")
+async def get_post(post_slug: str):
+    return {"slug": post_slug}
+
+@app.get("/files/&lt;path:file_path&gt;")
+async def get_file(file_path: str):
+    return {"path": file_path}</code></pre>
+                        </div>
+
+                        <h3>Brace-Style</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/users/{user_id:int}")
+async def get_user(user_id: int):
+    return {"id": user_id}
+
+@app.get("/posts/{post_slug:slug}")
+async def get_post(post_slug: str):
+    return {"slug": post_slug}</code></pre>
+                        </div>
+
+                        <h4>Supported Converters</h4>
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Converter</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>str</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">String (default)</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;name&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>int</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Integer</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;int:user_id&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>float</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Float</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;float:price&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>path</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Path with slashes</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;path:file_path&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>uuid</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">UUID</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;uuid:token&gt;</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>slug</code></td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Slug (a-z, 0-9, -, _)</td>
+                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;slug:post_slug&gt;</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2>Route Groups (Routers)</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Router
+
+api = Router(prefix="/api/v1")
+
+@api.get("/users")
+async def list_users():
+    return [{"id": 1, "name": "Alice"}]
+
+@api.post("/users")
+async def create_user():
+    return {"created": True}
+
+app.include_router(api)</code></pre>
+                        </div>
+
+                        <h2>Nested Routers</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">v1 = Router(prefix="/v1")
+v2 = Router(prefix="/v2")
+
+@v1.get("/users")
+async def users_v1():
+    return {"version": "v1"}
+
+@v2.get("/users")
+async def users_v2():
+    return {"version": "v2"}
+
+api = Router(prefix="/api")
+api.include_router(v1)
+api.include_router(v2)
+
+app.include_router(api)</code></pre>
+                        </div>
+
+                        <h2>Named Routes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;", name="users.detail")
+async def get_user(user_id: int):
+    return {"id": user_id}
+
+# Generate URL
+url = app.url_for("users.detail", user_id=42)
+# url == "/users/42"</code></pre>
+                        </div>
+
+                        <h2>Route Matching Order</h2>
+                        <div class="note warning">
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Important</strong>
+                            <p class="mb-0 mt-1">Routes are matched in the order they are registered. More specific routes should be registered before more general routes.</p>
+                        </div>
+
+                        <div class="code-block">
+                            <pre><code class="language-python"># Specific route first
+@app.get("/users/me")
+async def get_current_user():
+    return {"user": "current"}
+
+# General route second
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id}</code></pre>
+                        </div>
+
+                        <h2>Error Handling</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import HTTPException
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    if user_id == 0:
+        raise HTTPException(400, "Invalid user ID", code="FX-INVALID-ID")
+    if user_id == 404:
+        raise HTTPException(404, "User not found", code="FX-USER-404")
+    return {"id": user_id, "name": f"User {user_id}"}</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-terminal mr-2"></i> CLI Command</strong>
+                            <p class="mb-0 mt-1">List all routes: <code>flaxon routes app:app</code></p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

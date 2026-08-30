@@ -1,0 +1,330 @@
+/* ============================================================
+   GLOBAL STYLES – Flaxon Website
+   ============================================================ */
+
+/* ----- Base ----- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #0f172a;
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body,
+body.dark {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+a {
+    text-decoration: none;
+    color: #2563eb;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #1d4ed8;
+}
+
+.dark a {
+    color: #60a5fa;
+}
+
+.dark a:hover {
+    color: #93c5fd;
+}
+
+/* ----- Container ----- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* ----- Typography ----- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+h2 {
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.25rem;
+}
+
+/* ----- Gradients ----- */
+.gradient-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #1e3a5f 70%, #0c4a6e 100%);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gradient-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8, #0891b2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+}
+
+.dark .gradient-btn {
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+}
+
+/* ----- Cards ----- */
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.glass-card-dark {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+}
+
+.card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+}
+
+.dark .card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.dark .card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ----- Code Blocks ----- */
+.code-block {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    border: 1px solid #1e293b;
+    margin: 1rem 0;
+}
+
+.code-block code {
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+}
+
+.code-block .hljs {
+    background: transparent !important;
+}
+
+.dark .code-block {
+    background: #0a0f1a;
+    border-color: #1e293b;
+}
+
+/* ----- Feature Icons ----- */
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-icon.blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+.feature-icon.purple {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+.feature-icon.emerald {
+    background: #d1fae5;
+    color: #059669;
+}
+.feature-icon.amber {
+    background: #fef3c7;
+    color: #d97706;
+}
+.feature-icon.rose {
+    background: #ffe4e6;
+    color: #e11d48;
+}
+.feature-icon.teal {
+    background: #ccfbf1;
+    color: #0d9488;
+}
+.feature-icon.indigo {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+.feature-icon.cyan {
+    background: #cffafe;
+    color: #0891b2;
+}
+
+.dark .feature-icon.blue {
+    background: rgba(37, 99, 235, 0.25);
+    color: #60a5fa;
+}
+.dark .feature-icon.purple {
+    background: rgba(124, 58, 237, 0.25);
+    color: #a78bfa;
+}
+.dark .feature-icon.emerald {
+    background: rgba(5, 150, 105, 0.25);
+    color: #34d399;
+}
+.dark .feature-icon.amber {
+    background: rgba(217, 119, 6, 0.25);
+    color: #fbbf24;
+}
+.dark .feature-icon.rose {
+    background: rgba(225, 29, 72, 0.25);
+    color: #fb7185;
+}
+.dark .feature-icon.teal {
+    background: rgba(13, 148, 136, 0.25);
+    color: #2dd4bf;
+}
+.dark .feature-icon.indigo {
+    background: rgba(79, 70, 229, 0.25);
+    color: #818cf8;
+}
+.dark .feature-icon.cyan {
+    background: rgba(8, 145, 178, 0.25);
+    color: #22d3ee;
+}
+
+.feature-icon:hover {
+    transform: scale(1.1);
+}
+
+/* ----- Stats ----- */
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ----- Buttons ----- */
+.btn-primary {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-outline {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.dark .btn-outline {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ----- Animations ----- */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+}
+
+/* ----- Section Backgrounds ----- */
+.bg-section-light {
+    background: #f8fafc;
+}
+
+.bg-section-dark {
+    background: #0f172a;
+}
+
+.dark .bg-section-light {
+    background: #0f172a;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    .stat-number {
+        font-size: 2rem;
+    }
+    .container {
+        padding: 0 1rem;
+    }
+}

@@ -1,0 +1,142 @@
+<!-- docs/getting-started/quickstart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quick Start – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html" class="active">Quick Start</a>
+                        <div class="section-title">More</div>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Quick Start</h1>
+                        <p>Build your first Flaxon application in minutes.</p>
+
+                        <h2>Create a Project</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">mkdir my-flaxon-app
+cd my-flaxon-app
+python -m venv .venv
+source .venv/bin/activate
+pip install "flaxon[standard]"</code></pre>
+                        </div>
+
+                        <h2>Create app.py</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("hello-world", debug=True)
+
+@app.get("/")
+async def home():
+    return {"message": "Hello, World!"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "service": "hello-world"}</code></pre>
+                        </div>
+
+                        <h2>Run It</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">flaxon run app:app --reload</code></pre>
+                        </div>
+                        <p>Visit <code>http://localhost:8000</code> to see your API.</p>
+
+                        <h2>Add a Route with Parameters</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id, "name": f"User {user_id}"}</code></pre>
+                        </div>
+                        <p>Visit <code>http://localhost:8000/users/42</code></p>
+
+                        <h2>Add Validation</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+
+class CreateUser(Schema):
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    age = fields.IntField(required=False, minimum=13, maximum=120)
+
+@app.post("/users")
+async def create_user(data: CreateUser):
+    return {"success": True, "user": data.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Add a WebSocket</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.websocket("/ws/echo")
+async def echo(socket):
+    await socket.accept()
+    async for message in socket.iter_json():
+        await socket.send_json({"echo": message})</code></pre>
+                        </div>
+
+                        <div class="note success">
+                            <strong><i class="fas fa-check-circle mr-2"></i> Done!</strong>
+                            <p class="mb-0 mt-1">You've built your first Flaxon application. Check the <a href="/docs.html">documentation</a> for more.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

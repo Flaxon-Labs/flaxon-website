@@ -1,0 +1,170 @@
+<!-- faq.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FAQ – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <!-- FAQ Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Frequently Asked Questions</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">Common questions about Flaxon.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-4" x-data="{ open: null }">
+
+                <!-- FAQ 1 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 1 ? null : 1" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">What is Flaxon?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 1 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 1" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Flaxon is a technology-neutral, async-first Python backend framework that combines Flask-like ease of use with production-grade features. It's designed for APIs, real-time applications, mobile backends, and structured enterprise systems.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 2 ? null : 2" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">How is it different from Flask/Django/FastAPI?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 2 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 2" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>vs Flask:</strong> Flaxon is async-first with built-in WebSocket support and optional large-application structure.</li>
+                                <li><strong>vs Django:</strong> Flaxon is technology-neutral — no forced ORM, templates, or admin interface.</li>
+                                <li><strong>vs FastAPI:</strong> Flaxon offers Flask-style routing (decorators) and optional Jinax templates for HTML rendering.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 3 ? null : 3" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">Is Flaxon production ready?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 3 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 3" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Flaxon is currently in <strong>alpha</strong>. It is suitable for evaluation, experimentation, and learning. Production use is possible with careful testing and monitoring, but the API is not yet stable. The 1.0 release is planned for late 2026.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 4 ? null : 4" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">What databases are supported?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 4 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 4" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Flaxon is database-agnostic. You can use any database with any Python driver or ORM. Built-in adapters include PostgreSQL (asyncpg), SQLite (aiosqlite), MySQL (aiomysql), MongoDB (motor), and Redis (redis-py).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 5 ? null : 5" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">Can I use it with React, Vue, or Android?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 5 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 5" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Absolutely! Flaxon is technology-neutral. It works with any frontend (React, Vue, Angular, Svelte, Next.js) and any mobile platform (Android, iOS, Flutter, React Native) through REST APIs and WebSockets.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 6 ? null : 6" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">What is the license?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 6 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 6" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Flaxon is released under the <strong>MIT License</strong>. You can use it freely in commercial and open-source projects.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 7 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 7 ? null : 7" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">How can I contribute?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 7 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 7" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            You can contribute by filing issues, submitting pull requests, improving documentation, or spreading the word. Check the <a href="/community.html" class="text-flaxon-blue hover:underline">Community page</a> for details.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 8 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button @click="open = open === 8 ? null : 8" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <span class="font-semibold text-slate-900 dark:text-white">Does Flaxon support WebSockets?</span>
+                        <i class="fas fa-chevron-down text-slate-500 transition-transform" :class="open === 8 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open === 8" x-collapse>
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Yes! WebSocket support is built directly into the core with room-based broadcasting, heartbeat detection, and authentication. Perfect for chat, notifications, and real-time data streaming.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

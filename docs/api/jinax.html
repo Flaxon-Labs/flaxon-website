@@ -1,0 +1,240 @@
+<!-- docs/api/jinax.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Jinax API – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html" class="active">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Jinax API</h1>
+
+                        <h2>Jinax</h2>
+                        <p>Jinax template engine.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Jinax(template_directory: str | Path = "templates", *, auto_reload: bool = False, strict_undefined: bool = True, globals: dict[str, Any] | None = None, filters: dict[str, Callable[..., Any]] | None = None)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+
+                        <h4>add_global</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">def add_global(name: str, value: Any) -> None</code></pre>
+                        </div>
+                        <p>Add a global variable.</p>
+
+                        <h4>add_filter</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">def add_filter(name: str, func: Callable[..., Any]) -> None</code></pre>
+                        </div>
+                        <p>Add a custom filter.</p>
+
+                        <h4>render</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def render(template_name: str, context: dict[str, Any] | None = None) -> str</code></pre>
+                        </div>
+                        <p>Render a template.</p>
+
+                        <h4>render_response</h4>
+                        <div class="code-block">
+                            <pre><code class="language-python">async def render_response(template_name: str, context: dict[str, Any] | None = None, *, status_code: int = 200, headers: dict[str, str] | None = None) -> HTMLResponse</code></pre>
+                        </div>
+                        <p>Render and return an HTML response.</p>
+
+                        <h2>Environment</h2>
+                        <p>Jinax environment.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Environment(loader: Any, autoescape: bool = True, enable_async: bool = True, auto_reload: bool = False, strict_undefined: bool = False)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>add_global(name, value)</code> — Add a global variable</li>
+                            <li><code>add_filter(name, func)</code> — Add a custom filter</li>
+                            <li><code>get_template(name)</code> — Get a template</li>
+                            <li><code>from_string(source)</code> — Create a template from a string</li>
+                        </ul>
+
+                        <h2>Loader</h2>
+                        <p>Template loader.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Loader(search_path: str | Path, encoding: str = "utf-8")</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>get_source(environment, template)</code> — Get template source</li>
+                            <li><code>list_templates()</code> — List all templates</li>
+                        </ul>
+
+                        <h2>Filters</h2>
+
+                        <h3>Built-in Filters</h3>
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Filter</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border px-4 py-2"><code>capitalize</code></td><td class="border px-4 py-2">Capitalize a string</td></tr>
+                                <tr><td class="border px-4 py-2"><code>lower</code></td><td class="border px-4 py-2">Convert to lowercase</td></tr>
+                                <tr><td class="border px-4 py-2"><code>upper</code></td><td class="border px-4 py-2">Convert to uppercase</td></tr>
+                                <tr><td class="border px-4 py-2"><code>title</code></td><td class="border px-4 py-2">Convert to title case</td></tr>
+                                <tr><td class="border px-4 py-2"><code>trim</code></td><td class="border px-4 py-2">Trim whitespace</td></tr>
+                                <tr><td class="border px-4 py-2"><code>escape</code></td><td class="border px-4 py-2">Escape HTML</td></tr>
+                                <tr><td class="border px-4 py-2"><code>safe</code></td><td class="border px-4 py-2">Mark as safe</td></tr>
+                                <tr><td class="border px-4 py-2"><code>json</code></td><td class="border px-4 py-2">Convert to JSON</td></tr>
+                                <tr><td class="border px-4 py-2"><code>length</code></td><td class="border px-4 py-2">Get length</td></tr>
+                                <tr><td class="border px-4 py-2"><code>reverse</code></td><td class="border px-4 py-2">Reverse a string or list</td></tr>
+                                <tr><td class="border px-4 py-2"><code>join</code></td><td class="border px-4 py-2">Join a list</td></tr>
+                                <tr><td class="border px-4 py-2"><code>replace</code></td><td class="border px-4 py-2">Replace text</td></tr>
+                                <tr><td class="border px-4 py-2"><code>date</code></td><td class="border px-4 py-2">Format a date</td></tr>
+                                <tr><td class="border px-4 py-2"><code>datetime</code></td><td class="border px-4 py-2">Format a datetime</td></tr>
+                                <tr><td class="border px-4 py-2"><code>currency</code></td><td class="border px-4 py-2">Format as currency</td></tr>
+                                <tr><td class="border px-4 py-2"><code>truncate</code></td><td class="border px-4 py-2">Truncate text</td></tr>
+                                <tr><td class="border px-4 py-2"><code>default</code></td><td class="border px-4 py-2">Default value</td></tr>
+                                <tr><td class="border px-4 py-2"><code>first</code></td><td class="border px-4 py-2">First item</td></tr>
+                                <tr><td class="border px-4 py-2"><code>last</code></td><td class="border px-4 py-2">Last item</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Custom Filter Example</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">def currency_filter(value, symbol="$"):
+    return f"{symbol}{value:.2f}"
+
+jinax.add_filter("currency", currency_filter)</code></pre>
+                        </div>
+
+                        <h2>Functions</h2>
+
+                        <h3>Built-in Functions</h3>
+                        <ul>
+                            <li><code>now()</code> — Current datetime</li>
+                            <li><code>date()</code> — Current date</li>
+                            <li><code>datetime()</code> — Current datetime</li>
+                            <li><code>range(n)</code> — Range of numbers</li>
+                            <li><code>length(value)</code> — Get length</li>
+                            <li><code>type(value)</code> — Get type</li>
+                            <li><code>json(value)</code> — Convert to JSON</li>
+                            <li><code>random()</code> — Random float</li>
+                            <li><code>random_int(min, max)</code> — Random integer</li>
+                            <li><code>random_choice(items)</code> — Random choice</li>
+                            <li><code>uuid()</code> — Generate UUID</li>
+                            <li><code>hash(value)</code> — Hash a value</li>
+                            <li><code>env(key, default)</code> — Get environment variable</li>
+                        </ul>
+
+                        <h2>TemplateNotFound</h2>
+                        <p>Exception raised when a template is not found.</p>
+
+                        <div class="code-block">
+                            <pre><code class="language-python">TemplateNotFound(template: str)</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">Jinax is lazily loaded. If you don't use templates, Jinja2 is never imported.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

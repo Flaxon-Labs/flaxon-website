@@ -1,0 +1,216 @@
+<!-- docs/api/http.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HTTP API – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html" class="active">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>HTTP API</h1>
+
+                        <h2>Request</h2>
+                        <p>HTTP request object.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Request(scope: dict[str, Any], receive: Any, app: Any)</code></pre>
+                        </div>
+
+                        <h3>Properties</h3>
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Property</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Type</th>
+                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border px-4 py-2"><code>method</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">HTTP method</td></tr>
+                                <tr><td class="border px-4 py-2"><code>path</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">Request path</td></tr>
+                                <tr><td class="border px-4 py-2"><code>headers</code></td><td class="border px-4 py-2"><code>Headers</code></td><td class="border px-4 py-2">Request headers</td></tr>
+                                <tr><td class="border px-4 py-2"><code>query</code></td><td class="border px-4 py-2"><code>QueryParams</code></td><td class="border px-4 py-2">Query parameters</td></tr>
+                                <tr><td class="border px-4 py-2"><code>cookies</code></td><td class="border px-4 py-2"><code>Cookies</code></td><td class="border px-4 py-2">Cookies</td></tr>
+                                <tr><td class="border px-4 py-2"><code>client</code></td><td class="border px-4 py-2"><code>tuple[str, int] | None</code></td><td class="border px-4 py-2">Client address</td></tr>
+                                <tr><td class="border px-4 py-2"><code>url</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">Full URL</td></tr>
+                                <tr><td class="border px-4 py-2"><code>user</code></td><td class="border px-4 py-2"><code>Any</code></td><td class="border px-4 py-2">Authenticated user</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>async body() -> bytes</code> — Get request body as bytes</li>
+                            <li><code>async json() -> Any</code> — Get request body as JSON</li>
+                            <li><code>async text() -> str</code> — Get request body as text</li>
+                            <li><code>async form() -> dict[str, Any]</code> — Get request body as form data</li>
+                            <li><code>async render(template_name, context) -> Any</code> — Render a template</li>
+                        </ul>
+
+                        <h2>Response</h2>
+                        <p>HTTP response.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Response(content: bytes | str = b"", *, status_code: int = 200, headers: dict[str, str] | None = None, media_type: str | None = None)</code></pre>
+                        </div>
+
+                        <h3>Class Methods</h3>
+                        <ul>
+                            <li><code>from_value(value: Any) -> Response</code> — Convert a value to a response</li>
+                        </ul>
+
+                        <h2>Response Types</h2>
+
+                        <h3>JSONResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">JSONResponse(content: Any, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
+                        </div>
+
+                        <h3>HTMLResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">HTMLResponse(content: str, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
+                        </div>
+
+                        <h3>TextResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">TextResponse(content: str, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
+                        </div>
+
+                        <h3>RedirectResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">RedirectResponse(url: str, status_code: int = 307, headers: dict[str, str] | None = None)</code></pre>
+                        </div>
+
+                        <h3>StreamingResponse</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">StreamingResponse(content: AsyncIterator[bytes] | Iterable[bytes], *, status_code: int = 200, headers: dict[str, str] | None = None, media_type: str = "application/octet-stream")</code></pre>
+                        </div>
+
+                        <h2>Headers</h2>
+                        <p>HTTP headers dictionary.</p>
+
+                        <h3>Constructor</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">Headers(raw: list[tuple[bytes, bytes]] | None = None)</code></pre>
+                        </div>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>get(key, default)</code> — Get a header value</li>
+                            <li><code>get_raw(key)</code> — Get header as bytes</li>
+                            <li><code>to_list()</code> — Convert to raw ASGI format</li>
+                            <li><code>to_dict()</code> — Convert to dictionary</li>
+                        </ul>
+
+                        <h2>Cookies</h2>
+                        <p>HTTP cookies dictionary.</p>
+
+                        <h3>Methods</h3>
+                        <ul>
+                            <li><code>get(key, default)</code> — Get a cookie value</li>
+                            <li><code>set(key, value, **options)</code> — Set a cookie with options</li>
+                            <li><code>delete(key)</code> — Delete a cookie</li>
+                            <li><code>to_dict()</code> — Convert to dictionary</li>
+                            <li><code>to_headers()</code> — Convert to Set-Cookie headers</li>
+                        </ul>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Cookie Options</strong>
+                            <p class="mb-0 mt-1"><code>max_age</code>, <code>expires</code>, <code>path</code>, <code>domain</code>, <code>secure</code>, <code>httponly</code>, <code>samesite</code></p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

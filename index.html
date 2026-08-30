@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="google-site-verification" content="l5zab0NHk3lbRe6HAabq8PNIt4BbzaHUr1Sao5YM5yc" />
+    <title>Flaxon – Simple Python. Serious Applications.</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js (light + dark) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/solar.css">
+
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- LOADING OVERLAY (now a self-contained 2D solar system)        -->
+    <!-- ============================================================ -->
+    <div id="loading-overlay">
+        <div class="loading-content">
+
+            <!-- 2D CSS Solar System -->
+            <div class="solar2d" aria-hidden="true">
+                <div class="solar2d-sun"></div>
+                <div class="solar2d-orbit solar2d-orbit-1"><span class="solar2d-planet solar2d-planet-1"></span></div>
+                <div class="solar2d-orbit solar2d-orbit-2"><span class="solar2d-planet solar2d-planet-2"></span></div>
+                <div class="solar2d-orbit solar2d-orbit-3"><span class="solar2d-planet solar2d-planet-3"></span></div>
+                <div class="solar2d-orbit solar2d-orbit-4"><span class="solar2d-planet solar2d-planet-4"></span></div>
+            </div>
+
+            <!-- Title -->
+            <div class="loading-title">
+                <span>Flaxon</span>
+            </div>
+            <div class="loading-subtitle">Loading your Python backend...</div>
+
+            <!-- Typing Animation Container -->
+            <div class="typing-container" id="typing-container">
+                <div id="typing-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT                                                  -->
+    <!-- ============================================================ -->
+    <div class="content-overlay">
+
+        <!-- HEADER -->
+        <div id="header"></div>
+
+        <!-- PARTIALS -->
+        <div id="hero"></div>
+        <div id="features"></div>
+        <div id="stats"></div>
+        <div id="testimonials"></div>
+        <div id="cta"></div>
+        <div id="newsletter"></div>
+
+        <!-- FOOTER -->
+        <div id="footer"></div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPTS                                                       -->
+    <!-- ============================================================ -->
+    <script>
+        // ============================================================
+        // TYPING ANIMATION
+        // ============================================================
+        (function() {
+            const lines = [
+                { text: 'from flaxon import Flaxon', type: 'import' },
+                { text: '', type: 'empty' },
+                { text: 'app = Flaxon("my-app", debug=True)', type: 'code' },
+                { text: '', type: 'empty' },
+                { text: '@app.get("/")', type: 'decorator' },
+                { text: 'async def home():', type: 'function' },
+                { text: '    return {"message": "Hello, World!"}', type: 'return' },
+                { text: '', type: 'empty' },
+                { text: '@app.get("/users/<int:user_id>")', type: 'decorator' },
+                { text: 'async def get_user(user_id: int):', type: 'function' },
+                { text: '    return {"id": user_id, "name": f"User {user_id}"}', type: 'return' },
+                { text: '', type: 'empty' },
+                { text: '# Ready to serve! 🚀', type: 'comment' },
+            ];
+
+            let lineIndex = 0;
+            let charIndex = 0;
+            const container = document.getElementById('typing-content');
+            const typingSpeed = 30;
+            const pauseBetweenLines = 400;
+
+            function getLineHtml(line) {
+                if (line.type === 'empty') return '<br>';
+                if (line.type === 'comment') {
+                    return `<span class="comment">${line.text}</span>`;
+                }
+                if (line.type === 'decorator') {
+                    return `<span class="decorator">${line.text}</span>`;
+                }
+                if (line.type === 'function') {
+                    return `<span class="function">${line.text}</span>`;
+                }
+                if (line.type === 'return') {
+                    return `<span class="string">${line.text}</span>`;
+                }
+                if (line.type === 'import') {
+                    return `<span class="keyword">${line.text}</span>`;
+                }
+                return `<span>${line.text}</span>`;
+            }
+
+            function typeLine() {
+                if (lineIndex >= lines.length) {
+                    // All done - show final state with cursor
+                    return;
+                }
+
+                const line = lines[lineIndex];
+
+                if (charIndex <= line.text.length) {
+                    // Type out the line character by character
+                    const typed = line.text.substring(0, charIndex);
+                    const remaining = line.text.substring(charIndex);
+                    const displayHtml = line.type === 'empty' ? '<br>' :
+                        `<span>${typed}</span><span style="opacity:0.3">${remaining}</span>`;
+
+                    // Keep previous lines
+                    const prevLines = container.innerHTML.split('<br>').slice(0, -1).join('<br>');
+                    const finalHtml = prevLines + (prevLines ? '<br>' : '') + displayHtml;
+                    container.innerHTML = finalHtml + '<span class="typing-cursor"></span>';
+
+                    charIndex++;
+                    setTimeout(typeLine, typingSpeed);
+                } else {
+                    // Line complete - move to next
+                    charIndex = 0;
+                    lineIndex++;
+                    setTimeout(typeLine, pauseBetweenLines);
+                }
+            }
+
+            // Start typing after a short delay
+            setTimeout(typeLine, 800);
+
+            // Hide loading overlay after typing completes (plus extra time)
+            setTimeout(function() {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.classList.add('hidden');
+            }, (lines.length * 40) + 2000); // Estimated time based on lines
+
+        })();
+
+        // ============================================================
+        // LOAD PARTIALS
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const partials = [
+                { id: 'hero', path: '/partials/hero.html' },
+                { id: 'features', path: '/partials/features.html' },
+                { id: 'stats', path: '/partials/stats.html' },
+                { id: 'testimonials', path: '/partials/testimonials.html' },
+                { id: 'cta', path: '/partials/cta.html' },
+                { id: 'newsletter', path: '/partials/newsletter.html' },
+            ];
+
+            partials.forEach(function(partial) {
+                fetch(partial.path)
+                    .then(r => r.text())
+                    .then(html => document.getElementById(partial.id).innerHTML = html)
+                    .catch(err => console.error('Failed to load partial:', partial.path, err));
+            });
+
+            // Init Highlight.js
+            hljs.highlightAll();
+        });
+
+        // Dark mode toggle (persistent)
+        if (localStorage.getItem('dark-mode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+</body>
+</html>

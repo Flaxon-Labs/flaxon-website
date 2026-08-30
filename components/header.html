@@ -1,0 +1,88 @@
+<!-- components/header.html -->
+<header class="bg-slate-900 dark:bg-slate-950 text-white sticky top-0 z-50 border-b border-slate-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/assets/images/logo/flaxon.png" alt="Flaxon" class="h-8 w-8" onerror="this.style.display='none'">
+                <span class="text-xl font-extrabold tracking-tight">
+                    Flaxon
+                    <span class="text-flaxon-electric">.</span>
+                </span>
+            </a>
+            <span class="hidden md:inline-block text-xs bg-flaxon-blue/20 text-flaxon-electric px-2 py-0.5 rounded-full font-mono">v0.2.0</span>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-6">
+            <a href="/" class="text-slate-300 hover:text-white transition text-sm font-medium">Home</a>
+            <a href="/docs.html" class="text-slate-300 hover:text-white transition text-sm font-medium">Docs</a>
+            <a href="/playground.html" class="text-slate-300 hover:text-white transition text-sm font-medium">Playground</a>
+            <a href="/examples.html" class="text-slate-300 hover:text-white transition text-sm font-medium">Examples</a>
+            <a href="/community.html" class="text-slate-300 hover:text-white transition text-sm font-medium">Community</a>
+            <a href="/blog.html" class="text-slate-300 hover:text-white transition text-sm font-medium">Blog</a>
+        </nav>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-3">
+            <!-- Search Trigger -->
+            <button id="search-trigger" class="text-slate-400 hover:text-white transition p-2 rounded-lg hover:bg-slate-800" aria-label="Search documentation">
+                <i class="fas fa-search"></i>
+                <span class="hidden lg:inline ml-1 text-xs text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded font-mono">⌘K</span>
+            </button>
+
+            <!-- Dark Mode Toggle -->
+            <button id="dark-mode-toggle" class="text-slate-400 hover:text-white transition p-2 rounded-lg hover:bg-slate-800" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <!-- GitHub Link -->
+            <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition p-2 rounded-lg hover:bg-slate-800" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+
+            <!-- Get Started Button -->
+            <a href="/installation.html" class="hidden lg:inline-block gradient-btn text-white font-medium px-4 py-2 rounded-lg text-sm transition hover:shadow-lg hover:shadow-blue-500/25">
+                <i class="fas fa-rocket mr-1.5"></i> Get Started
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2 rounded-lg hover:bg-slate-800" aria-label="Toggle mobile menu">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 dark:bg-slate-950 border-t border-slate-800">
+        <div class="container mx-auto px-4 py-4 flex flex-col gap-3">
+            <a href="/" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Home</a>
+            <a href="/docs.html" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Docs</a>
+            <a href="/playground.html" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Playground</a>
+            <a href="/examples.html" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Examples</a>
+            <a href="/community.html" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Community</a>
+            <a href="/blog.html" class="text-slate-300 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition">Blog</a>
+            <div class="border-t border-slate-800 pt-3 mt-1">
+                <a href="/installation.html" class="block gradient-btn text-white font-medium text-center py-2.5 rounded-lg transition hover:shadow-lg hover:shadow-blue-500/25">
+                    <i class="fas fa-rocket mr-1.5"></i> Get Started
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="breadcrumb-container" class="hidden bg-slate-800/50 dark:bg-slate-900/50 border-b border-slate-700/50 py-2 px-4">
+    <div class="container mx-auto">
+        <nav id="breadcrumb" class="text-sm text-slate-400" aria-label="Breadcrumb">
+            <a href="/" class="hover:text-white transition">
+                <i class="fas fa-home mr-1.5"></i> Home
+            </a>
+            <span class="text-slate-600 mx-2">/</span>
+            <span id="breadcrumb-current" class="text-slate-300">Documentation</span>
+        </nav>
+    </div>
+</div>
+
+<!-- Search Modal Container -->
+<div id="search-modal-container"></div>

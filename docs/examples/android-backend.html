@@ -1,0 +1,221 @@
+<!-- docs/examples/android-backend.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Android Backend Example – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+
+                        <div class="section-title">Examples</div>
+                        <a href="/docs/examples/basic-api.html">Basic API</a>
+                        <a href="/docs/examples/react-backend.html">React Backend</a>
+                        <a href="/docs/examples/android-backend.html" class="active">Android Backend</a>
+                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
+                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
+                        <a href="/docs/examples/large-application.html">Large Application</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Android Backend Example</h1>
+                        <p>A mobile-optimized backend for Android applications with JWT authentication, device registration, and data synchronization.</p>
+
+                        <h2>Application Code</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># app.py
+import time
+from flaxon import Flaxon, HTTPException
+from flaxon.security import JWTBackend, login_required
+from flaxon.validation import Schema, fields
+
+app = Flaxon("android-backend")
+
+# JWT Authentication
+jwt_backend = JWTBackend(secret_key="your-secret-key")
+
+# Schemas
+class LoginRequest(Schema):
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)
+
+class RegisterRequest(Schema):
+    username = fields.StrField(required=True, min_length=3, max_length=30)
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)
+
+class DeviceRegistration(Schema):
+    device_id = fields.StrField(required=True, min_length=8)
+    platform = fields.ChoiceField(["android", "ios"], required=True)
+    notification_token = fields.StrField(required=True, min_length=16)
+    app_version = fields.StrField(required=False)
+
+class SyncRequest(Schema):
+    last_sync = fields.IntField(required=False, default=0)
+    local_changes = fields.ListField(required=False)
+
+# In-memory storage
+users = {}
+devices = {}
+posts = []
+user_id_counter = 1
+post_id_counter = 1
+
+@app.post("/api/v1/auth/register")
+async def register(data: RegisterRequest):
+    if data.email in users:
+        raise HTTPException(400, "Email already registered")
+
+    user = data.to_dict()
+    user["id"] = user_id_counter
+    user_id_counter += 1
+    user["created_at"] = int(time.time())
+    users[data.email] = user
+
+    token = await jwt_backend.create_token({"id": user["id"], "email": user["email"]})
+    return {"user": user, "token": token}
+
+@app.post("/api/v1/auth/login")
+async def login(data: LoginRequest):
+    user = users.get(data.email)
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    if user["password"] != data.password:
+        raise HTTPException(401, "Invalid credentials")
+
+    token = await jwt_backend.create_token({"id": user["id"], "email": user["email"]})
+    return {"user": user, "token": token}
+
+@app.post("/api/v1/devices")
+@login_required
+async def register_device(request, data: DeviceRegistration):
+    user = getattr(request, "user")
+    device = data.to_dict()
+    device["user_id"] = user["id"]
+    device["registered_at"] = int(time.time())
+
+    devices[data.device_id] = device
+    return {"success": True, "device": device}
+
+@app.get("/api/v1/profile")
+@login_required
+async def get_profile(request):
+    user = getattr(request, "user")
+    return {"user": users.get(user["email"])}
+
+@app.put("/api/v1/profile")
+@login_required
+async def update_profile(request):
+    user = getattr(request, "user")
+    data = await request.json()
+
+    stored_user = users.get(user["email"])
+    if stored_user:
+        stored_user.update(data)
+        return {"updated": True, "user": stored_user}
+
+    raise HTTPException(404, "User not found")</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
+                            <ul class="mb-0 mt-1">
+                                <li><strong>JWT Authentication:</strong> Secure token-based auth</li>
+                                <li><strong>Device Registration:</strong> Track mobile devices</li>
+                                <li><strong>Mobile-Optimized:</strong> Versioned API routes</li>
+                                <li><strong>Profile Management:</strong> User profile CRUD</li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

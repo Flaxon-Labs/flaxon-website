@@ -1,0 +1,651 @@
+<!-- docs/guides/plugins.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Plugins – Flaxon Documentation</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="stylesheet" href="/assets/css/plugin.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- THREE.JS BACKGROUND                                           -->
+    <!-- ============================================================ -->
+    <div id="three-bg"></div>
+
+    <!-- ============================================================ -->
+    <!-- CONTENT OVERLAY                                              -->
+    <!-- ============================================================ -->
+    <div class="content-overlay">
+
+        <!-- HEADER -->
+        <div id="header"></div>
+
+        <!-- MAIN CONTENT -->
+        <section class="pt-8 pb-16">
+            <div class="container mx-auto px-4">
+                <div class="grid lg:grid-cols-4 gap-8">
+
+                    <!-- SIDEBAR -->
+                    <aside class="lg:col-span-1">
+                        <div class="doc-sidebar">
+                            <div class="section-title">Getting Started</div>
+                            <a href="/docs/getting-started/index.html">Overview</a>
+                            <a href="/docs/getting-started/installation.html">Installation</a>
+                            <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                            <div class="section-title">Core Concepts</div>
+                            <a href="/docs/core-concepts/routing.html">Routing</a>
+                            <a href="/docs/core-concepts/requests.html">Requests</a>
+                            <a href="/docs/core-concepts/responses.html">Responses</a>
+                            <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                            <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                            <div class="section-title">Guides</div>
+                            <a href="/docs/guides/databases.html">Databases</a>
+                            <a href="/docs/guides/authentication.html">Authentication</a>
+                            <a href="/docs/guides/authorization.html">Authorization</a>
+                            <a href="/docs/guides/websockets.html">WebSockets</a>
+                            <a href="/docs/guides/tasks.html">Tasks</a>
+                            <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                            <a href="/docs/guides/testing.html">Testing</a>
+                            <a href="/docs/guides/debugging.html">Debugging</a>
+                            <a href="/docs/guides/plugins.html" class="active">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                            <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+                        </div>
+                    </aside>
+
+                    <!-- MAIN CONTENT -->
+                    <main class="lg:col-span-3">
+                        <div class="doc-content">
+
+                            <!-- Page Title -->
+                            <h1 class="text-3xl font-bold text-slate-900">🔌 Plugins</h1>
+                            <p class="text-slate-600 mt-2">Flaxon's plugin system lets you extend the framework with modular, reusable components. Learn how to use, install, and build your own plugins.</p>
+
+                            <!-- ============================================================ -->
+                            <!-- TABS                                                         -->
+                            <!-- ============================================================ -->
+                            <div class="mt-8">
+                                <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+                                    <button class="tab-btn active" data-tab="install" onclick="switchTab('install')">
+                                        <i class="fas fa-download mr-2"></i>Available Plugins
+                                    </button>
+                                    <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')">
+                                        <i class="fas fa-graduation-cap mr-2"></i>Learn Plugins
+                                    </button>
+                                    <button class="tab-btn" data-tab="build" onclick="switchTab('build')">
+                                        <i class="fas fa-code mr-2"></i>Build Your Own
+                                    </button>
+                                </div>
+
+                                <!-- ============================================================ -->
+                                <!-- TAB 1: Available Plugins                                    -->
+                                <!-- ============================================================ -->
+                                <div id="tab-install" class="tab-content active">
+                                    <h2 class="mt-6 text-xl font-semibold text-slate-900">Official Flaxon Plugins</h2>
+                                    <p class="text-slate-600 text-sm">Use packages published on PyPI, and check each package's repository for its supported Flaxon version and configuration.</p>
+
+                                    <div class="grid md:grid-cols-2 gap-4 mt-6">
+
+                                        <!-- Plugin 1: flaxon-ai -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="ai"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🧠 flaxon-ai</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-ai/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-ai" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">AI/LLM integration with Gemini, OpenAI, and local Flax/JAX models.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-ai[all]')">
+                                                        <code>pip install flaxon-ai[all]</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 2: flaxon-mobile -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="mobile"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">📱 flaxon-mobile</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-mobile/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-mobile" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Mobile backend services with push notifications and Android/iOS support.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-mobile[all]')">
+                                                        <code>pip install flaxon-mobile[all]</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 3: flaxon-oauth-google -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="oauth"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🔐 flaxon-oauth-google</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-oauth-google/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-oauth-google" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Google OAuth 2.0 authentication for Flaxon applications.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-oauth-google')">
+                                                        <code>pip install flaxon-oauth-google</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 4: flaxon-inertia -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="inertia"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🔗 flaxon-inertia</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-inertia/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-inertia" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Inertia.js integration for Vue, React, and Svelte frontends.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-inertia')">
+                                                        <code>pip install flaxon-inertia</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 5: flaxon-fyr -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="fyr"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🔥 flaxon-fyr</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-fyr/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-fyr" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Fyr.js CDN-only reactive framework integration.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-fyr')">
+                                                        <code>pip install flaxon-fyr</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 6: flaxon-debug-toolbar -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="debug"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🐛 flaxon-debug-toolbar</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-debug-toolbar/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-debug-toolbar" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Debug toolbar with Three.js 3D visualizations.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-debug-toolbar')">
+                                                        <code>pip install flaxon-debug-toolbar</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 7: flaxon-sentry -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="sentry"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">📡 flaxon-sentry</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-sentry/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-sentry" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Sentry error tracking and performance monitoring.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-sentry')">
+                                                        <code>pip install flaxon-sentry</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Plugin 8: flaxon-pytest -->
+                                        <div class="plugin-card">
+                                            <div class="scene-container" data-plugin="pytest"></div>
+                                            <div class="p-4">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <span class="text-lg font-semibold text-slate-900">🧪 flaxon-pytest</span>
+                                                        <span class="plugin-status alpha ml-2">Alpha</span>
+                                                    </div>
+                                                    <div class="flex gap-2 text-xs">
+                                                        <a href="https://pypi.org/project/flaxon-pytest/" class="plugin-link" target="_blank"><i class="fab fa-python"></i></a>
+                                                        <a href="https://github.com/aldanedev-create/flaxon-pytest" class="plugin-link" target="_blank"><i class="fab fa-github"></i></a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">Pytest fixtures and utilities for testing Flaxon applications.</p>
+                                                <div class="flex items-center gap-3 mt-3">
+                                                    <span class="install-cmd" onclick="copyCommand('pip install flaxon-pytest')">
+                                                        <code>pip install flaxon-pytest</code>
+                                                        <span class="copy-icon text-xs ml-2"><i class="far fa-copy"></i></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <section class="mt-8 p-5 rounded-xl border border-amber-200 bg-amber-50">
+                                        <h3 class="text-lg font-semibold text-slate-900">New integration packages</h3>
+                                        <p class="text-sm text-slate-700 mt-1">These repositories are ready for release but are <strong>not on PyPI yet</strong>. Install from PyPI only after their first release is published. See the <a class="underline font-medium" href="/docs/guides/ecosystem.html">ecosystem guide</a> for accurate setup and usage examples.</p>
+                                        <div class="grid md:grid-cols-2 gap-3 mt-4 text-sm">
+                                            <a class="plugin-card p-3" href="https://github.com/aldanedev-create/flaxon-sqlalchemy" target="_blank" rel="noopener"><strong>flaxon-sqlalchemy</strong><br><span>SQLAlchemy integration</span></a>
+                                            <a class="plugin-card p-3" href="https://github.com/aldanedev-create/flaxon-stripe" target="_blank" rel="noopener"><strong>flaxon-stripe</strong><br><span>Stripe integration</span></a>
+                                            <a class="plugin-card p-3" href="https://github.com/aldanedev-create/flaxon-s3" target="_blank" rel="noopener"><strong>flaxon-s3</strong><br><span>S3-compatible storage integration</span></a>
+                                            <a class="plugin-card p-3" href="https://github.com/aldanedev-create/flaxon-postsql" target="_blank" rel="noopener"><strong>flaxon-postsql</strong><br><span>PostgreSQL integration</span></a>
+                                        </div>
+                                    </section>
+                                </div>
+
+                                <!-- ============================================================ -->
+                                <!-- TAB 2: Learn Plugins                                       -->
+                                <!-- ============================================================ -->
+                                <div id="tab-learn" class="tab-content">
+                                    <h2 class="mt-6 text-xl font-semibold text-slate-900">📚 Understanding the Plugin System</h2>
+                                    <p class="text-slate-600 text-sm">Flaxon's plugin system is designed to be simple yet powerful. Here's how it works.</p>
+
+                                    <!-- Plugin Lifecycle Diagram -->
+                                    <div class="mt-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
+                                        <h3 class="text-lg font-semibold text-slate-900">🔄 Plugin Lifecycle</h3>
+                                        <div class="flex flex-wrap items-center justify-center gap-4 mt-4 text-sm">
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">1️⃣ Discovery</span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">2️⃣ Load <span class="text-xs text-slate-500">(on_load)</span></span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">3️⃣ Setup <span class="text-xs text-slate-500">(setup)</span></span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">4️⃣ Startup <span class="text-xs text-slate-500">(on_startup)</span></span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">5️⃣ Running</span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">6️⃣ Shutdown <span class="text-xs text-slate-500">(on_shutdown)</span></span>
+                                            <span class="text-blue-400">→</span>
+                                            <span class="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">7️⃣ Unload <span class="text-xs text-slate-500">(on_unload)</span></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Key Concepts -->
+                                    <div class="grid md:grid-cols-2 gap-4 mt-6">
+                                        <div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+                                            <div class="text-2xl mb-2">🏷️</div>
+                                            <h4 class="font-semibold text-slate-900">Plugin Metadata</h4>
+                                            <p class="text-sm text-slate-600">Every plugin has a <code>name</code>, <code>version</code>, <code>description</code>, and <code>author</code>.</p>
+                                        </div>
+                                        <div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+                                            <div class="text-2xl mb-2">🔗</div>
+                                            <h4 class="font-semibold text-slate-900">Dependencies</h4>
+                                            <p class="text-sm text-slate-600">Plugins can declare <code>requires</code> and <code>provides</code> for dependency management.</p>
+                                        </div>
+                                        <div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+                                            <div class="text-2xl mb-2">🧩</div>
+                                            <h4 class="font-semibold text-slate-900">Hooks</h4>
+                                            <p class="text-sm text-slate-600">Plugins can register lifecycle hooks: <code>on_load</code>, <code>setup</code>, <code>on_startup</code>, <code>on_shutdown</code>, <code>on_unload</code>.</p>
+                                        </div>
+                                        <div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+                                            <div class="text-2xl mb-2">📦</div>
+                                            <h4 class="font-semibold text-slate-900">What Plugins Can Do</h4>
+                                            <p class="text-sm text-slate-600">Add routes, middleware, CLI commands, health checks, and application state.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Plugin Discovery -->
+                                    <div class="mt-6 p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+                                        <h4 class="font-semibold text-slate-900">🔍 Plugin Discovery</h4>
+                                        <p class="text-sm text-slate-600 mt-1">Flaxon automatically discovers plugins in:</p>
+                                        <ul class="text-sm text-slate-600 mt-2 list-disc list-inside">
+                                            <li>The <code>plugins/</code> directory</li>
+                                            <li>A module loaded explicitly with <code>await app.plugins.load_plugins_from_module(...)</code></li>
+                                            <li>A plugin instance registered with <code>await app.plugins.load_plugin(...)</code></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- ============================================================ -->
+                                <!-- TAB 3: Build Your Own Plugin                                 -->
+                                <!-- ============================================================ -->
+                                <div id="tab-build" class="tab-content">
+                                    <h2 class="mt-6 text-xl font-semibold text-slate-900">🛠️ Building Your Own Plugin</h2>
+                                    <p class="text-slate-600 text-sm">Create custom Flaxon plugins in 5 minutes.</p>
+
+                                    <!-- Step 1 -->
+                                    <div class="mt-6">
+                                        <h3 class="text-lg font-semibold text-slate-900">Step 1: Create the Plugin Class</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">from flaxon.plugins import Plugin
+
+class MyPlugin(Plugin):
+    name = "my-plugin"
+    version = "1.0.0"
+    description = "A custom Flaxon plugin"
+    author = "Your Name"
+
+    def setup(self, app):
+        """Called when the plugin is loaded."""
+        print("MyPlugin setup!")
+        app.state.my_plugin = "Hello from MyPlugin!"
+
+    def on_load(self):
+        print("Plugin loaded")
+
+    def on_startup(self):
+        print("Plugin startup")
+
+    def on_shutdown(self):
+        print("Plugin shutdown")
+
+    def on_unload(self):
+        print("Plugin unloaded")</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2 -->
+                                    <div class="mt-6">
+                                        <h3 class="text-lg font-semibold text-slate-900">Step 2: Add Routes</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">class MyPlugin(Plugin):
+    name = "my-plugin"
+    version = "1.0.0"
+
+    def setup(self, app):
+        @app.get("/plugin")
+        async def plugin_route():
+            return {"plugin": "MyPlugin", "status": "active"}
+
+        @app.get("/plugin/health")
+        async def plugin_health():
+            return {"status": "healthy", "plugin": "MyPlugin"}</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="mt-6">
+                                        <h3 class="text-lg font-semibold text-slate-900">Step 3: Add Middleware</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">from flaxon.middleware import Middleware
+
+class MyPluginMiddleware(Middleware):
+    async def __call__(self, scope, receive, send):
+        print("MyPluginMiddleware processing request")
+        await self.app(scope, receive, send)
+
+class MyPlugin(Plugin):
+    name = "my-plugin"
+    version = "1.0.0"
+
+    def setup(self, app):
+        app.add_middleware(MyPluginMiddleware)</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 4 -->
+                                    <div class="mt-6">
+                                        <h3 class="text-lg font-semibold text-slate-900">Step 4: Add Configuration</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">class MyPlugin(Plugin):
+    name = "my-plugin"
+    version = "1.0.0"
+
+    def __init__(self, config=None):
+        self.config = config or {}
+
+    def setup(self, app):
+        # Access configuration
+        debug = self.config.get("debug", False)
+        api_key = self.config.get("api_key")
+
+        if debug:
+            print("Debug mode enabled")
+
+        # Use config in routes
+        @app.get("/plugin/config")
+        async def plugin_config():
+            return {
+                "debug": debug,
+                "api_key": "***" if api_key else "not set"
+            }</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 5 -->
+                                    <div class="mt-6">
+                                        <h3 class="text-lg font-semibold text-slate-900">Step 5: Register Your Plugin</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">from flaxon import Flaxon
+from my_plugin import MyPlugin
+
+app = Flaxon("my-app")
+
+@app.on_startup
+async def load_my_plugin():
+    # Plugin loading is asynchronous.
+    await app.plugins.load_plugin(MyPlugin(config={
+        "debug": True,
+        "api_key": "your-api-key"
+    }))
+
+# Your plugin is now active!
+
+@app.get("/")
+async def home():
+    return {"message": "Hello from Flaxon!"}</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Complete Plugin Template -->
+                                    <div class="mt-8">
+                                        <h3 class="text-lg font-semibold text-slate-900">📄 Complete Plugin Template</h3>
+                                        <div class="code-block mt-2">
+                                            <pre><code class="language-python">"""flaxon-my-plugin - A custom Flaxon plugin."""
+
+from flaxon.plugins import Plugin
+
+
+class MyPlugin(Plugin):
+    """
+    My custom Flaxon plugin.
+
+    Register this plugin from an async startup handler:
+        @app.on_startup
+        async def load_plugin():
+            await app.plugins.load_plugin(MyPlugin(config={"debug": True}))
+    """
+
+    name = "my-plugin"
+    version = "1.0.0"
+    description = "A custom Flaxon plugin"
+    author = "Your Name"
+    requires = []
+    provides = ["my-plugin-service"]
+
+    def __init__(self, config=None):
+        self.config = config or {}
+        self._app = None
+
+    def setup(self, app):
+        """Setup the plugin."""
+        self._app = app
+        app.state.my_plugin = self
+
+        # Add routes
+        @app.get("/my-plugin")
+        async def plugin_route():
+            return {
+                "plugin": "my-plugin",
+                "version": self.version,
+                "config": self.config
+            }
+
+        # Add middleware
+        app.add_middleware(MyPluginMiddleware)
+
+        # Plugin lifecycle hooks are invoked by Flaxon's plugin manager.
+
+    def on_load(self):
+        print(f"[{self.name}] Loaded")
+
+    def on_startup(self):
+        print(f"[{self.name}] Starting up...")
+
+    def on_shutdown(self):
+        print(f"[{self.name}] Shutting down...")
+
+    def on_unload(self):
+        print(f"[{self.name}] Unloaded")
+
+    def get_config(self):
+        return self.config
+
+
+class MyPluginMiddleware:
+    """Custom middleware for MyPlugin."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        print("[MyPluginMiddleware] Request received")
+        await self.app(scope, receive, send)</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tips -->
+                                    <div class="note mt-6">
+                                        <strong><i class="fas fa-lightbulb mr-2"></i> Pro Tips</strong>
+                                        <ul class="mt-2 text-sm text-slate-600 list-disc list-inside">
+                                            <li>Use <code>app.state</code> to share data between plugin components</li>
+                                            <li>Plugins can add <strong>CLI commands</strong> via <code>app.cli</code></li>
+                                            <li>Use <code>requires</code> and <code>provides</code> for dependency management</li>
+                                            <li>Always handle errors gracefully in your plugin</li>
+                                            <li>Write tests for your plugin</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End Tabs -->
+
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <div id="footer"></div>
+
+    </div>
+
+        <script src="/assets/js/plugin.js"></script>
+
+
+    
+
+</body>
+</html>

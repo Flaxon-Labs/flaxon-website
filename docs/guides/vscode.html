@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flaxon VS Code Extension - Documentation</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head><body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Flaxon VS Code extension</h1><p>The Flaxon extension adds project scaffolding, route discovery, Python completions, hover help, diagnostics, snippets, CodeLens, and run/debug commands to Visual Studio Code. The Python extension and Pylance remain responsible for general Python language support.</p><p><a href="https://github.com/aldanedev-create/Flaxon-vscode" target="_blank" rel="noopener">Extension source</a> | <a href="https://marketplace.visualstudio.com/" target="_blank" rel="noopener">VS Code Marketplace</a></p><h2>Requirements</h2><ul><li>Visual Studio Code 1.74 or newer.</li><li>Python 3.11 or newer.</li><li>The Microsoft Python extension; Pylance is recommended.</li><li>Flaxon installed in the same virtual environment used by VS Code.</li></ul><h2>Install from VS Code</h2><ol><li>Open Extensions with <code>Ctrl+Shift+X</code> on Windows/Linux or <code>Cmd+Shift+X</code> on macOS.</li><li>Search for <strong>Flaxon</strong>, select the Flaxon extension, and choose <strong>Install</strong>.</li><li>Reload VS Code if prompted.</li><li>Open a trusted folder containing <code>app.py</code>, <code>main.py</code>, <code>run.py</code>, or <code>flaxon.py</code>.</li></ol><h3>Install from a VSIX</h3><pre><code>code --install-extension flaxon-vscode-0.1.5.vsix</code></pre><p>You can also choose <strong>Install from VSIX...</strong> from the Extensions <code>...</code> menu. Prefer the exact VSIX filename from the release because publisher identifiers and filenames may vary by release.</p><h2>Create a project</h2><p>Open the Command Palette with <code>Ctrl+Shift+P</code> or <code>Cmd+Shift+P</code>, then run <strong>Flaxon: Create Project</strong>. Manual setup:</p><pre><code>python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install "flaxon[standard]"
+code .</code></pre><p>On macOS/Linux activate with <code>source .venv/bin/activate</code>. Create <code>app.py</code>:</p><pre><code>from flaxon import Flaxon
+
+app = Flaxon("my-api")
+
+@app.get("/api/health")
+async def health():
+    return {"status": "healthy"}</code></pre><p>Save the file. The extension activates on Python files and indexes supported Flaxon decorators.</p><h2>Workspace settings</h2><p>Create <code>.vscode/settings.json</code>:</p><pre><code>{
+  "flaxon.pythonPath": ".venv\\Scripts\\python",
+  "flaxon.entryPoint": "app:app",
+  "flaxon.debug.reload": true,
+  "flaxon.enableRouteExplorer": true,
+  "flaxon.enableCodeLens": true,
+  "flaxon.enableDiagnostics": true,
+  "flaxon.enableCompletions": true,
+  "flaxon.snippets.enable": true,
+  "flaxon.trace.server": "off"
+}</code></pre><p>Use <code>.venv/bin/python</code> for macOS/Linux. The entry point uses <code>module:variable</code>, such as <code>main:app</code>. Select the same interpreter in the Python extension.</p><h2>Route Explorer</h2><p>Run <strong>Flaxon: Show Routes</strong> or press <code>Ctrl+Shift+R</code>. The <strong>Flaxon Routes</strong> view groups recognized HTTP and WebSocket routes by file. Select a route to jump to its handler. Save files after editing so the index can refresh.</p><pre><code>@app.get("/users")
+async def users():
+    return {"users": []}
+
+@app.post("/users")
+async def create_user():
+    return {"created": True}
+
+@app.websocket("/ws/chat")
+async def chat(socket):
+    await socket.accept()</code></pre><h2>Completions, hover, and snippets</h2><p>Type <code>@app.</code> for route decorators, <code>fields.</code> for validation fields, or <code>request.</code> for request APIs. Hover supported symbols for examples. Available Python snippets include:</p><table><thead><tr><th>Prefix</th><th>Generates</th></tr></thead><tbody><tr><td><code>froute</code></td><td>GET route</td></tr><tr><td><code>fpost</code></td><td>POST route</td></tr><tr><td><code>fws</code></td><td>WebSocket route</td></tr><tr><td><code>fschema</code></td><td>Validation schema</td></tr><tr><td><code>fvalidation</code></td><td>Validated endpoint</td></tr><tr><td><code>fmiddleware</code></td><td>Middleware template</td></tr><tr><td><code>ftest</code></td><td>API test starter</td></tr></tbody></table><h2>CodeLens and diagnostics</h2><p>CodeLens can show run, debug, and reference actions above recognized routes. Diagnostics flag common mistakes such as missing Flaxon imports, missing application objects, non-async handlers, missing returns, missing WebSocket acceptance, and validation imports. They are editor hints, not a replacement for tests.</p><h2>Run and debug</h2><p>Run <strong>Flaxon: Run App</strong> or press <code>Ctrl+Shift+F5</code>. Equivalent CLI:</p><pre><code>flaxon run app:app --reload</code></pre><p><strong>Flaxon: Debug App</strong> launches the Python debugger. A manual <code>.vscode/launch.json</code> entry is:</p><pre><code>{
+  "version": "0.2.0",
+  "configurations": [{
+    "name": "Flaxon: Debug App",
+    "type": "debugpy",
+    "request": "launch",
+    "module": "flaxon",
+    "args": ["run", "app:app"],
+    "console": "integratedTerminal",
+    "justMyCode": true
+  }]
+}</code></pre><h2>Generate code</h2><ul><li><strong>Flaxon: Generate Route</strong> asks for path, method, and optional name.</li><li><strong>Flaxon: Generate Schema</strong> creates a validation schema and fields.</li><li><strong>Flaxon: Open Documentation</strong> opens the Flaxon documentation.</li><li><strong>Flaxon: Restart Language Server</strong> reloads indexing, completions, hover, diagnostics, definitions, and references.</li></ul><h2>Teloce and .vel</h2><p>The Flaxon extension supports Python. Teloce-Py is the separate compiler for .vel components. Use Teloce tooling for .vel syntax and run its CLI from the integrated terminal:</p><pre><code>python -m pip install teloce-py
+teloce doctor --verbose
+teloce dev
+teloce build --out-dir dist --source-map</code></pre><p>Flaxon serves generated JavaScript/CSS and owns the API, authentication, authorization, and persistence. See <a href="/docs/teloce-py.html">Teloce-Py documentation</a>.</p><h2>Language-server logs</h2><p>Open Output with <code>Ctrl+Shift+U</code>, select <strong>Flaxon</strong>, and temporarily enable:</p><pre><code>{ "flaxon.trace.server": "verbose" }</code></pre><p>Set tracing back to <code>off</code> after diagnosis.</p><h2>Testing and extension development</h2><pre><code>python -m pytest
+flaxon doctor app:app
+flaxon routes app:app
+
+# From the Flaxon VS Code extension repository:
+npm install
+npm test
+npm run package</code></pre><p>The extension test workflow compiles TypeScript, runs lint and parser/LSP tests, and verifies a VSIX package. Keep project settings safe for the team and secrets in environment configuration.</p><h2>Troubleshooting</h2><h3>Extension does not activate</h3><p>Open a Python file in a trusted workspace, select the correct interpreter, install Flaxon, and reload VS Code. Check the Flaxon Output channel.</p><h3>Route Explorer is empty</h3><p>Save the file, confirm decorators such as <code>@app.get</code>, <code>@app.post</code>, or <code>@app.websocket</code>, check <code>flaxon.entryPoint</code>, and restart the language server.</p><h3>Completions or CodeLens are missing</h3><p>Enable <code>flaxon.enableCompletions</code> and <code>flaxon.enableCodeLens</code>, install Python/Pylance, save the file, and restart the language server.</p><h3>Run or debug fails</h3><p>Run the selected Python interpreter directly, verify the entry point imports, and compare the terminal command with <code>flaxon run app:app --reload</code>.</p><h2>Shortcuts</h2><table><thead><tr><th>Shortcut</th><th>Action</th></tr></thead><tbody><tr><td><code>Ctrl+Shift+P</code></td><td>Command Palette</td></tr><tr><td><code>Ctrl+Shift+R</code></td><td>Show Routes</td></tr><tr><td><code>Ctrl+Shift+F5</code></td><td>Run App</td></tr><tr><td><code>Ctrl+Shift+U</code></td><td>Output panel</td></tr></tbody></table><h2>Security</h2><p>Use trusted workspaces. The extension is an editor tool, not an authorization boundary. Keep tokens, database URLs, signing keys, and production secrets outside source files. Review third-party VSIX files before installing them.</p></article></main></div></div></section><div id="footer"></div><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+
+

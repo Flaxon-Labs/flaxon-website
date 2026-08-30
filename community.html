@@ -1,0 +1,150 @@
+<!-- community.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Community – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <!-- Community Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Community</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">Join the Flaxon community and help shape the future of Python backend development.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+
+                <!-- GitHub -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-900 dark:bg-slate-800 rounded-xl flex items-center justify-center text-white text-2xl">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">GitHub</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm">Code, issues, and discussions</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/issues" target="_blank" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-exclamation-circle mr-2"></i> Issues & Bug Reports
+                        </a>
+                        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/discussions" target="_blank" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-comments mr-2"></i> Discussions
+                        </a>
+                        <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/pulls" target="_blank" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-code-pull-request mr-2"></i> Pull Requests
+                        </a>
+                    </div>
+                    <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" target="_blank" class="mt-4 inline-block gradient-btn text-white font-medium px-5 py-2 rounded-xl text-sm">
+                        <i class="fab fa-github mr-2"></i> View on GitHub
+                    </a>
+                </div>
+
+                <!-- Contributing -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-2xl">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Contributing</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm">Help build Flaxon</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <a href="/CONTRIBUTING.md" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-book mr-2"></i> Contributing Guide
+                        </a>
+                        <a href="/CODE_OF_CONDUCT.md" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-gavel mr-2"></i> Code of Conduct
+                        </a>
+                        <a href="/SECURITY.md" class="block text-slate-700 dark:text-slate-300 hover:text-flaxon-blue dark:hover:text-flaxon-electric">
+                            <i class="fas fa-shield-alt mr-2"></i> Security Policy
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sponsor -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition md:col-span-2">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400 text-2xl">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Support Flaxon</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm">Help sustain open-source development</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-4">Flaxon is MIT licensed and free to use. If you find it useful, consider supporting the project.</p>
+                    <a href="https://github.com/sponsors/aldanedev-create" target="_blank" class="mt-4 inline-block bg-amber-500 hover:bg-amber-600 text-white font-medium px-5 py-2 rounded-xl text-sm transition">
+                        <i class="fas fa-heart mr-2"></i> Sponsor
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Core Team -->
+            <div class="mt-16 max-w-2xl mx-auto text-center">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Core Team</h2>
+                <div class="mt-6 flex justify-center">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm max-w-xs">
+                        <div class="w-20 h-20 bg-gradient-to-br from-flaxon-blue to-flaxon-electric rounded-full mx-auto flex items-center justify-center text-3xl text-white font-bold">
+                            AH
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Aldane Hutchinson</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Creator & Maintainer</p>
+                        <div class="flex justify-center gap-3 mt-3">
+                            <a href="https://github.com/aldanedev-create" target="_blank" class="text-slate-500 hover:text-slate-700 dark:hover:text-white"><i class="fab fa-github"></i></a>
+                            <a href="#" class="text-slate-500 hover:text-slate-700 dark:hover:text-white"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-slate-500 hover:text-slate-700 dark:hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

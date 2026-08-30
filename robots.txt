@@ -1,0 +1,14 @@
+# robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin and private paths
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://flaxon.dev/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

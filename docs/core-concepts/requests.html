@@ -1,0 +1,229 @@
+<!-- docs/core-concepts/requests.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Requests – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html" class="active">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Requests</h1>
+                        <p>The <code>Request</code> class provides access to all incoming request data.</p>
+
+                        <h2>Accessing the Request</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon import Request
+
+@app.get("/")
+async def home(request: Request):
+    return {"method": request.method, "path": request.path}</code></pre>
+                        </div>
+
+                        <h2>Request Properties</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/info")
+async def info(request: Request):
+    return {
+        "method": request.method,
+        "path": request.path,
+        "scheme": request.scheme,
+        "host": request.host,
+        "url": request.url,
+        "client": request.client,
+    }</code></pre>
+                        </div>
+
+                        <h2>Headers</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/headers")
+async def get_headers(request: Request):
+    return {
+        "user_agent": request.headers.get("user-agent"),
+        "content_type": request.headers.get("content-type"),
+        "all_headers": dict(request.headers),
+    }</code></pre>
+                        </div>
+
+                        <h2>Query Parameters</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/search")
+async def search(request: Request):
+    # Single value
+    q = request.query.get("q")
+    page = request.query.get("page", 1)
+
+    # Multiple values
+    filters = request.query.get_list("filter")
+
+    # Type conversion
+    page_int = request.query.get_int("page", 1)
+    active = request.query.get("active", "false").lower() in {"1", "true", "yes", "on"}
+
+    return {"query": q, "page": page, "filters": filters}</code></pre>
+                        </div>
+
+                        <h2>Cookies</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.get("/profile")
+async def profile(request: Request):
+    session_id = request.cookies.get("session_id")
+    theme = request.cookies.get("theme", "light")
+
+    return {"session_id": session_id, "theme": theme}</code></pre>
+                        </div>
+
+                        <h2>Reading the Body</h2>
+
+                        <h3>JSON Body</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/users")
+async def create_user(request: Request):
+    data = await request.json()
+    return {"received": data}</code></pre>
+                        </div>
+
+                        <h3>Text Body</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/text")
+async def handle_text(request: Request):
+    text = await request.text()
+    return {"length": len(text)}</code></pre>
+                        </div>
+
+                        <h3>Raw Bytes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/binary")
+async def handle_binary(request: Request):
+    data = await request.body()
+    return {"size": len(data)}</code></pre>
+                        </div>
+
+                        <h3>Form Data</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@app.post("/form")
+async def handle_form(request: Request):
+    form = await request.form()
+    return {"name": form.get("name"), "email": form.get("email")}</code></pre>
+                        </div>
+
+                        <h2>Validation with Schemas</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+
+class CreateUser(Schema):
+    name = fields.StrField(required=True, min_length=2)
+    email = fields.EmailField(required=True)
+    age = fields.IntField(required=False, minimum=13)
+
+@app.post("/users")
+async def create_user(data: CreateUser):
+    # data is automatically validated
+    return {"user": data.to_dict()}</code></pre>
+                        </div>
+
+                        <h2>Combining Parameters</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+
+class SearchParams(Schema):
+    q = fields.StrField(required=True, min_length=1)
+    page = fields.IntField(default=1, minimum=1)
+    per_page = fields.IntField(default=20, minimum=1, maximum=100)
+
+@app.get("/api/search")
+async def search(request: Request, params: SearchParams):
+    return {
+        "query": params.q,
+        "page": params.page,
+        "per_page": params.per_page,
+    }</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
+                            <p class="mb-0 mt-1">The <code>Request</code> object also has a <code>.state</code> attribute for storing request-scoped data.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!-- docs/examples/basic-api.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Basic API Example – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+
+                        <div class="section-title">Examples</div>
+                        <a href="/docs/examples/basic-api.html" class="active">Basic API</a>
+                        <a href="/docs/examples/react-backend.html">React Backend</a>
+                        <a href="/docs/examples/android-backend.html">Android Backend</a>
+                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
+                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
+                        <a href="/docs/examples/large-application.html">Large Application</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Basic API Example</h1>
+                        <p>A simple REST API with Flaxon demonstrating CRUD operations, validation, and error handling.</p>
+
+                        <h2>Application Code</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># app.py
+from flaxon import Flaxon, JSONResponse, NotFound
+from flaxon.validation import Schema, fields
+
+app = Flaxon("basic-api", debug=True)
+
+# Health check
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "service": "basic-api"}
+
+# Home endpoint
+@app.get("/")
+async def home():
+    return {
+        "message": "Welcome to the Basic API",
+        "endpoints": [
+            "GET /health",
+            "GET /users",
+            "GET /users/&lt;id&gt;",
+            "POST /users",
+            "PUT /users/&lt;id&gt;",
+            "DELETE /users/&lt;id&gt;",
+        ],
+    }
+
+# Schema for user creation
+class CreateUser(Schema):
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    age = fields.IntField(required=False, minimum=13, maximum=120)
+
+# Schema for user update
+class UpdateUser(Schema):
+    name = fields.StrField(required=False, min_length=2, max_length=80)
+    email = fields.EmailField(required=False)
+    age = fields.IntField(required=False, minimum=13, maximum=120)
+
+# In-memory storage
+users = []
+user_id_counter = 1
+
+@app.get("/users")
+async def list_users():
+    return users
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    for user in users:
+        if user["id"] == user_id:
+            return user
+    raise NotFound("User not found")
+
+@app.post("/users")
+async def create_user(data: CreateUser):
+    global user_id_counter
+    user = data.to_dict()
+    user["id"] = user_id_counter
+    user_id_counter += 1
+    users.append(user)
+    return JSONResponse({"created": True, "user": user}, status_code=201)
+
+@app.put("/users/&lt;int:user_id&gt;")
+async def update_user(user_id: int, data: UpdateUser):
+    for user in users:
+        if user["id"] == user_id:
+            updates = {key: value for key, value in data.to_dict().items() if value is not None}
+            user.update(updates)
+            return {"updated": True, "user": user}
+    raise NotFound("User not found")
+
+@app.delete("/users/&lt;int:user_id&gt;")
+async def delete_user(user_id: int):
+    for i, user in enumerate(users):
+        if user["id"] == user_id:
+            users.pop(i)
+            return {"deleted": True, "id": user_id}
+    raise NotFound("User not found")</code></pre>
+                        </div>
+
+                        <h2>Running the Application</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash"># Install dependencies
+pip install "flaxon[standard]"
+
+# Run the application
+flaxon run app:app --reload</code></pre>
+                        </div>
+
+                        <h2>Testing the API</h2>
+
+                        <h3>Create a User</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl -X POST http://localhost:8000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice", "email": "alice@example.com", "age": 30}'</code></pre>
+                        </div>
+
+                        <h3>List All Users</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl http://localhost:8000/users</code></pre>
+                        </div>
+
+                        <h3>Get a User</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl http://localhost:8000/users/1</code></pre>
+                        </div>
+
+                        <h3>Update a User</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl -X PUT http://localhost:8000/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice Updated"}'</code></pre>
+                        </div>
+
+                        <h3>Delete a User</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl -X DELETE http://localhost:8000/users/1</code></pre>
+                        </div>
+
+                        <h3>Health Check</h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">curl http://localhost:8000/health</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
+                            <ul class="mb-0 mt-1">
+                                <li><strong>Routes:</strong> GET, POST, PUT, DELETE</li>
+                                <li><strong>Validation:</strong> Schema with String, Email, Integer fields</li>
+                                <li><strong>Error Handling:</strong> 404 Not Found responses</li>
+                                <li><strong>In-Memory Storage:</strong> Simple list for demonstration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

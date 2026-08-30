@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="google-site-verification" content="l5zab0NHk3lbRe6HAabq8PNIt4BbzaHUr1Sao5YM5yc" />
+    <title>Flaxon – Security</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Highlight.js (light + dark) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/secure.css">
+
+  
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: {
+                            blue: '#3776AB',
+                            electric: '#00D4FF',
+                            dark: '#0F172A',
+                            light: '#F8FAFC',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+    <script defer src="/assets/js/secure.js"></script></head>
+
+<body>
+
+    <!-- ============================================================ -->
+    <!-- THREE.JS CANVAS                                               -->
+    <!-- ============================================================ -->
+    <div id="three-canvas"></div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT                                                  -->
+    <!-- ============================================================ -->
+    <div class="content">
+
+        <!-- ============================================================ -->
+        <!-- HEADER                                                         -->
+        <!-- ============================================================ -->
+        <div id="header"></div>
+
+        <!-- ============================================================ -->
+        <!-- SECURITY HERO                                                 -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-8">
+            <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+                <span class="security-badge">
+                    <span class="dot"></span>
+                    Security First
+                </span>
+                <span class="text-gray-600">/</span>
+                <span class="text-gray-500">Zero-Trust Architecture</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight">
+                Security at the
+                <span class="gradient-text">Core</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mt-4 leading-relaxed">
+                Built-in security from the ground up. Flaxon implements industry-standard
+                security practices so you can focus on building your application.
+            </p>
+
+            <div class="flex flex-wrap gap-4 mt-6">
+                <a href="#features" class="btn-primary">
+                    Explore Features
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security" target="_blank" class="btn-outline">
+                    <i class="fas fa-shield-alt"></i>
+                    Security Policy
+                </a>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- STATS                                                         -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number">100%</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Open Source</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number text-[#60a5fa]">MIT</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">License</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number">22</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">GitHub Stars</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <div class="stat-number text-[#a78bfa]">11</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">PyPI Downloads</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- FEATURES                                                      -->
+        <!-- ============================================================ -->
+        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Security Features</h2>
+                <p class="text-gray-400 mt-2">Built-in protections that work out of the box</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+
+                <!-- Feature 1 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon">🛡️</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Autoescaping</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Jinja2 templates automatically escape content to prevent XSS attacks.
+                                Raw HTML requires explicit opt-in.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon green">✅</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Request Validation</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Declarative schemas validate all incoming data with automatic
+                                422 responses for invalid requests.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon purple">🔐</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Security Headers</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and
+                                Permissions-Policy headers set by default.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon orange">🚫</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Rate Limiting</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Configurable rate limiting to prevent abuse and DoS attacks.
+                                Distributed rate limiting support via Redis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon red">🔍</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Data Redaction</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Passwords, tokens, and secrets are automatically redacted from
+                                debug output and error responses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="feature-icon cyan">🔑</div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">CSRF Protection</h3>
+                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
+                                Built-in CSRF token validation for state-changing operations.
+                                Seamless integration with forms and APIs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECURITY POLICY SECTION                                       -->
+        <!-- ============================================================ -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="glass-card rounded-2xl p-8 md:p-12 text-center">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h2 class="text-2xl font-bold text-white">Security Policy</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mt-2">
+                    Flaxon follows responsible disclosure. We take security seriously and
+                    respond to vulnerability reports promptly.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mt-6">
+                    <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/policy" target="_blank"
+                    class="btn-primary">
+                    <i class="fas fa-shield-alt"></i>
+                    View Security Policy
+                </a>
+                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/advisories" target="_blank"
+                class="btn-outline">
+                <i class="fas fa-exclamation-triangle"></i>
+                Security Advisories
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CTA                                                            -->
+<!-- ============================================================ -->
+<div id="cta" x-data="{}" x-init="fetch('/partials/cta.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                         -->
+<!-- ============================================================ -->
+<div id="footer"></div>
+
+</div>
+<!-- END content -->
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    // Load partials
+    document.addEventListener('DOMContentLoaded', function() {
+        const partials = [
+            { id: 'cta', path: '/partials/cta.html' },
+        ];
+
+        partials.forEach(function(partial) {
+            fetch(partial.path)
+                .then(r => r.text())
+                .then(html => {
+                    const el = document.getElementById(partial.id);
+                    if (el) el.innerHTML = html;
+                })
+                .catch(err => console.error('Failed to load partial:', partial.path, err));
+        });
+
+        // Init Highlight.js
+        hljs.highlightAll();
+    });
+
+    // Dark mode toggle (persistent)
+    if (localStorage.getItem('dark-mode') === 'true') {
+        document.documentElement.classList.add('dark');
+    }
+</script>
+
+
+</body>
+</html>

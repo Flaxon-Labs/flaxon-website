@@ -1,0 +1,174 @@
+<!-- examples/canvas.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Real-Time Collaborative Canvas – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/examples.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-8">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-3 mb-6">
+                <a href="/examples.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <i class="fas fa-arrow-left"></i> Back to Examples
+                </a>
+                <span class="text-slate-300 dark:text-slate-600">|</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">Real-Time Collaborative Canvas</h1>
+                <span class="ml-auto text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full">WebSocket Demo</span>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 mb-6">
+                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                    <i class="fas fa-info-circle text-flaxon-blue mr-2"></i>
+                    A real-time collaborative drawing canvas powered by Flaxon WebSockets. Draw with others in real-time.
+                </p>
+            </div>
+
+            <!-- Demo Layout -->
+            <div class="grid lg:grid-cols-4 gap-6">
+                <!-- Canvas -->
+                <div class="lg:col-span-3">
+                    <div class="example-container">
+                        <canvas id="drawing-canvas" width="800" height="500"></canvas>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white mb-3">Controls</h3>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm text-slate-600 dark:text-slate-400 block mb-1">Color</label>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button class="color-option active" style="background:#000000" data-color="#000000"></button>
+                                    <button class="color-option" style="background:#ef4444" data-color="#ef4444"></button>
+                                    <button class="color-option" style="background:#3b82f6" data-color="#3b82f6"></button>
+                                    <button class="color-option" style="background:#22c55e" data-color="#22c55e"></button>
+                                    <button class="color-option" style="background:#f59e0b" data-color="#f59e0b"></button>
+                                    <button class="color-option" style="background:#8b5cf6" data-color="#8b5cf6"></button>
+                                    <button class="color-option" style="background:#ec4899" data-color="#ec4899"></button>
+                                    <button class="color-option" style="background:#ffffff;border:2px solid #94a3b8;" data-color="#ffffff"></button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-sm text-slate-600 dark:text-slate-400 block mb-1">Size</label>
+                                <input type="range" id="brush-size" min="1" max="20" value="3" class="w-full accent-flaxon-blue">
+                                <span id="size-display" class="text-xs text-slate-500">3px</span>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button id="clear-canvas" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+                                    <i class="fas fa-trash mr-1"></i> Clear
+                                </button>
+                                <button id="undo-canvas" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+                                    <i class="fas fa-undo mr-1"></i> Undo
+                                </button>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
+                                <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                                    <span><i class="fas fa-users mr-1"></i> <span id="canvas-users">1</span> online</span>
+                                    <span id="connection-status" class="text-emerald-500">● Connected</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backend Code Showcase -->
+            <div class="mt-8">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="font-semibold text-slate-900 dark:text-white">
+                            <i class="fab fa-python text-flaxon-blue mr-2"></i> Flaxon WebSocket Backend
+                        </h3>
+                        <span class="text-xs text-slate-500">canvas_backend.py</span>
+                    </div>
+                    <div class="code-block rounded-none border-0">
+                        <pre><code class="language-python">from flaxon import Flaxon, WebSocket, WebSocketDisconnect
+
+app = Flaxon("canvas-backend", debug=True)
+
+# Store drawing strokes
+strokes = []
+
+@app.websocket("/ws/canvas")
+async def canvas_socket(socket: WebSocket):
+    await socket.accept()
+    await socket.join("canvas-room")
+
+    # Send existing strokes to new user
+    for stroke in strokes:
+        await socket.send_json(stroke)
+
+    try:
+        async for message in socket.iter_json():
+            # Store stroke
+            strokes.append(message)
+            # Broadcast to all connected clients
+            await socket.broadcast_json("canvas-room", message)
+
+    except WebSocketDisconnect:
+        await socket.leave("canvas-room")
+
+@app.get("/api/canvas/clear")
+async def clear_canvas():
+    strokes.clear()
+    return {"cleared": True}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script src="/assets/js/examples/canvas.js"></script>
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

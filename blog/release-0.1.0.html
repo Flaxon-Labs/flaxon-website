@@ -1,0 +1,135 @@
+<!-- blog/release-0.1.0.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Release v0.1.0 – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <!-- Back -->
+                <a href="/blog.html" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center gap-2 mb-6">
+                    <i class="fas fa-arrow-left"></i> Back to Blog
+                </a>
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full font-semibold">Release</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-3">Flaxon v0.1.0 — Alpha Release</h1>
+                    <div class="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        <span><i class="far fa-calendar mr-1"></i> July 2026</span>
+                        <span><i class="far fa-user mr-1"></i> Aldane Hutchinson</span>
+                        <span><i class="far fa-clock mr-1"></i> 5 min read</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="doc-content bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800">
+
+                    <p class="text-lg font-medium text-slate-700 dark:text-slate-300">After months of development, we are thrilled to announce the first public release of Flaxon — version 0.1.0 Alpha.</p>
+
+                    <p>Flaxon is a technology-neutral, async-first Python backend framework that combines Flask-like ease with production-grade features. This release marks a major milestone in our mission to provide developers with a framework that is simple to start, powerful to scale, and completely free in terms of technology choice.</p>
+
+                    <h2>What's Included</h2>
+                    <p>Flaxon 0.1.0 comes packed with features to help you build modern Python applications:</p>
+
+                    <ul>
+                        <li><strong>Async-first ASGI architecture</strong> — Built for high-concurrency I/O workloads with Python's asyncio.</li>
+                        <li><strong>Flask-style route decorators</strong> — Familiar and intuitive syntax that Python developers already know and love.</li>
+                        <li><strong>Optional modular structure</strong> — Start simple, scale to large applications with routers, services, and repositories.</li>
+                        <li><strong>Request validation</strong> — Declarative schemas with automatic 422 responses.</li>
+                        <li><strong>WebSocket support</strong> — Real-time communication with room broadcasting built-in.</li>
+                        <li><strong>Jinax templates</strong> — Optional Jinja2 integration for server-side HTML rendering.</li>
+                        <li><strong>Middleware stack</strong> — CORS, request IDs, security headers, and rate limiting.</li>
+                        <li><strong>Readable debugger</strong> — Explains failures in plain language with request context.</li>
+                        <li><strong>Technology neutral</strong> — Use any frontend, database, ORM, or client.</li>
+                        <li><strong>CLI tools</strong> — Run, inspect, doctor, and generate projects.</li>
+                        <li><strong>Testing utilities</strong> — Sync and async test clients.</li>
+                    </ul>
+
+                    <h2>Installation</h2>
+                    <div class="code-block">
+                        <pre><code class="language-bash">pip install flaxon</code></pre>
+                    </div>
+
+                    <h2>Hello World</h2>
+                    <div class="code-block">
+                        <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("hello-world", debug=True)
+
+@app.get("/")
+async def home():
+    return {"message": "Hello, World!"}</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <pre><code class="language-bash">flaxon run app:app --reload</code></pre>
+                    </div>
+
+                    <h2>Community & Contribution</h2>
+                    <p>We invite you to try Flaxon, share your feedback, and contribute to the project. Whether you're building APIs, real-time applications, or mobile backends, Flaxon is designed to make your development experience better.</p>
+
+                    <ul>
+                        <li><strong>GitHub:</strong> <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework" class="text-flaxon-blue hover:underline">github.com/aldanedev-create/Flaxon-Backend-Framework</a></li>
+                        <li><strong>PyPI:</strong> <a href="https://pypi.org/project/flaxon/" class="text-flaxon-blue hover:underline">pypi.org/project/flaxon</a></li>
+                        <li><strong>Issues:</strong> <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/issues" class="text-flaxon-blue hover:underline">Report bugs and request features</a></li>
+                    </ul>
+
+                    <div class="note success">
+                        <strong><i class="fas fa-check-circle mr-2"></i> Try It Today</strong>
+                        <p class="mb-0 mt-1">Install Flaxon and build your first application in minutes. We can't wait to see what you create!</p>
+                    </div>
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">— Aldane Hutchinson, Creator & Maintainer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

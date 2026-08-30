@@ -1,0 +1,615 @@
+<!-- docs/examples/large-application.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Large Application Example – Flaxon Documentation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+
+                <aside class="lg:col-span-1">
+                    <div class="doc-sidebar">
+                        <div class="section-title">Getting Started</div>
+                        <a href="/docs/getting-started/index.html">Overview</a>
+                        <a href="/docs/getting-started/installation.html">Installation</a>
+                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+
+                        <div class="section-title">Core Concepts</div>
+                        <a href="/docs/core-concepts/routing.html">Routing</a>
+                        <a href="/docs/core-concepts/requests.html">Requests</a>
+                        <a href="/docs/core-concepts/responses.html">Responses</a>
+                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
+                        <a href="/docs/core-concepts/validation.html">Validation</a>
+
+                        <div class="section-title">Guides</div>
+                        <a href="/docs/guides/databases.html">Databases</a>
+                        <a href="/docs/guides/authentication.html">Authentication</a>
+                        <a href="/docs/guides/authorization.html">Authorization</a>
+                        <a href="/docs/guides/websockets.html">WebSockets</a>
+                        <a href="/docs/guides/tasks.html">Tasks</a>
+                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
+                        <a href="/docs/guides/testing.html">Testing</a>
+                        <a href="/docs/guides/debugging.html">Debugging</a>
+                        <a href="/docs/guides/plugins.html">Plugins</a>
+                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+
+                        <div class="section-title">API Reference</div>
+                        <a href="/docs/api/application.html">Application</a>
+                        <a href="/docs/api/routing.html">Routing</a>
+                        <a href="/docs/api/http.html">HTTP</a>
+                        <a href="/docs/api/websocket.html">WebSocket</a>
+                        <a href="/docs/api/validation.html">Validation</a>
+                        <a href="/docs/api/security.html">Security</a>
+                        <a href="/docs/api/jinax.html">Jinax</a>
+                        <a href="/docs/api/tasks.html">Tasks</a>
+                        <a href="/docs/api/testing.html">Testing</a>
+
+                        <div class="section-title">Examples</div>
+                        <a href="/docs/examples/basic-api.html">Basic API</a>
+                        <a href="/docs/examples/react-backend.html">React Backend</a>
+                        <a href="/docs/examples/android-backend.html">Android Backend</a>
+                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
+                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
+                        <a href="/docs/examples/large-application.html" class="active">Large Application</a>
+                    </div>
+                </aside>
+
+                <main class="lg:col-span-3">
+                    <div class="doc-content">
+                        <h1>Large Application Example</h1>
+                        <p>A structured large application with routers, services, repositories, schemas, and middleware.</p>
+
+                        <h2>Project Structure</h2>
+                        <div class="code-block">
+                            <pre><code class="language-bash">myapp/
+├── app.py
+├── config.py
+├── models/
+│   └── user.py
+├── schemas/
+│   └── user.py
+├── services/
+│   └── user_service.py
+├── repositories/
+│   └── user_repository.py
+├── routes/
+│   ├── __init__.py
+│   ├── users.py
+│   └── auth.py
+├── middleware/
+│   └── auth.py
+└── utils/
+    └── db.py</code></pre>
+                        </div>
+
+                        <h2>Configuration</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># config.py
+import os
+from typing import Any
+
+class Config:
+    DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "change-me")
+    DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///app.db")
+    ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    JWT_EXPIRATION = int(os.environ.get("JWT_EXPIRATION", 3600))
+    MAX_BODY_SIZE = int(os.environ.get("MAX_BODY_SIZE", 10 * 1024 * 1024))
+
+    @classmethod
+    def to_dict(cls) -> dict[str, Any]:
+        return {
+            "DEBUG": cls.DEBUG,
+            "SECRET_KEY": cls.SECRET_KEY,
+            "DATABASE_URL": cls.DATABASE_URL,
+            "ALLOWED_ORIGINS": cls.ALLOWED_ORIGINS,
+            "JWT_EXPIRATION": cls.JWT_EXPIRATION,
+            "MAX_BODY_SIZE": cls.MAX_BODY_SIZE,
+        }</code></pre>
+                        </div>
+
+                        <h2>Models</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># models/user.py
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
+@dataclass
+class User:
+    id: Optional[int] = None
+    name: str = ""
+    email: str = ""
+    hashed_password: str = ""
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "User":
+        return cls(
+            id=data.get("id"),
+            name=data.get("name", ""),
+            email=data.get("email", ""),
+            hashed_password=data.get("hashed_password", ""),
+            created_at=data.get("created_at"),
+            updated_at=data.get("updated_at"),
+        )</code></pre>
+                        </div>
+
+                        <h2>Schemas (Validation)</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># schemas/user.py
+from flaxon.validation import Schema, fields
+
+class CreateUser(Schema):
+    name = fields.StrField(required=True, min_length=2, max_length=80)
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)
+
+class UpdateUser(Schema):
+    name = fields.StrField(required=False, min_length=2, max_length=80)
+    email = fields.EmailField(required=False)
+
+class LoginRequest(Schema):
+    email = fields.EmailField(required=True)
+    password = fields.StrField(required=True, min_length=8)</code></pre>
+                        </div>
+
+                        <h2>Repository</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># repositories/user_repository.py
+from typing import Optional, List
+from models.user import User
+
+class UserRepository:
+    def __init__(self, db):
+        self.db = db
+
+    async def get_by_id(self, user_id: int) -> Optional[User]:
+        row = await self.db.fetch_one("SELECT * FROM users WHERE id = $1", user_id)
+        return User.from_dict(row) if row else None
+
+    async def get_by_email(self, email: str) -> Optional[User]:
+        row = await self.db.fetch_one("SELECT * FROM users WHERE email = $1", email)
+        return User.from_dict(row) if row else None
+
+    async def create(self, user: User) -> User:
+        row = await self.db.fetch_one(
+            "INSERT INTO users (name, email, hashed_password) VALUES ($1, $2, $3) RETURNING *",
+            user.name, user.email, user.hashed_password
+        )
+        return User.from_dict(row)
+
+    async def update(self, user: User) -> User:
+        row = await self.db.fetch_one(
+            "UPDATE users SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *",
+            user.name, user.email, user.id
+        )
+        return User.from_dict(row)
+
+    async def delete(self, user_id: int) -> bool:
+        await self.db.execute("DELETE FROM users WHERE id = $1", user_id)
+        return True
+
+    async def list(self, limit: int = 100, offset: int = 0) -> List[User]:
+        rows = await self.db.fetch_all("SELECT * FROM users LIMIT $1 OFFSET $2", limit, offset)
+        return [User.from_dict(row) for row in rows]
+
+    async def count(self) -> int:
+        return await self.db.fetch_val("SELECT COUNT(*) FROM users")</code></pre>
+                        </div>
+
+                        <h2>Service Layer</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># services/user_service.py
+from typing import Optional, List
+from flaxon.security import hash_password, verify_password
+from models.user import User
+from repositories.user_repository import UserRepository
+
+class UserService:
+    def __init__(self, repo: UserRepository):
+        self.repo = repo
+
+    async def get_user(self, user_id: int) -> Optional[User]:
+        return await self.repo.get_by_id(user_id)
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        return await self.repo.get_by_email(email)
+
+    async def create_user(self, name: str, email: str, password: str) -> User:
+        if await self.repo.get_by_email(email):
+            raise ValueError("Email already registered")
+
+        user = User(
+            name=name,
+            email=email,
+            hashed_password=hash_password(password),
+        )
+        return await self.repo.create(user)
+
+    async def authenticate(self, email: str, password: str) -> Optional[User]:
+        user = await self.repo.get_by_email(email)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
+
+    async def update_user(self, user_id: int, data: dict) -> Optional[User]:
+        user = await self.repo.get_by_id(user_id)
+        if not user:
+            return None
+        if "name" in data:
+            user.name = data["name"]
+        if "email" in data:
+            user.email = data["email"]
+        return await self.repo.update(user)
+
+    async def delete_user(self, user_id: int) -> bool:
+        return await self.repo.delete(user_id)
+
+    async def list_users(self, page: int = 1, per_page: int = 20) -> dict:
+        offset = (page - 1) * per_page
+        users = await self.repo.list(per_page, offset)
+        total = await self.repo.count()
+
+        return {
+            "items": [u.to_dict() for u in users],
+            "page": page,
+            "per_page": per_page,
+            "total": total,
+            "total_pages": (total + per_page - 1) // per_page,
+        }</code></pre>
+                        </div>
+
+                        <h2>Auth Routes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># routes/auth.py
+from flaxon import Router, HTTPException, Response
+from flaxon.security import JWTBackend, login_required
+
+from schemas.user import CreateUser, LoginRequest
+from services.user_service import UserService
+from repositories.user_repository import UserRepository
+from utils.db import get_db
+from config import Config
+
+router = Router(prefix="/api/v1/auth")
+jwt_backend = JWTBackend(secret_key=Config.SECRET_KEY)
+
+@router.post("/register")
+async def register(data: CreateUser):
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    try:
+        user = await service.create_user(data.name, data.email, data.password)
+        return {"success": True, "user": user.to_dict()}
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+@router.post("/login")
+async def login(data: LoginRequest):
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    user = await service.authenticate(data.email, data.password)
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    token = await jwt_backend.create_token(user.to_dict())
+    return {"token": token, "user": user.to_dict()}
+
+@router.post("/refresh")
+@login_required
+async def refresh(request):
+    user = getattr(request, "user")
+    token = await jwt_backend.create_token(user)
+    return {"token": token}
+
+@router.post("/logout")
+@login_required
+async def logout(request):
+    # In production, blacklist the token
+    return {"success": True}</code></pre>
+                        </div>
+
+                        <h2>User Routes</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># routes/users.py
+from flaxon import Router, HTTPException
+from flaxon.security import login_required, permission_required
+
+from schemas.user import UpdateUser
+from services.user_service import UserService
+from repositories.user_repository import UserRepository
+from utils.db import get_db
+
+router = Router(prefix="/api/v1/users")
+
+@router.get("/")
+@login_required
+async def list_users(request):
+    page = request.query.get_int("page", 1)
+    per_page = request.query.get_int("per_page", 20)
+
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    return await service.list_users(page, per_page)
+
+@router.get("/<int:user_id>")
+@login_required
+async def get_user(user_id: int):
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    user = await service.get_user(user_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    return user.to_dict()
+
+@router.put("/<int:user_id>")
+@login_required
+async def update_user(user_id: int, data: UpdateUser):
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    user = await service.update_user(user_id, data.to_dict())
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    return user.to_dict()
+
+@router.delete("/<int:user_id>")
+@login_required
+@permission_required("delete_user")
+async def delete_user(user_id: int):
+    db = get_db()
+    repo = UserRepository(db)
+    service = UserService(repo)
+
+    result = await service.delete_user(user_id)
+    if not result:
+        raise HTTPException(404, "User not found")
+
+    return {"deleted": True}
+
+@router.get("/me")
+@login_required
+async def get_me(request):
+    user = getattr(request, "user")
+    return user</code></pre>
+                        </div>
+
+                        <h2>Middleware</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># middleware/auth.py
+from flaxon.middleware import Middleware
+
+class AuthMiddleware(Middleware):
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        # Add user to scope for WebSocket authentication
+        if "user" not in scope:
+            scope["user"] = None
+
+        await self.app(scope, receive, send)
+
+# middleware/logging.py
+class LoggingMiddleware(Middleware):
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        import time
+        start = time.perf_counter()
+        path = scope.get("path", "/")
+        method = scope.get("method", "GET")
+
+        await self.app(scope, receive, send)
+
+        duration = (time.perf_counter() - start) * 1000
+        print(f"{method} {path} - {duration:.2f}ms")</code></pre>
+                        </div>
+
+                        <h2>Database Utilities</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># utils/db.py
+import asyncpg
+from config import Config
+
+_db_pool = None
+
+async def init_db():
+    global _db_pool
+    _db_pool = await asyncpg.create_pool(Config.DATABASE_URL)
+
+async def close_db():
+    if _db_pool:
+        await _db_pool.close()
+
+def get_db():
+    return _db_pool
+
+# utils/health.py
+from flaxon.health import HealthCheck
+
+class DatabaseHealthCheck(HealthCheck):
+    def __init__(self):
+        super().__init__("database", self._check)
+
+    async def _check(self):
+        try:
+            db = get_db()
+            await db.fetch("SELECT 1")
+            return {"status": "healthy"}
+        except Exception as exc:
+            return {"status": "unhealthy", "message": str(exc)}</code></pre>
+                        </div>
+
+                        <h2>Application Entry Point (Complete)</h2>
+                        <div class="code-block">
+                            <pre><code class="language-python"># app.py
+from flaxon import Flaxon
+from flaxon.middleware import RequestIDMiddleware, SecurityHeadersMiddleware, CORSMiddleware
+from flaxon.security import AuthenticationMiddleware
+
+from config import Config
+from routes import users, auth
+from middleware.auth import AuthMiddleware
+from middleware.logging import LoggingMiddleware
+from utils.db import init_db, close_db
+from utils.health import DatabaseHealthCheck
+from flaxon.health import HealthRegistry
+
+app = Flaxon("myapp", debug=Config.DEBUG)
+app.config.update(Config.to_dict())
+
+# Middleware (order matters)
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allowed_origins=Config.ALLOWED_ORIGINS,
+    allow_credentials=True,
+)
+app.add_middleware(AuthMiddleware)
+
+# Authentication
+from flaxon.security import JWTBackend
+jwt_backend = JWTBackend(secret_key=Config.SECRET_KEY)
+app.add_middleware(AuthenticationMiddleware, backend=jwt_backend)
+
+# Routes
+app.include_router(auth.router)
+app.include_router(users.router)
+
+# Health Checks
+health = HealthRegistry()
+health.register(DatabaseHealthCheck())
+
+@app.get("/health")
+async def health_check():
+    return await health.check_all()
+
+@app.get("/health/live")
+async def liveness():
+    return {"status": "alive"}
+
+@app.get("/health/ready")
+async def readiness():
+    result = await health.check_all()
+    all_healthy = all(r["status"] == "healthy" for r in result.values())
+    status = 200 if all_healthy else 503
+    return result, status
+
+# Lifecycle
+@app.on_startup
+async def startup():
+    await init_db()
+    print("✅ Database connected")
+
+@app.on_shutdown
+async def shutdown():
+    await close_db()
+    print("✅ Database disconnected")
+
+@app.get("/")
+async def home():
+    return {"message": "Welcome to MyApp API", "version": "1.0.0"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)</code></pre>
+                        </div>
+
+                        <div class="note">
+                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
+                            <ul class="mb-0 mt-1">
+                                <li><strong>Separation of Concerns:</strong> Routes, Services, Repositories</li>
+                                <li><strong>Dependency Injection:</strong> Services receive repositories</li>
+                                <li><strong>Configuration:</strong> Centralized config management with env vars</li>
+                                <li><strong>Middleware:</strong> Auth, CORS, Request ID, Security Headers, Logging</li>
+                                <li><strong>Health Checks:</strong> Liveness, readiness, and database health</li>
+                                <li><strong>Lifecycle:</strong> Startup and shutdown hooks</li>
+                                <li><strong>Validation:</strong> Schemas for request validation</li>
+                                <li><strong>Authentication:</strong> JWT with refresh tokens</li>
+                                <li><strong>Authorization:</strong> Permission-based decorators</li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>

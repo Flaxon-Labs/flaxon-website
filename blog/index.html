@@ -1,0 +1,169 @@
+<!-- blog/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Blog – Flaxon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
+    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <script defer src="/assets/js/main.js"></script></head>
+<body>
+
+    <div id="header"></div>
+
+    <!-- Blog Page -->
+    <section class="bg-slate-50 dark:bg-slate-950 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Flaxon Blog</h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">News, updates, and announcements from the Flaxon team.</p>
+            </div>
+
+            <!-- Featured Post -->
+            <div class="max-w-3xl mx-auto mb-12">
+                <div class="bg-gradient-to-r from-flaxon-blue/10 to-flaxon-electric/10 dark:from-flaxon-blue/20 dark:to-flaxon-electric/20 rounded-2xl p-6 border border-flaxon-blue/20 dark:border-flaxon-blue/30">
+                    <span class="text-xs bg-flaxon-blue/20 text-flaxon-blue dark:text-flaxon-electric px-3 py-1 rounded-full font-semibold">Featured</span>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-3">
+                        <a href="/blog/release-0.1.0.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon v0.1.0 — Alpha Release
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">The first public release of Flaxon is here! Learn about the features, philosophy, and what's coming next.</p>
+                    <div class="flex items-center gap-4 mt-4 text-sm text-slate-500 dark:text-slate-400">
+                        <span><i class="far fa-calendar mr-1"></i> July 2026</span>
+                        <span><i class="far fa-user mr-1"></i> Aldane Hutchinson</span>
+                        <span><i class="far fa-clock mr-1"></i> 5 min read</span>
+                    </div>
+                    <a href="/blog/release-0.1.0.html" class="inline-block mt-4 text-flaxon-blue dark:text-flaxon-electric font-medium hover:underline">
+                        Read more →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- Post 1 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-2 py-0.5 rounded text-xs font-medium">Roadmap</span>
+                        <span>•</span>
+                        <span>June 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/roadmap-2024.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon Roadmap 2026-2027
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">A look at the future of Flaxon — from protocol hardening to distributed tasks and the 1.0 stable release.</p>
+                    <a href="/blog/roadmap-2024.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded text-xs font-medium">Release</span>
+                        <span>•</span>
+                        <span>July 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/release-0.1.0.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon v0.1.0 — Alpha Release
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">The first public release of Flaxon is here! Learn about the features, philosophy, and what's coming next.</p>
+                    <a href="/blog/release-0.1.0.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded text-xs font-medium">Philosophy</span>
+                        <span>•</span>
+                        <span>May 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/why-flaxon.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Why Flaxon? The Philosophy Behind the Framework
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">Understanding the design decisions that make Flaxon different — simplicity, structure, and technology neutrality.</p>
+                    <a href="/blog/why-flaxon.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+                <!-- Post 4 -->
+                <article class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span class="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-2 py-0.5 rounded text-xs font-medium">Future</span>
+                        <span>•</span>
+                        <span>August 2026</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                        <a href="/blog/why-flaxon.html" class="hover:text-flaxon-blue dark:hover:text-flaxon-electric transition">
+                            Flaxon 0.2.0 — What's Coming Next
+                        </a>
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2">Protocol hardening, multipart uploads, ASGI conformance, and more.</p>
+                    <a href="/blog/why-flaxon.html" class="inline-block mt-3 text-flaxon-blue dark:text-flaxon-electric font-medium text-sm hover:underline">
+                        Read more →
+                    </a>
+                </article>
+
+            </div>
+
+            <!-- Newsletter Signup -->
+            <div class="max-w-2xl mx-auto mt-12 bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Stay Updated</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Get notified about new releases and updates.</p>
+                <form class="mt-4 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                    <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-flaxon-blue">
+                    <button class="gradient-btn text-white font-medium px-6 py-2 rounded-xl transition hover:shadow-lg">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
+    </script>
+
+</body>
+</html>
