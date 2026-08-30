@@ -35,6 +35,7 @@ def setup_admin(app: Any, settings: Settings, database: Any) -> AdminDashboard:
             settings={"organization": "Flaxon Labs", "head": "Aldane Hutchinson"},
         ),
         url_prefix="/admin",
+        template_dir=str(settings.template_dir),
         database=database,
         store=postgres_store,
         redis_url=settings.redis_url,
