@@ -1,4 +1,4 @@
-flaxon[standard,security] @ git+https://github.com/Flaxon-Labs/flaxon.git@main
+flaxon[standard,security]==0.2.4
 asyncpg>=0.29
 aiosqlite>=0.20
 uvicorn>=0.30
