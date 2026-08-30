@@ -1,0 +1,6 @@
+flaxon[standard,security]
+asyncpg>=0.29
+aiosqlite>=0.20
+uvicorn>=0.30
+redis>=5.0
+psycopg[binary]>=3.2

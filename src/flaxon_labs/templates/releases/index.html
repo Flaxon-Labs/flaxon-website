@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Releases | Flaxon Labs{% endblock %}
+{% block content %}<section class="page-heading"><p class="eyebrow">RELEASES</p><h1>Published project releases.</h1><p class="lead">Version notes and links maintained by the Flaxon Labs team.</p></section><section class="section"><div class="grid">{% for release in releases %}<article class="item"><p class="kicker">{{ release.project }}</p><h2><a href="/releases/{{ release.slug }}">{{ release.version }}</a></h2><p>{{ release.title }}</p></article>{% else %}<p>No published releases yet.</p>{% endfor %}</div></section>{% endblock %}

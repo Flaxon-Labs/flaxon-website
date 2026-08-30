@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}{{ title }} | Flaxon Labs{% endblock %}{% block content %}<article class="article"><p class="eyebrow">{{ post.author or 'FLAXON LABS' }}</p><h1>{{ post.title }}</h1>{% if post.excerpt %}<p class="lead">{{ post.excerpt }}</p>{% endif %}<div class="richtext">{{ post.body|safe }}</div></article>{% endblock %}

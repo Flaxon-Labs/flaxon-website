@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | Releases{% endblock %}
+{% block content %}<article class="article"><p class="eyebrow">{{ release.project }} RELEASE</p><h1>{{ release.version }}</h1><h2>{{ release.title }}</h2><div class="richtext">{{ release.body|safe }}</div>{% if release.release_url %}<div class="actions"><a class="button" href="{{ release.release_url }}">View release</a><a class="button secondary" href="/releases">All releases</a></div>{% endif %}</article>{% endblock %}

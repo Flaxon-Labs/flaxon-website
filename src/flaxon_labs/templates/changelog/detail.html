@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | Changelog{% endblock %}
+{% block content %}<article class="article"><p class="eyebrow">CHANGELOG</p><h1>{{ entry.title }}</h1><p class="note">By {{ entry.author or "Flaxon Labs" }}</p><div class="richtext">{{ entry.body|safe }}</div><div class="actions"><a class="button secondary" href="/changelog">All changelog entries</a></div></article>{% endblock %}

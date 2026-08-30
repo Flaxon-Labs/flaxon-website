@@ -1,0 +1,8 @@
+{
+  "version": "0001",
+  "name": "flaxon_labs_initial",
+  "up": "CREATE TABLE IF NOT EXISTS flaxon_admin_store (namespace VARCHAR(255) NOT NULL, key VARCHAR(255) NOT NULL, value TEXT NOT NULL, PRIMARY KEY(namespace, key)); CREATE TABLE IF NOT EXISTS flaxon_admin_operations (id VARCHAR(64) PRIMARY KEY, kind VARCHAR(128) NOT NULL, payload TEXT NOT NULL, created_at REAL NOT NULL); CREATE TABLE IF NOT EXISTS flaxon_subscribers (id VARCHAR(64) PRIMARY KEY, email VARCHAR(320) NOT NULL UNIQUE, created_at VARCHAR(64) NOT NULL); CREATE TABLE IF NOT EXISTS flaxon_contact_messages (id VARCHAR(64) PRIMARY KEY, name VARCHAR(160) NOT NULL, email VARCHAR(320) NOT NULL, subject VARCHAR(240) NOT NULL, message TEXT NOT NULL, status VARCHAR(32) NOT NULL, created_at VARCHAR(64) NOT NULL, ip_address VARCHAR(64), user_agent TEXT); CREATE TABLE IF NOT EXISTS flaxon_community_rate_events (id VARCHAR(64) PRIMARY KEY, action VARCHAR(32) NOT NULL, ip_address VARCHAR(64) NOT NULL, created_at VARCHAR(64) NOT NULL); CREATE INDEX IF NOT EXISTS idx_faxon_contact_status ON flaxon_contact_messages(status); CREATE INDEX IF NOT EXISTS idx_faxon_contact_created ON flaxon_contact_messages(created_at); CREATE INDEX IF NOT EXISTS idx_faxon_rate_lookup ON flaxon_community_rate_events(action, ip_address, created_at);",
+  "down": "DROP TABLE IF EXISTS flaxon_community_rate_events; DROP TABLE IF EXISTS flaxon_contact_messages; DROP TABLE IF EXISTS flaxon_subscribers; DROP TABLE IF EXISTS flaxon_admin_operations; DROP TABLE IF EXISTS flaxon_admin_store;",
+  "dependencies": [],
+  "created_at": "2026-08-30T00:00:00"
+}
