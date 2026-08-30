@@ -17,7 +17,7 @@
 cd flaxon-labs-app
 py -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install "flaxon[standard,security]==2.4.0" psycopg[binary] redis
+pip install "flaxon[standard,security]==0.2.4" psycopg[binary] redis
 flaxon init .</code></pre>
 <h2>2. Bootstrap Flaxon, Jinax, Admin, and CMS</h2>
 <pre><code class="language-python">import os
@@ -29,10 +29,13 @@ from flaxon.admin.cms import CMS, CMSField, ContentType
 app = Flaxon("organization", debug=False)
 app.use_templates(Jinax("templates"))
 
+# Attach a configured PostgreSQL adapter before creating Admin/CMS.
+database = app.database
+
 admin = AdminDashboard(
     app,
     config=AdminConfig(site_title="Organization Admin"),
-    database_url=os.environ["DATABASE_URL"],
+    database=database,
     redis_url=os.environ.get("REDIS_URL"),
 )
 
@@ -40,7 +43,7 @@ cms = CMS(
     app,
     url_prefix="/admin/cms",
     auth=admin.auth,
-    database=admin.store,
+    database=database,
     redis_url=os.environ.get("REDIS_URL"),
 )
 cms.register(ContentType(
