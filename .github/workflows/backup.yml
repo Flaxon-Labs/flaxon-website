@@ -1,0 +1,24 @@
+name: Database Backup
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Create backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pg_dump --format=custom --file flaxon-labs-${{ github.run_id }}.dump "$DATABASE_URL"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flaxon-labs-database-${{ github.run_id }}
+          path: flaxon-labs-${{ github.run_id }}.dump
+          retention-days: 30
