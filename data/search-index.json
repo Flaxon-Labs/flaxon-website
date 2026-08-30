@@ -330,6 +330,13 @@
       "section": "Guides"
     },
     {
+      "id": "modules-guide",
+      "title": "Modules",
+      "url": "/docs/guides/modules.html",
+      "content": "FlaxonModule modules industrial applications fast development dependency injection mount prefixes versioning auto discovery hooks templates static files services testing production",
+      "section": "Guides"
+    },
+    {
       "id": "jinax-flaxon-app",
       "title": "Jinax App Starter",
       "url": "/docs/guides/jinax-flaxon-app.html",

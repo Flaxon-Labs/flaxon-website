@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modules and Fast Development - Flaxon Documentation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css">
+<script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content">
+<h1>Modules for Industrial and Fast Development</h1>
+<p>Flaxon modules are reusable application units built on the real router, dependency container, lifecycle hooks, static files, and Jinax templates. A module keeps one business area together while allowing the application to mount it at any prefix. This is useful for teams that need to ship quickly without turning <code>app.py</code> into a monolith.</p>
+<div class="note success"><strong>When to use modules</strong><p class="mb-0 mt-1">Use one module for each domain such as accounts, orders, inventory, billing, or reporting. Keep repositories and services inside the domain module, expose routes from its <code>module</code> object, and mount all modules from one application entry point.</p></div>
+<h2>1. Project structure</h2>
+<pre><code class="language-text">myapp/
+|-- app.py
+|-- pyproject.toml
+|-- .env.example
+|-- migrations/
+|-- modules/
+|   |-- __init__.py
+|   |-- loader.py
+|   |-- core/
+|   |   `-- __init__.py
+|   |-- accounts/
+|   |   |-- __init__.py
+|   |   |-- repository.py
+|   |   |-- service.py
+|   |   |-- templates/
+|   |   `-- static/
+|   `-- inventory/
+|       |-- __init__.py
+|       `-- repository.py
+`-- tests/
+    |-- test_accounts.py
+    `-- test_inventory.py</code></pre>
+<p>This structure gives each team a clear ownership boundary. The application
+entry point wires shared infrastructure; modules own domain behavior.</p>
+<h2>2. Build a reusable module</h2>
+<pre><code class="language-python"># modules/inventory/__init__.py
+from flaxon.modules import FlaxonModule
+from flaxon.exceptions import NotFound
+
+module = FlaxonModule("inventory")
+module.requires("db")
+
+@module.get("/")
+async def list_inventory(db):
+    return await db.fetch_all(
+        "SELECT id, sku, name, stock FROM inventory ORDER BY name"
+    )
+
+@module.get("/<int:item_id>")
+async def get_item(item_id: int, db):
+    item = await db.fetch_one(
+        "SELECT id, sku, name, stock FROM inventory WHERE id = ?", item_id
+    )
+    if item is None:
+        raise NotFound("Inventory item not found")
+    return item</code></pre>
+<p>The module stays unaware of its final URL. Mount it at <code>/api/inventory</code>,
+<code>/v1/inventory</code>, or another prefix without changing the module code.</p>
+<h2>3. Mount modules with dependency injection</h2>
+<pre><code class="language-python"># app.py
+from flaxon import Flaxon
+from flaxon.database.manager import DatabaseManager
+from flaxon.database.adapters.sqlite import SQLiteAdapter
+from modules.inventory import module as inventory
+
+app = Flaxon("shop", debug=True)
+db = DatabaseManager(SQLiteAdapter(database="var/shop.sqlite3"))
+app.container.register_instance("db", db)
+app.mount_module(inventory, prefix="/api/inventory")
+
+@app.on_startup
+async def startup():
+    await db.initialize()
+
+@app.on_shutdown
+async def shutdown():
+    await db.close()</code></pre>
+<p>Register dependencies before mounting. If a module declares <code>requires("db")</code>
+and the container does not provide it, mounting fails early with a dependency error.</p>
+<h2>4. Mount the same module for API versions</h2>
+<pre><code class="language-python">from modules.inventory import module as inventory
+
+app.mount_module(inventory, prefix="/v1/inventory", name="inventory-v1")
+app.mount_module(inventory, prefix="/v2/inventory", name="inventory-v2")</code></pre>
+<p>Use a distinct <code>name</code> for repeated mounts. The same module instance
+can support versioned routes while the domain implementation remains shared.</p>
+<h2>5. Auto-discover modules</h2>
+<pre><code class="language-python"># modules/loader.py
+import importlib
+import pkgutil
+
+def mount_all(app, prefix_base="/api"):
+    package = importlib.import_module("modules")
+    for _, name, is_package in pkgutil.iter_modules(package.__path__):
+        if not is_package:
+            continue
+        current = importlib.import_module(f"modules.{name}")
+        module = getattr(current, "module", None)
+        if module is None:
+            continue
+        prefix = "" if name == "core" else f"{prefix_base}/{name}"
+        app.mount_module(module, prefix=prefix)</code></pre>
+<pre><code class="language-python"># app.py
+from modules.loader import mount_all
+
+# Register db, mail, cache, and other shared services first.
+mount_all(app, prefix_base="/api")</code></pre>
+<p>Adding a new domain becomes adding a package with a module-level <code>module</code>
+object. Keep startup dependencies registered before calling the loader.</p>
+<h2>6. Add module-scoped security</h2>
+<pre><code class="language-python">from flaxon.exceptions import Unauthorized
+from flaxon.modules import FlaxonModule
+
+staff = FlaxonModule("staff")
+
+@staff.before_request
+async def require_staff(request):
+    if not request.session.get("staff_id"):
+        raise Unauthorized("Staff login required")
+
+@staff.after_request
+async def record_access(request, result):
+    request.app.logger.info("staff route: %s", request.path)
+
+@staff.get("/reports")
+async def reports(db):
+    return await db.fetch_all("SELECT * FROM reports ORDER BY created_at DESC")</code></pre>
+<p>Module hooks only affect routes registered on that module. For Admin pages,
+also call the Admin permission guard inside each custom route and include CSRF
+validation for every browser mutation.</p>
+<h2>7. Add templates and static assets</h2>
+<pre><code class="language-python">from flaxon.http import Request
+from flaxon.modules import FlaxonModule
+
+portal = FlaxonModule(
+    "portal",
+    template_dir="modules/portal/templates",
+    static_dir="modules/portal/static",
+)
+
+@portal.get("/")
+async def home(request: Request):
+    return await request.render("portal.html", {"title": "Staff portal"})
+
+app.mount_module(portal, prefix="/portal")</code></pre>
+<p>Module static files are mounted under the module namespace. Existing app
+templates take precedence when names overlap, so an application can provide a
+controlled override without editing a dependency.</p>
+<h2>8. Industrial service boundaries</h2>
+<pre><code class="language-python"># modules/orders/service.py
+class OrderService:
+    def __init__(self, repository, payment_gateway):
+        self.repository = repository
+        self.payment_gateway = payment_gateway
+
+    async def create(self, customer_id, lines):
+        order = await self.repository.create_draft(customer_id, lines)
+        await self.payment_gateway.authorize(order.total)
+        return await self.repository.mark_authorized(order.id)</code></pre>
+<p>Route handlers should translate HTTP input and call services. Services own
+business rules, repositories own persistence, and workers own long-running
+operations. This makes the same behavior reusable from REST, GraphQL, Admin,
+WebSockets, and scheduled jobs.</p>
+<h2>9. Testing modules</h2>
+<pre><code class="language-python">import pytest
+from flaxon.testing import AsyncTestClient
+
+@pytest.mark.asyncio
+async def test_inventory_list(app):
+    async with AsyncTestClient(app) as client:
+        response = await client.get("/api/inventory/")
+    assert response.status_code == 200
+
+@pytest.mark.asyncio
+async def test_unknown_inventory_item(app):
+    async with AsyncTestClient(app) as client:
+        response = await client.get("/api/inventory/999999")
+    assert response.status_code == 404</code></pre>
+<p>Test modules independently with fakes for fast feedback, then test the
+assembled application for mount prefixes, middleware, database lifecycle,
+authentication, and cross-module behavior.</p>
+<h2>10. Production checklist</h2>
+<ul><li>Register shared database and service dependencies before module mounting.</li><li>Use migrations and close database connections during application shutdown.</li><li>Keep secrets in environment variables and disable debug in production.</li><li>Use Redis or a shared store for sessions, rate limits, locks, and events across workers.</li><li>Keep authorization in route and service boundaries, not only in navigation.</li><li>Use transactions for related writes and idempotency for retries.</li><li>Run <code>flaxon routes</code>, <code>flaxon doctor</code>, and the full test suite before release.</li><li>Run durable workers separately for scheduled jobs, thumbnails, mail, and retries.</li></ul>
+<h2>Run it</h2>
+<pre><code class="language-powershell">pip install "flaxon[standard]"
+flaxon migrate --database sqlite://./var/shop.sqlite3 --migrations-dir migrations
+flaxon run app:app --reload --port 8000</code></pre>
+<p>For the complete framework behavior and edge cases, read the source lessons
+<code>docs/guides/Modules.md</code> and <code>docs/lessons/production-app-guide.md</code>
+in the Flaxon repository.</p>
+</article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded",function(){if(window.hljs)window.hljs.highlightAll();});</script></body></html>
