@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% block title %}Operations{% endblock %}
+{% block content %}
+<div class="space-y-6"><div><h1 class="text-2xl font-bold">Operations</h1><p class="text-slate-400">Application health, metrics, and background work.</p></div>
+<section class="bg-slate-800/50 border border-slate-700 rounded-lg p-5"><h2 class="font-semibold mb-3">Registered health checks</h2>{% for check in checks %}<p class="text-emerald-400">{{ check }}</p>{% else %}<p class="text-slate-400">No health checks registered.</p>{% endfor %}</section>
+<section class="bg-slate-800/50 border border-slate-700 rounded-lg p-5"><h2 class="font-semibold mb-3">Background tasks</h2><div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead><tr class="border-b border-slate-700"><th class="p-2">Task</th><th class="p-2">Queue</th><th class="p-2">Status</th><th class="p-2">Error</th></tr></thead><tbody>{% for task in tasks %}<tr class="border-b border-slate-800"><td class="p-2">{{ task.name }}</td><td class="p-2">{{ task.queue }}</td><td class="p-2">{{ task.status }}</td><td class="p-2 text-red-300">{{ task.error or '' }}</td></tr>{% else %}<tr><td colspan="4" class="p-3 text-slate-400">No task queue is configured.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="bg-slate-800/50 border border-slate-700 rounded-lg p-5"><h2 class="font-semibold mb-3">Metrics</h2><pre class="text-slate-400 text-sm whitespace-pre-wrap">{{ metrics }}</pre></section></div>
+{% endblock %}

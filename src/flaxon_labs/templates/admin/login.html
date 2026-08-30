@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ title }} - Sign in</title>
+  <link rel="stylesheet" href="/static/admin/css/admin.css?v=20260827-2">
+</head>
+<body class="admin-login">
+  <main class="login-layout">
+    <section class="admin-login-aside">
+      <div><div class="admin-login-mark">F</div>
+      <p class="login-kicker">{{ title }}</p>
+      <h1>A focused workspace for your content and operations.</h1></div>
+      <p class="login-aside-note">Secure access for editors, administrators, and developers.</p>
+    </section>
+    <section class="login-form-panel">
+      <div class="login-heading"><div><p class="login-kicker login-kicker-blue">Welcome back</p><h2>Sign in to continue</h2></div>
+      <button type="button" onclick="toggleLoginTheme()" class="theme-button" title="Toggle theme" aria-label="Toggle theme"><i id="theme-icon" class="fa-solid fa-moon"></i></button></div>
+      {% if error %}<div role="alert" class="login-alert">{{ error }}</div>{% endif %}
+      <form method="post" class="login-form">
+        <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+        <label>Username<input name="username" required autofocus autocomplete="username"></label>
+        <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+        <label>Authenticator code <span>required when MFA is enabled</span><input name="otp" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code"></label>
+        <button class="login-submit">Sign in</button>
+      </form>
+      <a href="{{ reset_url }}" class="login-recovery">Forgot your password?</a>
+    </section>
+  </main>
+  <script>
+    function toggleLoginTheme() {
+      const dark = document.documentElement.classList.toggle('dark');
+      document.documentElement.classList.toggle('light', !dark);
+      document.body.classList.toggle('theme-dark', dark);
+      document.body.classList.toggle('theme-light', !dark);
+      localStorage.setItem('admin-dark-mode', dark);
+      document.getElementById('theme-icon').className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    }
+    if (localStorage.getItem('admin-dark-mode') === 'true') toggleLoginTheme();
+  </script>
+</body>
+</html>

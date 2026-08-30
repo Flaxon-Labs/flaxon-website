@@ -1,0 +1,43 @@
+<!-- templates/admin/delete.html -->
+{% extends "admin/base.html" %}
+
+{% block title %}Delete {{ verbose_name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-4 sm:space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Delete {{ verbose_name }}</h1>
+            <p class="text-slate-400 text-sm mt-1">Confirm deletion of {{ verbose_name|lower }} #{{ object_id }}</p>
+        </div>
+        <a href="{{ dashboard.url_prefix }}/{{ model.get_name() }}" class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg text-sm transition text-white flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            Back to list
+        </a>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="bg-slate-800/50 backdrop-blur-sm border border-red-500/30 rounded-xl overflow-hidden">
+        <div class="p-4 sm:p-6 text-center">
+            <div class="w-16 h-16 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl text-red-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Are you sure?</h3>
+            <p class="text-slate-400 max-w-md mx-auto">
+                This action cannot be undone. This will permanently delete the {{ verbose_name|lower }}.
+            </p>
+            <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                <form method="POST" class="inline"><input type="hidden" name="_csrf" value="{{ dashboard.csrf_token() }}">
+                    <button type="submit" class="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm font-medium transition text-white">
+                        <i class="fas fa-trash mr-2"></i> Yes, delete
+                    </button>
+                </form>
+                <a href="{{ dashboard.url_prefix }}/{{ model.get_name() }}" class="px-6 py-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg text-sm transition text-white">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

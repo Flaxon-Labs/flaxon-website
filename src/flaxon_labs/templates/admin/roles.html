@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% block title %}Roles{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <div><h1 class="text-2xl font-bold">Roles & permissions</h1><p class="text-slate-400">Define reusable permission sets for admin users.</p></div>
+  {% if error %}<p class="text-red-400">{{ error }}</p>{% endif %}
+  <form method="post" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+    <input type="hidden" name="_csrf" value="{{ dashboard.csrf_token() }}">
+    <input name="name" required placeholder="Role name" class="bg-slate-700 border border-slate-600 rounded px-3 py-2">
+    <input name="permissions" required placeholder="admin:read, product:delete" class="bg-slate-700 border border-slate-600 rounded px-3 py-2 md:col-span-2">
+    <button class="bg-blue-600 rounded px-3 py-2">Save role</button>
+  </form>
+  <table class="w-full text-left"><thead><tr class="border-b border-slate-700"><th class="p-3">Role</th><th class="p-3">Permissions</th></tr></thead><tbody>
+  {% for name, permissions in roles.items() %}<tr class="border-b border-slate-800"><td class="p-3">{{ name }}</td><td class="p-3">{{ permissions|join(', ') }}</td><td class="p-3">{% if name not in ['staff', 'administrator'] %}<form method="post"><input type="hidden" name="_csrf" value="{{ dashboard.csrf_token() }}"><input type="hidden" name="name" value="{{ name }}"><input type="hidden" name="action" value="delete"><button class="text-red-400" type="submit">Delete</button></form>{% endif %}</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

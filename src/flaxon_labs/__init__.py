@@ -18,6 +18,9 @@ def create_app():
     # explicitly because the website's public /static mount takes precedence.
     import flaxon.admin as flaxon_admin
     admin_static = Path(flaxon_admin.__file__).resolve().parent / "static" / "admin"
+    if not admin_static.exists():
+        # The published Flaxon wheel may omit framework assets; keep Vercel self-contained.
+        admin_static = settings.static_dir / "admin"
     app.mount_static("/static/admin", str(admin_static))
 
     from .database import create_database
