@@ -1,4 +1,12 @@
-# Flaxon Website
+# Flaxon Documentation Website
+
+This repository is the **Flaxon framework documentation website**. It is
+separate from the Flaxon Labs organization website repository:
+
+- Documentation: https://github.com/Flaxon-Labs/flaxon-website
+- Organization website: https://github.com/Flaxon-Labs/flaxon-labs-website
+
+The deployed documentation site is https://flaxon-website.vercel.app.
 
 <p align="center">
   <img src="assets/images/logo/flaxon.png" alt="Flaxon Logo" width="200"/>
