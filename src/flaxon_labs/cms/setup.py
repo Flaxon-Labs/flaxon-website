@@ -8,7 +8,15 @@ from ..config import Settings
 
 
 def setup_cms(app: Any, settings: Settings, database: Any, admin: Any) -> CMS:
-    cms = CMS(app, url_prefix="/admin/cms", title="Flaxon Labs Content", auth=admin.auth, database=database, redis_url=settings.redis_url)
+    cms = CMS(
+        app,
+        url_prefix="/admin/cms",
+        title="Flaxon Labs Content",
+        template_path=settings.template_dir / "admin" / "cms.html",
+        auth=admin.auth,
+        database=database,
+        redis_url=settings.redis_url,
+    )
     cms.register(ContentType(
         "page", label="Page", label_plural="Pages",
         fields=[CMSField("title", required=True), CMSField("body", type="richtext"), CMSField("seo_description"), CMSField("status", type="select", choices=["draft", "review", "published", "archived"])],
