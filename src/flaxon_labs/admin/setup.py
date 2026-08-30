@@ -67,5 +67,6 @@ def setup_admin(app: Any, settings: Settings, database: Any) -> AdminDashboard:
         if route.path == "/admin/login":
             route.endpoint = login_with_persistent_state
     admin.jinax.add_global("cms_url", "/admin/cms")
+    admin.jinax.add_global("config", admin.config)
     admin.register_widget(lambda: {"title": "Organization", "value": "Open source technology for developers"})
     return admin
