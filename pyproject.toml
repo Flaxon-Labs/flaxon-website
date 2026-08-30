@@ -7,7 +7,7 @@ name = "flaxon-labs-website"
 version = "0.1.0"
 description = "The Flaxon Labs organization website built with Flaxon"
 requires-python = ">=3.11"
-dependencies = ["flaxon[standard,security]", "asyncpg>=0.29", "aiosqlite>=0.20", "psycopg[binary]>=3.2"]
+dependencies = ["flaxon[standard,security] @ git+https://github.com/Flaxon-Labs/flaxon.git@main", "asyncpg>=0.29", "aiosqlite>=0.20", "psycopg[binary]>=3.2"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

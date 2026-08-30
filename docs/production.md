@@ -44,7 +44,7 @@ rate limits, and cross-worker coordination.
 ## First deployment
 
 ```powershell
-pip install -e ..\Flaxon-Backend-Framework-main[standard,security]
+pip install "flaxon[standard,security] @ git+https://github.com/Flaxon-Labs/flaxon.git@main"
 pip install -r requirements.txt
 flaxon migrate --database "$env:DATABASE_URL" --migrations-dir migrations
 python scripts/seed.py
