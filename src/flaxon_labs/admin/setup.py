@@ -24,6 +24,7 @@ def setup_admin(app: Any, settings: Settings, database: Any) -> AdminDashboard:
     postgres_store = PostgreSQLAdminStore(settings.database_url) if settings.database_url else None
     if postgres_store is not None:
         app.on_shutdown(postgres_store.close)
+    upload_dir = Path(settings.data_dir) / "uploads"
     admin = AdminDashboard(
         app,
         config=AdminConfig(
@@ -43,7 +44,7 @@ def setup_admin(app: Any, settings: Settings, database: Any) -> AdminDashboard:
         password_reset_sender=reset_mailer,
         email_verification_sender=verification_mailer,
         storage_path=None if postgres_store else str(settings.admin_storage_path),
-        upload_dir=str(settings.data_dir / "uploads"),
+        upload_dir=str(upload_dir),
         media_storage=blob,
         users=[
             {

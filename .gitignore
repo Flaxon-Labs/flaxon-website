@@ -7,3 +7,6 @@ __pycache__/
 var/
 uploads/
 *.sqlite3
+
+.vercel
+.env*

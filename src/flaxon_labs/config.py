@@ -61,7 +61,9 @@ class Settings:
             missing.extend(name for name, value in required_integrations.items() if not value)
             if missing:
                 raise RuntimeError("Production configuration is unsafe or incomplete: " + ", ".join(missing))
-        data_dir = Path(os.getenv("FLAXON_LABS_DATA_DIR", str(ROOT / "var")))
+        # Vercel's deployed bundle is read-only; only the explicit /tmp area is writable.
+        default_data_dir = "/tmp/flaxon-labs" if os.getenv("VERCEL") else str(ROOT / "var")
+        data_dir = Path(os.getenv("FLAXON_LABS_DATA_DIR", default_data_dir))
         data_dir.mkdir(parents=True, exist_ok=True)
         admin_storage_path = Path(os.getenv("FLAXON_ADMIN_STORAGE_PATH", str(data_dir / "admin.sqlite3")))
         admin_storage_path.parent.mkdir(parents=True, exist_ok=True)
