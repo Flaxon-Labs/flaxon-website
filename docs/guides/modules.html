@@ -12,6 +12,28 @@
 <h1>Modules for Industrial and Fast Development</h1>
 <p>Flaxon modules are reusable application units built on the real router, dependency container, lifecycle hooks, static files, and Jinax templates. A module keeps one business area together while allowing the application to mount it at any prefix. This is useful for teams that need to ship quickly without turning <code>app.py</code> into a monolith.</p>
 <div class="note success"><strong>When to use modules</strong><p class="mb-0 mt-1">Use one module for each domain such as accounts, orders, inventory, billing, or reporting. Keep repositories and services inside the domain module, expose routes from its <code>module</code> object, and mount all modules from one application entry point.</p></div>
+<h2>Reusable route packages</h2>
+<p>A module is a self-contained route package. Define its endpoints once, then attach the package to one or more applications or URL prefixes. The host application decides where the routes live; the module keeps its own handlers, dependencies, hooks, templates, and static assets.</p>
+<pre><code class="language-python"># modules/catalog.py
+from flaxon.modules import FlaxonModule
+
+catalog = FlaxonModule("catalog")
+
+@catalog.get("/products")
+async def products(db):
+    return await db.fetch_all("SELECT id, name, price FROM products")
+
+@catalog.get("/products/<int:product_id>")
+async def product(product_id: int, db):
+    return await db.fetch_one(
+        "SELECT id, name, price FROM products WHERE id = ?", product_id
+    )
+
+# In app.py, mount the package wherever the application needs it.
+from modules.catalog import catalog
+app.mount_module(catalog, prefix="/store")
+# Routes are now /store/products and /store/products/42.</code></pre>
+<p>This keeps feature code portable and makes a module easy to test in isolation. Mount the same package at <code>/v1/store</code> and <code>/v2/store</code> when an API needs versioned entry points, using a unique mount name for each registration.</p>
 <h2>1. Project structure</h2>
 <pre><code class="language-text">myapp/
 |-- app.py
