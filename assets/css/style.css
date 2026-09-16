@@ -328,3 +328,127 @@ h3 {
         padding: 0 1rem;
     }
 }
+
+/* ----- Shared narrow-screen safeguards ----- */
+html {
+    overflow-x: hidden;
+}
+
+body {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+main,
+section,
+article,
+header,
+footer,
+.content-overlay,
+.container {
+    min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+    max-width: 100%;
+}
+
+pre,
+.code-block {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    max-width: 100%;
+}
+
+#search-modal {
+    padding-inline: 0.75rem;
+}
+
+#search-modal > div {
+    max-height: calc(100dvh - 1.5rem);
+}
+
+/* Keep the primary mobile navigation usable even before Tailwind's CDN
+   utilities finish processing asynchronously injected header markup. */
+#mobile-menu-btn {
+    display: none;
+}
+
+#mobile-menu.hidden {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    #mobile-menu-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding-inline: 1rem;
+    }
+
+    .site-header .container {
+        padding-inline: 0.75rem;
+    }
+
+    #mobile-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+    }
+
+    #mobile-menu:not(.hidden) {
+        display: block;
+    }
+
+    #mobile-menu {
+        max-height: calc(100dvh - 4rem);
+        overflow-y: auto;
+    }
+
+    #search-modal {
+        align-items: flex-start;
+        padding-top: 0.75rem;
+    }
+
+    #search-modal > div {
+        margin-inline: 0;
+        border-radius: 0.875rem;
+    }
+
+    #search-results-container {
+        max-height: 55dvh;
+    }
+
+    .code-block,
+    pre {
+        font-size: 0.78rem;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 420px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+    }
+
+    .btn-primary,
+    .btn-outline {
+        padding-inline: 1rem;
+    }
+}

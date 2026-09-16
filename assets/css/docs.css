@@ -268,4 +268,30 @@
     .doc-content {
         padding: 1rem;
     }
+
+    .doc-content {
+        overflow-wrap: anywhere;
+    }
+
+    .doc-content table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .doc-content pre {
+        white-space: pre;
+        word-break: normal;
+    }
+
+    .doc-sidebar {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    .doc-sidebar > .lg\\:hidden {
+        width: 100%;
+    }
 }

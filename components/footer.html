@@ -103,6 +103,11 @@
     this.onload=null;
 
     ['/assets/js/main.js', '/assets/js/dark-mode.js'].forEach(function(src) {
+        var fileName = src.split('/').pop();
+        var alreadyLoaded = Array.from(document.scripts).some(function(script) {
+            return (script.src || '').includes(fileName);
+        });
+        if (alreadyLoaded) return;
         var s = document.createElement('script');
         s.src = src;
         document.body.appendChild(s);

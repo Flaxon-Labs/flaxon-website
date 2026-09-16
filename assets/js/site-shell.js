@@ -35,11 +35,73 @@
         }
     }
 
+    function hasLoadedScript(name) {
+        return Array.from(document.scripts).some(function (script) {
+            return (script.src || "").includes(name);
+        });
+    }
+
+    function loadScript(path) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement("script");
+            script.src = siteUrl(path);
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    async function ensureSharedInteractions() {
+        var scripts = [];
+
+        // Some compact documentation pages intentionally have a small head.
+        // Load the shared controls there as well so search, theme, and the
+        // mobile menu do not depend on which page template was copied.
+        if (!hasLoadedScript("header-search.js")) {
+            scripts.push(loadScript("/assets/js/header-search.js"));
+        }
+        if (!hasLoadedScript("main.js")) {
+            scripts.push(loadScript("/assets/js/main.js"));
+        }
+
+        // The sidebar uses Alpine for its mobile disclosure. Load it only on
+        // pages that actually received that component and do not already have
+        // Alpine in the document head.
+        if (document.getElementById("docs-sidebar") && !window.Alpine && !hasLoadedScript("alpinejs")) {
+            scripts.push(loadScript("https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"));
+        }
+
+        if (scripts.length) {
+            await Promise.all(scripts);
+        }
+    }
+
+    function initializeMobileMenu() {
+        var button = document.getElementById("mobile-menu-btn");
+        var menu = document.getElementById("mobile-menu");
+        if (!button || !menu || button.dataset.menuBound === "true") return;
+
+        button.dataset.menuBound = "true";
+        button.setAttribute("aria-expanded", "false");
+        button.addEventListener("click", function () {
+            var isOpen = !menu.classList.contains("hidden");
+            menu.classList.toggle("hidden", isOpen);
+            button.setAttribute("aria-expanded", String(!isOpen));
+            var icon = button.querySelector("i");
+            if (icon) {
+                icon.classList.toggle("fa-bars", isOpen);
+                icon.classList.toggle("fa-times", !isOpen);
+            }
+        });
+    }
+
     async function initializeShell() {
         await Promise.all([
             loadComponent("header", "/components/header.html"),
             loadComponent("footer", "/components/footer.html"),
         ]);
+        await ensureSharedInteractions();
+        initializeMobileMenu();
         document.dispatchEvent(new CustomEvent("flaxon:header-ready"));
         document.dispatchEvent(new CustomEvent("flaxon:shell-ready"));
     }
