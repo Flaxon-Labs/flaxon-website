@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FastMCP Integration - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <h1>FastMCP integration</h1>
+                        <p>FastMCP is an optional integration for exposing Flaxon operations as Model Context Protocol tools, resources, and prompts. It can live beside normal HTTP, GraphQL, WebSocket, Admin, and CMS routes.</p>
+                        <h2>Install and mount</h2>
+                        <pre><code class="language-bash">python -m pip install "flaxon[mcp]"</code></pre>
+                        <pre><code class="language-python">from fastmcp import FastMCP
+from flaxon import Flaxon
+from flaxon.integrations.fastmcp import mount_fastmcp
+
+app = Flaxon("store", debug=True)
+mcp = FastMCP("Store Tools")
+
+@mcp.tool
+async def find_product(name: str) -> dict[str, str | bool]:
+    """Find a product in the store catalog."""
+    return {"name": name, "available": True}
+
+mount_fastmcp(app, mcp, path="/mcp", require_auth=False)</code></pre>
+                        <p>The mounted endpoint is <code>/mcp</code>. Flaxon owns the ASGI lifecycle; do not call <code>mcp.run()</code> inside an endpoint or startup callback.</p>
+                        <h2>Production authentication</h2>
+                        <pre><code class="language-python">mount_fastmcp(
+    app,
+    mcp,
+    path="/mcp",
+    auth=auth_provider,
+    require_auth=True,
+    host_origin_protection=True,
+    allowed_hosts=["api.example.com"],
+    allowed_origins=["https://console.example.com"],
+)</code></pre>
+                        <p>Do not expose remote tools without authentication. Apply authorization, rate limits, input validation, audit logging, and business rules before allowing side effects.</p>
+                        <h2>Multiple workers</h2>
+                        <pre><code class="language-python">mount_fastmcp(app, mcp, path="/mcp", stateless_http=True)</code></pre>
+                        <p>FastMCP's default Streamable HTTP sessions are process-local. Use stateless mode for multiple workers and put application state and event storage in shared Redis or database infrastructure.</p>
+                        <h2>Keep protocol boundaries clear</h2>
+                        <ul>
+                            <li>Use Flaxon routes for normal HTTP APIs.</li>
+                            <li>Use GraphQL for typed graph queries.</li>
+                            <li>Use WebSockets for application real-time features.</li>
+                            <li>Use FastMCP for tools and resources consumed by MCP clients.</li>
+                        </ul>
+                        <p>FastMCP remains the source of truth for MCP protocol behavior; Flaxon's adapter provides mounting and lifecycle composition.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pydantic Integration - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <h1>Pydantic integration</h1>
+                        <p>Pydantic is an optional integration. Flaxon keeps its native validation system independent while allowing endpoints to accept Pydantic <code>BaseModel</code> parameters and return model instances.</p>
+                        <h2>Install</h2>
+                        <pre><code class="language-bash">python -m pip install "flaxon[pydantic]" email-validator</code></pre>
+                        <h2>Validate request bodies</h2>
+                        <pre><code class="language-python">from pydantic import BaseModel, EmailStr
+from flaxon import Flaxon
+
+app = Flaxon("accounts")
+
+class CreateUser(BaseModel):
+    name: str
+    email: EmailStr
+    age: int
+
+@app.post("/users")
+async def create_user(user: CreateUser) -> CreateUser:
+    return user</code></pre>
+                        <p>Malformed JSON returns <code>400</code>. Valid JSON that fails the Pydantic model returns <code>422</code> with field-level errors under <code>error.fields</code>.</p>
+                        <h2>Response models</h2>
+                        <pre><code class="language-python">@app.get("/users/&lt;user_id&gt;")
+async def get_user(user_id: str) -> CreateUser:
+    return CreateUser(name="Ava", email="ava@example.com", age=28)</code></pre>
+                        <p>Flaxon serializes returned models with <code>model_dump()</code>. Native <code>Schema</code> classes remain available when you do not want an additional dependency.</p>
+                        <h2>Use Pydantic in modules</h2>
+                        <pre><code class="language-python">from flaxon.modules import FlaxonModule
+from pydantic import BaseModel, EmailStr
+
+accounts = FlaxonModule("accounts")
+
+class CreateAccount(BaseModel):
+    name: str
+    email: EmailStr
+
+@accounts.post("/")
+async def create_account(account: CreateAccount) -> CreateAccount:
+    return account
+
+app.mount_module(accounts, prefix="/api/accounts")</code></pre>
+                        <p>Keep persistence in a service or repository rather than in the Pydantic model or route handler. See the <a href="/docs/guides/modules.html">Modules guide</a> for application-factory composition.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>

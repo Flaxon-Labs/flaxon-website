@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenAPI, Swagger UI, and ReDoc - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <h1>OpenAPI, Swagger UI, and ReDoc</h1>
+                        <p>Flaxon can generate an OpenAPI 3.1 document from the routes already registered on the application. The same schema powers an interactive Swagger UI and a ReDoc reference page.</p>
+                        <h2>Enable interactive documentation</h2>
+                        <pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("catalog", openapi=True)
+
+# Generated endpoints:
+# /openapi.json - OpenAPI 3.1 JSON
+# /docs         - Swagger UI with Try it out
+# /redoc        - ReDoc reference browser</code></pre>
+                        <p>OpenAPI is opt-in. An application that does not pass <code>openapi=True</code> does not mount these routes.</p>
+                        <h2>Configure URLs and metadata</h2>
+                        <pre><code class="language-python">app = Flaxon(
+    "catalog",
+    openapi={
+        "title": "Catalog API",
+        "version": "2026.1",
+        "description": "Inventory and ordering API.",
+        "docs_url": "/api/docs",
+        "redoc_url": "/api/reference",
+        "openapi_url": "/api/openapi.json",
+    },
+)</code></pre>
+                        <h2>Document typed endpoints</h2>
+                        <pre><code class="language-python">from flaxon import Query
+
+@app.get(
+    "/products/&lt;int:product_id&gt;",
+    summary="Get a product",
+    tags=["products"],
+    operation_id="get_product",
+)
+async def get_product(
+    product_id: int,
+    page: int = Query(1, ge=1),
+    search: str = Query("", max_length=120),
+):
+    return {"id": product_id, "page": page, "search": search}</code></pre>
+                        <p>Path converters and <code>Query</code> declarations become schema parameters and are validated at runtime. Invalid values use Flaxon's normal <code>422</code> validation response.</p>
+                        <h2>Use schemas and Pydantic</h2>
+                        <pre><code class="language-python">from flaxon.validation import IntField, Schema, StrField
+
+class CreateProduct(Schema):
+    name = StrField(required=True, min_length=2, max_length=120)
+    stock = IntField(required=True, minimum=0)
+
+@app.post("/products", summary="Create a product", tags=["products"])
+async def create_product(product: CreateProduct) -> CreateProduct:
+    return product</code></pre>
+                        <p>Native Flaxon schemas work without extra dependencies. Install <code>flaxon[pydantic]</code> when you want Pydantic models; their <code>model_json_schema()</code> output is included in the OpenAPI components.</p>
+                        <h2>Modules and routers</h2>
+                        <p>Routes included with <code>include_router()</code> or mounted with <code>mount_module()</code> are discovered from the final application registry. Metadata stays with the feature that owns the route.</p>
+                        <h2>Protect documentation</h2>
+                        <pre><code class="language-python">from flaxon import HTTPException
+
+async def docs_guard(request):
+    if request.headers.get("x-docs-key") != "internal-preview":
+        raise HTTPException(403, "Documentation is restricted.")
+    return True
+
+app.enable_openapi(
+    title="Internal API",
+    docs_guard=docs_guard,
+    protect_docs=True,
+)</code></pre>
+                        <p>OpenAPI describes the contract; it does not authenticate requests. Keep the application's real authentication and authorization in place. For private deployments, serve Swagger and ReDoc assets from your own host.</p>
+                        <h2>Export and check the schema</h2>
+                        <pre><code class="language-bash">flaxon docs app:app --output openapi.json
+flaxon docs app:app --output openapi.json --check</code></pre>
+                        <p>The check compares parsed JSON and returns a non-zero exit code when the checked-in schema is missing, invalid, or out of date.</p>
+                        <p>WebSocket routes are not represented by OpenAPI; document their messages separately in the <a href="/docs/guides/websockets.html">WebSockets guide</a>.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>

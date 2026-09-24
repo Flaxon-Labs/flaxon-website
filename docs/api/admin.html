@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin API - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <h1>Admin API</h1>
+                        <p>The Admin API provides authenticated model management, CMS operations, production services, and a microservice control plane. Browser mutations require the Admin session cookie and <code>X-CSRF-Token</code>.</p>
+                        <h2>Dashboard and extension API</h2>
+                        <pre><code class="language-python">from flaxon.admin import AdminDashboard
+
+admin = AdminDashboard(
+    app,
+    storage_path="admin.sqlite3",
+    redis_url="redis://127.0.0.1:6379/0",
+)
+
+# Register model adapters and mount custom FlaxonModule pages.
+admin.register(products, name="product", fields=["id", "name"])
+admin.mount_module(reports, prefix="/admin/extensions/reports")</code></pre>
+                        <h2>Production service objects</h2>
+                        <pre><code class="language-python">from flaxon.admin import (
+    DurableJobStore, DurableJobWorker, ImmutableAuditLog,
+    NotificationService, ResumableUploadStore, WebAuthnService,
+)</code></pre>
+                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
+                            <thead><tr class="bg-slate-100 dark:bg-slate-800"><th class="border px-4 py-2 text-left">Service</th><th class="border px-4 py-2 text-left">Purpose</th></tr></thead>
+                            <tbody>
+                                <tr><td class="border px-4 py-2"><code>DurableJobStore</code></td><td class="border px-4 py-2">Persist queued, running, completed, and failed jobs with retry metadata.</td></tr>
+                                <tr><td class="border px-4 py-2"><code>DurableJobWorker</code></td><td class="border px-4 py-2">Register named handlers and process due jobs.</td></tr>
+                                <tr><td class="border px-4 py-2"><code>ImmutableAuditLog</code></td><td class="border px-4 py-2">Append hash-chained records and verify tamper evidence.</td></tr>
+                                <tr><td class="border px-4 py-2"><code>NotificationService</code></td><td class="border px-4 py-2">Store notification preferences and per-user delivery records.</td></tr>
+                                <tr><td class="border px-4 py-2"><code>ResumableUploadStore</code></td><td class="border px-4 py-2">Persist upload sessions, chunks, expiry, and final SHA-256 validation.</td></tr>
+                                <tr><td class="border px-4 py-2"><code>WebAuthnService</code></td><td class="border px-4 py-2">Delegate credential registration and assertion ceremonies to an injected provider.</td></tr>
+                            </tbody>
+                        </table>
+                        <h2>Important endpoints</h2>
+                        <ul>
+                            <li><code>/admin/media/resumable</code> creates and completes chunked uploads.</li>
+                            <li><code>/admin/media/{filename}</code> updates metadata, signed URLs, and deletes media.</li>
+                            <li><code>/admin/notifications/preferences</code> manages per-user delivery preferences.</li>
+                            <li><code>/admin/audit/verify</code> verifies the persisted audit hash chain.</li>
+                            <li><code>/admin/profile/webauthn/*</code> handles provider-backed WebAuthn ceremonies.</li>
+                            <li><code>/admin/profile/trusted-devices</code> lists and revokes trusted devices.</li>
+                            <li><code>/admin/cms/api/scheduler/jobs</code> exposes scheduled-publication history and retries.</li>
+                            <li><code>/admin/cms/api/media</code> lists reusable media for CMS fields.</li>
+                        </ul>
+                        <h2>Authorization</h2>
+                        <p><code>PermissionCatalog</code> exposes readable model <code>view</code>, <code>add</code>, <code>change</code>, and <code>delete</code> capabilities plus CMS capabilities. Use <code>strict_permissions=True</code> when exact action permissions are required. <code>CasbinAuthorizationProvider</code> is available as an optional adapter; PyCasbin is not a core dependency.</p>
+                        <h2>Microservice control plane</h2>
+                        <p>The control plane is enabled by default and is rooted at <code>/admin/api/control-plane/</code>. Use <code>ServiceRegistry</code> for service metadata, <code>RemoteServiceClient</code> for authenticated API calls, and <code>RemoteModelAdapter</code> for service-owned Admin models. Each service owns its database; Admin should not query another service's database directly.</p>
+                        <pre><code class="language-python">from flaxon.admin import RemoteModelAdapter, RemoteServiceClient
+
+catalog = RemoteServiceClient(
+    "https://catalog.internal",
+    token=service_token,
+    timeout=3,
+    retries=2,
+)
+admin.register(
+    RemoteModelAdapter(catalog, "products"),
+    name="product",
+    fields=["id", "name", "price", "status"],
+)</code></pre>
+                        <p>See the <a href="/docs/guides/microservices.html">microservice control-plane guide</a> for gateways, events, outbox delivery, Redis, object storage, and multi-worker deployment.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>

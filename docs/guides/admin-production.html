@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin in Production - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <h1>Admin in production</h1>
+                        <p>Flaxon Admin is a server-rendered management surface for application models and operations. It is not a replacement for your identity provider, mail service, object storage, job worker, or monitoring platform. Configure those boundaries explicitly before deployment.</p>
+                        <h2>What the Admin provides</h2>
+                        <ul>
+                            <li>Cookie-backed login/logout, password policy validation, reset and verification tokens, and TOTP MFA with recovery codes.</li>
+                            <li>User editing, deactivation, deletion, roles, permissions, protected system roles, and permission-aware CRUD.</li>
+                            <li>Model list/detail/create/edit/delete, global search, filters, sorting, pagination, and CSRF-protected bulk actions.</li>
+                            <li>Media upload, folders, metadata, hashing, validation, signed URLs, resumable uploads, and thumbnail job integration.</li>
+                            <li>Activity, hash-chained audit verification, notifications, operations, settings, CSV/JSON import and export, and CMS workspaces.</li>
+                        </ul>
+                        <h2>Production bootstrap</h2>
+                        <pre><code class="language-python">import os
+from flaxon import Flaxon
+from flaxon.admin import AdminConfig, AdminDashboard
+
+app = Flaxon("backoffice", debug=False)
+admin = AdminDashboard(
+    app,
+    url_prefix="/admin",
+    config=AdminConfig(site_title="Operations", timezone="UTC"),
+    storage_path="var/admin.sqlite3",
+    redis_url=os.environ.get("REDIS_URL"),
+    users=[{
+        "username": "owner",
+        "password": os.environ["FLAXON_ADMIN_PASSWORD"],
+        "roles": ["administrator"],
+    }],
+)</code></pre>
+                        <p>Use a database-backed Admin store for PostgreSQL/Neon deployments. Apply migrations before starting web processes and workers. A process-local session backend is for development only.</p>
+                        <h2>Redis and multiple workers</h2>
+                        <pre><code class="language-python">admin = AdminDashboard(
+    app,
+    storage_path="var/admin.sqlite3",
+    redis_url=os.environ["REDIS_URL"],
+    redis_protocol=2,
+    redis_max_connections=100,
+    session_idle_timeout=1800,
+)</code></pre>
+                        <p>Redis-backed configuration coordinates sessions, Admin request limits, publishing locks, and optional WebSocket fan-out. Configure TLS, authentication, pooling, and a protocol version tested with the deployed Redis client.</p>
+                        <h2>Passwords, reset mail, and MFA</h2>
+                        <pre><code class="language-python">async def send_reset(identifier: str, token: str) -> None:
+    await mail.send(
+        to=identifier,
+        subject="Reset your Admin password",
+        body=f"https://admin.example.com/admin/password-reset?token={token}",
+    )
+
+admin = AdminDashboard(
+    app,
+    password_reset_sender=send_reset,
+    require_email_verification=True,
+)</code></pre>
+                        <p>Queue delivery instead of blocking a request on a mail provider. Enable distributed rate limits for reset and MFA endpoints when multiple workers are used. Never log passwords, MFA secrets, or recovery codes.</p>
+                        <h2>Model lists and custom models</h2>
+                        <pre><code class="language-python">from flaxon.admin import admin_model
+
+@admin_model(
+    list_display=["id", "name", "price", "active"],
+    search_fields=["name", "sku"],
+    list_filter=["active", "category"],
+    ordering=["name"],
+)
+class Flower:
+    ...
+
+# Example URLs:
+# /admin/flower?q=rose
+# /admin/flower?filter_category=Bouquets&order_by=-price&page=2</code></pre>
+                        <p>Server-side permissions remain authoritative. Custom clients must handle <code>401</code>, <code>403</code>, validation errors, loading states, and retry states; hidden buttons are not security.</p>
+                        <h2>Media and operations</h2>
+                        <p>Use S3-compatible storage for private or large files, signed URLs for controlled access, antivirus scanning, EXIF policy, content hashing, upload limits, and durable background thumbnail workers. Use the operations page for visibility, but send serious errors to an external logging and alerting platform.</p>
+                        <h2>CSRF and custom pages</h2>
+                        <pre><code class="language-html">&lt;input type="hidden" name="_csrf" value="{{ dashboard.csrf_token() }}"&gt;</code></pre>
+                        <pre><code class="language-python">@app.get("/admin/reports")
+async def reports(request):
+    user = await admin.auth.current_user(request)
+    admin.auth.authorize(user, "admin:read")
+    return await admin.jinax.render_response(
+        "admin/reports.html",
+        {"dashboard": admin, "models": admin.registry.get_all()},
+    )</code></pre>
+                        <p>For reusable custom areas with their own routes, templates, static files, hooks, and CLI commands, use <code>FlaxonModule</code> and <code>admin.mount_module()</code>. See the <a href="/docs/guides/modules.html">Modules guide</a>.</p>
+                        <h2>Deployment checklist</h2>
+                        <ul>
+                            <li>Run Admin migrations and use durable database or Redis sessions.</li>
+                            <li>Use secret-managed passwords, MFA, secure cookies, TLS, and a trusted public origin.</li>
+                            <li>Configure object storage, signed URLs, antivirus, upload limits, and thumbnail workers.</li>
+                            <li>Define audit retention, external log export, health checks, metrics, and alerts.</li>
+                            <li>Test denied permissions, CSRF rejection, invalid imports, browser workflows, and multi-worker behavior.</li>
+                        </ul>
+                        <p>For endpoint details, see the <a href="/docs/api/admin.html">Admin API</a>. For service-owned databases and the control plane, see <a href="/docs/guides/microservices.html">Microservices</a>.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>
