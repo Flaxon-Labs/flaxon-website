@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Microservice Control Plane - Flaxon Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/docs.css">
+    <script defer src="/assets/js/site-shell.js"></script>
+    <script defer src="/assets/js/dark-mode.js"></script>
+    <script defer src="/assets/js/header-search.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <aside>
+                    <div id="docs-sidebar"></div>
+                    <script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script>
+                </aside>
+                <main class="lg:col-span-3">
+                    <article class="doc-content">
+                        <p class="text-sm font-semibold uppercase tracking-wide text-cyan-600 dark:text-cyan-400">Architecture guide</p>
+                        <h1>Microservice control plane</h1>
+                        <p>Use Flaxon Admin as one operational control plane while each microservice owns its database, business rules, and migrations. The Admin communicates through authenticated service APIs; it never reaches into another service's database.</p>
+
+                        <h2>Target architecture</h2>
+                        <pre><code class="language-text">Browser
+  |
+Admin/CMS
+  |
+API gateway
+  +-- Identity service
+  +-- Admin service
+  +-- CMS service
+  +-- Catalog service
+  +-- Orders service
+  +-- Media service
+  |
+Redis / event bus / object storage</code></pre>
+
+                        <h2>Register services</h2>
+                        <p>The control plane is mounted by default with <code>AdminDashboard</code>. Use a persistent Admin store in every worker and configure Redis for sessions, locks, rate limits, and cross-worker events.</p>
+                        <pre><code class="language-python">from flaxon import Flaxon
+from flaxon.admin import AdminDashboard, AdminStore
+
+app = Flaxon("operations")
+admin = AdminDashboard(
+    app,
+    store=AdminStore("admin.sqlite3"),
+    redis_url="redis://127.0.0.1:6379/0",
+    users=[{
+        "username": "admin",
+        "password": "load-this-from-a-secret-manager",
+        "roles": ["administrator"],
+    }],
+)
+
+# The service remains the authority for its records.
+# Register connection and ownership metadata through the control-plane API.</code></pre>
+
+                        <h2>Service-owned Admin models</h2>
+                        <p>Expose a stable JSON contract from the service and connect it to Admin with <code>RemoteServiceClient</code> and <code>RemoteModelAdapter</code>. List responses may be a JSON array or <code>{"items": [...]}</code>; detail, create, update, and delete use the corresponding resource endpoints.</p>
+                        <pre><code class="language-python">from flaxon.admin import RemoteModelAdapter, RemoteServiceClient
+
+catalog = RemoteServiceClient(
+    "https://catalog.internal",
+    token=service_token,
+    timeout=3,
+    retries=2,
+)
+products = RemoteModelAdapter(catalog, "products")
+admin.register(
+    products,
+    name="product",
+    fields=["id", "name", "price", "status"],
+    list_display=["id", "name", "price", "status"],
+)</code></pre>
+
+                        <h2>Custom Admin modules</h2>
+                        <p>Use <code>FlaxonModule</code> for reports, support tooling, billing pages, or service-specific workflows. A module can own routes, Jinax templates, static assets, hooks, dependencies, and CLI commands.</p>
+                        <pre><code class="language-python">from flaxon.modules import FlaxonModule
+
+reports = FlaxonModule("reports", template_dir="reports/templates")
+
+@reports.get("/summary")
+async def summary():
+    return {"service": "reports", "status": "ready"}
+
+admin.mount_module(
+    reports,
+    prefix="/admin/extensions/reports",
+    navigation=[{"name": "Reports", "path": "summary"}],
+)
+
+# URL: /admin/extensions/reports/summary</code></pre>
+
+                        <h2>Events and reliable commands</h2>
+                        <p>Publish an event after the service transaction commits. Use an outbox and a broker such as Redis Streams, RabbitMQ, or Kafka for production delivery. Consumers must be idempotent because retries can deliver an event more than once.</p>
+                        <pre><code class="language-python">event = admin.control_plane.events.publish(
+    "OrderCreated",
+    {"order_id": "ord_123", "tenant_id": "tenant_42"},
+)
+
+# Typical events: ProductStockReserved, UserDeactivated,
+# PostPublished, and MediaUploaded.</code></pre>
+
+                        <h2>Gateway and security responsibilities</h2>
+                        <ul>
+                            <li>Terminate TLS and route <code>/admin</code>, <code>/cms</code>, and versioned service APIs.</li>
+                            <li>Validate identity, tenant, and scopes before forwarding requests.</li>
+                            <li>Propagate request IDs and trace IDs through every service.</li>
+                            <li>Use idempotency keys, timeouts, retries, circuit breakers, and dead-letter queues for cross-service commands.</li>
+                            <li>Keep service tokens scoped, rotated, and stored in a secret manager.</li>
+                        </ul>
+
+                        <h2>Production checklist</h2>
+                        <ul>
+                            <li>Give every service its own database and migration history.</li>
+                            <li>Use Redis-backed sessions, rate limits, locks, and WebSocket fan-out when running multiple workers.</li>
+                            <li>Run durable task workers separately from web processes.</li>
+                            <li>Store media in S3-compatible object storage with signed URLs and background scanning.</li>
+                            <li>Keep audit records append-only and apply a documented retention policy.</li>
+                            <li>Treat the built-in registry as an operational catalog, not a replacement for service discovery.</li>
+                        </ul>
+
+                        <p>For the Admin and CMS feature guide, see <a href="/docs/guides/admin-cms.html">Admin and CMS</a>. For application composition, see <a href="/docs/guides/modules.html">Modules</a>.</p>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/js/docs.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
+</body>
+</html>

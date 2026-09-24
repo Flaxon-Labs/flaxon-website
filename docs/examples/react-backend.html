@@ -122,6 +122,13 @@ class CreateProduct(Schema):
     category = fields.StrField(required=False, max_length=50)
     in_stock = fields.BoolField(default=True)
 
+class UpdateProduct(Schema):
+    name = fields.StrField(required=False, min_length=2, max_length=100)
+    price = fields.FloatField(required=False, minimum=0)
+    description = fields.StrField(required=False, max_length=500)
+    category = fields.StrField(required=False, max_length=50)
+    in_stock = fields.BoolField(required=False)
+
 # In-memory storage
 products = []
 product_id_counter = 1
@@ -157,7 +164,7 @@ async def create_product(data: CreateProduct):
     return JSONResponse({"created": True, "product": product}, status_code=201)
 
 @app.put("/api/products/&lt;int:product_id&gt;")
-async def update_product(product_id: int, data: CreateProduct):
+async def update_product(product_id: int, data: UpdateProduct):
     for product in products:
         if product["id"] == product_id:
             product.update(data.to_dict())

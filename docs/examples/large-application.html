@@ -315,7 +315,7 @@ class UserService:
                         <div class="code-block">
                             <pre><code class="language-python"># routes/auth.py
 from flaxon import Router, HTTPException, Response
-from flaxon.security import JWTBackend, login_required
+from flaxon.security import JWTBackend, User, login_required
 
 from schemas.user import CreateUser, LoginRequest
 from services.user_service import UserService
@@ -348,7 +348,7 @@ async def login(data: LoginRequest):
     if not user:
         raise HTTPException(401, "Invalid credentials")
 
-    token = await jwt_backend.create_token(user.to_dict())
+    token = await jwt_backend.create_token(User.from_dict(user.to_dict()))
     return {"token": token, "user": user.to_dict()}
 
 @router.post("/refresh")
@@ -381,8 +381,8 @@ router = Router(prefix="/api/v1/users")
 @router.get("/")
 @login_required
 async def list_users(request):
-    page = request.query.get_int("page", 1)
-    per_page = request.query.get_int("per_page", 20)
+    page = int(request.query.get("page", "1"))
+    per_page = int(request.query.get("per_page", "20"))
 
     db = get_db()
     repo = UserRepository(db)
@@ -501,7 +501,7 @@ class DatabaseHealthCheck(HealthCheck):
     async def _check(self):
         try:
             db = get_db()
-            await db.fetch("SELECT 1")
+            await db.fetchval("SELECT 1")
             return {"status": "healthy"}
         except Exception as exc:
             return {"status": "unhealthy", "message": str(exc)}</code></pre>
@@ -510,7 +510,7 @@ class DatabaseHealthCheck(HealthCheck):
                         <h2>Application Entry Point (Complete)</h2>
                         <div class="code-block">
                             <pre><code class="language-python"># app.py
-from flaxon import Flaxon
+from flaxon import Flaxon, JSONResponse
 from flaxon.middleware import RequestIDMiddleware, SecurityHeadersMiddleware, CORSMiddleware
 from flaxon.security import AuthenticationMiddleware
 
@@ -551,7 +551,8 @@ health.register(DatabaseHealthCheck())
 
 @app.get("/health")
 async def health_check():
-    return await health.check_all()
+    results = await health.run_all()
+    return {result.name: result.to_dict() for result in results}
 
 @app.get("/health/live")
 async def liveness():
@@ -559,10 +560,11 @@ async def liveness():
 
 @app.get("/health/ready")
 async def readiness():
-    result = await health.check_all()
-    all_healthy = all(r["status"] == "healthy" for r in result.values())
+    results = await health.run_all()
+    result = {item.name: item.to_dict() for item in results}
+    all_healthy = all(item["status"] == "healthy" for item in result.values())
     status = 200 if all_healthy else 503
-    return result, status
+    return JSONResponse(result, status_code=status)
 
 # Lifecycle
 @app.on_startup

@@ -121,13 +121,15 @@ async def profile(request):
 
                         <h2>Session Authentication</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import SessionBackend, AuthenticationMiddleware
+                            <pre><code class="language-python">from flaxon import JSONResponse
+from flaxon.security import SessionBackend, AuthenticationMiddleware
 
 backend = SessionBackend()
 app.add_middleware(AuthenticationMiddleware, backend=backend)
 
 @app.post("/login")
 async def login(request):
+    data = await request.json()
     user = await authenticate_user(data)
     session_id = await backend.create_token(user)
     response = JSONResponse({"success": True})

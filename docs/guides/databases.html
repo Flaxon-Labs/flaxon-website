@@ -184,14 +184,18 @@ async def get_cache(key: str):
 
                         <h2>Database Health Checks</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.health import DatabaseHealthCheck
+                            <pre><code class="language-python">from flaxon.database.adapters.sqlite import SQLiteAdapter
+from flaxon.database.manager import DatabaseManager
+from flaxon.health import DatabaseHealthCheck
 
+db = DatabaseManager(SQLiteAdapter("app.db"))
+await db.initialize()
 db_check = DatabaseHealthCheck(db)
-health.register(db_check)
+app.health.register(db_check)
 
 @app.get("/health/db")
 async def db_health():
-    return await db_check.check()</code></pre>
+    return (await db_check.run()).to_dict()</code></pre>
                         </div>
 
                         <h2>Transactions</h2>

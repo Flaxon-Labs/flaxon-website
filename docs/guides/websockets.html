@@ -114,19 +114,20 @@ async def chat(socket: WebSocket, room_id: str):
 
                         <h2>Authentication</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import login_required, get_current_user
+                            <pre><code class="language-python">from flaxon.websocket.authentication import WebSocketAuth
 
+auth = WebSocketAuth(secret_key="change-this-in-production")
 @app.websocket("/ws/auth")
-@login_required
+@auth.require_auth
 async def auth_websocket(socket: WebSocket):
-    user = get_current_user(socket.scope)
+    user = socket.user
     await socket.accept()
-    await socket.send_json({"user": user.to_dict()})</code></pre>
+    await socket.send_json({"user": user})</code></pre>
                         </div>
 
                         <h2>Heartbeat</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.websocket import Heartbeat
+                            <pre><code class="language-python">from flaxon.websocket.heartbeat import Heartbeat
 
 heartbeat = Heartbeat(interval=30, timeout=60)
 
@@ -150,7 +151,7 @@ async def multi_room(socket: WebSocket):
     await socket.accept()
 
     await socket.join("global")
-    await socket.join("user-" + str(user_id))
+    await socket.join("user-" + str(id(socket)))
 
     async for message in socket.iter_json():
         room = message.get("room")
@@ -160,7 +161,7 @@ async def multi_room(socket: WebSocket):
 
                         <h2>WebSocket Events</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.websocket import WebSocketEvents
+                            <pre><code class="language-python">from flaxon.websocket.events import WebSocketEvents
 
 @app.websocket("/ws/events")
 async def events(socket: WebSocket):

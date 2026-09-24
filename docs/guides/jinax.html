@@ -162,21 +162,21 @@ async def home(request):
 {{ value|trim }}
 {{ value|escape }}
 {{ value|safe }}
-{{ value|json }}
 {{ value|length }}
 {{ value|reverse }}
 {{ value|join(", ") }}
 {{ value|replace(old, new) }}
-{{ value|date("%Y-%m-%d") }}
-{{ value|datetime("%Y-%m-%d %H:%M:%S") }}
 {{ value|currency("USD") }}
-{{ value|truncate(100, "...") }}
-{{ value|default("N/A") }}</code></pre>
+{{ value|truncate(100, True, "...") }}
+{{ value|default("N/A") }}
+{{ value|tojson }}</code></pre>
                         </div>
+
+                        <p><code>capitalize</code>, <code>lower</code>, <code>upper</code>, <code>title</code>, <code>trim</code>, <code>escape</code>, <code>safe</code>, <code>length</code>, <code>reverse</code>, <code>join</code>, <code>replace</code>, <code>truncate</code>, <code>default</code>, and <code>tojson</code> are Jinja2 built-ins. Flaxon adds <code>currency</code>. Date formatting is not registered by Jinax; add your own filter when you need it.</p>
 
                         <h2>Custom Filters</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">jinax = Jinax("templates")
+                            <pre><code class="language-python">jinax = app.jinax
 
 def currency_filter(value, symbol="$"):
     return f"{symbol}{value:.2f}"

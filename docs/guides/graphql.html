@@ -138,7 +138,7 @@ Audit = ObjectType("Audit", {
                     <p>GraphQL does not replace identity or permission checks. Attach the authenticated request to context through normal Flaxon middleware and enforce authorization inside every resolver that reads or changes protected data.</p>
                     <pre><code class="language-python">def resolve_private_repository(parent, args, context, info):
     request = context["request"]
-    user = getattr(request.state, "user", None)
+    user = getattr(request, "user", None)
     if user is None:
         raise GraphQLError("Authentication required")
     repo = repository.get(args["id"])

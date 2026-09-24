@@ -215,4 +215,72 @@ flaxon run app:app --reload --port 8000</code></pre>
 <p>For the complete framework behavior and edge cases, read the source lessons
 <code>docs/guides/Modules.md</code> and <code>docs/lessons/production-app-guide.md</code>
 in the Flaxon repository.</p>
+<h2>Modules and Jinax: the file order</h2>
+<p>A <code>FlaxonModule</code> is Flaxon's blueprint-style unit. Define routes and module hooks in a reusable module, then choose the public URL when the application mounts it. Importing <code>FlaxonModule</code> also installs <code>mount_module()</code> on the real <code>Flaxon</code> class.</p>
+<pre><code class="language-text">site/
+|-- app.py                 # create the app and wire shared services
+|-- modules/
+|   |-- __init__.py
+|   |-- pages.py           # public pages module
+|   `-- shop.py            # shop module and database routes
+|-- templates/
+|   |-- base.html
+|   |-- pages/home.html
+|   `-- shop/catalog.html
+|-- static/
+|   |-- css/site.css
+|   `-- js/site.js
+`-- tests/</code></pre>
+<p>Use this order at startup: import modules, create <code>Flaxon</code>, configure Jinax, register dependencies, mount modules, register lifecycle hooks, and finally run the application.</p>
+<pre><code class="language-python"># modules/pages.py
+from flaxon.modules import FlaxonModule
+
+pages = FlaxonModule("pages")
+
+@pages.get("/")
+async def home(request):
+    return await request.render("pages/home.html", {
+        "title": "Flaxon site",
+    })</code></pre>
+<pre><code class="language-python"># modules/shop.py
+from flaxon.modules import FlaxonModule
+
+shop = FlaxonModule("shop")
+shop.requires("db")
+
+@shop.get("/catalog")
+async def catalog(request, db):
+    products = await db.fetch_all(
+        "SELECT id, name, price FROM products ORDER BY name"
+    )
+    return await request.render("shop/catalog.html", {
+        "title": "Catalog",
+        "products": products,
+    })</code></pre>
+<pre><code class="language-python"># app.py
+from flaxon import Flaxon
+from flaxon.database.adapters.sqlite import SQLiteAdapter
+from flaxon.database.manager import DatabaseManager
+from flaxon.jinax import Jinax
+from modules.pages import pages
+from modules.shop import shop
+
+app = Flaxon("site", debug=True)
+app.use_templates(Jinax("templates", auto_reload=True))
+
+db = DatabaseManager(SQLiteAdapter("var/site.sqlite3"))
+app.container.register_instance("db", db)
+
+app.mount_module(pages, prefix="")
+app.mount_module(shop, prefix="/shop")
+
+@app.on_startup
+async def startup():
+    await db.initialize()
+
+@app.on_shutdown
+async def shutdown():
+    await db.close()</code></pre>
+<p>The resulting URLs are <code>/</code> and <code>/shop/catalog</code>. The module's route stays <code>/catalog</code>; the mount prefix is applied only by <code>app.mount_module()</code>. Mount the same module again with a distinct <code>name=</code> for versioned APIs, for example <code>app.mount_module(shop, prefix="/v2/shop", name="shop-v2")</code>.</p>
+<p>For module-owned templates or assets, pass <code>template_dir</code> and <code>static_dir</code> to <code>FlaxonModule</code>. Jinax uses the application template loader first, then module loaders as fallbacks. Module static files are exposed below <code>/static/&lt;mount-name&gt;</code>. Keep authentication, authorization, and CSRF checks in the module routes or services; mounting a module does not grant permission by itself.</p>
 </article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded",function(){if(window.hljs)window.hljs.highlightAll();});</script></body></html>

@@ -81,10 +81,12 @@
 
                         <h2>Android (Kotlin) Backend</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
+                            <pre><code class="language-python">from flaxon import Flaxon, WebSocket, WebSocketDisconnect
+from flaxon.security import JWTBackend
 from flaxon.validation import Schema, fields
 
 app = Flaxon("android-backend")
+jwt_backend = JWTBackend(secret_key="change-this-in-production")
 
 class DeviceRegistration(Schema):
     device_id = fields.StrField(required=True, min_length=8)
@@ -107,7 +109,7 @@ async def login(request):
                         <div class="code-block">
                             <pre><code class="language-python">@app.websocket("/ws/mobile")
 async def mobile_websocket(socket: WebSocket):
-    user = getattr(socket.scope, "user", None)
+    user = socket.scope.get("user")
     if not user:
         await socket.close(code=4001)
         return

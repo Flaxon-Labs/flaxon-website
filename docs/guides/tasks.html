@@ -81,14 +81,12 @@
 
                         <h2>Defining Tasks</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import task
+                            <pre><code class="language-python">from flaxon.tasks import Task
 
-@task(name="send_email")
 async def send_email(to: str, subject: str, body: str):
     # Send email
     return {"sent": True, "to": to}
 
-@task(name="process_image")
 def process_image(image_path: str):
     # CPU-intensive processing
     return {"processed": True}</code></pre>
@@ -96,7 +94,7 @@ def process_image(image_path: str):
 
                         <h2>Running Tasks</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import TaskQueue, TaskRegistry
+                            <pre><code class="language-python">from flaxon.tasks import Task, TaskQueue, TaskRegistry
 
 registry = TaskRegistry()
 queue = TaskQueue()
@@ -104,8 +102,8 @@ queue = TaskQueue()
 registry.register("send_email", send_email)
 registry.register("process_image", process_image)
 
-task = Task("send_email", send_email, args=["user@example.com", "Hello"])
-await queue.push(task)</code></pre>
+email_task = Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome"))
+await queue.push(email_task)</code></pre>
                         </div>
 
                         <h2>Starting Workers</h2>
@@ -119,37 +117,37 @@ flaxon worker app:app --queue email --concurrency 2</code></pre>
 
                         <h2>Scheduling Tasks</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import Scheduler
+                            <pre><code class="language-python">from flaxon.tasks import Scheduler, Task
 
 scheduler = Scheduler(queue)
 
 # Schedule a one-time task
 scheduler.schedule(
-    task=Task("send_email", send_email, args=["user@example.com", "Hello"]),
+    task=Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome")),
     delay=60,  # 60 seconds from now
 )
 
 # Schedule recurring task
 scheduler.schedule(
-    task=Task("process_image", process_image),
+    task=Task("process_image", process_image, args=("/tmp/image.jpg",)),
     interval=300,  # Every 5 minutes
 )
 
-# Scheduled decorator
-from flaxon.tasks import scheduled_task
-
-@scheduled_task(interval=60)
+# Recurring work is scheduled by Scheduler; defining a function alone does not enqueue it.
 async def cleanup_tokens():
-    await db.execute("DELETE FROM expired_tokens")</code></pre>
+    await db.execute("DELETE FROM expired_tokens")
+
+scheduler.schedule(task=Task("cleanup_tokens", cleanup_tokens), interval=60)</code></pre>
                         </div>
 
                         <h2>Task Results</h2>
                         <div class="code-block">
-                            <pre><code class="language-python">task = Task("send_email", send_email, args=["user@example.com", "Hello"])
-await queue.push(task)
-
-result = await queue.get_result(task.id)
-print(result.result)  # {"sent": True, "to": "user@example.com"}</code></pre>
+                            <pre><code class="language-python">email_task = Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome"))
+await queue.push(email_task)
+# A worker must execute the task before its result is available.
+queued_task = await queue.get(email_task.id)
+result = queued_task.to_result() if queued_task else None
+print(result.result if result else None)</code></pre>
                         </div>
 
                         <h2>Retry Policies</h2>

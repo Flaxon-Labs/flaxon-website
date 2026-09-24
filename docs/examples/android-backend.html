@@ -103,7 +103,7 @@
                             <pre><code class="language-python"># app.py
 import time
 from flaxon import Flaxon, HTTPException
-from flaxon.security import JWTBackend, login_required
+from flaxon.security import JWTBackend, User, login_required
 from flaxon.validation import Schema, fields
 
 app = Flaxon("android-backend")
@@ -149,7 +149,7 @@ async def register(data: RegisterRequest):
     user["created_at"] = int(time.time())
     users[data.email] = user
 
-    token = await jwt_backend.create_token({"id": user["id"], "email": user["email"]})
+    token = await jwt_backend.create_token(User.from_dict(user))
     return {"user": user, "token": token}
 
 @app.post("/api/v1/auth/login")
@@ -161,7 +161,7 @@ async def login(data: LoginRequest):
     if user["password"] != data.password:
         raise HTTPException(401, "Invalid credentials")
 
-    token = await jwt_backend.create_token({"id": user["id"], "email": user["email"]})
+    token = await jwt_backend.create_token(User.from_dict(user))
     return {"user": user, "token": token}
 
 @app.post("/api/v1/devices")
@@ -169,7 +169,7 @@ async def login(data: LoginRequest):
 async def register_device(request, data: DeviceRegistration):
     user = getattr(request, "user")
     device = data.to_dict()
-    device["user_id"] = user["id"]
+    device["user_id"] = user.id
     device["registered_at"] = int(time.time())
 
     devices[data.device_id] = device
@@ -179,7 +179,7 @@ async def register_device(request, data: DeviceRegistration):
 @login_required
 async def get_profile(request):
     user = getattr(request, "user")
-    return {"user": users.get(user["email"])}
+    return {"user": users.get(user.email)}
 
 @app.put("/api/v1/profile")
 @login_required
@@ -187,7 +187,7 @@ async def update_profile(request):
     user = getattr(request, "user")
     data = await request.json()
 
-    stored_user = users.get(user["email"])
+    stored_user = users.get(user.email)
     if stored_user:
         stored_user.update(data)
         return {"updated": True, "user": stored_user}

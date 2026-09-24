@@ -103,6 +103,7 @@
                             <pre><code class="language-python"># app.py
 import json
 from datetime import datetime
+from urllib.parse import parse_qs
 from flaxon import Flaxon, WebSocket, WebSocketDisconnect
 
 app = Flaxon("chat-app", debug=True)
@@ -115,7 +116,10 @@ max_messages_per_room = 100
 
 @app.websocket("/ws/chat/&lt;room_id&gt;")
 async def chat(socket: WebSocket, room_id: str):
-    username = socket.scope.get("query_string", "").split("=")[1] if "user=" in socket.scope.get("query_string", "") else "Anonymous"
+    raw_query = socket.scope.get("query_string", b"")
+    if isinstance(raw_query, bytes):
+        raw_query = raw_query.decode("utf-8", "ignore")
+    username = parse_qs(raw_query).get("user", ["Anonymous"])[0][:40] or "Anonymous"
     user_id = f"{username}-{id(socket)}"
 
     await socket.accept()
@@ -146,6 +150,8 @@ async def chat(socket: WebSocket, room_id: str):
 
     try:
         async for message in socket.iter_json():
+            if not isinstance(message, dict):
+                continue
             if message.get("type") == "message":
                 msg = {
                     "type": "message",

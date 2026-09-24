@@ -119,13 +119,13 @@ async def get_headers(request: Request):
 async def search(request: Request):
     # Single value
     q = request.query.get("q")
-    page = request.query.get("page", 1)
+    page = request.query.get("page", "1")
 
-    # Multiple values
-    filters = request.query.get_list("filter")
+    # Request.query is dict[str, str] and keeps the first value for repeated keys.
+    filters = request.query.get("filter")
 
-    # Type conversion
-    page_int = request.query.get_int("page", 1)
+    # Convert values explicitly.
+    page_int = int(request.query.get("page", "1"))
     active = request.query.get("active", "false").lower() in {"1", "true", "yes", "on"}
 
     return {"query": q, "page": page, "filters": filters}</code></pre>
@@ -210,7 +210,7 @@ async def search(request: Request, params: SearchParams):
 
                         <div class="note">
                             <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">The <code>Request</code> object also has a <code>.state</code> attribute for storing request-scoped data.</p>
+                            <p class="mb-0 mt-1">Use <code>request.app.state</code> for application-scoped services such as database pools. Keep request-specific values in local variables or middleware-populated request attributes.</p>
                         </div>
                     </div>
                 </main>
