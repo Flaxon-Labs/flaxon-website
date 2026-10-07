@@ -1,211 +1,852 @@
-<!-- docs/guides/jinax.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Jinax Templates – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Jinax Templates — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Jinax Templates — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Jinax Templates</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/jinax.md">Framework source</a> · <a href="../../content/framework/docs/guides/jinax.md" download>Markdown</a></p><h1 id="jinax-templates">Jinax Templates</h1>
+<h2 id="overview">Overview</h2>
+<p>Jinax is Flaxon's optional server-side template engine powered by Jinja2.</p>
+<p>It provides modern HTML rendering while integrating seamlessly with Flaxon's async-first architecture.</p>
+<h3 id="features">Features</h3>
+<ul>
+<li>Server-side HTML rendering</li>
+<li>Template inheritance</li>
+<li>Automatic HTML escaping</li>
+<li>Async rendering</li>
+<li>Custom filters</li>
+<li>Custom global functions</li>
+<li>Template caching</li>
+<li>Hot reloading during development</li>
+<li>Macros</li>
+<li>Includes</li>
+<li>Layouts</li>
+<li>Jinja2 template caching and configurable reload behavior</li>
+</ul>
+<hr/>
+<h2 id="installation">Installation</h2>
+<p>Install Flaxon with template support:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>templates<span class="o">]</span>
+</code></pre></div>
+<hr/>
+<h2 id="setup">Setup</h2>
+<p>Configure Jinax with your application.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"website"</span><span class="p">)</span>
 
-    <div id="header"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+    <span class="n">Jinax</span><span class="p">(</span>
+        <span class="s2">"templates"</span><span class="p">,</span>
+        <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="project-structure">Project Structure</h2>
+<p>A typical project looks like:</p>
+<div class="highlight"><pre><span></span><code>project/
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html" class="active">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+├── app.py
+├── templates/
+│   ├── base.html
+│   ├── home.html
+│   ├── about.html
+│   ├── contact.html
+│   ├── macros.html
+│   └── partials/
+│       ├── navbar.html
+│       └── footer.html
+└── static/
+    ├── css/
+    ├── js/
+    └── images/
+</code></pre></div>
+<hr/>
+<h2 id="rendering-templates">Rendering Templates</h2>
+<p>Templates are rendered using the request object.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Jinax Templates</h1>
-                        <p>Jinax is Flaxon's optional Jinja2 template integration with autoescaping, inheritance, filters, and async support.</p>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
 
-                        <h2>Installation</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">pip install "flaxon[templates]"</code></pre>
-                        </div>
+        <span class="s2">"home.html"</span><span class="p">,</span>
 
-                        <h2>Setup</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
-from flaxon.jinax import Jinax
+        <span class="p">{</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Home"</span><span class="p">,</span>
 
-app = Flaxon("website")
-app.use_templates(Jinax("templates", auto_reload=True))</code></pre>
-                        </div>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"World"</span><span class="p">,</span>
 
-                        <h2>Basic Template</h2>
-                        <p><strong>templates/home.html</strong></p>
-                        <div class="code-block">
-                            <pre><code class="language-html">&lt;!doctype html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;{{ title }}&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt;Welcome, {{ name }}!&lt;/h1&gt;
-    &lt;ul&gt;
+            <span class="s2">"items"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">"Routing"</span><span class="p">,</span>
+                <span class="s2">"Templates"</span><span class="p">,</span>
+                <span class="s2">"Validation"</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="your-first-template">Your First Template</h2>
+<p>Create:</p>
+<div class="highlight"><pre><span></span><code>templates/home.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+        Welcome {{ name }}!
+    <span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+        {% for item in items %}
+
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{ item }}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+        {% endfor %}
+
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-copy-paste-application">Complete copy-paste application</h2>
+<p>Create <code>app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"jinax-example"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span><span class="n">Jinax</span><span class="p">(</span><span class="s2">"templates"</span><span class="p">,</span> <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"home.html"</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Jinax"</span><span class="p">,</span>
+        <span class="s2">"items"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"Routing"</span><span class="p">,</span> <span class="s2">"Validation"</span><span class="p">,</span> <span class="s2">"Templates"</span><span class="p">],</span>
+    <span class="p">})</span>
+</code></pre></div>
+<p>Create <code>templates/home.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"en"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">"utf-8"</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
     {% for item in items %}
-        &lt;li&gt;{{ item }}&lt;/li&gt;
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{ item }}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
     {% endfor %}
-    &lt;/ul&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                        </div>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Run <code>pip install "flaxon[templates]"</code> and then <code>flaxon run app:app --reload</code>.
+Jinax uses Jinja2 autoescaping for HTML templates. Keep database queries and
+permission decisions in routes/services and pass prepared view data to templates.</p>
+<hr/>
+<h2 id="template-inheritance">Template Inheritance</h2>
+<p>Inheritance allows pages to share a common layout.</p>
+<h2 id="base-template">Base Template</h2>
+<div class="highlight"><pre><span></span><code>templates/base.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
 
-                        <p><strong>Route</strong></p>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/")
-async def home(request):
-    return await request.render("home.html", {
-        "title": "Home",
-        "name": "World",
-        "items": ["Routing", "Validation", "Templates"],
-    })</code></pre>
-                        </div>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
 
-                        <h2>Template Inheritance</h2>
-                        <p><strong>templates/base.html</strong></p>
-                        <div class="code-block">
-                            <pre><code class="language-html">&lt;!doctype html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;{% block title %}Flaxon{% endblock %}&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;header&gt;{% block header %}Default Header{% endblock %}&lt;/header&gt;
-    &lt;main&gt;{% block content %}{% endblock %}&lt;/main&gt;
-    &lt;footer&gt;{% block footer %}Default Footer{% endblock %}&lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                        </div>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
 
-                        <p><strong>templates/page.html</strong></p>
-                        <div class="code-block">
-                            <pre><code class="language-html">{% extends "base.html" %}
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>
 
-{% block title %}My Page{% endblock %}
+        {% block title %}
+            Flaxon
+        {% endblock %}
 
-{% block header %}Welcome to My Page{% endblock %}
+    <span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">header</span><span class="p">&gt;</span>
+
+    {% block header %}
+
+        Default Header
+
+    {% endblock %}
+
+<span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+
+    {% block content %}
+
+    {% endblock %}
+
+<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>
+
+    {% block footer %}
+
+        Copyright © 2026
+
+    {% endblock %}
+
+<span class="p">&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="child-template">Child Template</h2>
+<div class="highlight"><pre><span></span><code>templates/home.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>{% extends "base.html" %}
+
+{% block title %}
+
+Home
+
+{% endblock %}
+
+
+{% block header %}
+
+Welcome
+
+{% endblock %}
+
 
 {% block content %}
-    &lt;h1&gt;{{ heading }}&lt;/h1&gt;
-    &lt;p&gt;{{ description }}&lt;/p&gt;
-{% endblock %}</code></pre>
-                        </div>
 
-                        <h2>Filters</h2>
-                        <div class="code-block">
-                            <pre><code class="language-html">{{ value|capitalize }}
-{{ value|lower }}
-{{ value|upper }}
-{{ value|title }}
-{{ value|trim }}
-{{ value|escape }}
-{{ value|safe }}
-{{ value|length }}
-{{ value|reverse }}
-{{ value|join(", ") }}
-{{ value|replace(old, new) }}
-{{ value|currency("USD") }}
-{{ value|truncate(100, True, "...") }}
-{{ value|default("N/A") }}
-{{ value|tojson }}</code></pre>
-                        </div>
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ heading }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
-                        <p><code>capitalize</code>, <code>lower</code>, <code>upper</code>, <code>title</code>, <code>trim</code>, <code>escape</code>, <code>safe</code>, <code>length</code>, <code>reverse</code>, <code>join</code>, <code>replace</code>, <code>truncate</code>, <code>default</code>, and <code>tojson</code> are Jinja2 built-ins. Flaxon adds <code>currency</code>. Date formatting is not registered by Jinax; add your own filter when you need it.</p>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ description }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 
-                        <h2>Custom Filters</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">jinax = app.jinax
+{% endblock %}
+</code></pre></div>
+<hr/>
+<h2 id="including-templates">Including Templates</h2>
+<p>Reusable components can be included.</p>
+<div class="highlight"><pre><span></span><code>{% include "partials/navbar.html" %}
 
-def currency_filter(value, symbol="$"):
-    return f"{symbol}{value:.2f}"
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
-jinax.add_filter("currency", currency_filter)
+{% include "partials/footer.html" %}
+</code></pre></div>
+<hr/>
+<h2 id="built-in-filters">Built-in Filters</h2>
+<p>Jinax includes many commonly used filters.</p>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capitalize</code></td>
+<td>Capitalize text</td>
+</tr>
+<tr>
+<td><code>lower</code></td>
+<td>Convert to lowercase</td>
+</tr>
+<tr>
+<td><code>upper</code></td>
+<td>Convert to uppercase</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>Title case</td>
+</tr>
+<tr>
+<td><code>trim</code></td>
+<td>Remove whitespace</td>
+</tr>
+<tr>
+<td><code>escape</code></td>
+<td>Escape HTML</td>
+</tr>
+<tr>
+<td><code>safe</code></td>
+<td>Mark content as safe</td>
+</tr>
+<tr>
+<td><code>json</code></td>
+<td>Convert to JSON</td>
+</tr>
+<tr>
+<td><code>length</code></td>
+<td>Count items</td>
+</tr>
+<tr>
+<td><code>reverse</code></td>
+<td>Reverse a sequence</td>
+</tr>
+<tr>
+<td><code>join</code></td>
+<td>Join list items</td>
+</tr>
+<tr>
+<td><code>replace</code></td>
+<td>Replace text</td>
+</tr>
+<tr>
+<td><code>default</code></td>
+<td>Default value</td>
+</tr>
+<tr>
+<td><code>first</code></td>
+<td>First item</td>
+</tr>
+<tr>
+<td><code>last</code></td>
+<td>Last item</td>
+</tr>
+<tr>
+<td><code>truncate</code></td>
+<td>Shorten text</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>Format dates</td>
+</tr>
+<tr>
+<td><code>datetime</code></td>
+<td>Format date and time</td>
+</tr>
+<tr>
+<td><code>currency</code></td>
+<td>Format currency</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="filter-examples">Filter Examples</h2>
+<div class="highlight"><pre><span></span><code>{{ name|capitalize }}
 
-@app.get("/")
-async def home(request):
-    return await request.render("product.html", {
-        "price": 99.99,
-    })</code></pre>
-                        </div>
+{{ username|lower }}
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Jinax templates are lazily loaded. If you don't use them, Jinja2 is never imported.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+{{ price|currency("USD") }}
 
-    <div id="footer"></div>
+{{ description|truncate(100) }}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+{{ tags|join(", ") }}
 
-</body>
-</html>
+{{ created_at|datetime("%Y-%m-%d %H:%M") }}
+</code></pre></div>
+<hr/>
+<h2 id="custom-filters">Custom Filters</h2>
+<p>Create your own filters.</p>
+<div class="highlight"><pre><span></span><code><span class="n">jinax</span> <span class="o">=</span> <span class="n">Jinax</span><span class="p">(</span>
+    <span class="s2">"templates"</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">currency_filter</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">symbol</span><span class="o">=</span><span class="s2">"$"</span>
+<span class="p">):</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">symbol</span><span class="si">}{</span><span class="n">value</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span>
+
+    <span class="s2">"currency"</span><span class="p">,</span>
+
+    <span class="n">currency_filter</span>
+
+<span class="p">)</span>
+</code></pre></div>
+<p>Using the filter:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+Price:
+
+{{ product.price|currency("$") }}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="global-functions">Global Functions</h2>
+<p>Global functions can be registered and used directly inside templates.</p>
+<div class="highlight"><pre><span></span><code><span class="n">jinax</span> <span class="o">=</span> <span class="n">Jinax</span><span class="p">(</span>
+    <span class="s2">"templates"</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+        <span class="s2">"email"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">@example.com"</span>
+    <span class="p">}</span>
+
+
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span>
+    <span class="s2">"get_user"</span><span class="p">,</span>
+    <span class="n">get_user</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Using the function:</p>
+<div class="highlight"><pre><span></span><code>{% set user = get_user("alice") %}
+
+<span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ user.name }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ user.email }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="global-variables">Global Variables</h2>
+<p>Global variables are available in every template.</p>
+<div class="highlight"><pre><span></span><code><span class="n">jinax</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span>
+    <span class="s2">"site_name"</span><span class="p">,</span>
+    <span class="s2">"Flaxon"</span>
+<span class="p">)</span>
+
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span>
+    <span class="s2">"version"</span><span class="p">,</span>
+    <span class="s2">"0.1.0"</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Template:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>
+
+{{ site_name }}
+
+Version {{ version }}
+
+<span class="p">&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="macros">Macros</h2>
+<p>Macros allow reusable template components.</p>
+<p>Create:</p>
+<div class="highlight"><pre><span></span><code>templates/macros.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>{% macro render_card(title, content, color="blue") %}
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"card card-{{ color }}"</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ content }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+{% endmacro %}
+</code></pre></div>
+<p>Using the macro:</p>
+<div class="highlight"><pre><span></span><code>{% import "macros.html" as macros %}
+
+{{ macros.render_card(
+
+    "Welcome",
+
+    "Hello from Jinax",
+
+    "green"
+
+) }}
+</code></pre></div>
+<hr/>
+<h2 id="control-statements">Control Statements</h2>
+<p>Jinax supports standard template control statements.</p>
+<p>Loop:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+{% for product in products %}
+
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>
+
+        {{ product.name }}
+
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+{% endfor %}
+
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Conditional:</p>
+<div class="highlight"><pre><span></span><code>{% if user %}
+
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+        Welcome {{ user.name }}
+
+    <span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+{% else %}
+
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+        Welcome Guest
+
+    <span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+{% endif %}
+</code></pre></div>
+<hr/>
+<h2 id="async-rendering">Async Rendering</h2>
+<p>Jinax fully supports asynchronous rendering.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/dashboard"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="k">await</span> <span class="n">database</span><span class="o">.</span><span class="n">get_users</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+
+        <span class="s2">"dashboard.html"</span><span class="p">,</span>
+
+        <span class="p">{</span>
+
+            <span class="s2">"users"</span><span class="p">:</span> <span class="n">users</span>
+
+        <span class="p">}</span>
+
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="hot-reloading">Hot Reloading</h2>
+<p>During development templates can automatically reload.</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span>
+
+    <span class="n">Jinax</span><span class="p">(</span>
+
+        <span class="s2">"templates"</span><span class="p">,</span>
+
+        <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span>
+
+    <span class="p">)</span>
+
+<span class="p">)</span>
+</code></pre></div>
+<p>Hot reloading should normally be disabled in production.</p>
+<hr/>
+<h2 id="template-caching">Template Caching</h2>
+<p>Enable template caching for production deployments.</p>
+<div class="highlight"><pre><span></span><code><span class="n">jinax</span> <span class="o">=</span> <span class="n">Jinax</span><span class="p">(</span>
+
+    <span class="s2">"templates"</span><span class="p">,</span>
+
+    <span class="n">cache_size</span><span class="o">=</span><span class="mi">100</span>
+
+<span class="p">)</span>
+</code></pre></div>
+<p>Larger applications may increase the cache size.</p>
+<hr/>
+<h2 id="autoescaping">Autoescaping</h2>
+<p>Jinax automatically escapes HTML output to reduce XSS risks.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>{{ username }}
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>&lt;script&gt;alert("XSS")&lt;/script&gt;
+</code></pre></div>
+<p>becomes</p>
+<div class="highlight"><pre><span></span><code><span class="ni">&amp;lt;</span>script<span class="ni">&amp;gt;</span>alert("XSS")<span class="ni">&amp;lt;</span>/script<span class="ni">&amp;gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="safe-html">Safe HTML</h2>
+<p>Only mark trusted HTML as safe.</p>
+<div class="highlight"><pre><span></span><code>{{ article.body|safe }}
+</code></pre></div>
+<p>Avoid using <code>safe</code> with untrusted user input.</p>
+<hr/>
+<h2 id="static-files">Static Files</h2>
+<p>Reference static assets inside templates.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">link</span>
+    <span class="na">rel</span><span class="o">=</span><span class="s">"stylesheet"</span>
+    <span class="na">href</span><span class="o">=</span><span class="s">"/static/css/style.css"</span>
+<span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span>
+    <span class="na">src</span><span class="o">=</span><span class="s">"/static/js/app.js"</span>
+<span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"website-demo"</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span>
+
+    <span class="n">Jinax</span><span class="p">(</span>
+
+        <span class="s2">"templates"</span><span class="p">,</span>
+
+        <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span>
+
+    <span class="p">)</span>
+
+<span class="p">)</span>
+
+
+<span class="n">jinax</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">jinax</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">currency</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">symbol</span><span class="o">=</span><span class="s2">"$"</span>
+<span class="p">):</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">symbol</span><span class="si">}{</span><span class="n">value</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span>
+    <span class="s2">"currency"</span><span class="p">,</span>
+    <span class="n">currency</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">now</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+        <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S"</span>
+    <span class="p">)</span>
+
+
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span>
+    <span class="s2">"now"</span><span class="p">,</span>
+    <span class="n">now</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">products</span> <span class="o">=</span> <span class="p">[</span>
+
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Laptop"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span> <span class="mf">999.99</span>
+        <span class="p">},</span>
+
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Keyboard"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span> <span class="mf">49.99</span>
+        <span class="p">},</span>
+
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Mouse"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span> <span class="mf">19.99</span>
+        <span class="p">}</span>
+
+    <span class="p">]</span>
+
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+
+        <span class="s2">"home.html"</span><span class="p">,</span>
+
+        <span class="p">{</span>
+
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Store"</span><span class="p">,</span>
+
+            <span class="s2">"products"</span><span class="p">:</span> <span class="n">products</span>
+
+        <span class="p">}</span>
+
+    <span class="p">)</span>
+</code></pre></div>
+<p>Example template:</p>
+<div class="highlight"><pre><span></span><code>templates/home.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>{% extends "base.html" %}
+
+{% block title %}
+
+{{ title }}
+
+{% endblock %}
+
+
+{% block content %}
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+Welcome to our Store
+
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"products"</span><span class="p">&gt;</span>
+
+{% for product in products %}
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"product"</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>
+
+        {{ product.name }}
+
+    <span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+        {{ product.price|currency("$") }}
+
+    <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+{% endfor %}
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+Generated:
+
+{{ now() }}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+{% endblock %}
+</code></pre></div>
+<hr/>
+<h2 id="security">Security</h2>
+<p>Jinax enables HTML autoescaping by default.</p>
+<p>Recommended practices:</p>
+<ul>
+<li>Keep autoescaping enabled.</li>
+<li>Never trust user-generated HTML.</li>
+<li>Only use the <code>safe</code> filter with trusted content.</li>
+<li>Validate all user input.</li>
+<li>Use Content Security Policy (CSP) where appropriate.</li>
+<li>Sanitize uploaded HTML before rendering.</li>
+</ul>
+<hr/>
+<h2 id="performance-tips">Performance Tips</h2>
+<p>For production deployments:</p>
+<ul>
+<li>Enable template caching.</li>
+<li>Disable hot reloading.</li>
+<li>Reuse template environments.</li>
+<li>Cache expensive database queries.</li>
+<li>Minimize complex template logic.</li>
+<li>Perform heavy processing inside Python instead of templates.</li>
+</ul>
+<hr/>
+<h2 id="debugging">Debugging</h2>
+<p>When Flaxon runs in debug mode, template errors appear in the Debug Dashboard.</p>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/__debug__
+</code></pre></div>
+<p>The debugger records:</p>
+<ul>
+<li>Template syntax errors</li>
+<li>Missing templates</li>
+<li>Undefined variables</li>
+<li>Rendering exceptions</li>
+<li>Stack traces</li>
+<li>Request information</li>
+<li>Error history</li>
+</ul>
+<p>Sensitive information is automatically redacted.</p>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Keep business logic inside Python.</li>
+<li>Keep templates focused on presentation.</li>
+<li>Use template inheritance.</li>
+<li>Reuse components with macros and includes.</li>
+<li>Organize templates into folders.</li>
+<li>Prefer descriptive template names.</li>
+<li>Enable caching in production.</li>
+<li>Use async rendering when loading data.</li>
+</ul>
+<hr/>
+<h2 id="recommended-project-structure">Recommended Project Structure</h2>
+<div class="highlight"><pre><span></span><code>project/
+
+├── app.py
+├── templates/
+│   ├── base.html
+│   ├── home.html
+│   ├── about.html
+│   ├── contact.html
+│   ├── macros.html
+│   ├── layouts/
+│   ├── partials/
+│   │   ├── navbar.html
+│   │   ├── sidebar.html
+│   │   └── footer.html
+│   ├── auth/
+│   ├── admin/
+│   ├── errors/
+│   └── emails/
+└── static/
+    ├── css/
+    ├── js/
+    ├── fonts/
+    └── images/
+</code></pre></div>
+<hr/>
+<h2 id="api-reference">API Reference</h2>
+<p>See the Jinax API Reference for complete documentation of:</p>
+<ul>
+<li>Jinax</li>
+<li>Template rendering</li>
+<li>Filters</li>
+<li>Globals</li>
+<li>Macros</li>
+<li>Async rendering</li>
+<li>Template caching</li>
+<li>Autoescaping</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with:</p>
+<ul>
+<li>Authentication</li>
+<li>Databases</li>
+<li>Security</li>
+<li>Performance</li>
+<li>Debugging</li>
+<li>GraphQL</li>
+<li>Deployment</li>
+<li>Architecture</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

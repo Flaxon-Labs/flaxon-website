@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Maintenance Guide — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Maintenance Guide — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Maintenance Guide</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/maintenance.md">Framework source</a> · <a href="../content/framework/docs/maintenance.md" download>Markdown</a></p><h1 id="maintenance-guide">Maintenance Guide</h1>
+<p>This document describes how to maintain the Flaxon framework, manage releases, review pull requests, and keep the project healthy over time.</p>
+<hr/>
+<h2 id="goals">Goals</h2>
+<p>The maintenance process should ensure that Flaxon remains:</p>
+<ul>
+<li>Stable</li>
+<li>Secure</li>
+<li>Fast</li>
+<li>Well documented</li>
+<li>Backwards compatible whenever possible</li>
+<li>Easy for contributors to work with</li>
+</ul>
+<hr/>
+<h2 id="repository-structure">Repository Structure</h2>
+<div class="highlight"><pre><span></span><code>flaxon/
+├── flaxon/
+├── docs/
+├── examples/
+├── tests/
+├── benchmarks/
+├── scripts/
+├── .github/
+├── pyproject.toml
+├── CHANGELOG.md
+├── ROADMAP.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+└── MAINTENANCE.md
+</code></pre></div>
+<hr/>
+<h2 id="versioning">Versioning</h2>
+<p>Flaxon follows <strong>Semantic Versioning (SemVer)</strong>.</p>
+<div class="highlight"><pre><span></span><code>MAJOR.MINOR.PATCH
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.0.0
+1.2.0
+1.2.4
+2.0.0
+</code></pre></div>
+<h3 id="patch-release">Patch Release</h3>
+<p>Used for:</p>
+<ul>
+<li>Bug fixes</li>
+<li>Performance improvements</li>
+<li>Documentation updates</li>
+<li>Internal refactoring</li>
+<li>Dependency updates</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.3.2 → 1.3.3
+</code></pre></div>
+<hr/>
+<h3 id="minor-release">Minor Release</h3>
+<p>Used for:</p>
+<ul>
+<li>New features</li>
+<li>New APIs</li>
+<li>New plugins</li>
+<li>New middleware</li>
+<li>New decorators</li>
+</ul>
+<p>Must remain backwards compatible.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.3.0 → 1.4.0
+</code></pre></div>
+<hr/>
+<h3 id="major-release">Major Release</h3>
+<p>Used for:</p>
+<ul>
+<li>Breaking API changes</li>
+<li>Large architecture changes</li>
+<li>Removed features</li>
+<li>New plugin system</li>
+<li>New routing system</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.x.x → 2.0.0
+</code></pre></div>
+<hr/>
+<h2 id="release-checklist">Release Checklist</h2>
+<p>Before every release:</p>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> All tests pass</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Documentation updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Examples updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> CHANGELOG updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Version bumped</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Benchmarks reviewed</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Security review completed</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> CI passing</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Build package</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Publish to PyPI</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Create GitHub Release</li>
+</ul>
+<hr/>
+<h2 id="dependency-maintenance">Dependency Maintenance</h2>
+<p>Review dependencies regularly.</p>
+<p>Update:</p>
+<ul>
+<li>Python support</li>
+<li>Uvicorn</li>
+<li>AnyIO</li>
+<li>WebSockets</li>
+<li>HTTP libraries</li>
+<li>Development dependencies</li>
+</ul>
+<p>Avoid unnecessary dependencies.</p>
+<p>Prefer standard library implementations whenever practical.</p>
+<hr/>
+<h2 id="python-version-support">Python Version Support</h2>
+<p>Maintain support for officially supported Python versions.</p>
+<p>Example:</p>
+<table>
+<thead>
+<tr>
+<th>Python</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.10</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>3.11</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>3.12</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>3.13</td>
+<td>Supported</td>
+</tr>
+</tbody>
+</table>
+<p>Deprecate older versions gradually.</p>
+<hr/>
+<h2 id="security-maintenance">Security Maintenance</h2>
+<p>Regularly review:</p>
+<ul>
+<li>Authentication</li>
+<li>Authorization</li>
+<li>Session handling</li>
+<li>JWT implementation</li>
+<li>Password hashing</li>
+<li>CSRF protection</li>
+<li>CORS configuration</li>
+<li>Rate limiting</li>
+<li>Request parsing</li>
+<li>Template rendering</li>
+</ul>
+<p>Monitor security advisories.</p>
+<p>Release patches immediately for critical vulnerabilities.</p>
+<hr/>
+<h2 id="performance-maintenance">Performance Maintenance</h2>
+<p>Monitor:</p>
+<ul>
+<li>Request throughput</li>
+<li>Memory usage</li>
+<li>Startup time</li>
+<li>Route matching</li>
+<li>Template rendering</li>
+<li>JSON serialization</li>
+<li>WebSocket performance</li>
+<li>Plugin loading</li>
+</ul>
+<p>Benchmark major releases.</p>
+<hr/>
+<h2 id="documentation-maintenance">Documentation Maintenance</h2>
+<p>Ensure documentation stays synchronized with the codebase.</p>
+<p>Review:</p>
+<ul>
+<li>API reference</li>
+<li>Tutorials</li>
+<li>Examples</li>
+<li>CLI commands</li>
+<li>Plugin documentation</li>
+<li>Migration guides</li>
+</ul>
+<p>Broken examples should be fixed immediately.</p>
+<hr/>
+<h2 id="test-maintenance">Test Maintenance</h2>
+<p>Maintain coverage for:</p>
+<ul>
+<li>Routing</li>
+<li>Requests</li>
+<li>Responses</li>
+<li>Middleware</li>
+<li>Validation</li>
+<li>Templates</li>
+<li>WebSockets</li>
+<li>CLI</li>
+<li>Plugins</li>
+<li>Security</li>
+<li>Background tasks</li>
+</ul>
+<p>Remove flaky tests.</p>
+<p>Add regression tests for every bug fix.</p>
+<hr/>
+<h2 id="plugin-maintenance">Plugin Maintenance</h2>
+<p>Each official plugin should include:</p>
+<ul>
+<li>Documentation</li>
+<li>Unit tests</li>
+<li>Version compatibility</li>
+<li>CHANGELOG</li>
+<li>Examples</li>
+</ul>
+<p>Verify compatibility before every Flaxon release.</p>
+<p>Official plugins should follow the same release schedule whenever possible.</p>
+<hr/>
+<h2 id="pull-request-review-checklist">Pull Request Review Checklist</h2>
+<p>Before merging:</p>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> Code style passes</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Tests added</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Documentation updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Type hints included</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> No unnecessary dependencies</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> No breaking API changes</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> CI passing</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Performance acceptable</li>
+</ul>
+<hr/>
+<h2 id="issue-triage">Issue Triage</h2>
+<p>Label issues appropriately.</p>
+<p>Recommended labels:</p>
+<ul>
+<li>bug</li>
+<li>feature</li>
+<li>enhancement</li>
+<li>documentation</li>
+<li>performance</li>
+<li>security</li>
+<li>regression</li>
+<li>discussion</li>
+<li>good first issue</li>
+<li>help wanted</li>
+<li>duplicate</li>
+<li>invalid</li>
+<li>wontfix</li>
+</ul>
+<hr/>
+<h2 id="deprecation-policy">Deprecation Policy</h2>
+<p>Avoid removing APIs immediately.</p>
+<p>Instead:</p>
+<ol>
+<li>Mark as deprecated.</li>
+<li>Document the replacement.</li>
+<li>Emit deprecation warnings.</li>
+<li>Remove in the next major release.</li>
+</ol>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>v1.8
+↓
+Deprecated
+
+v1.9
+↓
+Still supported
+
+v2.0
+↓
+Removed
+</code></pre></div>
+<hr/>
+<h2 id="code-style">Code Style</h2>
+<p>Maintain consistent style throughout the project.</p>
+<p>Use:</p>
+<ul>
+<li>Black</li>
+<li>Ruff</li>
+<li>isort</li>
+<li>MyPy</li>
+</ul>
+<p>Keep functions focused and readable.</p>
+<p>Prefer composition over duplication.</p>
+<hr/>
+<h2 id="continuous-integration">Continuous Integration</h2>
+<p>CI should verify:</p>
+<ul>
+<li>Formatting</li>
+<li>Linting</li>
+<li>Type checking</li>
+<li>Unit tests</li>
+<li>Integration tests</li>
+<li>Documentation build</li>
+<li>Package build</li>
+</ul>
+<p>No pull request should be merged if CI fails.</p>
+<hr/>
+<h2 id="benchmarking">Benchmarking</h2>
+<p>Run benchmarks before major releases.</p>
+<p>Measure:</p>
+<ul>
+<li>Requests/second</li>
+<li>Route matching</li>
+<li>Validation speed</li>
+<li>Template rendering</li>
+<li>JSON serialization</li>
+<li>WebSocket throughput</li>
+<li>Startup time</li>
+</ul>
+<p>Track performance regressions over time.</p>
+<hr/>
+<h2 id="documentation-build">Documentation Build</h2>
+<p>Verify documentation builds successfully.</p>
+<p>Check for:</p>
+<ul>
+<li>Broken links</li>
+<li>Missing pages</li>
+<li>Invalid Markdown</li>
+<li>Invalid MkDocs directives</li>
+<li>Broken code examples</li>
+</ul>
+<hr/>
+<h2 id="release-process">Release Process</h2>
+<ol>
+<li>Freeze new features.</li>
+<li>Fix outstanding bugs.</li>
+<li>Run full test suite.</li>
+<li>Update documentation.</li>
+<li>Update CHANGELOG.</li>
+<li>Bump version.</li>
+<li>Build distributions.</li>
+<li>Publish to PyPI.</li>
+<li>Create GitHub Release.</li>
+<li>Announce release.</li>
+</ol>
+<hr/>
+<h2 id="long-term-support-lts">Long-Term Support (LTS)</h2>
+<p>For LTS releases:</p>
+<ul>
+<li>Accept only bug fixes.</li>
+<li>Accept security patches.</li>
+<li>Avoid new features.</li>
+<li>Maintain API stability.</li>
+</ul>
+<hr/>
+<h2 id="repository-housekeeping">Repository Housekeeping</h2>
+<p>Regularly:</p>
+<ul>
+<li>Close stale issues</li>
+<li>Archive obsolete discussions</li>
+<li>Remove unused code</li>
+<li>Remove dead documentation</li>
+<li>Remove deprecated examples</li>
+<li>Update dependencies</li>
+<li>Review GitHub Actions</li>
+</ul>
+<hr/>
+<h2 id="backup-and-recovery">Backup and Recovery</h2>
+<p>Ensure:</p>
+<ul>
+<li>GitHub repository is protected</li>
+<li>Releases are tagged</li>
+<li>Documentation is versioned</li>
+<li>PyPI releases are preserved</li>
+<li>CI workflows are backed up</li>
+</ul>
+<hr/>
+<h2 id="maintenance-schedule">Maintenance Schedule</h2>
+<h2 id="daily">Daily</h2>
+<ul>
+<li>Review CI failures</li>
+<li>Respond to critical issues</li>
+<li>Review pull requests</li>
+</ul>
+<hr/>
+<h2 id="weekly">Weekly</h2>
+<ul>
+<li>Review open issues</li>
+<li>Merge approved PRs</li>
+<li>Update documentation if needed</li>
+</ul>
+<hr/>
+<h2 id="monthly">Monthly</h2>
+<ul>
+<li>Update dependencies</li>
+<li>Review benchmarks</li>
+<li>Review plugin compatibility</li>
+<li>Check security advisories</li>
+</ul>
+<hr/>
+<h2 id="quarterly">Quarterly</h2>
+<ul>
+<li>Review roadmap</li>
+<li>Remove completed milestones</li>
+<li>Plan next release</li>
+<li>Audit documentation</li>
+</ul>
+<hr/>
+<h2 id="maintainer-responsibilities">Maintainer Responsibilities</h2>
+<p>Maintainers should:</p>
+<ul>
+<li>Review pull requests fairly</li>
+<li>Respond to community questions</li>
+<li>Keep documentation accurate</li>
+<li>Maintain code quality</li>
+<li>Protect API stability</li>
+<li>Encourage new contributors</li>
+<li>Ensure releases remain reliable</li>
+</ul>
+<hr/>
+<h2 id="emergency-releases">Emergency Releases</h2>
+<p>Emergency releases may be published for:</p>
+<ul>
+<li>Critical security vulnerabilities</li>
+<li>Data corruption bugs</li>
+<li>Severe regressions</li>
+<li>Installation failures</li>
+<li>Major compatibility issues</li>
+</ul>
+<p>Emergency releases should contain only the minimum required fixes.</p>
+<hr/>
+<h2 id="philosophy">Philosophy</h2>
+<p>Flaxon aims to remain:</p>
+<ul>
+<li>Simple</li>
+<li>Fast</li>
+<li>Modern</li>
+<li>Predictable</li>
+<li>Well documented</li>
+<li>Production ready</li>
+<li>Community driven</li>
+</ul>
+<p>Every maintenance decision should support these goals.</p></article>
+</main></div><div id="footer"></div></body></html>

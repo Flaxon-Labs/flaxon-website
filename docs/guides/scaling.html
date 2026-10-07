@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Growing a Flaxon application — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Growing a Flaxon application — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Growing a Flaxon application</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/scaling.md">Framework source</a> · <a href="../../content/framework/docs/guides/scaling.md" download>Markdown</a></p><h1 id="growing-a-flaxon-application">Growing a Flaxon application</h1>
+<p>This guide is for an application with roughly 200 pages, endpoints, views, or
+feature screens. At that size, the important decision is not the number of
+files—it is keeping each feature independent enough to change and test safely.</p>
+<h2 id="use-feature-modules">Use feature modules</h2>
+<p>Keep each bounded feature together: its routes, schemas, service, templates,
+and tests. Do not put business logic in route functions or create one global
+<code>routes.py</code> file.</p>
+<div class="highlight"><pre><span></span><code>myapp/
+├── app/
+│   ├── main.py                 # application factory and global middleware
+│   ├── config.py               # environment-specific settings
+│   ├── modules/
+│   │   ├── accounts/
+│   │   │   ├── routes.py
+│   │   │   ├── schemas.py
+│   │   │   ├── service.py
+│   │   │   └── templates/accounts/
+│   │   ├── catalog/
+│   │   │   ├── routes.py
+│   │   │   ├── schemas.py
+│   │   │   ├── service.py
+│   │   │   └── templates/catalog/
+│   │   └── billing/
+│   │       ├── routes.py
+│   │       ├── schemas.py
+│   │       └── service.py
+│   └── infrastructure/
+│       ├── database.py
+│       ├── cache.py
+│       └── logging.py
+├── tests/
+│   ├── modules/
+│   ├── integration/
+│   └── security/
+└── pyproject.toml
+</code></pre></div>
+<p>This layout works just as well for 20 features as it does for 200 pages. Split
+a large feature into submodules only when that feature itself becomes hard to
+navigate.</p>
+<h2 id="use-the-same-boundary-for-pydantic-and-fastmcp">Use the same boundary for Pydantic and FastMCP</h2>
+<p>Optional integrations belong inside the feature module that uses them. The
+application factory should mount modules and provide shared dependencies; it
+should not contain every schema or tool.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/catalog/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"catalog"</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateProduct</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">price</span><span class="p">:</span> <span class="nb">float</span>
+
+
+<span class="nd">@catalog</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_product</span><span class="p">(</span><span class="n">product</span><span class="p">:</span> <span class="n">CreateProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateProduct</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">product</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">install_catalog</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/products"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/ai_tools/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.integrations.fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">mount_fastmcp</span>
+
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">"Store Tools"</span><span class="p">)</span>
+
+
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"available"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">install_ai_tools</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">auth_provider</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">mount_fastmcp</span><span class="p">(</span>
+        <span class="n">app</span><span class="p">,</span>
+        <span class="n">mcp</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span>
+        <span class="n">auth</span><span class="o">=</span><span class="n">auth_provider</span><span class="p">,</span>
+        <span class="n">require_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stateless_http</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Mount both from one factory:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth_provider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.ai_tools.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_ai_tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.catalog.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_catalog</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flaxon</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"store"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">install_catalog</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">install_ai_tools</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth_provider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<p>Install the optional dependencies explicitly:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[pydantic,mcp]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>app.main:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>The resulting contracts are easy to find: normal JSON clients call
+<code>POST /api/products/</code>, while MCP clients connect to <code>/mcp</code>. Pydantic validates
+the JSON body; FastMCP handles MCP protocol messages; the feature service is
+where shared business rules belong. Do not call <code>mcp.run()</code> when it is mounted
+into Flaxon.</p>
+<h2 id="keep-the-application-entry-point-small">Keep the application entry point small</h2>
+<p>The application entry point should compose feature routers and global
+infrastructure; it should not contain product rules.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span><span class="p">,</span> <span class="n">RequestIDMiddleware</span><span class="p">,</span> <span class="n">SecurityHeadersMiddleware</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.accounts.routes</span><span class="w"> </span><span class="kn">import</span> <span class="n">router</span> <span class="k">as</span> <span class="n">accounts_router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.catalog.routes</span><span class="w"> </span><span class="kn">import</span> <span class="n">router</span> <span class="k">as</span> <span class="n">catalog_router</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flaxon</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"myapp"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">RequestIDMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SecurityHeadersMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+        <span class="n">CORSMiddleware</span><span class="p">,</span>
+        <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span><span class="s2">"https://app.example.com"</span><span class="p">],</span>
+        <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">accounts_router</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">catalog_router</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<p>Use explicit origins when credentials are enabled. Flaxon rejects the unsafe
+combination of <code>allow_credentials=True</code> and <code>allowed_origins=["*"]</code>.</p>
+<h2 id="put-http-code-in-routes-and-product-rules-in-services">Put HTTP code in routes and product rules in services</h2>
+<p>Routes convert HTTP input into a service call. Services should not depend on
+<code>Request</code>, <code>Response</code>, or template objects, which keeps the same rule usable
+from HTTP, WebSocket, task, and CLI entry points.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/catalog/routes.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.service</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatalogService</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1/products"</span><span class="p">)</span>
+<span class="n">service</span> <span class="o">=</span> <span class="n">CatalogService</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateProduct</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">price_cents</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_product</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"product"</span><span class="p">:</span> <span class="n">product</span><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/catalog/service.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CatalogService</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># Call a repository or an external API here.</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="s2">"new-product"</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">}</span>
+</code></pre></div>
+<h2 id="draw-clear-ownership-lines">Draw clear ownership lines</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Put it in</th>
+<th>Keep it out of</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Path, method, status code, headers</td>
+<td>route</td>
+<td>service/repository</td>
+</tr>
+<tr>
+<td>Input shape and validation</td>
+<td>schema</td>
+<td>template/business service</td>
+</tr>
+<tr>
+<td>Product rules and workflows</td>
+<td>service</td>
+<td>route handler</td>
+</tr>
+<tr>
+<td>Persistence queries</td>
+<td>repository/infrastructure</td>
+<td>route handler</td>
+</tr>
+<tr>
+<td>Cross-cutting HTTP behavior</td>
+<td>middleware</td>
+<td>individual routes</td>
+</tr>
+<tr>
+<td>HTML presentation</td>
+<td>Jinax templates</td>
+<td>service</td>
+</tr>
+</tbody>
+</table>
+<h2 id="add-capabilities-deliberately">Add capabilities deliberately</h2>
+<p>At this scale, use framework features where they match the boundary:</p>
+<ul>
+<li><strong>Middleware:</strong> request IDs, security headers, CORS, body limits, trusted
+  hosts, compression, logging, and timeouts.</li>
+<li><strong>Validation:</strong> typed JSON payloads with <code>Schema</code> and the <code>*Field</code> classes.</li>
+<li><strong>Jinax:</strong> server-rendered pages and reusable template layouts.</li>
+<li><strong>WebSockets:</strong> real-time connections and in-process room broadcasts.</li>
+<li><strong>Tasks:</strong> work that must not hold an HTTP request open.</li>
+<li><strong>Caching:</strong> cache read-heavy, invalidation-safe data with <code>cached_async</code>.</li>
+<li><strong>Observability:</strong> the built-in <code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>,
+  and <code>/metrics</code> endpoints, plus your own dependency checks.</li>
+<li><strong>OpenAPI and GraphQL:</strong> enable only when the project actually exposes those
+  interfaces.</li>
+</ul>
+<h2 id="plan-for-more-than-one-worker">Plan for more than one worker</h2>
+<p>An in-memory object belongs to one Python process. That includes the default
+session backend, task queue, cache, rate-limit state, and WebSocket room
+manager. A multi-worker or multi-instance deployment must not rely on those
+objects for shared state.</p>
+<p>For a horizontally scaled application:</p>
+<ol>
+<li>Keep route handlers stateless.</li>
+<li>Store authoritative data in your database or object storage.</li>
+<li>Use a shared service such as Redis when sessions, cached values, task
+   coordination, or WebSocket fan-out must cross process boundaries.</li>
+<li>Use the Redis-backed adapters only after installing and operating Redis;
+   they are not part of the core install.</li>
+<li>Run background workers separately from HTTP workers.</li>
+</ol>
+<h2 id="keep-templates-manageable">Keep templates manageable</h2>
+<p>For 200 server-rendered pages, use a base template, feature-owned template
+folders, and view models prepared by services/routes. Do not place database
+queries, permission decisions, or network calls inside Jinax templates.</p>
+<h3 id="copy-paste-feature-module-with-jinax">Copy-paste feature module with Jinax</h3>
+<p><code>Router</code> keeps a feature's endpoints together, while <code>Jinax</code> renders its
+templates through the shared application engine:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.catalog.routes</span><span class="w"> </span><span class="kn">import</span> <span class="n">router</span> <span class="k">as</span> <span class="n">catalog_router</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"catalog"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span><span class="n">Jinax</span><span class="p">(</span><span class="s2">"app/templates"</span><span class="p">,</span> <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">catalog_router</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/store"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/catalog/routes.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/catalog"</span><span class="p">)</span>
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">catalog</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"catalog/index.html"</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Catalog"</span><span class="p">,</span>
+        <span class="s2">"products"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Starter"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">:</span> <span class="mi">19</span><span class="p">}],</span>
+    <span class="p">})</span>
+</code></pre></div>
+<p>This serves <code>GET /store/catalog</code>. Create <code>app/templates/catalog/index.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% for product in products %}<span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>{{ product.name }}: ${{ product.price }}<span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>{% endfor %}
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Run <code>pip install "flaxon[templates]"</code> and
+<code>flaxon run app.main:app --reload</code>.</p>
+<h2 id="test-by-feature-and-by-boundary">Test by feature and by boundary</h2>
+<ul>
+<li>Unit-test services without an ASGI client.</li>
+<li>Use <code>TestClient</code> for routes, middleware, validation, and error responses.</li>
+<li>Use <code>AsyncWebSocketClient</code> for WebSocket protocol tests; use
+  <code>AsyncTestClient</code> when the HTTP test itself runs inside an async test.</li>
+<li>Add integration tests for the real database/cache adapters you choose.</li>
+<li>Keep regression tests beside the feature that previously failed.</li>
+</ul>
+<h2 id="release-checklist-for-a-large-application">Release checklist for a large application</h2>
+<ul>
+<li>Production configuration has <code>DEBUG=False</code> and a non-default secret.</li>
+<li>CORS origins and trusted hosts are explicit.</li>
+<li>Database migrations, backups, and restore drills exist.</li>
+<li>In-memory defaults are not used as cross-worker shared state.</li>
+<li>Health checks cover critical dependencies.</li>
+<li>Metrics, structured logs, alerts, and request IDs are connected to your
+  operations tooling.</li>
+<li>Load tests use the real ASGI server, deployment topology, and dependencies.</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

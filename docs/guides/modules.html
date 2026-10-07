@@ -1,286 +1,565 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Modules and Fast Development - Flaxon Documentation</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css">
-<script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content">
-<h1>Modules for Industrial and Fast Development</h1>
-<p>Flaxon modules are reusable application units built on the real router, dependency container, lifecycle hooks, static files, and Jinax templates. A module keeps one business area together while allowing the application to mount it at any prefix. This is useful for teams that need to ship quickly without turning <code>app.py</code> into a monolith.</p>
-<div class="note success"><strong>When to use modules</strong><p class="mb-0 mt-1">Use one module for each domain such as accounts, orders, inventory, billing, or reporting. Keep repositories and services inside the domain module, expose routes from its <code>module</code> object, and mount all modules from one application entry point.</p></div>
-<h2>Reusable route packages</h2>
-<p>A module is a self-contained route package. Define its endpoints once, then attach the package to one or more applications or URL prefixes. The host application decides where the routes live; the module keeps its own handlers, dependencies, hooks, templates, and static assets.</p>
-<pre><code class="language-python"># modules/catalog.py
-from flaxon.modules import FlaxonModule
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Modules Guide — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Modules Guide — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Modules Guide</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/Modules.md">Framework source</a> · <a href="../../content/framework/docs/guides/Modules.md" download>Markdown</a></p><h1 id="modules-guide">Modules Guide</h1>
+<p><code>flaxon/modules.py</code> adds a Flask-blueprint-style composition unit to
+Flaxon: <code>FlaxonModule</code>. It's one file, drops into an existing Flaxon
+install with no other changes, and is built entirely on Flaxon's own
+real primitives (<code>Router</code>, <code>Container</code>, <code>on_startup</code>/<code>on_shutdown</code>,
+<code>mount_static</code>, Jinax) rather than copying Flask's design wholesale.</p>
+<p>Every example on this page has been run and verified, not just written.</p>
+<p>Importing it is what activates it -- it attaches <code>mount_module()</code> onto
+the real <code>Flaxon</code> app class the moment it's imported:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>   <span class="c1"># this import alone is enough</span>
+</code></pre></div>
+<p>If you're also using <code>flaxon_cli.py</code>-at-project-root for custom CLI
+commands (see the CLI section below), make sure your <code>flaxon/cli/discovery.py</code>
+has the <code>sys.path</code> fix -- without it, that specific discovery path silently
+finds nothing when run through the installed <code>flaxon</code> command (a real,
+pre-existing bug, unrelated to modules.py). The <code>./cli/*.py</code> discovery path
+doesn't need the fix and works either way.</p>
+<hr/>
+<h2 id="quick-start">Quick Start</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
 
-catalog = FlaxonModule("catalog")
+<span class="n">users</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"users"</span><span class="p">)</span>
 
-@catalog.get("/products")
-async def products(db):
-    return await db.fetch_all("SELECT id, name, price FROM products")
+<span class="nd">@users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"users"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"alice"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">]}</span>
 
-@catalog.get("/products/<int:product_id>")
-async def product(product_id: int, db):
-    return await db.fetch_one(
-        "SELECT id, name, price FROM products WHERE id = ?", product_id
-    )
+<span class="nd">@users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}</span>
 
-# In app.py, mount the package wherever the application needs it.
-from modules.catalog import catalog
-app.mount_module(catalog, prefix="/store")
-# Routes are now /store/products and /store/products/42.</code></pre>
-<p>This keeps feature code portable and makes a module easy to test in isolation. Mount the same package at <code>/v1/store</code> and <code>/v2/store</code> when an API needs versioned entry points, using a unique mount name for each registration.</p>
-<h2>1. Project structure</h2>
-<pre><code class="language-text">myapp/
-|-- app.py
-|-- pyproject.toml
-|-- .env.example
-|-- migrations/
-|-- modules/
-|   |-- __init__.py
-|   |-- loader.py
-|   |-- core/
-|   |   `-- __init__.py
-|   |-- accounts/
-|   |   |-- __init__.py
-|   |   |-- repository.py
-|   |   |-- service.py
-|   |   |-- templates/
-|   |   `-- static/
-|   `-- inventory/
-|       |-- __init__.py
-|       `-- repository.py
-`-- tests/
-    |-- test_accounts.py
-    `-- test_inventory.py</code></pre>
-<p>This structure gives each team a clear ownership boundary. The application
-entry point wires shared infrastructure; modules own domain behavior.</p>
-<h2>2. Build a reusable module</h2>
-<pre><code class="language-python"># modules/inventory/__init__.py
-from flaxon.modules import FlaxonModule
-from flaxon.exceptions import NotFound
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"my-app"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1/users"</span><span class="p">)</span>
+</code></pre></div>
+<p>Run with <code>flaxon run app:app --reload</code>. <code>GET /api/v1/users/</code> and
+<code>GET /api/v1/users/42</code> both work. The module itself has no idea it's
+mounted under <code>/api/v1/users</code> -- that's decided entirely at
+<code>mount_module()</code> time, not baked into the module when it's authored.
+That's the core design difference from Flask blueprints, whose
+<code>url_prefix</code> handling has historically been a source of confusion.</p>
+<hr/>
+<h2 id="large-application-pattern">Large application pattern</h2>
+<p>Use one <code>FlaxonModule</code> for each business capability. Keep the application
+factory responsible for composition, and keep feature code responsible for
+its own routes, schemas, services, templates, and tests. This lets a large
+application grow without turning <code>app.py</code> into a registry of unrelated
+handlers.</p>
+<div class="highlight"><pre><span></span><code>myapp/
+|-- app/
+|   |-- main.py
+|   |-- config.py
+|   `-- modules/
+|       |-- catalog/
+|       |   |-- __init__.py
+|       |   `-- module.py
+|       |-- accounts/
+|       |   |-- __init__.py
+|       |   `-- module.py
+|       `-- ai_tools/
+|           |-- __init__.py
+|           `-- module.py
+|-- tests/
+`-- pyproject.toml
+</code></pre></div>
+<p>The entry point should only create the app and mount features:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-module = FlaxonModule("inventory")
-module.requires("db")
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.accounts.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_accounts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.catalog.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_catalog</span>
 
-@module.get("/")
-async def list_inventory(db):
-    return await db.fetch_all(
-        "SELECT id, sku, name, stock FROM inventory ORDER BY name"
-    )
 
-@module.get("/<int:item_id>")
-async def get_item(item_id: int, db):
-    item = await db.fetch_one(
-        "SELECT id, sku, name, stock FROM inventory WHERE id = ?", item_id
-    )
-    if item is None:
-        raise NotFound("Inventory item not found")
-    return item</code></pre>
-<p>The module stays unaware of its final URL. Mount it at <code>/api/inventory</code>,
-<code>/v1/inventory</code>, or another prefix without changing the module code.</p>
-<h2>3. Mount modules with dependency injection</h2>
-<pre><code class="language-python"># app.py
-from flaxon import Flaxon
-from flaxon.database.manager import DatabaseManager
-from flaxon.database.adapters.sqlite import SQLiteAdapter
-from modules.inventory import module as inventory
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flaxon</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"store"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">install_accounts</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">install_catalog</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
 
-app = Flaxon("shop", debug=True)
-db = DatabaseManager(SQLiteAdapter(database="var/shop.sqlite3"))
-app.container.register_instance("db", db)
-app.mount_module(inventory, prefix="/api/inventory")
 
-@app.on_startup
-async def startup():
-    await db.initialize()
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<p>Define routes and request models beside the feature that owns them:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/catalog/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-@app.on_shutdown
-async def shutdown():
-    await db.close()</code></pre>
-<p>Register dependencies before mounting. If a module declares <code>requires("db")</code>
-and the container does not provide it, mounting fails early with a dependency error.</p>
-<h2>4. Mount the same module for API versions</h2>
-<pre><code class="language-python">from modules.inventory import module as inventory
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
-app.mount_module(inventory, prefix="/v1/inventory", name="inventory-v1")
-app.mount_module(inventory, prefix="/v2/inventory", name="inventory-v2")</code></pre>
-<p>Use a distinct <code>name</code> for repeated mounts. The same module instance
-can support versioned routes while the domain implementation remains shared.</p>
-<h2>5. Auto-discover modules</h2>
-<pre><code class="language-python"># modules/loader.py
-import importlib
-import pkgutil
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
 
-def mount_all(app, prefix_base="/api"):
-    package = importlib.import_module("modules")
-    for _, name, is_package in pkgutil.iter_modules(package.__path__):
-        if not is_package:
-            continue
-        current = importlib.import_module(f"modules.{name}")
-        module = getattr(current, "module", None)
-        if module is None:
-            continue
-        prefix = "" if name == "core" else f"{prefix_base}/{name}"
-        app.mount_module(module, prefix=prefix)</code></pre>
-<pre><code class="language-python"># app.py
-from modules.loader import mount_all
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"catalog"</span><span class="p">)</span>
 
-# Register db, mail, cache, and other shared services first.
-mount_all(app, prefix_base="/api")</code></pre>
-<p>Adding a new domain becomes adding a package with a module-level <code>module</code>
-object. Keep startup dependencies registered before calling the loader.</p>
-<h2>6. Add module-scoped security</h2>
-<pre><code class="language-python">from flaxon.exceptions import Unauthorized
-from flaxon.modules import FlaxonModule
 
-staff = FlaxonModule("staff")
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateProduct</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">price</span><span class="p">:</span> <span class="nb">float</span>
 
-@staff.before_request
-async def require_staff(request):
-    if not request.session.get("staff_id"):
-        raise Unauthorized("Staff login required")
 
-@staff.after_request
-async def record_access(request, result):
-    request.app.logger.info("staff route: %s", request.path)
+<span class="nd">@catalog</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_product</span><span class="p">(</span><span class="n">product</span><span class="p">:</span> <span class="n">CreateProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateProduct</span><span class="p">:</span>
+    <span class="c1"># Replace this with a service/repository call in a real application.</span>
+    <span class="k">return</span> <span class="n">product</span>
 
-@staff.get("/reports")
-async def reports(db):
-    return await db.fetch_all("SELECT * FROM reports ORDER BY created_at DESC")</code></pre>
-<p>Module hooks only affect routes registered on that module. For Admin pages,
-also call the Admin permission guard inside each custom route and include CSRF
-validation for every browser mutation.</p>
-<h2>7. Add templates and static assets</h2>
-<pre><code class="language-python">from flaxon.http import Request
-from flaxon.modules import FlaxonModule
 
-portal = FlaxonModule(
-    "portal",
-    template_dir="modules/portal/templates",
-    static_dir="modules/portal/static",
-)
+<span class="k">def</span><span class="w"> </span><span class="nf">install_catalog</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/products"</span><span class="p">)</span>
+</code></pre></div>
+<p>The same feature can expose MCP tools without mixing protocol startup into the
+HTTP application:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/ai_tools/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-@portal.get("/")
-async def home(request: Request):
-    return await request.render("portal.html", {"title": "Staff portal"})
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
 
-app.mount_module(portal, prefix="/portal")</code></pre>
-<p>Module static files are mounted under the module namespace. Existing app
-templates take precedence when names overlap, so an application can provide a
-controlled override without editing a dependency.</p>
-<h2>8. Industrial service boundaries</h2>
-<pre><code class="language-python"># modules/orders/service.py
-class OrderService:
-    def __init__(self, repository, payment_gateway):
-        self.repository = repository
-        self.payment_gateway = payment_gateway
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.integrations.fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">mount_fastmcp</span>
 
-    async def create(self, customer_id, lines):
-        order = await self.repository.create_draft(customer_id, lines)
-        await self.payment_gateway.authorize(order.total)
-        return await self.repository.mark_authorized(order.id)</code></pre>
-<p>Route handlers should translate HTTP input and call services. Services own
-business rules, repositories own persistence, and workers own long-running
-operations. This makes the same behavior reusable from REST, GraphQL, Admin,
-WebSockets, and scheduled jobs.</p>
-<h2>9. Testing modules</h2>
-<pre><code class="language-python">import pytest
-from flaxon.testing import AsyncTestClient
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">"Store Tools"</span><span class="p">)</span>
 
-@pytest.mark.asyncio
-async def test_inventory_list(app):
-    async with AsyncTestClient(app) as client:
-        response = await client.get("/api/inventory/")
-    assert response.status_code == 200
 
-@pytest.mark.asyncio
-async def test_unknown_inventory_item(app):
-    async with AsyncTestClient(app) as client:
-        response = await client.get("/api/inventory/999999")
-    assert response.status_code == 404</code></pre>
-<p>Test modules independently with fakes for fast feedback, then test the
-assembled application for mount prefixes, middleware, database lifecycle,
-authentication, and cross-module behavior.</p>
-<h2>10. Production checklist</h2>
-<ul><li>Register shared database and service dependencies before module mounting.</li><li>Use migrations and close database connections during application shutdown.</li><li>Keep secrets in environment variables and disable debug in production.</li><li>Use Redis or a shared store for sessions, rate limits, locks, and events across workers.</li><li>Keep authorization in route and service boundaries, not only in navigation.</li><li>Use transactions for related writes and idempotency for retries.</li><li>Run <code>flaxon routes</code>, <code>flaxon doctor</code>, and the full test suite before release.</li><li>Run durable workers separately for scheduled jobs, thumbnails, mail, and retries.</li></ul>
-<h2>Run it</h2>
-<pre><code class="language-powershell">pip install "flaxon[standard]"
-flaxon migrate --database sqlite://./var/shop.sqlite3 --migrations-dir migrations
-flaxon run app:app --reload --port 8000</code></pre>
-<p>For the complete framework behavior and edge cases, read the source lessons
-<code>docs/guides/Modules.md</code> and <code>docs/lessons/production-app-guide.md</code>
-in the Flaxon repository.</p>
-<h2>Modules and Jinax: the file order</h2>
-<p>A <code>FlaxonModule</code> is Flaxon's blueprint-style unit. Define routes and module hooks in a reusable module, then choose the public URL when the application mounts it. Importing <code>FlaxonModule</code> also installs <code>mount_module()</code> on the real <code>Flaxon</code> class.</p>
-<pre><code class="language-text">site/
-|-- app.py                 # create the app and wire shared services
-|-- modules/
-|   |-- __init__.py
-|   |-- pages.py           # public pages module
-|   `-- shop.py            # shop module and database routes
-|-- templates/
-|   |-- base.html
-|   |-- pages/home.html
-|   `-- shop/catalog.html
-|-- static/
-|   |-- css/site.css
-|   `-- js/site.js
-`-- tests/</code></pre>
-<p>Use this order at startup: import modules, create <code>Flaxon</code>, configure Jinax, register dependencies, mount modules, register lifecycle hooks, and finally run the application.</p>
-<pre><code class="language-python"># modules/pages.py
-from flaxon.modules import FlaxonModule
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"available"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-pages = FlaxonModule("pages")
 
-@pages.get("/")
-async def home(request):
-    return await request.render("pages/home.html", {
-        "title": "Flaxon site",
-    })</code></pre>
-<pre><code class="language-python"># modules/shop.py
-from flaxon.modules import FlaxonModule
+<span class="k">def</span><span class="w"> </span><span class="nf">install_ai_tools</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">auth_provider</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">mount_fastmcp</span><span class="p">(</span>
+        <span class="n">app</span><span class="p">,</span>
+        <span class="n">mcp</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span>
+        <span class="n">auth</span><span class="o">=</span><span class="n">auth_provider</span><span class="p">,</span>
+        <span class="n">require_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stateless_http</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p><code>auth_provider</code> is your application's configured authentication provider. Do
+not replace it with <code>require_auth=False</code> for a public deployment. Do not call
+<code>mcp.run()</code> from a module; <code>mount_fastmcp()</code> owns the mounted ASGI lifecycle.</p>
+<h2 id="decide-where-code-goes">Decide where code goes</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Location</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>URL and HTTP method</td>
+<td><code>FlaxonModule</code> route</td>
+<td>Defines the public HTTP contract</td>
+</tr>
+<tr>
+<td>JSON input shape</td>
+<td>Pydantic model or Flaxon <code>Schema</code></td>
+<td>Gives clients predictable validation errors</td>
+</tr>
+<tr>
+<td>Business rules</td>
+<td>Service called by the route/tool</td>
+<td>Reusable from HTTP, MCP, tasks, and tests</td>
+</tr>
+<tr>
+<td>Database queries</td>
+<td>Repository or adapter</td>
+<td>Keeps storage replaceable and testable</td>
+</tr>
+<tr>
+<td>HTML</td>
+<td>Feature-owned Jinax templates</td>
+<td>Keeps presentation out of services</td>
+</tr>
+<tr>
+<td>MCP tools/resources</td>
+<td>Feature-owned <code>FastMCP</code> instance</td>
+<td>Keeps MCP names and permissions together</td>
+</tr>
+<tr>
+<td>App-wide wiring</td>
+<td><code>create_app()</code></td>
+<td>Makes startup, testing, and deployment consistent</td>
+</tr>
+</tbody>
+</table>
+<p>Install the optional integrations only when you use them:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[pydantic,mcp]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>app.main:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>The complete runnable versions are in
+<code>examples/pydantic_api/</code> and <code>examples/fastmcp_app/</code>.</p>
+<hr/>
+<h2 id="why-the-prefix-is-decided-at-mount-time-not-authoring-time">Why the prefix is decided at mount time (not authoring time)</h2>
+<p>This matters in practice, not just in theory -- it's what makes a
+module reusable for API versioning without copy-pasting it:</p>
+<div class="highlight"><pre><span></span><code><span class="n">api</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"api"</span><span class="p">)</span>
 
-shop = FlaxonModule("shop")
-shop.requires("db")
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/ping"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"pong"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-@shop.get("/catalog")
-async def catalog(request, db):
-    products = await db.fetch_all(
-        "SELECT id, name, price FROM products ORDER BY name"
-    )
-    return await request.render("shop/catalog.html", {
-        "title": "Catalog",
-        "products": products,
-    })</code></pre>
-<pre><code class="language-python"># app.py
-from flaxon import Flaxon
-from flaxon.database.adapters.sqlite import SQLiteAdapter
-from flaxon.database.manager import DatabaseManager
-from flaxon.jinax import Jinax
-from modules.pages import pages
-from modules.shop import shop
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"versioned-app"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/v1"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"api-v1"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/v2"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"api-v2"</span><span class="p">)</span>
+</code></pre></div>
+<p>Both <code>/v1/ping</code> and <code>/v2/ping</code> work, from the exact same module
+instance. The <code>name=</code> is required here because two mounts of the same
+module default to the same name and would otherwise collide -- see
+"Duplicate mounts" below.</p>
+<hr/>
+<h2 id="declaring-dependencies-with-requires">Declaring dependencies with <code>requires()</code></h2>
+<p>A module can declare what it needs from the app's dependency-injection
+container. If the dependency isn't registered, mounting fails
+immediately with a clear error -- not an <code>AttributeError</code> three requests
+later in production.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span><span class="p">,</span> <span class="n">ModuleDependencyError</span>
 
-app = Flaxon("site", debug=True)
-app.use_templates(Jinax("templates", auto_reload=True))
+<span class="n">posts</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"posts"</span><span class="p">)</span>
+<span class="n">posts</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"db"</span><span class="p">)</span>
 
-db = DatabaseManager(SQLiteAdapter("var/site.sqlite3"))
-app.container.register_instance("db", db)
+<span class="nd">@posts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_posts</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="s2">"SELECT * FROM posts"</span><span class="p">)</span>
 
-app.mount_module(pages, prefix="")
-app.mount_module(shop, prefix="/shop")
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"blog-app"</span><span class="p">)</span>
 
-@app.on_startup
-async def startup():
-    await db.initialize()
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/posts"</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">ModuleDependencyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>  <span class="c1"># "Module 'posts' requires ['db'] in app.container, but ..."</span>
 
-@app.on_shutdown
-async def shutdown():
-    await db.close()</code></pre>
-<p>The resulting URLs are <code>/</code> and <code>/shop/catalog</code>. The module's route stays <code>/catalog</code>; the mount prefix is applied only by <code>app.mount_module()</code>. Mount the same module again with a distinct <code>name=</code> for versioned APIs, for example <code>app.mount_module(shop, prefix="/v2/shop", name="shop-v2")</code>.</p>
-<p>For module-owned templates or assets, pass <code>template_dir</code> and <code>static_dir</code> to <code>FlaxonModule</code>. Jinax uses the application template loader first, then module loaders as fallbacks. Module static files are exposed below <code>/static/&lt;mount-name&gt;</code>. Keep authentication, authorization, and CSRF checks in the module routes or services; mounting a module does not grant permission by itself.</p>
-</article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded",function(){if(window.hljs)window.hljs.highlightAll();});</script></body></html>
+<span class="c1"># Register the dependency, then it mounts fine:</span>
+<span class="n">app</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="n">my_database_connection</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/posts"</span><span class="p">)</span>
+</code></pre></div>
+<p>Handlers ask for dependencies by parameter name (<code>db</code> above) -- same
+injection convention as any other Flaxon route, since modules just wrap
+the real router underneath.</p>
+<hr/>
+<h2 id="module-scoped-request-hooks">Module-scoped request hooks</h2>
+<p><code>before_request</code> and <code>after_request</code> only run for routes registered on
+<em>that</em> module -- they don't affect routes elsewhere in your app.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Unauthorized</span>
+
+<span class="n">admin_area</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"admin_area"</span><span class="p">)</span>
+
+<span class="nd">@admin_area</span><span class="o">.</span><span class="n">before_request</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">require_admin_header</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x-admin-key"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"secret"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Missing or invalid admin key"</span><span class="p">)</span>
+
+<span class="nd">@admin_area</span><span class="o">.</span><span class="n">after_request</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">log_access</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Admin route accessed: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nd">@admin_area</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/stats"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"visits"</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"app-with-admin-area"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">admin_area</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/admin-area"</span><span class="p">)</span>
+</code></pre></div>
+<p>A <code>before_request</code> that raises genuinely blocks the handler -- it never
+runs at all, not even partially. This is implemented by wrapping each
+endpoint at mount time (not by patching Flaxon's internal request
+dispatcher, which would be far riskier) -- the wrapper preserves the
+original handler's exact signature, so path params, <code>request</code> injection,
+and DI-resolved dependencies still work correctly whether or not the
+handler itself declares a <code>request</code> parameter.</p>
+<hr/>
+<h2 id="module-scoped-error-handlers">Module-scoped error handlers</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">posts</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"posts"</span><span class="p">)</span>
+
+<span class="nd">@posts</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="n">PostNotFound</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_missing_post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+
+<span class="nd">@posts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;int:post_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">post_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">real_posts_store</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PostNotFound</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No post with id </span><span class="si">{</span><span class="n">post_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">real_posts_store</span><span class="p">[</span><span class="n">post_id</span><span class="p">]</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"blog"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/posts"</span><span class="p">)</span>
+</code></pre></div>
+<p>Only exceptions of the registered type (or a subclass) raised <strong>within
+this module's own routes</strong> are caught here. Exceptions from unrelated
+routes elsewhere in the app, or exception types this module hasn't
+registered a handler for, propagate as normal and hit your app's
+regular error handling.</p>
+<hr/>
+<h2 id="static-files-and-templates">Static files and templates</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+
+<span class="n">blog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"blog"</span><span class="p">,</span> <span class="n">template_dir</span><span class="o">=</span><span class="s2">"templates"</span><span class="p">,</span> <span class="n">static_dir</span><span class="o">=</span><span class="s2">"static"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"index.html"</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"blog-app"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">blog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/blog"</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><code>static_dir</code> is served at <code>/static/&lt;module name&gt;/...</code> (uses the real
+  <code>app.mount_static()</code>, which is idempotent and path-traversal safe).</li>
+<li><code>template_dir</code> is wired into the app's template loader. If the app
+  doesn't have a template engine set up yet, mounting the module sets
+  one up for you. If it already does, the module's templates become a
+  <strong>fallback</strong> -- the app's own templates always take precedence for a
+  same-named file. This mirrors Flask's blueprint template-namespacing
+  intent without requiring a <code>&lt;module_name&gt;/</code> prefix convention on
+  every filename.</li>
+</ul>
+<hr/>
+<h2 id="lifecycle-hooks">Lifecycle hooks</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">blog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"blog"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">warm_cache</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Warming blog cache..."</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">flush_cache</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Flushing blog cache..."</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"blog-app"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">blog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/blog"</span><span class="p">)</span>
+</code></pre></div>
+<p>These forward directly into the app's real ASGI lifespan hooks
+(<code>app.on_startup</code>/<code>app.on_shutdown</code>) -- they fire on real startup/shutdown
+events (e.g. under <code>flaxon run</code>), the same as any hook registered
+directly on the app.</p>
+<hr/>
+<h2 id="nested-modules">Nested modules</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">v1_users</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"users"</span><span class="p">)</span>
+
+<span class="nd">@v1_users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"users"</span><span class="p">:</span> <span class="p">[]}</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"api"</span><span class="p">)</span>
+<span class="n">api</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">v1_users</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/v1/users"</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"nested-app"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
+<span class="c1"># final resolved path: GET /api/v1/users/</span>
+</code></pre></div>
+<p>Nest as deep as you want. A module can't be nested inside itself, and
+cycles (<code>a</code> nests <code>b</code>, <code>b</code> nests <code>a</code>) are detected and rejected with
+<code>ModuleCycleError</code> at <code>register_module()</code> time, before you ever try to
+mount anything.</p>
+<hr/>
+<h2 id="cli-commands-owned-by-a-module">CLI commands owned by a module</h2>
+<p>Flaxon's CLI already supports plugin-style command discovery from two
+places: a <code>flaxon_cli.py</code> at your project root, or any <code>./cli/*.py</code>
+file. <code>FlaxonModule</code> hooks into this directly -- no core CLI changes
+needed.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># cli/blog.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">blog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"blog"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">cli_command</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">"Seed demo blog posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">seed_posts</span><span class="p">(</span><span class="n">console</span><span class="p">):</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Seeding demo posts..."</span><span class="p">)</span>
+    <span class="c1"># ... insert demo data ...</span>
+
+<span class="n">blog</span><span class="o">.</span><span class="n">install_cli_commands</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
+</code></pre></div>
+<p>Then:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>--help<span class="w">     </span><span class="c1"># "seed" shows up in the command list</span>
+flaxon<span class="w"> </span>seed<span class="w">       </span><span class="c1"># actually runs it</span>
+</code></pre></div>
+<p>Command functions can be sync or async, and can optionally take <code>args</code>
+as a second parameter if they need to read CLI flags:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@blog</span><span class="o">.</span><span class="n">cli_command</span><span class="p">(</span><span class="s2">"import"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">import_posts</span><span class="p">(</span><span class="n">console</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Importing from: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">command</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Use <code>./cli/*.py</code>, not <code>flaxon_cli.py</code>, unless you've applied the
+<code>discovery.py</code> fix.</strong> The <code>flaxon_cli.py</code>-at-project-root path relies on
+plain <code>import flaxon_cli</code>, which only works if the current directory
+happens to already be on <code>sys.path</code> -- verified this is not reliably
+true when running the installed <code>flaxon</code> console script. <code>./cli/*.py</code>
+uses explicit file loading instead and works regardless.</p>
+<hr/>
+<h2 id="testing-a-module-in-isolation">Testing a module in isolation</h2>
+<p>No full app needed:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span><span class="p">,</span> <span class="n">ModuleTestClient</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_ping</span><span class="p">():</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"api"</span><span class="p">)</span>
+
+    <span class="nd">@mod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/ping"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"pong"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">ModuleTestClient</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">"GET"</span><span class="p">,</span> <span class="s2">"/ping"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">test_ping</span><span class="p">())</span>
+</code></pre></div>
+<p><code>ModuleTestClient</code> builds a throwaway <code>Flaxon</code> app, mounts your module
+at the root, and wraps it in the real <code>AsyncTestClient</code> -- genuinely
+low-risk since <code>AsyncTestClient</code> only needs a bare ASGI callable, not
+anything Flaxon-specific.</p>
+<hr/>
+<h2 id="production-considerations">Production considerations</h2>
+<h2 id="duplicate-mounts-fail-loudly-on-purpose">Duplicate mounts fail loudly, on purpose</h2>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/a"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/b"</span><span class="p">)</span>  <span class="c1"># raises ModuleAlreadyMountedError</span>
+</code></pre></div>
+<p>This is intentional -- a second full-module mount under the same
+default name is more likely a real bug (accidentally mounting the same
+module twice) than something you meant to do. If you <em>do</em> mean it
+(e.g. API versioning), pass distinct <code>name=</code> values, as shown earlier.</p>
+<h2 id="requires-as-a-deploy-time-safety-net"><code>requires()</code> as a deploy-time safety net</h2>
+<p>Put every hard dependency your module needs in <code>requires()</code>. Combined
+with mounting all your modules at app-startup (not lazily, not inside a
+request handler), a misconfigured deployment -- a missing database
+connection, a missing cache client -- fails immediately when the app
+starts, not on the first real request from a user.</p>
+<h2 id="error-handlers-and-information-leakage">Error handlers and information leakage</h2>
+<p>A module-scoped <code>errorhandler</code> fully controls what gets sent back to
+the client for its exception types. Don't accidentally leak internals:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@posts</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="n">DatabaseError</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_db_error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+    <span class="c1"># Log the real exception server-side...</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"DB error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="n">exc</span><span class="p">)</span>
+    <span class="c1"># ...but never put exc's raw message straight into the response.</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Internal error"</span><span class="p">},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="no-unmounting">No unmounting</h2>
+<p>There's no <code>app.unmount_module()</code>. Once mounted, a module's routes stay
+registered for the app's lifetime. This is deliberate -- runtime
+unmounting of routes is a much larger design problem (in-flight
+requests, cache invalidation, route-table consistency) that this cut
+doesn't attempt to solve. If you need conditional features, decide
+whether to mount a module <em>before</em> calling <code>mount_module()</code>, not after:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="n">feature_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"new_dashboard"</span><span class="p">):</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">dashboard_v2</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/dashboard"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">dashboard_v1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/dashboard"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="websocket-routes-are-handled-but-check-your-version">WebSocket routes are handled, but check your version</h2>
+<p>Flaxon's own <code>Router.include_router()</code> re-prefixes HTTP routes
+correctly but does <strong>not</strong> re-prefix WebSocket routes at all (verified
+against the router source). <code>modules.py</code> works around this itself, so
+WebSocket routes on a module mount correctly regardless -- but if you
+ever bypass <code>mount_module()</code> and call <code>include_router()</code> directly on a
+module's <code>.router</code>, you'll hit this gap yourself.</p>
+<h2 id="route-collision-warnings-are-expected-and-fine">Route collision warnings are expected and fine</h2>
+<p>Mounting a module whose routes overlap with an existing catch-all
+pattern (e.g. a literal route landing inside a broader <code>&lt;param&gt;</code>
+pattern from something else, like <code>AdminDashboard</code>) will log a
+collision warning at mount time. This is informational, not an error --
+Flaxon's router resolves these correctly via specificity (literal
+segments always win over <code>&lt;param&gt;</code> segments, regardless of which was
+registered first). Don't be alarmed by a noisy startup log full of
+these on an app with several plugins mounted; check that the <em>specific</em>
+route you care about actually resolves to what you expect, using
+<code>flaxon routes app:app</code>.</p>
+<hr/>
+<h2 id="full-example-a-real-module-everything-together">Full example: a real module, everything together</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># cli/blog.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Unauthorized</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">blog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"blog"</span><span class="p">,</span> <span class="n">template_dir</span><span class="o">=</span><span class="s2">"templates"</span><span class="p">,</span> <span class="n">static_dir</span><span class="o">=</span><span class="s2">"static"</span><span class="p">)</span>
+<span class="n">blog</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"db"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">before_request</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">require_api_key</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x-api-key"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"demo-key"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Missing API key"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="n">PostNotFound</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_missing</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_posts</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="s2">"SELECT * FROM posts"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/posts/&lt;int:post_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_post</span><span class="p">(</span><span class="n">post_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span><span class="s2">"SELECT * FROM posts WHERE id = ?"</span><span class="p">,</span> <span class="n">post_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">post</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PostNotFound</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No post with id </span><span class="si">{</span><span class="n">post_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">post</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"index.html"</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">warm_cache</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Blog module ready."</span><span class="p">)</span>
+
+<span class="nd">@blog</span><span class="o">.</span><span class="n">cli_command</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">"Seed demo blog posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">seed_posts</span><span class="p">(</span><span class="n">console</span><span class="p">):</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Seeding demo posts..."</span><span class="p">)</span>
+
+<span class="n">blog</span><span class="o">.</span><span class="n">install_cli_commands</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
+
+
+<span class="c1"># app.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cli.blog</span><span class="w"> </span><span class="kn">import</span> <span class="n">blog</span>  <span class="c1"># reuse the same module instance defined above</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"blog-app"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="n">my_database_connection</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">blog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/blog"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload<span class="w">   </span><span class="c1"># serves the app</span>
+flaxon<span class="w"> </span>seed<span class="w">                    </span><span class="c1"># runs the module's own CLI command</span>
+flaxon<span class="w"> </span>routes<span class="w"> </span>app:app<span class="w">          </span><span class="c1"># confirms everything mounted where you expect</span>
+</code></pre></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

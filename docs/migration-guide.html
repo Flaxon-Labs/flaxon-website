@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Migration Guide — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Migration Guide — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Migration Guide</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/migration-guide.md">Framework source</a> · <a href="../content/framework/docs/migration-guide.md" download>Markdown</a></p><h1 id="migration-guide">Migration Guide</h1>
+<p>This guide helps developers migrate existing applications from popular Python frameworks to <strong>Flaxon</strong>.</p>
+<p>Flaxon provides a modern, async-first approach while keeping familiar patterns from frameworks like Flask, Django, and FastAPI.</p>
+<hr/>
+<h2 id="migrating-from-flask">Migrating from Flask</h2>
+<h2 id="route-decorators">Route Decorators</h2>
+<h3 id="flask">Flask</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
+<span class="err">````</span>
+
+<span class="c1">### Flaxon</span>
+
+<span class="err">```</span><span class="n">python</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-and-response">Request and Response</h2>
+<h3 id="flask_1">Flask</h3>
+<div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+
+<span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
+    <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span>
+<span class="p">})</span>
+</code></pre></div>
+<h3 id="flaxon">Flaxon</h3>
+<div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="k">return</span> <span class="p">{</span>
+    <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="validation">Validation</h2>
+<h3 id="flask_2">Flask</h3>
+<p>Flask usually requires manual validation:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="ow">not</span> <span class="n">username</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Username required"</span><span class="p">}</span>
+</code></pre></div>
+<h3 id="flaxon_1">Flaxon</h3>
+<p>Flaxon provides schema-based validation:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="websockets">WebSockets</h2>
+<h3 id="flask_3">Flask</h3>
+<p>Requires an additional extension:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Requires Flask-SocketIO</span>
+</code></pre></div>
+<h3 id="flaxon_2">Flaxon</h3>
+<p>Built-in async WebSocket support:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">socket</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="migrating-from-django">Migrating from Django</h2>
+<h2 id="views">Views</h2>
+<h3 id="django">Django</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">})</span>
+</code></pre></div>
+<h3 id="flaxon_3">Flaxon</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="serializers">Serializers</h2>
+<h3 id="django-rest-framework">Django REST Framework</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">UserSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"id"</span><span class="p">,</span>
+            <span class="s2">"name"</span>
+        <span class="p">]</span>
+</code></pre></div>
+<h3 id="flaxon_4">Flaxon</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="migrating-from-fastapi">Migrating from FastAPI</h2>
+<h2 id="path-parameters">Path Parameters</h2>
+<h3 id="fastapi">FastAPI</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/</span><span class="si">{user_id}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h3 id="flaxon_5">Flaxon</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="validation_1">Validation</h2>
+<h3 id="fastapi_1">FastAPI</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="n">EmailStr</span>
+</code></pre></div>
+<h3 id="flaxon_6">Flaxon</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="common-patterns">Common Patterns</h2>
+<h2 id="database-connection">Database Connection</h2>
+<h3 id="flaxon-startup-and-shutdown">Flaxon Startup and Shutdown</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_pool</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="dependency-injection">Dependency Injection</h2>
+<p>Flaxon supports dependency injection for managing application services.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.dependency_injection</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span><span class="p">,</span> <span class="n">inject</span>
+
+
+<span class="n">container</span> <span class="o">=</span> <span class="n">Container</span><span class="p">()</span>
+
+<span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span>
+    <span class="s2">"db"</span><span class="p">,</span>
+    <span class="n">db_pool</span>
+<span class="p">)</span>
+
+
+<span class="nd">@inject</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing">Testing</h2>
+<p>Flaxon provides a testing client for application testing.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_users</span><span class="p">():</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+</code></pre></div>
+<hr/>
+<h2 id="breaking-changes">Breaking Changes</h2>
+<h2 id="version-010-future-versions">Version 0.1.0 → Future Versions</h2>
+<p>Before Flaxon reaches version <code>1.0</code>, some APIs may change.</p>
+<p>Migration notes:</p>
+<ul>
+<li>Check <code>CHANGELOG.md</code> before upgrading.</li>
+<li>Follow semantic versioning.</li>
+<li>Review deprecated features before updating.</li>
+</ul>
+<hr/>
+<h2 id="getting-help">Getting Help</h2>
+<p>If you need help migrating:</p>
+<h2 id="github-issues">GitHub Issues</h2>
+<p>Report bugs or migration problems through GitHub Issues.</p>
+<h2 id="discussions">Discussions</h2>
+<p>Ask questions and share migration tips through GitHub Discussions.</p>
+<p>```</p></article>
+</main></div><div id="footer"></div></body></html>

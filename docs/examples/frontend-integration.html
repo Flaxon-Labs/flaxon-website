@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Frontend Integration Examples — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Frontend Integration Examples — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Frontend Integration Examples</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/frontend-integration.md">Framework source</a> · <a href="../../content/framework/docs/examples/frontend-integration.md" download>Markdown</a></p><h1 id="frontend-integration-examples">Frontend Integration Examples</h1>
+<p>Flaxon works with modern frontend frameworks through JSON APIs, browser-safe CORS
+configuration, authentication, and WebSockets.</p>
+<p>Supported Frontends:</p>
+<ul>
+<li>React</li>
+<li>Vue</li>
+<li>Angular</li>
+<li>Svelte</li>
+<li>Next.js</li>
+</ul>
+<hr/>
+<h2 id="1-react-integration">1. React Integration</h2>
+<h2 id="backend">Backend</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"react-backend"</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"http://localhost:5173"</span>
+    <span class="p">],</span>
+    <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Laptop"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span> <span class="mi">999</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/orders"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_order</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"items"</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">"items"</span><span class="p">]</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h2 id="react-client">React Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">API</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"http://localhost:8000/api"</span><span class="p">;</span>
+
+
+<span class="k">export</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">getProducts</span><span class="p">(){</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
+<span class="w">        </span><span class="sb">`</span><span class="si">${</span><span class="nx">API</span><span class="si">}</span><span class="sb">/products`</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="2-vue-integration">2. Vue Integration</h2>
+<h2 id="backend_1">Backend</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"vue-backend"</span><span class="p">)</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"http://localhost:5173"</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tasks</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span><span class="s2">"Learn Flaxon"</span><span class="p">,</span>
+            <span class="s2">"completed"</span><span class="p">:</span><span class="kc">False</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</code></pre></div>
+<h2 id="vue-client">Vue Client</h2>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">setup</span><span class="p">&gt;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">ref</span><span class="p">,</span><span class="nx">onMounted</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"vue"</span>
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ref</span><span class="p">([])</span>
+
+
+<span class="nx">onMounted</span><span class="p">(</span><span class="k">async</span><span class="p">()=&gt;{</span>
+
+<span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span>
+<span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
+<span class="w"> </span><span class="s2">"http://localhost:8000/api/tasks"</span>
+<span class="w"> </span><span class="p">)</span>
+
+<span class="w"> </span><span class="nx">tasks</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span>
+<span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
+
+<span class="p">})</span>
+
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+Tasks
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">v-for</span><span class="o">=</span><span class="s">"</span><span class="nx">task</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">tasks</span><span class="s">"</span><span class="p">&gt;</span>
+
+<span class="cp">{{</span><span class="nx">task</span><span class="p">.</span><span class="nx">title</span><span class="cp">}}</span>
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="3-angular-integration">3. Angular Integration</h2>
+<h2 id="backend_2">Backend</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"angular-api"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span><span class="s2">"Hello Flaxon"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</code></pre></div>
+<h2 id="angular-service">Angular Service</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">@Injectable</span><span class="p">({</span>
+<span class="nx">providedIn</span><span class="o">:</span><span class="s2">"root"</span>
+<span class="p">})</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nx">ApiService</span><span class="p">{</span>
+
+
+<span class="k">private</span><span class="w"> </span><span class="nx">url</span><span class="w"> </span><span class="o">=</span>
+<span class="s2">"http://localhost:8000/api"</span><span class="p">;</span>
+
+
+<span class="kr">constructor</span><span class="p">(</span>
+<span class="k">private</span><span class="w"> </span><span class="nx">http</span><span class="o">:</span><span class="kt">HttpClient</span>
+<span class="p">){}</span>
+
+
+<span class="nx">getPosts</span><span class="p">(){</span>
+
+<span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span>
+<span class="sb">`</span><span class="si">${</span><span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="si">}</span><span class="sb">/posts`</span>
+<span class="p">)</span>
+
+<span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="4-svelte-integration">4. Svelte Integration</h2>
+<h2 id="backend_3">Backend</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"svelte-api"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/notes"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">notes</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span><span class="s2">"My Note"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</code></pre></div>
+<h2 id="svelte-client">Svelte Client</h2>
+<div class="highlight"><pre><span></span><code>&lt;script&gt;
+
+let notes=[];
+
+
+async function load(){
+
+const res =
+await fetch(
+"http://localhost:8000/api/notes"
+);
+
+notes =
+await res.json();
+
+}
+
+
+load();
+
+&lt;/script&gt;
+
+
+&lt;h1&gt;
+Notes
+&lt;/h1&gt;
+
+
+{#each notes as note}
+
+&lt;p&gt;
+{note.title}
+&lt;/p&gt;
+
+{/each}
+</code></pre></div>
+<hr/>
+<h2 id="5-nextjs-integration">5. Next.js Integration</h2>
+<p>Flaxon works with Next.js using REST APIs, SSR, and dynamic routing.</p>
+<h2 id="backend_4">Backend</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"next-backend"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/blog/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span><span class="s2">"Flaxon Blog"</span><span class="p">,</span>
+            <span class="s2">"slug"</span><span class="p">:</span><span class="s2">"flaxon"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</code></pre></div>
+<h2 id="nextjs-api-client">Next.js API Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">API</span><span class="w"> </span><span class="o">=</span>
+<span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NEXT_PUBLIC_API_URL</span><span class="p">;</span>
+
+
+<span class="k">export</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">getPosts</span><span class="p">(){</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
+<span class="sb">`</span><span class="si">${</span><span class="nx">API</span><span class="si">}</span><span class="sb">/blog/posts`</span>
+<span class="p">);</span>
+
+<span class="k">return</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="authentication-support">Authentication Support</h2>
+<p>All frontend frameworks can use:</p>
+<ul>
+<li>JWT Authentication</li>
+<li>Sessions</li>
+<li>OAuth providers</li>
+<li>Role permissions</li>
+<li>CSRF protection</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/profile"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="websocket-support">WebSocket Support</h2>
+<p>Flaxon also supports realtime frontend applications.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">socket</span><span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+<span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"message"</span><span class="p">:</span><span class="n">message</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+</code></pre></div>
+<p>Works with:</p>
+<ul>
+<li>React WebSocket hooks</li>
+<li>Vue composables</li>
+<li>Angular RxJS</li>
+<li>Svelte stores</li>
+<li>Next.js client components</li>
+</ul>
+<hr/>
+<h2 id="summary">Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Integration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>React</td>
+<td>REST API + WebSockets</td>
+</tr>
+<tr>
+<td>Vue</td>
+<td>REST API + CRUD</td>
+</tr>
+<tr>
+<td>Angular</td>
+<td>REST API + RxJS</td>
+</tr>
+<tr>
+<td>Svelte</td>
+<td>REST API + Reactive State</td>
+</tr>
+<tr>
+<td>Next.js</td>
+<td>REST API + SSR</td>
+</tr>
+</tbody>
+</table>
+<p>Flaxon can power modern frontend applications while keeping a Python-first backend architecture.</p></article>
+</main></div><div id="footer"></div></body></html>

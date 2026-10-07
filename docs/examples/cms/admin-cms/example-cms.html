@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CMS Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>CMS Example — Flaxon Docs</title>
+<link rel="icon" href="../../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../../assets/css/style.css"><link rel="stylesheet" href="../../../../assets/css/docs.css">
+<script src="../../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../../assets/js/site-shell.js"></script>
+<script defer src="../../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>CMS Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/cms/admin-cms/example-cms.md">Framework source</a> · <a href="../../../../content/framework/docs/examples/cms/admin-cms/example-cms.md" download>Markdown</a></p><h1 id="cms-example">CMS Example</h1>
+<blockquote>
+<p>This older example is retained for compatibility. Use the complete editable
+reference at <a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/cms/full_admin_cms/app.py">full_admin_cms/app.py</a> and follow the
+<a href="../../../guides/admin-cms.html">production guide</a> for current APIs.</p>
+</blockquote>
+<p>This example demonstrates the CMS panel — a small, self-contained,
+WordPress/Django-admin-style content manager that ships as two files
+(<code>cms.py</code> + <code>cms.html</code>). It's an optional add-on, independent of
+<code>AdminDashboard</code>: use it on its own, or mount it alongside a model-based
+<code>AdminDashboard</code> in the same app.</p>
+<h2 id="installing-the-two-files">Installing the two files</h2>
+<p>Copy both files into your Flaxon installation, keeping them in the same
+relative layout as the built-in admin templates:</p>
+<div class="highlight"><pre><span></span><code>flaxon/
+  admin/
+    cms.py
+    templates/
+      admin/
+        cms.html
+</code></pre></div>
+<p><code>cms.py</code> loads <code>cms.html</code> from <code>templates/admin/cms.html</code> relative to its
+own location by default. If you move <code>cms.html</code> elsewhere, pass
+<code>template_path=</code> explicitly when creating <code>CMS(...)</code>.</p>
+<h2 id="running-the-example">Running the Example</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a new Flaxon project</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>cms-example
+
+<span class="nb">cd</span><span class="w"> </span>cms-example
+
+<span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>flaxon
+
+<span class="c1"># Create app.py with the code below</span>
+
+<span class="c1"># Run the application</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Visit <code>http://localhost:8000/admin/cms</code>.</p>
+<hr/>
+<h2 id="full-example-code">Full Example Code</h2>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span><span class="p">,</span> <span class="n">ContentType</span><span class="p">,</span> <span class="n">CMSField</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"cms-example"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"My Site CMS"</span><span class="p">)</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Post"</span><span class="p">,</span>
+    <span class="n">label_plural</span><span class="o">=</span><span class="s2">"Posts"</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"Title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"content"</span><span class="p">,</span> <span class="s2">"Content"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"richtext"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"featured_image"</span><span class="p">,</span> <span class="s2">"Featured Image URL"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"updated_at"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">],</span>
+<span class="p">))</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"page"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Page"</span><span class="p">,</span>
+    <span class="n">label_plural</span><span class="o">=</span><span class="s2">"Pages"</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"Title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"content"</span><span class="p">,</span> <span class="s2">"Content"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"richtext"</span><span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome"</span><span class="p">,</span> <span class="s2">"cms"</span><span class="p">:</span> <span class="s2">"/admin/cms"</span><span class="p">}</span>
+</code></pre></div>
+<p>Run with <code>flaxon run app:app --reload</code>.</p>
+<hr/>
+<h2 id="using-it-alongside-admindashboard">Using It Alongside AdminDashboard</h2>
+<p><code>CMS</code> and <code>AdminDashboard</code> don't share any state or registry — they're
+fully independent panels that happen to be able to live under the same
+<code>/admin</code> prefix. Mount both in either order:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminDashboard</span><span class="p">,</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">admin_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span><span class="p">,</span> <span class="n">ContentType</span><span class="p">,</span> <span class="n">CMSField</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"combined-example"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span><span class="n">site_title</span><span class="o">=</span><span class="s2">"Product Admin"</span><span class="p">),</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">)</span>
+
+<span class="nd">@admin_model</span><span class="p">(</span><span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">],</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">])</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">:</span>
+    <span class="o">...</span>  <span class="c1"># see admin-panel.md for the full model</span>
+
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"My Site CMS"</span><span class="p">)</span>
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)]))</span>
+</code></pre></div>
+<p><code>AdminDashboard</code> handles <code>/admin/&lt;model_name&gt;</code> (e.g. <code>/admin/product</code>)
+and <code>CMS</code> handles everything under <code>/admin/cms</code> — its routes are
+registered so they always take priority over <code>AdminDashboard</code>'s
+catch-all <code>/admin/&lt;model_name&gt;</code> pattern, so there's no collision
+regardless of which one you construct first.</p>
+<hr/>
+<h2 id="content-types">Content Types</h2>
+<p>A <code>ContentType</code> is roughly Django admin's registered model, or
+WordPress's custom post type — a named collection of records with a
+field schema, search/filter/list configuration, and bulk actions.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ContentType</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>                 <span class="c1"># used in URLs and the JSON API</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Post"</span><span class="p">,</span>                <span class="c1"># singular display name (auto-derived if omitted)</span>
+    <span class="n">label_plural</span><span class="o">=</span><span class="s2">"Posts"</span><span class="p">,</span>        <span class="c1"># plural display name (auto-derived if omitted)</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span>                <span class="c1"># list of CMSField</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"updated_at"</span><span class="p">],</span>  <span class="c1"># columns shown in the list view</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>      <span class="c1"># exact-match dropdown filters in the list view</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">],</span>               <span class="c1"># fields the search box matches against</span>
+    <span class="n">has_status</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>             <span class="c1"># adds a draft/published status field + publish/unpublish bulk actions</span>
+    <span class="n">has_slug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>               <span class="c1"># adds an auto-generated, unique slug field</span>
+    <span class="n">slug_source</span><span class="o">=</span><span class="s2">"title"</span><span class="p">,</span>         <span class="c1"># which field the slug is derived from</span>
+    <span class="n">order_by</span><span class="o">=</span><span class="s2">"-updated_at"</span><span class="p">,</span>      <span class="c1"># default sort (prefix with "-" for descending)</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="fields">Fields</h2>
+<div class="highlight"><pre><span></span><code><span class="n">CMSField</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"title"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Title"</span><span class="p">,</span>           <span class="c1"># display label (auto-derived from name if omitted)</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">"text"</span><span class="p">,</span>              <span class="c1"># text | textarea | richtext | boolean | number | date | email | url | select</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">choices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>              <span class="c1"># list of strings, required for type="select"</span>
+    <span class="n">help_text</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>              <span class="c1"># shown under the field in the form</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p><code>richtext</code> renders as a large textarea in the SPA and stores raw HTML —
+there's no WYSIWYG editor built in, but the field is there for content
+you'll render as HTML on your own site.</p>
+<h2 id="bulk-actions">Bulk Actions</h2>
+<p>Every content type gets <code>delete</code> for free, and <code>publish</code>/<code>unpublish</code> if
+<code>has_status=True</code>. Register your own:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="n">content_type</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">item_id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">content_type</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">item_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"archived"</span><span class="p">})</span>
+
+<span class="n">my_content_type</span><span class="o">.</span><span class="n">register_action</span><span class="p">(</span><span class="s2">"archive"</span><span class="p">,</span> <span class="s2">"Archive selected"</span><span class="p">,</span> <span class="n">archive</span><span class="p">)</span>
+</code></pre></div>
+<p>Registered actions automatically show up in the SPA's bulk-action
+dropdown once you select one or more rows.</p>
+<hr/>
+<h2 id="json-api">JSON API</h2>
+<p>Everything the SPA does goes through a plain JSON API under
+<code>{url_prefix}/api/...</code> — useful if you want to build your own frontend
+against it, or call it from scripts/tests.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/config</code></td>
+<td>Title + schema for every registered content type</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/stats</code></td>
+<td>Per-type counts (total / published / draft)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/&lt;type&gt;/items</code></td>
+<td>List items — see query params below</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/&lt;type&gt;/items</code></td>
+<td>Create an item</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Get one item</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Partially update an item</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Delete an item</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/&lt;type&gt;/actions/&lt;action&gt;</code></td>
+<td>Run a bulk action — body: <code>{"ids": [...]}</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="list-query-params">List query params</h2>
+<ul>
+<li><code>q</code> — substring search across <code>search_fields</code></li>
+<li><code>filter_&lt;field&gt;</code> — exact match on a field, e.g. <code>?filter_status=published</code></li>
+<li><code>order_by</code> — field name, prefix with <code>-</code> for descending</li>
+<li><code>page</code>, <code>per_page</code> — pagination (<code>per_page</code> capped at 200)</li>
+</ul>
+<h2 id="example-requests">Example requests</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a post</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/admin/cms/api/post/items<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"title": "Hello World", "content": "&lt;p&gt;First post&lt;/p&gt;"}'</span>
+
+<span class="c1"># List published posts, page 1</span>
+curl<span class="w"> </span><span class="s2">"http://localhost:8000/admin/cms/api/post/items?filter_status=published&amp;page=1"</span>
+
+<span class="c1"># Search</span>
+curl<span class="w"> </span><span class="s2">"http://localhost:8000/admin/cms/api/post/items?q=hello"</span>
+
+<span class="c1"># Bulk publish</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/admin/cms/api/post/actions/publish<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"ids": ["abc123", "def456"]}'</span>
+</code></pre></div>
+<p>A <code>create</code>/<code>update</code> on a <code>required</code> field left out of the request body
+returns <code>400</code>. Looking up an unknown item id, content type, or action
+returns <code>404</code>.</p>
+<hr/>
+<h2 id="the-spa-cmshtml">The SPA (cms.html)</h2>
+<p><code>cms.html</code> is a single file — Tailwind + Alpine.js from CDN, no build
+step — matching the dark theme used by the rest of the Flaxon admin.
+It talks only to the JSON API above, so you can replace it entirely with
+your own frontend without touching <code>cms.py</code>.</p>
+<p>Views (hash-routed, so back/forward and refresh all work):</p>
+<ul>
+<li><code>#/</code> — dashboard: cards for each registered content type with live counts</li>
+<li><code>#/&lt;type&gt;</code> — list view: search, filters, sortable columns, pagination, row selection + bulk actions</li>
+<li><code>#/&lt;type&gt;/new</code> — create form, generated from the type's field schema</li>
+<li><code>#/&lt;type&gt;/&lt;id&gt;/edit</code> — edit form</li>
+</ul>
+<hr/>
+<h2 id="persistence">Persistence</h2>
+<p>Storage is in-memory (<code>ContentType.items</code>, a plain dict) and resets on
+restart — fine for demos and prototyping. To back it with a real
+database, subclass <code>ContentType</code> and override <code>create</code>/<code>update</code>/<code>delete</code>/
+<code>get</code>/<code>query</code>/<code>stats</code> to read and write your own storage instead of
+<code>self.items</code>.</p>
+<hr/>
+<h2 id="production-improvements">Production Improvements</h2>
+<p>Recommended next steps:</p>
+<ul>
+<li>Swap in-memory storage for a real database</li>
+<li>Add authentication in front of <code>/admin/cms</code> (see <code>flaxon.security.login_required</code>)</li>
+<li>Add file/image upload support for media fields instead of raw URL fields</li>
+<li>Add a real rich-text editor for <code>richtext</code> fields in <code>cms.html</code></li>
+<li>Add per-content-type permissions if multiple admin users share the panel</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,205 +1,612 @@
-<!-- docs/guides/testing.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Testing – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Testing — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Testing — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Testing</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/testing.md">Framework source</a> · <a href="../../content/framework/docs/guides/testing.md" download>Markdown</a></p><h1 id="testing">Testing</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides comprehensive testing utilities including synchronous and asynchronous test clients, WebSocket testing, fixtures, database testing, authentication testing, mocking, and custom assertions.</p>
+<h2 id="installation">Installation</h2>
+<p>Install Flaxon with development dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>dev<span class="o">]</span>
+<span class="sb">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+---
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="c1"># Basic Test Client</span>
 
-    <div id="header"></div>
+<span class="sb">```</span>python
+from<span class="w"> </span>flaxon<span class="w"> </span>import<span class="w"> </span>Flaxon
+from<span class="w"> </span>flaxon.testing<span class="w"> </span>import<span class="w"> </span>TestClient
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+def<span class="w"> </span>test_basic_route<span class="o">()</span>:
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="w">    </span><span class="nv">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>Flaxon<span class="o">(</span><span class="s2">"test-app"</span><span class="o">)</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html" class="active">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="w">    </span>@app.get<span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+<span class="w">    </span>async<span class="w"> </span>def<span class="w"> </span>home<span class="o">()</span>:
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">{</span><span class="s2">"message"</span>:<span class="w"> </span><span class="s2">"Hello"</span><span class="o">}</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Testing</h1>
-                        <p>Flaxon provides comprehensive testing utilities including synchronous and asynchronous test clients, WebSocket testing, fixtures, and assertions.</p>
+<span class="w">    </span><span class="nv">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>TestClient<span class="o">(</span>app<span class="o">)</span>
 
-                        <h2>Installation</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">pip install "flaxon[dev]"</code></pre>
-                        </div>
+<span class="w">    </span><span class="nv">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>client.get<span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
 
-                        <h2>Basic Test Client</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
-from flaxon.testing import TestClient
+<span class="w">    </span>assert<span class="w"> </span>response.status_code<span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">200</span>
+<span class="w">    </span>assert<span class="w"> </span>response.json<span class="o">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s2">"message"</span>:<span class="w"> </span><span class="s2">"Hello"</span>
+<span class="w">    </span><span class="o">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="async-test-client">Async Test Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncTestClient</span>
 
-def test_basic_route():
-    app = Flaxon("test-app")
 
-    @app.get("/")
-    async def home():
-        return {"message": "Hello"}
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_async_route</span><span class="p">():</span>
 
-    client = TestClient(app)
-    response = client.get("/")
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
 
-    assert response.status_code == 200
-    assert response.json() == {"message": "Hello"}</code></pre>
-                        </div>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span><span class="p">}</span>
 
-                        <h2>Async Test Client</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import pytest
-from flaxon.testing import AsyncTestClient
+    <span class="n">client</span> <span class="o">=</span> <span class="n">AsyncTestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
-@pytest.mark.asyncio
-async def test_async_route():
-    app = Flaxon("test-app")
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
 
-    @app.get("/")
-    async def home():
-        return {"message": "Hello"}
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-http-methods">Testing HTTP Methods</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_all_methods</span><span class="p">():</span>
 
-    client = AsyncTestClient(app)
-    response = await client.get("/")
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
 
-    assert response.status_code == 200
-    assert response.json() == {"message": "Hello"}</code></pre>
-                        </div>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/get"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_route</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"GET"</span><span class="p">}</span>
 
-                        <h2>Testing Request Body</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">def test_request_body():
-    app = Flaxon("test-app")
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/post"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">post_route</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"POST"</span><span class="p">}</span>
 
-    @app.post("/users")
-    async def create_user(request):
-        data = await request.json()
-        return {"received": data}
+    <span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/put"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">put_route</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"PUT"</span><span class="p">}</span>
 
-    client = TestClient(app)
-    response = client.post("/users", json_data={"name": "Alice", "age": 30})
+    <span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/delete"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_route</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"DELETE"</span><span class="p">}</span>
 
-    assert response.status_code == 200
-    assert response.json()["received"] == {"name": "Alice", "age": 30}</code></pre>
-                        </div>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
-                        <h2>Testing WebSockets</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import pytest
-from flaxon.testing import AsyncWebSocketClient
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/get"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"GET"</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/post"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"POST"</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/put"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"PUT"</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/delete"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"DELETE"</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-request-body">Testing Request Body</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_request_body</span><span class="p">():</span>
 
-@pytest.mark.asyncio
-async def test_websocket():
-    app = Flaxon("test-app")
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
 
-    @app.websocket("/ws/echo")
-    async def echo(socket):
-        await socket.accept()
-        async for message in socket.iter_json():
-            await socket.send_json({"echo": message})
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-    client = AsyncWebSocketClient(app)
-    await client.connect("/ws/echo")
+        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-    await client.send_json({"message": "Hello"})
-    response = await client.receive_json()
-    assert response == {"echo": {"message": "Hello"}}
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"received"</span><span class="p">:</span> <span class="n">data</span>
+        <span class="p">}</span>
 
-    await client.disconnect()</code></pre>
-                        </div>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
-                        <h2>Using Assertions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.testing import Assertions
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/users"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span>
+            <span class="s2">"age"</span><span class="p">:</span> <span class="mi">30</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
 
-def test_assertions():
-    app = Flaxon("test-app")
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
 
-    @app.get("/users")
-    async def get_users():
-        return [{"id": 1, "name": "Alice"}]
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"received"</span><span class="p">]</span> <span class="o">==</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span>
+        <span class="s2">"age"</span><span class="p">:</span> <span class="mi">30</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-query-parameters">Testing Query Parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_query_params</span><span class="p">():</span>
 
-    client = TestClient(app)
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
 
-    response = client.get("/users")
-    Assertions.assert_status(response, 200)
-    data = Assertions.assert_json(response)
-    assert data[0]["name"] == "Alice"</code></pre>
-                        </div>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/search"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Use <code>pytest</code> with <code>pytest-asyncio</code> for async tests.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"q"</span><span class="p">)</span>
 
-    <div id="footer"></div>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+            <span class="s2">"page"</span><span class="p">,</span>
+            <span class="mi">1</span>
+        <span class="p">)</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"q"</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span>
+        <span class="p">}</span>
 
-</body>
-</html>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"/search"</span><span class="p">,</span>
+        <span class="n">query</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"q"</span><span class="p">:</span> <span class="s2">"test"</span><span class="p">,</span>
+            <span class="s2">"page"</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"q"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"test"</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"page"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-headers">Testing Headers</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_headers</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/headers"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">headers</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"user_agent"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">"user-agent"</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"/headers"</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"TestClient/1.0"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"user_agent"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"TestClient/1.0"</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-cookies">Testing Cookies</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_cookies</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/cookies"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cookies</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"session"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">"session"</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"/cookies"</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"Cookie"</span><span class="p">:</span> <span class="s2">"session=abc123"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"session"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"abc123"</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-validation">Testing Validation</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span>
+    <span class="p">)</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_validation</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="p">}</span>
+
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/users"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span>
+            <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"alice@example.com"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/users"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
+            <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"invalid"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"error"</span><span class="p">][</span><span class="s2">"code"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"FX-VAL-001"</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-websockets">Testing WebSockets</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncWebSocketClient</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_websocket</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/echo"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="n">socket</span><span class="p">):</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+                <span class="s2">"echo"</span><span class="p">:</span> <span class="n">message</span>
+            <span class="p">})</span>
+
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">AsyncWebSocketClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"/ws/echo"</span><span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+    <span class="p">})</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">receive_json</span><span class="p">()</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span> <span class="o">==</span> <span class="p">{</span>
+        <span class="s2">"echo"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-with-fixtures">Testing With Fixtures</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">app</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+        <span class="p">}</span>
+
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_with_fixtures</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-database">Testing Database</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlite</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteAdapter</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">db</span><span class="p">():</span>
+
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">SQLiteAdapter</span><span class="p">(</span>
+        <span class="n">database</span><span class="o">=</span><span class="s2">":memory:"</span>
+    <span class="p">)</span>
+
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+
+    <span class="k">await</span> <span class="n">manager</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">        CREATE TABLE users (</span>
+<span class="s2">            id INTEGER PRIMARY KEY,</span>
+<span class="s2">            name TEXT NOT NULL</span>
+<span class="s2">        )</span>
+<span class="s2">    """</span><span class="p">)</span>
+
+
+    <span class="k">yield</span> <span class="n">manager</span>
+
+
+    <span class="k">await</span> <span class="n">manager</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_database</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">"INSERT INTO users(name) VALUES (?)"</span><span class="p">,</span>
+        <span class="s2">"Alice"</span>
+    <span class="p">)</span>
+
+
+    <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE name=?"</span><span class="p">,</span>
+        <span class="s2">"Alice"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Alice"</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-authentication">Testing Authentication</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_authentication</span><span class="p">():</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+        <span class="n">secret_key</span><span class="o">=</span><span class="s2">"test-secret"</span>
+    <span class="p">)</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">({</span>
+            <span class="s2">"username"</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]</span>
+        <span class="p">})</span>
+
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"token"</span><span class="p">:</span> <span class="n">token</span>
+        <span class="p">}</span>
+
+
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/login"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"alice"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="n">token</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"token"</span><span class="p">]</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"/protected"</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"Authorization"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-test-example">Complete Test Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test-app"</span><span class="p">)</span>
+
+<span class="n">users</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome"</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">users</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">data</span>
+    <span class="p">}</span>
+
+    <span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span>
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">:</span>
+
+            <span class="k">return</span> <span class="n">user</span>
+
+
+    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+        <span class="mi">404</span><span class="p">,</span>
+        <span class="s2">"User not found"</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_home</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"message"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Welcome"</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_create_user</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/users"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"created"</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span>
+</code></pre></div>
+<hr/>
+<h2 id="testing-best-practices">Testing Best Practices</h2>
+<ul>
+<li>Test every route.</li>
+<li>Test successful responses.</li>
+<li>Test validation errors.</li>
+<li>Test authentication failures.</li>
+<li>Test database operations separately.</li>
+<li>Use fixtures for reusable setup.</li>
+<li>Mock external services.</li>
+<li>Test WebSocket connections.</li>
+<li>Test background tasks.</li>
+<li>Run tests automatically in CI/CD.</li>
+</ul>
+<hr/>
+<h2 id="running-tests">Running Tests</h2>
+<div class="highlight"><pre><span></span><code>pytest
+</code></pre></div>
+<p>Run with coverage:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>--cov<span class="o">=</span>flaxon
+</code></pre></div>
+<p>Run async tests:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>-asyncio
+</code></pre></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

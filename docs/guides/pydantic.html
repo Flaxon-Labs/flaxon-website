@@ -1,72 +1,103 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Pydantic Integration - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>Pydantic integration</h1>
-                        <p>Pydantic is an optional integration. Flaxon keeps its native validation system independent while allowing endpoints to accept Pydantic <code>BaseModel</code> parameters and return model instances.</p>
-                        <h2>Install</h2>
-                        <pre><code class="language-bash">python -m pip install "flaxon[pydantic]" email-validator</code></pre>
-                        <h2>Validate request bodies</h2>
-                        <pre><code class="language-python">from pydantic import BaseModel, EmailStr
-from flaxon import Flaxon
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pydantic Integration — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Pydantic Integration — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Pydantic Integration</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/pydantic.md">Framework source</a> · <a href="../../content/framework/docs/guides/pydantic.md" download>Markdown</a></p><h1 id="pydantic-integration">Pydantic Integration</h1>
+<p>Pydantic support is optional. Flaxon keeps its core validation system
+independent, while the integration lets endpoints accept Pydantic <code>BaseModel</code>
+parameters and return model instances.</p>
+<h2 id="install">Install</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[pydantic]"</span><span class="w"> </span>email-validator
+</code></pre></div>
+<h2 id="validate-request-bodies">Validate request bodies</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">EmailStr</span>
 
-app = Flaxon("accounts")
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-class CreateUser(BaseModel):
-    name: str
-    email: EmailStr
-    age: int
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"accounts"</span><span class="p">)</span>
 
-@app.post("/users")
-async def create_user(user: CreateUser) -> CreateUser:
-    return user</code></pre>
-                        <p>Malformed JSON returns <code>400</code>. Valid JSON that fails the Pydantic model returns <code>422</code> with field-level errors under <code>error.fields</code>.</p>
-                        <h2>Response models</h2>
-                        <pre><code class="language-python">@app.get("/users/&lt;user_id&gt;")
-async def get_user(user_id: str) -> CreateUser:
-    return CreateUser(name="Ava", email="ava@example.com", age=28)</code></pre>
-                        <p>Flaxon serializes returned models with <code>model_dump()</code>. Native <code>Schema</code> classes remain available when you do not want an additional dependency.</p>
-                        <h2>Use Pydantic in modules</h2>
-                        <pre><code class="language-python">from flaxon.modules import FlaxonModule
-from pydantic import BaseModel, EmailStr
 
-accounts = FlaxonModule("accounts")
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="n">EmailStr</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
 
-class CreateAccount(BaseModel):
-    name: str
-    email: EmailStr
 
-@accounts.post("/")
-async def create_account(account: CreateAccount) -> CreateAccount:
-    return account
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateUser</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">user</span>
+</code></pre></div>
+<p>Invalid JSON returns <code>400</code>. Valid JSON that fails the model returns <code>422</code> with
+field-level errors under <code>error.fields</code>.</p>
+<h2 id="response-models">Response models</h2>
+<p>Returning a Pydantic model is supported directly. Flaxon serializes it with
+<code>model_dump()</code> while preserving normal JSON response behavior.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateUser</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">CreateUser</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Ava"</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s2">"ava@example.com"</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+</code></pre></div>
+<p>Flaxon's native <code>Schema</code> classes remain supported and are a good choice when
+you do not want an additional dependency.</p>
+<h2 id="use-pydantic-with-modules">Use Pydantic with modules</h2>
+<p>For a larger application, keep the model and endpoint inside the feature that
+owns them. Mount that feature once from the application factory:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/accounts/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-app.mount_module(accounts, prefix="/api/accounts")</code></pre>
-                        <p>Keep persistence in a service or repository rather than in the Pydantic model or route handler. See the <a href="/docs/guides/modules.html">Modules guide</a> for application-factory composition.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
-</body>
-</html>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">EmailStr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">accounts</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"accounts"</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateAccount</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="n">EmailStr</span>
+
+
+<span class="nd">@accounts</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_account</span><span class="p">(</span><span class="n">account</span><span class="p">:</span> <span class="n">CreateAccount</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateAccount</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">account</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">install_accounts</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">accounts</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/accounts"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.accounts.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_accounts</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flaxon</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"accounts"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">install_accounts</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<p>The endpoint is <code>POST /api/accounts/</code>. The model is close to the route, while
+the factory owns only application composition. Put database writes in a
+service or repository rather than in the Pydantic model or route handler.</p>
+<p>For a complete runnable version, see
+<code>examples/pydantic_api/</code>. Start it with:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>examples.pydantic_api.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

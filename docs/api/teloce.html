@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Teloce full-stack integration: API reference — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Teloce full-stack integration: API reference — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Teloce full-stack integration: API reference</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/teloce.md">Framework source</a> · <a href="../../content/framework/docs/api/teloce.md" download>Markdown</a></p><h1 id="teloce-full-stack-integration-api-reference">Teloce full-stack integration: API reference</h1>
+<p>Flaxon owns HTTP, APIs and WebSockets. Teloce compiles UI components and handles
+browser state and navigation. MinifyJS optimizes generated production JavaScript;
+it does not execute requests or replace Teloce's compiler.</p>
+<h2 id="api-reference">API reference</h2>
+<h3 id="appuse_teloce"><code>app.use_teloce(...)</code></h3>
+<p>Register once, before application startup. Returns <code>Teloce</code> and exposes it as
+<code>app.teloce</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project_root</code></td>
+<td>Current directory</td>
+<td>Root containing every UI source</td>
+</tr>
+<tr>
+<td><code>ui_dir</code></td>
+<td><code>ui</code></td>
+<td>Application components and pages</td>
+</tr>
+<tr>
+<td><code>build_dir</code></td>
+<td><code>.flaxon/build</code></td>
+<td>Generated output, relative to project root</td>
+</tr>
+<tr>
+<td><code>static_url</code></td>
+<td><code>/_flaxon</code></td>
+<td>Browser URL serving generated files</td>
+</tr>
+<tr>
+<td><code>entry</code></td>
+<td><code>app.html</code></td>
+<td>Root component within a registered UI tree</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>Application name</td>
+<td>HTML document title</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><code>{}</code></td>
+<td>Overrides passed to Teloce Builder; also <code>spa_mode</code>/<code>spa_base</code></td>
+</tr>
+</tbody>
+</table>
+<p>Startup compiles sources. Missing directories, invalid components and duplicate
+page routes fail the build. UI directories must be within <code>project_root</code>.</p>
+<h3 id="await-requestcompileentryapphtml-contextnone-titlenone"><code>await request.compile(entry="app.html", context=None, title=None)</code></h3>
+<p>Returns an <code>HTMLResponse</code> shell importing the root component, styles and router.
+Context is safely serialized as JSON and passed to <code>mount()</code>. This is client-side
+rendering, not server-rendered component HTML. A cached startup build is reused;
+if none exists, the integration builds lazily. Configure <code>app.use_teloce()</code> first.
+Never put secrets in context: it is visible in the browser.</p>
+<h3 id="apptelocebuild-and-register_sourcename-directory-routesnone"><code>app.teloce.build()</code> and <code>register_source(name, directory, routes=None)</code></h3>
+<p><code>build()</code> explicitly rebuilds registered trees and returns Teloce's result.
+<code>register_source()</code> adds a source and invalidates the cached build. Names and
+source directories must be unique. Register before serving traffic; runtime
+concurrent builds are not a deployment strategy.</p>
+<h3 id="flaxonmodulename-ui_dir-ui_routes"><code>FlaxonModule(name, ui_dir=..., ui_routes=...)</code></h3>
+<p>Mounting a module registers its backend endpoints and UI source. It works before
+or after <code>use_teloce()</code>. <code>ui_routes</code> maps generated page filenames to client paths,
+for example <code>{"ProductDetails/[id].js": "/products/:id"}</code>. Backend mount prefixes
+such as <code>/api/catalog</code> do not automatically prefix browser page routes.</p>
+<h3 id="navigation-attributes">Navigation attributes</h3>
+<p><code>data-teloce-router-view</code> identifies the page outlet (or use <code>id="router-view"</code>).
+<code>data-teloce-link</code> marks an anchor for client navigation:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/jobs"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Jobs<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">main</span> <span class="na">data-teloce-router-view</span><span class="p">&gt;&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>The listener only intercepts ordinary same-origin HTTP(S) clicks to a matching
+client route. External links, modified clicks, downloads, other targets,
+nonmatching routes and same-page fragments retain browser behavior. Router guards
+can reject a matched navigation; it does not fall back to a full page load.
+The server still needs a catch-all route for direct visits and page refreshes.</p>
+<h2 id="lesson-1-compile-your-first-interface">Lesson 1: Compile your first interface</h2>
+<p>Install <code>flaxon[standard]</code> and a Teloce version containing its MinifyJS integration.
+For repository development, install Flaxon and updated Teloce from their actual
+local checkouts; do not copy another developer's Windows path.</p>
+<p>Create <code>ui/app.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ business }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">props</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"business"</span><span class="p">]</span><span class="w"> </span><span class="p">};&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Create <code>app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"My business"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span><span class="n">project_root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"business"</span><span class="p">:</span> <span class="s2">"Morgan Build &amp; Repair"</span><span class="p">})</span>
+</code></pre></div>
+<p>Run <code>flaxon run app:app --reload</code> and visit port 8000. The component is compiled
+as HTML-mode Teloce input, not served as raw HTML. <code>.vel</code> components are also
+supported by Teloce. Edit a source and refresh after the server restarts.
+Generated <code>.flaxon</code> files are excluded from the watcher; <code>.vel</code> files are included.
+This process reload is not browser HMR.</p>
+<h2 id="lesson-2-load-data-from-flaxon">Lesson 2: Load data from Flaxon</h2>
+<p>Add an API before your catch-all route:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/jobs"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">jobs</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"items"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"customer"</span><span class="p">:</span> <span class="s2">"Harbour View Bakery"</span><span class="p">}]}</span>
+</code></pre></div>
+<p>A page can fetch it after mounting:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;&lt;</span><span class="nt">p</span> <span class="na">v-for</span><span class="o">=</span><span class="s">"job in jobs"</span> <span class="na">:key</span><span class="o">=</span><span class="s">"job.id"</span><span class="p">&gt;</span>{{ job.customer }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">jobs</span><span class="o">:</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="p">};</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">mounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"/api/jobs"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s2">"Could not load jobs"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">jobs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">items</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>The shipped SiteLedger Jobs page adds loading state, a Refresh button and a
+reusable <code>JobCard</code>. Its in-memory API is a teaching fixture: add persistence,
+authorization and visible loading/error states for production.</p>
+<h2 id="lesson-3-add-page-navigation">Lesson 3: Add page navigation</h2>
+<p>Put pages in <code>ui/pages/</code>; <code>Jobs.html</code> becomes <code>/jobs</code> and <code>jobs/[id].html</code> becomes
+<code>/jobs/:id</code>. Put marked links and a router outlet in <code>app.html</code>.
+Add a server fallback after API routes:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;path:spa_path&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">page</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">spa_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"business"</span><span class="p">:</span> <span class="s2">"My business"</span><span class="p">})</span>
+</code></pre></div>
+<p>The browser router mounts pages; Flaxon handles <code>/api/...</code> data. Directly visiting
+<code>/jobs/1</code> returns the same shell, and the router reads the URL. SiteLedger's detail
+page receives <code>id</code> as a prop and fetches <code>/api/jobs/${this.id}</code>.</p>
+<h2 id="lesson-4-keep-a-feature-in-one-module">Lesson 4: Keep a feature in one module</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span>
+    <span class="s2">"catalog"</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"ui"</span><span class="p">,</span>
+    <span class="n">ui_routes</span><span class="o">=</span><span class="p">{</span><span class="s2">"ProductDetails/[id].js"</span><span class="p">:</span> <span class="s2">"/products/:id"</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="nd">@catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"items"</span><span class="p">:</span> <span class="p">[]}</span>
+
+<span class="c1"># In the application:</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/catalog"</span><span class="p">)</span>
+</code></pre></div>
+<p>See the modules shop for auth, catalog, orders and chat. Catalog owns pages and
+product components; chat owns a WebSocket and its page. Its browser component
+closes the socket in <code>beforeUnmount()</code>. Duplicate page routes across modules fail
+rather than silently choosing one. The sample login/data are demonstrations,
+not a complete security or database implementation.</p>
+<h2 id="lesson-5-deploy-with-minifyjs">Lesson 5: Deploy with MinifyJS</h2>
+<p>Use <code>debug=False</code>. Flaxon requests production compilation, asset hashes and
+extracted CSS. Updated Teloce uses MinifyJS for component/runtime optimization;
+Flaxon also optimizes its separately generated router through MinifyJS. Both
+compression and local-name mangling are enabled for that router. No Node is needed.</p>
+<p>Development keeps Teloce's existing pipeline and source maps. This change does
+not enable the experimental native development backend. Bundling is not enabled
+by default; it requires selecting an appropriate entry and testing all module
+pages/lazy imports. Do not assume the startup integration is a unified bundle.</p>
+<p>The build directory is served with <code>Cache-Control: no-cache</code> in both modes, so
+stable aliases and <code>router.js</code> revalidate after deployment. The HTML shell uses
+<code>no-cache</code> in production and <code>no-store</code> in development. A CDN must preserve this
+policy; only add long immutable caching to files with verified content hashes.</p>
+<p>Install pinned compatible versions, build in a writable location at startup,
+and deploy source plus dependencies (or arrange an explicit build lifecycle).
+Each worker currently builds on startup: avoid concurrent writes to a shared
+build directory by using a single builder or isolated worker output directories.
+Add real authentication, database storage and authorization for business data.</p>
+<p><a href="../projects/teloce-siteledger/index.html">SiteLedger example</a> ·
+<a href="../projects/teloce-modules-shop/index.html">Modules example</a></p>
+<h2 id="optional-page-head-configuration">Optional page-head configuration</h2>
+<p>All additions are optional; existing <code>title</code>-only applications continue working.</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/static"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">))</span>
+<span class="n">theme_cdn</span> <span class="o">=</span> <span class="s2">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+    <span class="n">project_root</span><span class="o">=</span><span class="n">project_root</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Taskboard"</span><span class="p">,</span>
+    <span class="n">favicon</span><span class="o">=</span><span class="s2">"/static/favicon.svg"</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Team tasks in one place."</span><span class="p">,</span>
+    <span class="n">lang</span><span class="o">=</span><span class="s2">"en"</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">"#101827"</span><span class="p">,</span> <span class="n">stylesheets</span><span class="o">=</span><span class="p">[</span><span class="n">theme_cdn</span><span class="p">],</span>
+    <span class="n">scripts</span><span class="o">=</span><span class="p">[{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/help.js"</span><span class="p">,</span> <span class="s2">"defer"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>favicon</code></td>
+<td>None</td>
+<td>Icon link URL; serve the file separately</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>None</td>
+<td>Escaped description meta content</td>
+</tr>
+<tr>
+<td><code>lang</code></td>
+<td><code>en</code></td>
+<td>Escaped HTML document language, not script language</td>
+</tr>
+<tr>
+<td><code>theme_color</code></td>
+<td>None</td>
+<td>Theme-color meta content</td>
+</tr>
+<tr>
+<td><code>stylesheets</code></td>
+<td>None</td>
+<td>Ordered strings or dictionaries containing <code>href</code></td>
+</tr>
+<tr>
+<td><code>scripts</code></td>
+<td>None</td>
+<td>Ordered strings or dictionaries containing <code>src</code></td>
+</tr>
+</tbody>
+</table>
+<p>Scripts support <code>type</code>, boolean <code>defer</code>/<code>async</code>, <code>integrity</code>, <code>crossorigin</code>,
+<code>referrerpolicy</code>. Stylesheets support <code>rel</code>, <code>type</code>, <code>media</code>, <code>sizes</code>, <code>integrity</code>,
+<code>crossorigin</code>, <code>referrerpolicy</code>. Resource URLs allow relative, HTTP and HTTPS
+URLs; executable/data schemes and unknown attributes are rejected. Values are
+escaped; arbitrary HTML/event-handler attributes are not accepted.</p>
+<p>These settings add tags to the head; they do not download, bundle or upload CDN
+resources. Pin trusted dependencies. Scripts execute with page privileges.
+Use verified SRI hashes and <code>crossorigin="anonymous"</code> where supported; don't
+invent hashes. Async resources have no guaranteed execution order. Do not assume
+an external library has loaded before a component mounts: coordinate explicitly
+if your component depends on it. Fonts and resources may require network access
+and disclose requests to providers. Local copies support offline applications.</p>
+<p>Generated component CSS precedes extra stylesheet links, allowing intentional
+external overrides. Deferred classic scripts retain their order with each other;
+module and async timing needs separate consideration. The integration still
+emits an inline module bootstrap; a strict CSP needs a compatible nonce/hash
+strategy beyond these resource attributes. A favicon does not configure native
+Windows icons. Manifest and arbitrary head HTML are not part of this API.</p>
+<p>For TypeScript, use <code>&lt;script lang="ts"&gt;</code> and import <code>.ts</code> helpers with a compatible
+Teloce version. Output is JavaScript; transpilation does not replace type checking.
+See the <a href="../projects/teloce-head-ts/index.html">tested example</a> and
+<a href="../fullstack/index.html">10 full-stack lessons</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon Cheat Sheet — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon Cheat Sheet — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon Cheat Sheet</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Flaxon%20Cheat%20Sheet.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Flaxon Cheat Sheet.md" download>Markdown</a></p><h1 id="flaxon-cheat-sheet">Flaxon Cheat Sheet</h1>
+<p>For feature details and caveats, see <a href="features.html">Features</a>. For Admin/CMS details, see <a href="../guides/admin-cms.html">Admin and CMS</a> and <a href="admin-cheatsheet.html">Admin cheatsheet</a>.</p>
+<h2 id="app-and-routes">App and routes</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span> <span class="k">return</span> <span class="p">{</span><span class="s2">"ok"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div>
+<p>Run: <code>flaxon run app:app --reload</code>. Routes use <code>@app.get/post/put/patch/delete</code>; converters are <code>&lt;int:id&gt;</code>, <code>&lt;float:x&gt;</code>, <code>&lt;str:x&gt;</code>, <code>&lt;uuid:id&gt;</code>, and <code>&lt;path:value&gt;</code>. Return dict/list for JSON, string for text, or a response class.</p>
+<h2 id="validation-and-security">Validation and security</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security.password</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Input</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/items"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Input</span><span class="p">):</span> <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+<span class="n">hashed</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"secret"</span><span class="p">)</span>
+</code></pre></div>
+<p><code>request.session</code> is signed-cookie backed by default. Register dependencies with <code>app.container.register_instance</code> or <code>register_factory</code>. Add middleware with <code>app.add_middleware</code>; CSRF and rate limiting are in <code>flaxon.security</code>, other middleware is in <code>flaxon.middleware</code>. Security decorators: <code>jwt_required</code>, <code>role_required</code>, <code>permission_required</code>, <code>api_key_required</code>.</p>
+<h2 id="admin-and-cms">Admin and CMS</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMSConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlite</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteAdapter</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span><span class="n">site_title</span><span class="o">=</span><span class="s2">"Acme Admin"</span><span class="p">),</span>
+    <span class="n">database</span><span class="o">=</span><span class="n">SQLiteAdapter</span><span class="p">(</span><span class="s2">"data/admin.db"</span><span class="p">),</span>
+    <span class="n">cms_config</span><span class="o">=</span><span class="n">CMSConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Product</span><span class="p">,</span> <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">],</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">])</span>
+</code></pre></div>
+<p>Or use <code>app.enable_admin(url_prefix="/admin", config=..., ...)</code>. Run <code>flaxon migrate --direction up</code> before persistent use. The UI/API covers model CRUD and list controls, users/roles/permissions, profile/settings, audit activity, media, taxonomy, comments/moderation, revisions/restore, scheduled publishing/workflows, menus, and CSV/JSON import/export. Controls are permission- and configuration-aware.</p>
+<h2 id="database">Database</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlite</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteAdapter</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteAdapter</span><span class="p">(</span><span class="s2">"data/app.db"</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+<span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO users (name) VALUES (?)"</span><span class="p">,</span> <span class="s2">"Ada"</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>                 <span class="c1"># or await db.rollback()</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="s2">"SELECT * FROM users"</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</code></pre></div>
+<p>SQL adapters: <code>SQLiteAdapter</code>, <code>PostgreSQLAdapter</code>, <code>MySQLAdapter</code>, <code>SQLAlchemyAdapter</code>. <code>CustomAdapter</code> wraps a project connection. <code>MongoDBAdapter</code> uses <code>find_*</code>, <code>insert_*</code>, <code>update_*</code>, <code>delete_*</code>, and <code>count</code>; <code>RedisAdapter</code> uses <code>get</code>, <code>set</code>, hashes, lists, and sets. MongoDB and Redis intentionally do not implement SQL methods. Drivers are <code>aiosqlite</code>, <code>asyncpg</code>, <code>aiomysql</code>, <code>motor</code>, <code>redis</code>, and <code>sqlalchemy[asyncio]</code> as applicable.</p>
+<h2 id="other-modules">Other modules</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cache</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">();</span> <span class="k">await</span> <span class="n">c</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">"key"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/items"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ada"</span><span class="p">})</span>
+</code></pre></div>
+<p>WebSockets: <code>accept</code>, <code>join</code>, <code>leave</code>, <code>receive_json</code>, <code>send_json</code>, <code>iter_json</code>, <code>broadcast_json</code>, <code>close</code>. GraphQL: <code>app.enable_graphql(GraphQLSchema(query=query_type))</code>. OpenAPI: <code>app.enable_openapi(title="My API")</code>, serving <code>/openapi.json</code>, <code>/docs</code>, <code>/redoc</code>. Tasks: <code>flaxon worker app:app</code> and <code>flaxon schedule app:app</code>. Events use <code>EventRegistry</code> and <code>EventDispatcher</code>; mail uses <code>Mailer</code>; templates use <code>Jinax</code> and <code>request.render</code>. Health endpoints are <code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>, and <code>/metrics</code>; debug history is <code>/__debug__</code>.</p>
+<h2 id="cli">CLI</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>flaxon run app:app --reload</code></td>
+<td>Start development server</td>
+</tr>
+<tr>
+<td><code>flaxon routes app:app</code></td>
+<td>List routes</td>
+</tr>
+<tr>
+<td><code>flaxon doctor app:app</code></td>
+<td>Check app health</td>
+</tr>
+<tr>
+<td><code>flaxon docs app:app -o openapi.json</code></td>
+<td>Export OpenAPI</td>
+</tr>
+<tr>
+<td><code>flaxon inspect app:app --middleware --config</code></td>
+<td>Inspect app</td>
+</tr>
+<tr>
+<td><code>flaxon migrate --direction up</code></td>
+<td>Apply migrations</td>
+</tr>
+<tr>
+<td><code>flaxon worker app:app</code></td>
+<td>Run task worker</td>
+</tr>
+<tr>
+<td><code>flaxon schedule app:app</code></td>
+<td>Run scheduled tasks</td>
+</tr>
+<tr>
+<td><code>flaxon test</code></td>
+<td>Run tests</td>
+</tr>
+</tbody>
+</table>
+<p>Full CLI reference: <a href="cli.html">CLI Cheatsheet</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

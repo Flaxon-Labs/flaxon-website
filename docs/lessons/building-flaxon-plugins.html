@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Building Flaxon Plugins — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Building Flaxon Plugins — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Building Flaxon Plugins</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Building%20Flaxon%20Plugins.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Building Flaxon Plugins.md" download>Markdown</a></p><h1 id="building-flaxon-plugins">Building Flaxon Plugins</h1>
+<p>How the plugin system actually works under the hood, and the specific mistakes that will bite you if you don't know about them — every one of these was found by actually building and testing a real plugin, not guessed at.</p>
+<h2 id="the-shape-of-a-plugin">The shape of a plugin</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyPlugin</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">"my-plugin"</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="s2">"0.1.0"</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s2">"What this plugin does."</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="s2">"you"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Called once, when the plugin is loaded. Register routes, set</span>
+<span class="sd">        attributes on app, add middleware -- whatever your plugin does."""</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Called right after setup(), on load."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_startup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Called during the app's ASGI lifespan startup."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Called during the app's ASGI lifespan shutdown."""</span>
+</code></pre></div>
+<p>Only <code>setup()</code> is required (it's abstract). Everything else defaults to doing nothing.</p>
+<p>For a plugin that's just "run this one function," skip the subclass entirely:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimplePlugin</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_hello</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/hello"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"hello"</span><span class="p">:</span> <span class="s2">"world"</span><span class="p">}</span>
+
+<span class="n">plugin</span> <span class="o">=</span> <span class="n">SimplePlugin</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"hello"</span><span class="p">,</span> <span class="n">setup_func</span><span class="o">=</span><span class="n">setup_hello</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="loading-it">Loading it</h2>
+<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">load_plugin</span><span class="p">(</span><span class="n">MyPlugin</span><span class="p">())</span>
+</code></pre></div>
+<p><code>app.plugins</code> is a <code>PluginManager</code>, created automatically on every <code>Flaxon</code> app — you don't set anything up for this to exist. <code>load_plugin()</code> calls <code>setup(app)</code> then <code>on_load()</code> immediately. <code>on_startup()</code>/<code>on_shutdown()</code> fire later, automatically, during the app's real ASGI lifespan events — you don't call those yourself.</p>
+<h2 id="mistake-1-app-in-setupapp-is-the-real-flaxon-instance-but-thats-not-what-app-means-everywhere-else">Mistake #1: <code>app</code> in <code>setup(app)</code> is the real <code>Flaxon</code> instance — but that's <em>not</em> what <code>app</code> means everywhere else</h2>
+<p>This is the single most confusing thing about the codebase, and it caused a real, hard-to-find bug while this framework was being built. Two completely different conventions use the same parameter name:</p>
+<ul>
+<li><strong><code>Plugin.setup(self, app)</code></strong> — <code>app</code> is the actual <code>Flaxon</code> application instance. <code>app.get(...)</code>, <code>app.container</code>, <code>app.sessions</code> — all real, all there.</li>
+<li><strong>ASGI middleware's <code>__init__(self, app)</code></strong> (<code>RequestIDMiddleware</code>, <code>CORSMiddleware</code>, anything you pass to <code>app.add_middleware(...)</code>) — <code>app</code> there means "the next handler in the middleware chain," which is <strong>not</strong> the <code>Flaxon</code> instance. It has no <code>.container</code>, no <code>.sessions</code>, nothing — it's just a callable.</li>
+</ul>
+<p>If your plugin needs to configure something that also happens to be a middleware class, don't try to reach the real app through the middleware's <code>app</code> parameter — it isn't there. Pass what you need in explicitly instead:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Wrong -- self.app inside the middleware is the next handler, not your Flaxon app</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BadMiddleware</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">):</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"app"</span><span class="p">)</span><span class="o">.</span><span class="n">some_attribute</span>  <span class="c1"># scope["app"] isn't set yet at this point either!</span>
+
+<span class="c1"># Right -- pass what the middleware needs directly, at construction time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SomeMiddleware</span><span class="p">,</span> <span class="n">my_config</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">)</span>
+</code></pre></div>
+<p>Also worth knowing: <code>scope["app"]</code> (the actual Flaxon instance, reachable from inside a route handler via <code>request.app</code>) isn't populated until routing/dispatch actually starts — middleware runs <em>before</em> that point, so <code>scope.get("app")</code> is still <code>None</code> when your middleware's <code>__call__</code> first runs.</p>
+<h2 id="mistake-2-if-your-plugin-adds-decorators-they-need-functoolswraps-or-flaxon-cant-see-your-routes-real-parameters">Mistake #2: if your plugin adds decorators, they need <code>functools.wraps</code> — or Flaxon can't see your route's real parameters</h2>
+<p>Flaxon resolves a route handler's parameters (<code>request</code>, path params, <code>Schema</code>-typed bodies, container-registered dependencies) by inspecting its actual function signature with <code>inspect.signature()</code>. If your plugin provides a decorator and that decorator's inner wrapper is just <code>async def wrapper(*args, **kwargs)</code> without <code>@functools.wraps(func)</code>, Flaxon sees a generic <code>*args, **kwargs</code> signature instead of the real one — and crashes with <code>TypeError: Cannot resolve endpoint parameter 'args'</code> the moment anyone uses your decorator on a route with any parameters at all.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_required</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>          <span class="c1"># &lt;- without this line, every protected route breaks</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># ... your check ...</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</code></pre></div>
+<p>This exact bug existed in four of Flaxon's own built-in security decorators (<code>jwt_required</code>, <code>role_required</code>, <code>permission_required</code>, <code>api_key_required</code>) until it was found and fixed — it's an easy thing to miss and a confusing thing to debug from the outside, since the error points at <code>args</code>/<code>kwargs</code>, not at your decorator.</p>
+<h2 id="mistake-3-dont-mutate-selfrequiresselfprovides-without-knowing-theyre-shared-by-default">Mistake #3: don't mutate <code>self.requires</code>/<code>self.provides</code> without knowing they're shared by default</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PluginA</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span> <span class="o">...</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">PluginA</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">requires</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"database"</span><span class="p">)</span>  <span class="c1"># this used to also affect every OTHER Plugin subclass</span>
+</code></pre></div>
+<p>This was a real bug: <code>requires</code>/<code>provides</code> defaulted to the exact same mutable list shared across every <code>Plugin</code> subclass, so appending to one plugin's list silently polluted every unrelated plugin in the process. It's fixed now — each subclass gets its own independent list automatically — but the underlying lesson still matters: declare them at the class level if you want a fixed, known list —</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyPlugin</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="n">requires</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"database"</span><span class="p">,</span> <span class="s2">"cache"</span><span class="p">]</span>
+</code></pre></div>
+<p>— rather than building them up with <code>.append()</code> at runtime, which is more fragile regardless of the underlying fix.</p>
+<h2 id="testing-a-plugin-properly">Testing a plugin properly</h2>
+<p><code>load_plugin()</code> and the lifespan hooks are both async, and <code>on_startup</code>/<code>on_shutdown</code> only fire through the app's real ASGI lifespan protocol — not just by calling <code>load_plugin()</code>. To test a plugin fully, including its lifecycle hooks:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"plugin-test"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">load_and_start</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">load_plugin</span><span class="p">(</span><span class="n">MyPlugin</span><span class="p">())</span>
+
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"lifespan.startup"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"lifespan.shutdown"</span><span class="p">}]</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">messages</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">_handle_lifespan</span><span class="p">(</span><span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">load_and_start</span><span class="p">())</span>
+
+<span class="c1"># Now test normally -- setup() and on_startup() have both already run</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/hello"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="packaging-it-as-a-real-installable-plugin">Packaging it as a real, installable plugin</h2>
+<p>A plugin is just a small, separate Python package that depends on <code>flaxon</code> — not something you fork the framework to add.</p>
+<div class="highlight"><pre><span></span><code>flaxon_myplugin/
+├── __init__.py       # exports your Plugin subclass
+pyproject.toml
+README.md
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># pyproject.toml</span>
+<span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"flaxon-myplugin"</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"flaxon&gt;=0.1.4"</span><span class="p">]</span>
+<span class="n">dynamic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"version"</span><span class="p">]</span>
+
+<span class="k">[tool.setuptools.dynamic]</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">attr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">"flaxon_myplugin.__version__"</span><span class="p">}</span>
+</code></pre></div>
+<p>Build and publish it exactly like any other Python package: <code>python -m build</code>, then <code>twine upload dist/*</code>. Users add it with <code>pip install flaxon-myplugin</code> and <code>await app.plugins.load_plugin(MyPluginClass(...))</code>. <code>flaxon-ffd</code> (a plugin bridging FastAPI/Flask/Django apps into Flaxon via <code>app.mount_asgi()</code>) is a complete, real example of this exact shape if you want to see a working reference.</p>
+<h2 id="checklist-before-you-ship-a-plugin">Checklist before you ship a plugin</h2>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>setup(app)</code> only <em>registers</em> things (routes, middleware, container entries) — it shouldn't block or do slow work; save that for <code>on_startup()</code>.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Any decorator you export uses <code>@functools.wraps(func)</code>.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> If your plugin needs config from the app, take it as a constructor argument to your <code>Plugin</code> subclass, not by reaching into <code>app</code> inside a middleware.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>requires</code>/<code>provides</code> are declared once at the class level, not mutated at runtime.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> You've tested <code>on_startup()</code>/<code>on_shutdown()</code> through a real simulated lifespan, not just called <code>setup()</code> directly.</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

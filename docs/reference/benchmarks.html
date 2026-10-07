@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Run all benchmarks — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Run all benchmarks — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Run all benchmarks</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/benchmarks/README.md">Framework source</a> · <a href="../../content/framework/benchmarks/README.md" download>Markdown</a></p><p>Flaxon Benchmarks</p>
+<p>This directory contains performance benchmarks for the Flaxon framework.</p>
+<h2 id="running-benchmarks">Running Benchmarks</h2>
+<p>```bash</p>
+<h1 id="run-all-benchmarks">Run all benchmarks</h1>
+<p>python -m benchmarks.routing_benchmark
+python -m benchmarks.json_benchmark
+python -m benchmarks.middleware_benchmark
+python -m benchmarks.websocket_benchmark
+python -m benchmarks.template_benchmark</p>
+<h2 id="or-use-the-makefile">Or use the Makefile</h2>
+<p>make benchmark
+Benchmark Results
+Results are stored in the results/ directory as JSON files.</p>
+<p>Benchmark Descriptions
+routing_benchmark.py
+Tests the performance of route registration, matching, and URL generation.</p>
+<p>json_benchmark.py
+Tests JSON serialization and deserialization performance.</p>
+<p>middleware_benchmark.py
+Tests the overhead of middleware stacks.</p>
+<p>websocket_benchmark.py
+Tests WebSocket connection and message throughput.</p>
+<p>template_benchmark.py
+Tests Jinax template rendering performance.</p>
+<p>Interpreting Results
+Requests per second (RPS): Higher is better</p>
+<p>Latency (ms): Lower is better</p>
+<p>Memory usage (MB): Lower is better</p>
+<p>Environment
+All benchmarks should be run on the same hardware for consistent results.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,309 +1,572 @@
-<!-- docs/api/validation.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Validation API – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Validation API — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Validation API — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Validation API</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/validation.md">Framework source</a> · <a href="../../content/framework/docs/api/validation.md" download>Markdown</a></p><h1 id="validation-api">Validation API</h1>
+<h2 id="schema">Schema</h2>
+<p>Base schema class for data validation.</p>
+<h3 id="constructor">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Schema</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">SchemaMeta</span><span class="p">):</span>
+    <span class="n">__fields__</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
+<span class="err">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="o">---</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="c1">## Class Methods</span>
 
-    <div id="header"></div>
+<span class="c1">### load</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="err">```</span><span class="n">python</span>
+<span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Schema</span>
+</code></pre></div>
+<p>Load and validate data from a dictionary.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td>Any</td>
+<td>Data to validate (must be a dictionary)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong></p>
+<p><code>ValidationError</code> if validation fails.</p>
+<p><strong>Returns:</strong></p>
+<p>A schema instance with validated data.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">user</span> <span class="o">=</span> <span class="n">CreateUser</span><span class="o">.</span><span class="n">load</span><span class="p">({</span>
+    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span>
+    <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"alice@example.com"</span>
+<span class="p">})</span>
+</code></pre></div>
+<hr/>
+<h2 id="methods">Methods</h2>
+<h3 id="to_dict">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert schema to a dictionary.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="c1"># {</span>
+<span class="c1">#   "name": "Alice",</span>
+<span class="c1">#   "email": "alice@example.com"</span>
+<span class="c1"># }</span>
+</code></pre></div>
+<h3 id="to_json">to_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert schema to a JSON serializable dictionary.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">json_data</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="validate">validate</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate schema data manually.</p>
+<p><strong>Raises:</strong></p>
+<p><code>ValidationError</code> if validation fails.</p>
+<hr/>
+<h2 id="fields">Fields</h2>
+<h2 id="strfield">StrField</h2>
+<p>String field with validation options.</p>
+<div class="highlight"><pre><span></span><code><span class="n">StrField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">strip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>required</td>
+<td>bool</td>
+<td>Field must be present</td>
+</tr>
+<tr>
+<td>default</td>
+<td>Any</td>
+<td>Default value if missing</td>
+</tr>
+<tr>
+<td>nullable</td>
+<td>bool</td>
+<td>Allow null values</td>
+</tr>
+<tr>
+<td>min_length</td>
+<td>int</td>
+<td>None</td>
+</tr>
+<tr>
+<td>max_length</td>
+<td>int</td>
+<td>None</td>
+</tr>
+<tr>
+<td>strip</td>
+<td>bool</td>
+<td>Remove whitespace</td>
+</tr>
+<tr>
+<td>pattern</td>
+<td>str</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="intfield">IntField</h2>
+<p>Integer field with range validation.</p>
+<div class="highlight"><pre><span></span><code><span class="n">IntField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>minimum</td>
+<td>int</td>
+<td>None</td>
+</tr>
+<tr>
+<td>maximum</td>
+<td>int</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+    <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="floatfield">FloatField</h2>
+<p>Float field with range validation.</p>
+<div class="highlight"><pre><span></span><code><span class="n">FloatField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">price</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span>
+    <span class="n">minimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="o">=</span><span class="mf">9999.99</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="boolfield">BoolField</h2>
+<p>Boolean field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">BoolField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">active</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BoolField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="choicefield">ChoiceField</h2>
+<p>Field with allowed values.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ChoiceField</span><span class="p">(</span>
+    <span class="n">choices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>choices</td>
+<td>list</td>
+<td>tuple</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">status</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">"pending"</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">,</span> <span class="s2">"deleted"</span><span class="p">],</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">"pending"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="emailfield">EmailField</h2>
+<p>Email validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">EmailField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="datefield">DateField</h2>
+<p>Date validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DateField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>format</td>
+<td>str</td>
+<td>Date format string</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">birthday</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="datetimefield">DateTimeField</h2>
+<p>Datetime validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DateTimeField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">created_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="decimalfield">DecimalField</h2>
+<p>Decimal validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DecimalField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="n">Decimal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="n">Decimal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>places</td>
+<td>int</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">amount</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+    <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">places</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="uuidfield">UUIDField</h2>
+<p>UUID validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">UUIDField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">token</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="listfield">ListField</h2>
+<p>List field with item validation.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ListField</span><span class="p">(</span>
+    <span class="n">item_field</span><span class="p">:</span> <span class="n">Field</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>item_field</td>
+<td>Field</td>
+<td>None</td>
+</tr>
+<tr>
+<td>min_items</td>
+<td>int</td>
+<td>None</td>
+</tr>
+<tr>
+<td>max_items</td>
+<td>int</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">tags</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ListField</span><span class="p">(</span>
+    <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">min_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">10</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="nestedfield">NestedField</h2>
+<p>Nested schema field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">NestedField</span><span class="p">(</span>
+    <span class="n">schema_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Schema</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AddressSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">street</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">NestedField</span><span class="p">(</span><span class="n">AddressSchema</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="anyfield">AnyField</h2>
+<p>Accepts any value.</p>
+<div class="highlight"><pre><span></span><code><span class="n">AnyField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">metadata</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">AnyField</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="exceptions">Exceptions</h2>
+<h2 id="validationerror">ValidationError</h2>
+<p>Raised when validation fails.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ValidationError</span><span class="p">(</span>
+    <span class="n">fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fields</td>
+<td>dict[str, list[str]]</td>
+<td>Field error messages</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">CreateUser</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html" class="active">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-                    </div>
-                </aside>
+<span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="fielderror">FieldError</h2>
+<p>Raised when a field validation fails.</p>
+<div class="highlight"><pre><span></span><code><span class="n">FieldError</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>message</td>
+<td>str</td>
+<td>Error message</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation.validators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">custom_validator</span><span class="p">,</span>
+    <span class="n">and_validators</span><span class="p">,</span>
+    <span class="n">pattern_validator</span><span class="p">,</span>
+<span class="p">)</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Validation API</h1>
 
-                        <h2>Schema</h2>
-                        <p>Base schema class.</p>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_unique_email</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">"admin@example.com"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FieldError</span><span class="p">(</span><span class="s2">"Email already registered"</span><span class="p">)</span>
 
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class Schema(metaclass=SchemaMeta)</code></pre>
-                        </div>
 
-                        <h3>Class Methods</h3>
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">and_validators</span><span class="p">(</span>
+                <span class="n">pattern_validator</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">"^[a-zA-Z0-9_]+$"</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
 
-                        <h4>load</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">@classmethod
-def load(cls, data: Any) -> Schema</code></pre>
-                        </div>
-                        <p>Load and validate data from a dictionary.</p>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">custom_validator</span><span class="p">(</span><span class="n">validate_unique_email</span><span class="p">)</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
 
-                        <h3>Methods</h3>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <h4>to_dict</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">def to_dict(self) -> dict[str, Any]</code></pre>
-                        </div>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <h4>to_json</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">def to_json(self) -> dict[str, Any]</code></pre>
-                        </div>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"moderator"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <h4>validate</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">def validate(self) -> None</code></pre>
-                        </div>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ListField</span><span class="p">(</span>
+        <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">max_items</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <h2>Fields</h2>
 
-                        <h3>StrField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">StrField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    min_length: int | None = None,
-    max_length: int | None = None,
-    strip: bool = True,
-    pattern: str | None = None,
-)</code></pre>
-                        </div>
-
-                        <h3>IntField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">IntField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    minimum: int | None = None,
-    maximum: int | None = None,
-)</code></pre>
-                        </div>
-
-                        <h3>FloatField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">FloatField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    minimum: float | None = None,
-    maximum: float | None = None,
-)</code></pre>
-                        </div>
-
-                        <h3>BoolField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">BoolField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-)</code></pre>
-                        </div>
-
-                        <h3>ChoiceField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">ChoiceField(
-    choices: list[Any] | tuple[Any, ...] | set[Any],
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-)</code></pre>
-                        </div>
-
-                        <h3>EmailField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">EmailField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    min_length: int | None = None,
-    max_length: int | None = None,
-)</code></pre>
-                        </div>
-
-                        <h3>DateField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">DateField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    format: str = "%Y-%m-%d",
-)</code></pre>
-                        </div>
-
-                        <h3>DateTimeField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">DateTimeField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    format: str = "%Y-%m-%dT%H:%M:%S",
-)</code></pre>
-                        </div>
-
-                        <h3>UUIDField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">UUIDField(
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-)</code></pre>
-                        </div>
-
-                        <h3>ListField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">ListField(
-    item_field: Field | None = None,
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-    min_items: int | None = None,
-    max_items: int | None = None,
-)</code></pre>
-                        </div>
-
-                        <h3>NestedField</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">NestedField(
-    schema_class: type[Schema],
-    *,
-    required: bool = False,
-    default: Any = None,
-    nullable: bool = False,
-)</code></pre>
-                        </div>
-
-                        <h2>Validators</h2>
-
-                        <ul>
-                            <li><code>required_validator(value, field)</code> — Value must not be None</li>
-                            <li><code>length_validator(min_length, max_length)</code> — String/list length</li>
-                            <li><code>min_validator(min_value)</code> — Minimum value</li>
-                            <li><code>max_validator(max_value)</code> — Maximum value</li>
-                            <li><code>range_validator(min_value, max_value)</code> — Range</li>
-                            <li><code>email_validator()</code> — Email format</li>
-                            <li><code>url_validator()</code> — URL format</li>
-                            <li><code>pattern_validator(pattern)</code> — Regex pattern</li>
-                            <li><code>and_validators(*validators)</code> — Combine with AND</li>
-                            <li><code>or_validators(*validators)</code> — Combine with OR</li>
-                            <li><code>custom_validator(func)</code> — Custom validator function</li>
-                        </ul>
-
-                        <h2>Exceptions</h2>
-
-                        <h3>ValidationError</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">ValidationError(fields: dict[str, list[str]])</code></pre>
-                        </div>
-
-                        <h3>FieldError</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">FieldError(message: str)</code></pre>
-                        </div>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Example</strong>
-                            <div class="code-block mt-2">
-                                <pre><code class="language-python">class CreateUser(Schema):
-    name = fields.StrField(required=True, min_length=2)
-    email = fields.EmailField(required=True)
-
-@app.post("/users")
-async def create_user(data: CreateUser):
-    return {"user": data.to_dict()}</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

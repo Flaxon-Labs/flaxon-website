@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon WhatsApp-style Chat — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon WhatsApp-style Chat — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon WhatsApp-style Chat</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/whatsapp_chat/README.md">Framework source</a> · <a href="../../../content/framework/docs/examples/whatsapp_chat/README.md" download>Markdown</a></p><h1 id="flaxon-whatsapp-style-chat">Flaxon WhatsApp-style Chat</h1>
+<p>This example is a small production-shaped real-time chat application built
+with Flaxon WebSockets, Jinax, HTML, CSS, and browser JavaScript. It uses a
+JSON event protocol similar to a Node.js Socket.IO-style service while keeping
+the transport as native WebSockets.</p>
+<h2 id="run-in-editable-mode">Run in editable mode</h2>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-e</span> <span class="p">.</span>
+<span class="n">flaxon</span> <span class="n">run</span> <span class="n">docs</span><span class="p">.</span><span class="n">examples</span><span class="p">.</span><span class="n">whatsapp_chat</span><span class="p">.</span><span class="n">app</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</code></pre></div>
+<p>Open <code>http://127.0.0.1:8000/?user=ada</code> in two browser tabs. Messages and typing
+events are delivered to every connection in the <code>general</code> room.</p>
+<h2 id="protocol">Protocol</h2>
+<p>The client sends <code>message.send</code>, <code>typing</code>, and <code>ping</code> JSON events. The server
+sends <code>session.ready</code>, <code>message.created</code>, <code>presence.joined</code>, <code>presence.left</code>,
+and <code>error</code> events. Message history is available at
+<code>GET /api/rooms/general/messages</code>; liveness is available at <code>GET /health</code>.</p>
+<h2 id="production-hardening">Production hardening</h2>
+<p>The example intentionally keeps storage in memory for easy local testing.
+Replace <code>messages</code> with a database repository, validate the authenticated user
+from a session or JWT, and add authorization for room membership. For multiple
+workers, configure the framework's Redis broadcaster on
+<code>app.websocket_manager</code> so room broadcasts cross process boundaries. Add a
+message queue, attachment storage, moderation, rate limits, observability,
+and a durable outbox before production deployment.</p></article>
+</main></div><div id="footer"></div></body></html>

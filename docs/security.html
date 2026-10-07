@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Security — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Security — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/security.md">Framework source</a> · <a href="../content/framework/docs/security.md" download>Markdown</a></p><h1 id="security">Security</h1>
+<h2 id="overview">Overview</h2>
+<p>Security is an important part of Flaxon's design.</p>
+<p>Flaxon provides secure defaults and documentation to help developers build safer applications.</p>
+<p>The framework includes support for:</p>
+<ul>
+<li>Template autoescaping</li>
+<li>Request validation</li>
+<li>Security headers</li>
+<li>Request identifiers</li>
+<li>Sensitive data redaction</li>
+<li>Production-safe error handling</li>
+<li>Rate limiting</li>
+</ul>
+<p>Security features reduce common risks, but developers are still responsible for following secure application practices.</p>
+<hr/>
+<h2 id="built-in-security-features">Built-in Security Features</h2>
+<h2 id="autoescaping">Autoescaping</h2>
+<p>Jinax templates automatically escape HTML and XML content to help prevent Cross-Site Scripting (XSS) attacks.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>{{ user_input }}
+````
+
+Unsafe characters are escaped before being rendered.
+
+---
+
+# Request Validation
+
+Flaxon supports declarative schemas for validating incoming data before processing.
+
+Example:
+
+```python
+from flaxon.validation import Schema, fields
+
+
+class CreateUser(Schema):
+
+    name = fields.StrField(
+        required=True,
+        min_length=2
+    )
+
+    email = fields.EmailField(
+        required=True
+    )
+</code></pre></div>
+<p>Validation helps prevent malformed or unexpected input from reaching application logic.</p>
+<hr/>
+<h2 id="security-headers">Security Headers</h2>
+<p>Flaxon can apply recommended security headers.</p>
+<p>Common headers include:</p>
+<div class="highlight"><pre><span></span><code>X-Content-Type-Options: nosniff
+
+X-Frame-Options: DENY
+
+Referrer-Policy: strict-origin-when-cross-origin
+
+Permissions-Policy:
+geolocation=(),
+microphone=(),
+camera=()
+</code></pre></div>
+<p>These headers help protect against:</p>
+<ul>
+<li>Content type attacks</li>
+<li>Clickjacking</li>
+<li>Unnecessary browser permissions</li>
+</ul>
+<hr/>
+<h2 id="request-ids">Request IDs</h2>
+<p>Every request can receive a unique identifier.</p>
+<p>Request IDs help with:</p>
+<ul>
+<li>Debugging</li>
+<li>Logging</li>
+<li>Distributed tracing</li>
+<li>Production troubleshooting</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>Request-ID: fx-8a72c91d
+</code></pre></div>
+<hr/>
+<h2 id="sensitive-data-redaction">Sensitive Data Redaction</h2>
+<p>Flaxon avoids exposing sensitive information in logs and debug output.</p>
+<p>Sensitive values should be protected, including:</p>
+<ul>
+<li>Passwords</li>
+<li>Secrets</li>
+<li>Authentication tokens</li>
+<li>API keys</li>
+<li>Private keys</li>
+<li>Credit card information</li>
+<li>Authorization headers</li>
+</ul>
+<hr/>
+<h2 id="production-safe-errors">Production-Safe Errors</h2>
+<p>In production mode, Flaxon returns safe error responses.</p>
+<p>Production errors should:</p>
+<ul>
+<li>Hide internal tracebacks</li>
+<li>Avoid exposing application details</li>
+<li>Provide useful error identifiers</li>
+</ul>
+<p>Detailed debugging information should only be enabled in development environments.</p>
+<hr/>
+<h2 id="rate-limiting">Rate Limiting</h2>
+<p>Rate limiting helps prevent abuse by restricting excessive requests.</p>
+<p>Use cases include:</p>
+<ul>
+<li>API protection</li>
+<li>Login protection</li>
+<li>Resource management</li>
+<li>Abuse prevention</li>
+</ul>
+<hr/>
+<h2 id="security-recommendations">Security Recommendations</h2>
+<h2 id="admin-and-cms-hardening">Admin and CMS Hardening</h2>
+<p>For Admin deployments, configure a shared Redis backend for sessions and
+distributed request limits, keep CSRF enabled, and use <code>session_idle_timeout</code>
+with HTTPS-only deployment. Password-reset and MFA operations are separately
+limited by account and IP when Redis is configured.</p>
+<p>Media uploads can use a scanner callback, SHA-256 metadata, EXIF removal, and
+S3 presigned URLs. A scanner callback is only production antivirus protection
+when connected to an actual engine such as ClamAV; returning <code>True</code> from a test
+callback does not scan files.</p>
+<p>Audit records are hash chained and can be checked with
+<code>GET /admin/audit/verify</code>. Keep audit storage append-only at the database and
+infrastructure layers, and define a retention policy before deployment.</p>
+<h2 id="production-checklist">Production Checklist</h2>
+<p>Before deploying a Flaxon application:</p>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> Set <code>FLAXON_DEBUG=false</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Set <code>FLAXON_SECRET_KEY</code> with 32+ random bytes</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Configure <code>FLAXON_ALLOWED_HOSTS</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Enable HTTPS</li>
+<li class="task-list-item">
+<p><input disabled="" type="checkbox"/> Use secure cookies:</p>
+</li>
+<li>
+<p><code>Secure</code></p>
+</li>
+<li><code>HttpOnly</code></li>
+<li><code>SameSite</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Implement authentication and authorization</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Enable rate limiting</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Validate all user input</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Use parameterized database queries</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Keep dependencies updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Scan dependencies for vulnerabilities</li>
+</ul>
+<hr/>
+<h2 id="authentication">Authentication</h2>
+<p>Flaxon supports authentication backends for securing protected routes.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span><span class="p">,</span> <span class="n">login_required</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"secure-app"</span>
+<span class="p">)</span>
+
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret"</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">authenticate_user</span><span class="p">(</span>
+        <span class="n">data</span>
+    <span class="p">)</span>
+
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span>
+        <span class="n">user</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"token"</span><span class="p">:</span> <span class="n">token</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/protected"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">protected</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">,</span>
+        <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="csrf-protection">CSRF Protection</h2>
+<p>For applications using cookies and browser sessions, enable CSRF protection.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSRFMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CSRFMiddleware</span><span class="p">,</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="cors-configuration">CORS Configuration</h2>
+<p>Configure Cross-Origin Resource Sharing (CORS) carefully.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"https://example.com"</span>
+    <span class="p">],</span>
+    <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Avoid allowing unrestricted origins in production environments.</p>
+<hr/>
+<h2 id="rate-limiting-configuration">Rate Limiting Configuration</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">RateLimitMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">RateLimitMiddleware</span><span class="p">,</span>
+    <span class="n">requests</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">window_seconds</span><span class="o">=</span><span class="mi">60</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="threat-mitigation">Threat Mitigation</h2>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XSS</td>
+<td>Template escaping, Content Security Policy</td>
+</tr>
+<tr>
+<td>SQL Injection</td>
+<td>Parameterized queries, validation</td>
+</tr>
+<tr>
+<td>Credential Theft</td>
+<td>Secure password hashing, MFA</td>
+</tr>
+<tr>
+<td>Token Abuse</td>
+<td>Short-lived tokens, refresh rotation</td>
+</tr>
+<tr>
+<td>CSRF</td>
+<td>CSRF tokens</td>
+</tr>
+<tr>
+<td>DDoS</td>
+<td>Rate limiting, timeouts</td>
+</tr>
+<tr>
+<td>Data Leakage</td>
+<td>Redaction, safe error handling</td>
+</tr>
+<tr>
+<td>Supply Chain Attacks</td>
+<td>Dependency pinning, security scanning</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="reporting-vulnerabilities">Reporting Vulnerabilities</h2>
+<p>If you discover a security vulnerability in Flaxon:</p>
+<p>Please report it responsibly.</p>
+<p>Contact:</p>
+<p><code>aldanehutchinson5@gmail.com</code></p>
+<p>or create a private security advisory through the Flaxon GitHub repository.</p>
+<p>Please do not publicly disclose security issues before they are reviewed and addressed.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Industrial Admin Customization — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Industrial Admin Customization — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Industrial Admin Customization</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Industrial%20Admin%20Customization.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Industrial Admin Customization.md" download>Markdown</a></p><h1 id="industrial-admin-customization">Industrial Admin Customization</h1>
+<p>This lesson shows how to turn Flaxon's Admin into an operations console for a
+real business application. The examples use a flower shop, but the same
+patterns apply to inventory, healthcare, education, logistics, SaaS, and
+internal enterprise tools.</p>
+<p>The Admin is a management surface, not your domain model. Keep business rules
+in services and repositories, then let Admin call those same services. This
+prevents an Admin action from accidentally behaving differently from an API,
+worker, or scheduled job.</p>
+<h2 id="1-recommended-project-structure">1. Recommended project structure</h2>
+<div class="highlight"><pre><span></span><code>flower-shop/
+|-- app.py
+|-- pyproject.toml
+|-- .env.example
+|-- migrations/
+|-- src/flower_shop/
+|   |-- models.py
+|   |-- repositories.py
+|   |-- services.py
+|   |-- admin.py
+|   |-- admin_routes.py
+|   |-- templates/admin/
+|   `-- static/admin/
+`-- tests/
+    |-- test_admin_permissions.py
+    `-- test_admin_workflows.py
+</code></pre></div>
+<p>Use the same service layer from Admin and public endpoints:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/flower_shop/services.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FlowerService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="o">=</span> <span class="n">repository</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flower_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">flower</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">flower_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">flower_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"archived"</span><span class="p">})</span>
+</code></pre></div>
+<h2 id="2-bootstrap-a-persistent-admin">2. Bootstrap a persistent Admin</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># app.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"flower-shop"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Attach your initialized DatabaseManager or adapter before this block.</span>
+<span class="n">database</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">database</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span>
+        <span class="n">site_title</span><span class="o">=</span><span class="s2">"Petal and Stem Admin"</span><span class="p">,</span>
+        <span class="n">site_header</span><span class="o">=</span><span class="s2">"Petal and Stem Operations"</span><span class="p">,</span>
+        <span class="n">index_title</span><span class="o">=</span><span class="s2">"Flower shop operations"</span><span class="p">,</span>
+        <span class="n">timezone</span><span class="o">=</span><span class="s2">"UTC"</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"REDIS_URL"</span><span class="p">),</span>
+    <span class="n">redis_protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">redis_max_connections</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">session_idle_timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+    <span class="n">max_upload_size</span><span class="o">=</span><span class="mi">10</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+    <span class="n">allowed_upload_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"image/jpeg"</span><span class="p">,</span> <span class="s2">"image/png"</span><span class="p">,</span> <span class="s2">"image/webp"</span><span class="p">,</span> <span class="s2">"application/pdf"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Petal and Stem Content"</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">,</span>
+    <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"REDIS_URL"</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Use a database-backed Admin store or Redis session backend in production. The
+default in-memory session behavior is for development and does not coordinate
+multiple workers.</p>
+<h2 id="3-register-a-model-with-real-crud-hooks">3. Register a model with real CRUD hooks</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin_model</span>
+
+
+<span class="nd">@admin_model</span><span class="p">(</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"stock"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">],</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"stock"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Flower</span><span class="p">:</span>
+    <span class="n">repository</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instances</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">object_id</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">object_id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">object_id</span><span class="p">)</span>
+
+
+<span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Flower</span><span class="p">)</span>
+</code></pre></div>
+<p>For production, validate prices, stock, SKU uniqueness, and state transitions
+in the repository or service layer. Admin field configuration controls the
+management UI; it is not a substitute for server-side validation.</p>
+<h2 id="4-protect-custom-admin-pages">4. Protect custom Admin pages</h2>
+<p>Custom pages should authenticate and authorize at the route boundary. Do not
+rely on a hidden navigation item as security.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/flower_shop/admin_routes.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register_admin_routes</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">admin</span><span class="p">,</span> <span class="n">flower_service</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">inventory</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">admin</span><span class="o">.</span><span class="n">_require_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"admin:read"</span><span class="p">)</span>
+        <span class="n">flowers</span> <span class="o">=</span> <span class="k">await</span> <span class="n">flower_service</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="s2">"admin/inventory.html"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span> <span class="s2">"flowers"</span><span class="p">:</span> <span class="n">flowers</span><span class="p">,</span> <span class="s2">"dashboard"</span><span class="p">:</span> <span class="n">admin</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">flower_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">admin</span><span class="o">.</span><span class="n">_require_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"flower:update"</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s2">"to_dict"</span><span class="p">)</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+        <span class="n">admin</span><span class="o">.</span><span class="n">validate_csrf</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">flower_service</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">flower_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Flower not found"</span><span class="p">},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"ok"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"flower"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/admin/inventory"</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">{</span><span class="s2">"GET"</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"inventory"</span><span class="p">)(</span><span class="n">inventory</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+        <span class="s2">"/admin/flowers/&lt;flower_id&gt;/archive"</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">{</span><span class="s2">"POST"</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"archive_flower"</span><span class="p">,</span>
+    <span class="p">)(</span><span class="n">archive</span><span class="p">)</span>
+</code></pre></div>
+<p>Every browser mutation must include the CSRF token. A custom SPA must send the
+same token in the <code>X-CSRF-Token</code> header and handle <code>401</code>, <code>403</code>, and
+<code>422</code> responses explicitly.</p>
+<h2 id="5-add-a-custom-admin-template">5. Add a custom Admin template</h2>
+<p>Create <code>templates/admin/inventory.html</code>:</p>
+<div class="highlight"><pre><span></span><code>{% extends "admin/base.html" %}
+{% block content %}
+<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">"admin-page"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">header</span> <span class="na">class</span><span class="o">=</span><span class="s">"admin-page-header"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"eyebrow"</span><span class="p">&gt;</span>Operations<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Inventory<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;&lt;</span><span class="nt">tr</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Name<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>SKU<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Stock<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Status<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;/</span><span class="nt">tr</span><span class="p">&gt;&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">tbody</span><span class="p">&gt;</span>
+    {% for flower in flowers %}
+      <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ flower.name }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ flower.sku }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ flower.stock }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ flower.status }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    {% else %}
+      <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;&lt;</span><span class="nt">td</span> <span class="na">colspan</span><span class="o">=</span><span class="s">"4"</span><span class="p">&gt;</span>No inventory records found.<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    {% endfor %}
+    <span class="p">&lt;/</span><span class="nt">tbody</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+{% endblock %}
+</code></pre></div>
+<p>Keep custom templates compatible with the Admin base template and use Jinax
+autoescaping for user-controlled values. Add custom CSS below your app's
+Admin static directory rather than modifying framework package files.</p>
+<h2 id="6-add-a-controlled-workflow-action">6. Add a controlled workflow action</h2>
+<p>A publish, archive, refund, or approve action should call a service, record an
+activity event, and be idempotent. Bulk actions must enforce the specific model
+permission, such as <code>flower:update</code>, not only a broad write permission.</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">archive_flowers</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">actor</span><span class="p">):</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">object_id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">flower</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">object_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">updated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flower</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"updated"</span><span class="p">:</span> <span class="n">updated</span><span class="p">,</span> <span class="s2">"actor"</span><span class="p">:</span> <span class="n">actor</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]}</span>
+</code></pre></div>
+<p>For high-value operations, require a confirmation screen, write an audit
+event with actor and request metadata, and run the service inside one database
+transaction where the adapter supports it.</p>
+<h2 id="7-configure-users-and-roles">7. Configure users and roles</h2>
+<p>Use least privilege. A typical shop setup has:</p>
+<div class="highlight"><pre><span></span><code>administrator: admin:superuser
+manager: admin:read, admin:write, flower:read, flower:create, flower:update
+editor: admin:read, flower:read
+warehouse: admin:read, flower:read, flower:update
+</code></pre></div>
+<p>Keep system roles protected and do not grant <code>admin:superuser</code> to ordinary
+staff. Test both the API response and the rendered UI for each role. The UI
+can hide unavailable actions, but the route must still reject them.</p>
+<h2 id="8-add-cms-content-and-media">8. Add CMS content and media</h2>
+<p>Use CMS for editorial records such as landing pages, campaigns, blog posts,
+and announcements. Use Admin models for operational records such as orders,
+inventory, and staff.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMSField</span><span class="p">,</span> <span class="n">ContentType</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span>
+    <span class="s2">"campaign"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Campaign"</span><span class="p">,</span>
+    <span class="n">label_plural</span><span class="o">=</span><span class="s2">"Campaigns"</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"body"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"richtext"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"select"</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">"draft"</span><span class="p">,</span> <span class="s2">"review"</span><span class="p">,</span> <span class="s2">"published"</span><span class="p">]),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"publish_at"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"datetime"</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"updated_at"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">],</span>
+<span class="p">))</span>
+</code></pre></div>
+<p>Configure allowed MIME types, upload size limits, a scanner, object storage,
+and a durable worker for thumbnail processing. Do not make a public media URL
+private merely by hiding it in the UI; use signed URLs for private assets.</p>
+<h2 id="9-persistence-migrations-and-deployment">9. Persistence, migrations, and deployment</h2>
+<p>Generate and apply Admin migrations before starting web processes:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_admin_migration</span>
+
+<span class="n">write_admin_migration</span><span class="p">(</span><span class="s2">"migrations"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">flaxon</span> <span class="n">migrate</span> <span class="p">-</span><span class="n">-database</span> <span class="nv">$env:DATABASE_URL</span> <span class="p">-</span><span class="n">-migrations-dir</span> <span class="n">migrations</span>
+<span class="n">flaxon</span> <span class="n">run</span> <span class="n">app</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span>
+</code></pre></div>
+<p>Production configuration should include a strong <code>FLAXON_SECRET_KEY</code>, a
+database URL, Redis for shared sessions and locks, external mail delivery,
+object storage, and a worker process for scheduled or durable jobs. Keep
+<code>debug=False</code>, put the application behind HTTPS, and configure backups,
+monitoring, log retention, and alerting outside the Admin UI.</p>
+<h2 id="10-test-the-admin-as-a-user-would">10. Test the Admin as a user would</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncTestClient</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_editor_cannot_archive</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncTestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">login</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/login"</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"username"</span><span class="p">:</span> <span class="s2">"editor"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"test-password"</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">login</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">200</span><span class="p">,</span> <span class="mi">302</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/admin/flowers/1/archive"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{})</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+</code></pre></div>
+<p>Also test login throttling, CSRF failures, expired sessions, inactive users,
+role boundaries, duplicate submissions, concurrent edits, upload rejection,
+database rollback, and worker restart behavior. Browser tests should cover the
+actual responsive navigation and every important create/edit/delete workflow.</p>
+<h2 id="production-checklist">Production checklist</h2>
+<ul>
+<li>Use persistent Admin storage and migrations.</li>
+<li>Configure Redis for multi-worker sessions, limits, locks, and events.</li>
+<li>Enforce model-action permissions in every custom route and action.</li>
+<li>Include CSRF tokens in all browser mutations.</li>
+<li>Keep business rules in services and wrap related writes in transactions.</li>
+<li>Enable password policy, MFA, reset mail, and account-specific rate limits.</li>
+<li>Validate media type and size, scan uploads, strip unsafe metadata, and use signed URLs.</li>
+<li>Run thumbnails and scheduled publishing through durable workers.</li>
+<li>Record audit events with actor, IP, user agent, retention, and integrity checks.</li>
+<li>Add tests for allowed and denied workflows, not only successful pages.</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

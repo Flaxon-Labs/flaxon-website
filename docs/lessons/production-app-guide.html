@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Building a Production App with Modules — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Building a Production App with Modules — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Building a Production App with Modules</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/production-app-guide.md">Framework source</a> · <a href="../../content/framework/docs/lessons/production-app-guide.md" download>Markdown</a></p><h1 id="building-a-production-app-with-modules">Building a Production App with Modules</h1>
+<p>A guide to structuring a real, multi-domain Flaxon app around
+<code>FlaxonModule</code> -- file layout, an auto-mounting convention that keeps
+<code>app.py</code> from growing every time you add a feature, and the developer-
+experience tooling Flaxon already has that's worth wiring in from day
+one. Every piece of this has been built and run end to end, including
+the gotchas.</p>
+<hr/>
+<h2 id="recommended-file-structure">Recommended file structure</h2>
+<div class="highlight"><pre><span></span><code>myapp/
+├── app.py                    # entry point: builds the app, wires dependencies, mounts modules
+├── pyproject.toml            # dependencies + pytest config (see "Testing" below)
+├── .env                      # local secrets, gitignored
+├── .env.example              # checked in, documents what .env needs
+├── .gitignore
+│
+├── modules/
+│   ├── __init__.py           # empty -- just makes this a package
+│   ├── loader.py             # auto-discovers and mounts every module below
+│   │
+│   ├── core/
+│   │   └── __init__.py       # health/status endpoints, no url prefix
+│   │
+│   ├── users/
+│   │   ├── __init__.py       # defines `module = FlaxonModule("users")` + routes
+│   │   ├── repository.py     # DB access, kept out of route handlers
+│   │   ├── templates/
+│   │   └── static/
+│   │
+│   └── posts/
+│       ├── __init__.py
+│       └── repository.py
+│
+├── cli/
+│   └── seed.py                # module-owned CLI commands, e.g. `flaxon seed`
+│
+├── migrations/                 # flaxon migrate reads from here
+│
+└── tests/
+    ├── test_users_module.py    # ModuleTestClient -- no full app needed
+    └── test_app.py             # full-app integration tests via AsyncTestClient
+</code></pre></div>
+<p>One module = one folder = one domain area. Each module's <code>__init__.py</code>
+exposes a single module-level <code>FlaxonModule</code> instance named <code>module</code> --
+that convention is what makes the auto-mounting loader below possible.</p>
+<hr/>
+<h2 id="the-auto-mounting-convention-the-main-dx-win">The auto-mounting convention (the main DX win)</h2>
+<p>Without this, every new feature means editing <code>app.py</code> to add another
+<code>app.mount_module(...)</code> call. With it, adding a feature is "add a
+folder" -- <code>app.py</code> never changes.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># modules/loader.py</span>
+<span class="sd">"""Auto-discovers and mounts every module in this package.</span>
+
+<span class="sd">Convention: each subdirectory under modules/ is a package whose</span>
+<span class="sd">__init__.py exposes a module-level FlaxonModule instance named `module`.</span>
+<span class="sd">"""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pkgutil</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mount_all</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">prefix_base</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"/api"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">"modules"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">is_pkg</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">iter_modules</span><span class="p">(</span><span class="n">package</span><span class="o">.</span><span class="n">__path__</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_pkg</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">"modules.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="s2">"module"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"core"</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix_base</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># modules/users/__init__.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFound</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"users"</span><span class="p">)</span>
+<span class="n">module</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"db"</span><span class="p">)</span>
+
+<span class="nd">@module</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="s2">"SELECT * FROM users"</span><span class="p">)</span>
+
+<span class="nd">@module</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span><span class="s2">"SELECT * FROM users WHERE id = ?"</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No user with id </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># modules/posts/__init__.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"posts"</span><span class="p">)</span>
+<span class="n">module</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"db"</span><span class="p">)</span>
+
+<span class="nd">@module</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_posts</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="s2">"SELECT * FROM posts"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># modules/core/__init__.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"core"</span><span class="p">)</span>
+
+<span class="nd">@module</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/status"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}</span>
+</code></pre></div>
+<p><code>core</code> is treated specially -- mounted with no prefix, since health/
+status endpoints are conventionally at the app root, not under <code>/api</code>.
+Adjust that rule for your own conventions; the point is the loader
+makes the rule enforceable in one place instead of scattered across
+every <code>mount_module()</code> call.</p>
+<hr/>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlite</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteAdapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">mount_all</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"myapp"</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">"SECRET_KEY"</span><span class="p">:</span> <span class="s2">"change-me-in-production"</span><span class="p">},</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span><span class="n">SQLiteAdapter</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"DATABASE_PATH"</span><span class="p">,</span> <span class="s2">"app.db"</span><span class="p">)))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+
+<span class="n">mount_all</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup_db</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)"</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT)"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">teardown_db</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<p>Note the order: register dependencies in <code>app.container</code> <strong>before</strong>
+<code>mount_all(app)</code> runs, since <code>requires()</code> validation happens at mount
+time -- a module mounted before its dependency is registered fails
+immediately with a clear <code>ModuleDependencyError</code>, which is the point.</p>
+<p><strong>Real gotcha, found while building this:</strong> an <code>aiosqlite</code>-backed
+connection left open when a script/event loop exits can hang the
+interpreter indefinitely instead of exiting cleanly. Always pair
+<code>db.initialize()</code> in <code>on_startup</code> with <code>db.close()</code> in <code>on_shutdown</code> --
+under <code>flaxon run</code>, the real ASGI lifespan protocol fires both
+correctly, so this is only a trap in ad-hoc scripts/REPL experiments
+that don't go through the real lifespan.</p>
+<hr/>
+<h2 id="config-and-environments">Config and environments</h2>
+<p><code>Flaxon</code>'s built-in <code>Config</code> reads any <code>FLAXON_</code>-prefixed environment
+variable automatically, with type coercion (<code>"true"</code>/<code>"false"</code> become
+real booleans, comma-separated values become lists):</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># .env</span>
+<span class="nv">FLAXON_ENV</span><span class="o">=</span>development
+<span class="nv">FLAXON_DEBUG</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">FLAXON_SECRET_KEY</span><span class="o">=</span>dev-only-do-not-use-in-prod
+<span class="nv">FLAXON_ALLOWED_HOSTS</span><span class="o">=</span>localhost,127.0.0.1
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--env-file<span class="w"> </span>.env<span class="w"> </span>--reload
+</code></pre></div>
+<p><code>--env-file</code> uses <code>python-dotenv</code> under the hood -- it's not a hard
+Flaxon dependency, so add it yourself: <code>pip install python-dotenv</code>.</p>
+<p>In code, check environment with the real helpers rather than
+string-comparing <code>app.config["ENV"]</code> yourself:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_production</span><span class="p">():</span>
+    <span class="o">...</span>
+<span class="k">elif</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_development</span><span class="p">():</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p><code>.env.example</code> (checked into git, documents what production needs
+without leaking real secrets):</p>
+<div class="highlight"><pre><span></span><code><span class="nv">FLAXON_ENV</span><span class="o">=</span>production
+<span class="nv">FLAXON_DEBUG</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">FLAXON_SECRET_KEY</span><span class="o">=</span>
+<span class="nv">FLAXON_ALLOWED_HOSTS</span><span class="o">=</span>yourdomain.com
+</code></pre></div>
+<hr/>
+<h2 id="cli-commands">CLI commands</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># cli/seed.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">seed_mod</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"seed_cli"</span><span class="p">)</span>
+
+<span class="nd">@seed_mod</span><span class="o">.</span><span class="n">cli_command</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">"Seed demo users and posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">seed</span><span class="p">(</span><span class="n">console</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseManager</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlite</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLiteAdapter</span>
+
+    <span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span><span class="n">SQLiteAdapter</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s2">"app.db"</span><span class="p">))</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"INSERT INTO users (name) VALUES (?)"</span><span class="p">,</span> <span class="s2">"Demo User"</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Seeded 1 demo user."</span><span class="p">)</span>
+
+<span class="n">seed_mod</span><span class="o">.</span><span class="n">install_cli_commands</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>--help<span class="w">    </span><span class="c1"># "seed" shows up</span>
+flaxon<span class="w"> </span>seed<span class="w">      </span><span class="c1"># runs it</span>
+</code></pre></div>
+<p>Use <code>cli/*.py</code>, not a <code>flaxon_cli.py</code> at the project root, for this --
+verified the project-root path silently finds nothing when run through
+the installed <code>flaxon</code> command unless you've specifically patched
+<code>discovery.py</code>'s <code>sys.path</code> handling. <code>cli/*.py</code> works regardless, no
+patch needed.</p>
+<hr/>
+<h2 id="testing">Testing</h2>
+<h2 id="isolated-module-tests-fast-no-full-app">Isolated module tests (fast, no full app)</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># tests/test_users_module.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span><span class="p">,</span> <span class="n">ModuleDependencyError</span><span class="p">,</span> <span class="n">ModuleTestClient</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_requires_db_dependency</span><span class="p">():</span>
+    <span class="n">fresh</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"users"</span><span class="p">)</span>
+    <span class="n">fresh</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"db"</span><span class="p">)</span>
+
+    <span class="nd">@fresh</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">ModuleDependencyError</span><span class="p">):</span>
+        <span class="n">ModuleTestClient</span><span class="p">(</span><span class="n">fresh</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="full-app-integration-tests">Full-app integration tests</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># tests/test_app.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncTestClient</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">m</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_status</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">m</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">lifecycle</span><span class="o">.</span><span class="n">startup</span><span class="p">()</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">AsyncTestClient</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">"GET"</span><span class="p">,</span> <span class="s2">"/status"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">await</span> <span class="n">m</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="the-real-gotcha-you-need-pyprojecttoml-for">The real gotcha you need <code>pyproject.toml</code> for</h2>
+<p><code>flaxon test</code> runs <code>pytest</code> as a <strong>separate subprocess</strong> -- this does
+NOT get your project root added to <code>sys.path</code> the way <code>python -m pytest</code>
+does (verified: <code>from modules.users import module</code> fails under
+<code>flaxon test</code> without this, works fine under plain
+<code>python -m pytest tests/</code>). Fix it once, in <code>pyproject.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[tool.pytest.ini_options]</span>
+<span class="n">pythonpath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"."</span><span class="p">]</span>
+<span class="n">asyncio_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"auto"</span>
+</code></pre></div>
+<p>With that in place, both <code>flaxon test</code> and <code>pytest</code> directly work
+identically.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--coverage<span class="w"> </span>--keep-env
+</code></pre></div>
+<hr/>
+<h2 id="migrations">Migrations</h2>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span>
+<span class="s2">from flaxon.admin import write_admin_migration</span>
+<span class="s2">write_admin_migration('migrations')</span>
+<span class="s2">"</span>
+flaxon<span class="w"> </span>migrate<span class="w"> </span>--database<span class="w"> </span><span class="s2">"sqlite://./app.db"</span><span class="w"> </span>--migrations-dir<span class="w"> </span>migrations
+flaxon<span class="w"> </span>migrate<span class="w"> </span>--database<span class="w"> </span><span class="s2">"sqlite://./app.db"</span><span class="w"> </span>--migrations-dir<span class="w"> </span>migrations<span class="w"> </span>--status
+</code></pre></div>
+<p>Works the same way for Postgres/MySQL via <code>--database postgresql://...</code>
+or <code>--database mysql://...</code>.</p>
+<hr/>
+<h2 id="developer-experience-tooling-worth-wiring-in-from-day-one">Developer-experience tooling worth wiring in from day one</h2>
+<p>These already exist in Flaxon -- they cost nothing to use, and catch
+real problems before they reach production:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload<span class="w">            </span><span class="c1"># auto-reload on file changes, for local dev</span>
+flaxon<span class="w"> </span>routes<span class="w"> </span>app:app<span class="w">                  </span><span class="c1"># confirms every module mounted where you expect</span>
+flaxon<span class="w"> </span>doctor<span class="w"> </span>app:app<span class="w">                  </span><span class="c1"># catches duplicate routes, weak/missing SECRET_KEY</span>
+flaxon<span class="w"> </span>doctor<span class="w"> </span>app:app<span class="w"> </span>--fix<span class="w">            </span><span class="c1"># generates a real SECRET_KEY into .env if missing</span>
+</code></pre></div>
+<p>Run <code>flaxon routes app:app</code> after adding a new module -- it's the
+fastest way to confirm the auto-mount loader actually picked it up and
+prefixed it correctly, without needing to hit the server manually:</p>
+<div class="highlight"><pre><span></span><code>GET     /status                   status
+GET     /api/posts/               list_posts
+GET     /api/users/               list_users
+GET     /api/users/&lt;int:user_id&gt;  get_user
+</code></pre></div>
+<p><code>debug=True</code> also gets you a live debug dashboard at <code>/__debug__</code> and
+<code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>, <code>/metrics</code> for free --
+useful behind a load balancer's health checks even before you've built
+any of your own monitoring.</p>
+<hr/>
+<h2 id="summary-checklist-for-a-new-production-app">Summary checklist for a new production app</h2>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> One folder per domain under <code>modules/</code>, each exposing <code>module = FlaxonModule(...)</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>modules/loader.py</code> auto-mounts everything -- <code>app.py</code> stays small as you grow</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Dependencies registered in <code>app.container</code> <strong>before</strong> <code>mount_all(app)</code> runs</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>db.close()</code> paired with every <code>db.initialize()</code>, in <code>on_shutdown</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>.env</code> for local secrets, <code>.env.example</code> checked in, <code>--env-file</code> on <code>flaxon run</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>pyproject.toml</code> has <code>pythonpath = ["."]</code> under <code>[tool.pytest.ini_options]</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> CLI commands live in <code>cli/*.py</code>, not <code>flaxon_cli.py</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> <code>flaxon routes app:app</code> and <code>flaxon doctor app:app</code> run as a sanity check after any structural change</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

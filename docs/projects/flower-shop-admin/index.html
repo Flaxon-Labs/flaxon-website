@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Petal &amp; Stem Admin Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Petal &amp; Stem Admin Example — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Petal &amp; Stem Admin Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/flower_shop_admin/README.md">Framework source</a> · <a href="../../../content/framework/examples/flower_shop_admin/README.md" download>Markdown</a></p><h1 id="petal-stem-admin-example">Petal &amp; Stem Admin Example</h1>
+<p>This editable example combines the Flaxon Admin dashboard, CMS, and a
+WebSocket shop-floor chat room.</p>
+<h2 id="run">Run</h2>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-e</span> <span class="p">.</span><span class="no">[standard]</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">flaxon</span> <span class="n">run</span> <span class="n">examples</span><span class="p">.</span><span class="n">flower_shop_admin</span><span class="p">.</span><span class="n">app</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span>
+</code></pre></div>
+<p>Open <code>http://127.0.0.1:8000/</code>.</p>
+<ul>
+<li>Admin: <code>/admin/</code></li>
+<li>Custom Admin shop overview: <code>/admin/shop-overview</code></li>
+<li>CMS SPA: <code>/admin/cms/</code></li>
+<li>Chat room: <code>/chat?user=florist</code></li>
+</ul>
+<p>Development users are <code>owner / Owner123!</code> and <code>florist / Florist123!</code>.
+Change them before deployment. After signing in, open the Admin profile and
+enroll TOTP MFA. To require MFA on the first login, set a base32 secret in
+<code>FLORAL_MFA_SECRET</code>; use <code>FLORAL_ADMIN_PASSWORD</code> and
+<code>FLORAL_EDITOR_PASSWORD</code> for non-default passwords.</p>
+<p>The Admin/CMS SQLite store is written to <code>data/admin.sqlite3</code>; uploads are
+written to <code>data/uploads</code>. The flower catalog is deliberately an in-memory
+model to make replacement with a project database straightforward. The chat
+history is also in-memory; configure a persistent message repository and the
+Redis broadcaster for multi-worker deployment.</p></article>
+</main></div><div id="footer"></div></body></html>

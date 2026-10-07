@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Admin and framework security hardening — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Admin and framework security hardening — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Admin and framework security hardening</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/SECURITY_HARDENING.md">Framework source</a> · <a href="../../content/framework/SECURITY_HARDENING.md" download>Markdown</a></p><h1 id="admin-and-framework-security-hardening">Admin and framework security hardening</h1>
+<p>This review covers Admin authentication, account permissions, password changes,
+cookies, media uploads, remote service requests, CSRF, request body limits,
+proxy headers, and the public signed-session manager. The starting revision is
+<code>fec71040ef4318891b0309613261ac183e3bf607</code>.</p>
+<h2 id="findings-fixed">Findings fixed</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Previous behavior</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSRF</td>
+<td>An automatically submitted cookie alone satisfied CSRF validation. Future-dated signed tokens were also accepted.</td>
+<td>Unsafe requests require an explicitly submitted header token; future-dated tokens are rejected. Admin forms continue to validate their submitted form token.</td>
+</tr>
+<tr>
+<td>Request bodies</td>
+<td>A small declared Content-Length bypassed actual byte counting.</td>
+<td>The middleware counts every received chunk regardless of Content-Length.</td>
+</tr>
+<tr>
+<td>Proxy trust</td>
+<td>An empty trusted-proxy list trusted every client, including requests without a peer address.</td>
+<td>Forwarded headers are ignored unless the direct peer is explicitly trusted. Forwarded schemes are restricted to HTTP and HTTPS.</td>
+</tr>
+<tr>
+<td>Admin authentication</td>
+<td>An application-level request.user could substitute for Admin authentication. Session snapshots also retained removed accounts and old permissions.</td>
+<td>Admin authenticates through its own backend and requires a matching, active local account ID. Protected requests use the current account roles and permissions.</td>
+</tr>
+<tr>
+<td>Admin password changes</td>
+<td>Previously issued sessions and trusted devices survived a password reset or password change.</td>
+<td>Password changes rotate an account session version and revoke trusted devices. Earlier sessions fail the next protected request.</td>
+</tr>
+<tr>
+<td>Admin MFA</td>
+<td>Wrong MFA codes with a correct password did not count toward login throttling.</td>
+<td>MFA failures count against the same account/client login failure budget as password failures.</td>
+</tr>
+<tr>
+<td>Admin cookies</td>
+<td>Admin session cookies omitted Secure, including outside debug mode.</td>
+<td>Cookies use Secure outside debug mode, alongside HttpOnly and SameSite=Lax.</td>
+</tr>
+<tr>
+<td>Admin/CMS media</td>
+<td>Local uploads were stored before validation; stored filenames could retain active-content extensions; image validation failed open without Pillow.</td>
+<td>Bytes are validated before storage, actual byte limits are enforced, extensions match the declared allowed media type, images require Pillow, and PDF uploads require a PDF signature. Normal, CMS, and resumable uploads use consistent extension handling.</td>
+</tr>
+<tr>
+<td>Remote service credentials</td>
+<td>The HTTP client followed redirects while carrying service credentials.</td>
+<td>Remote API redirects are rejected instead of forwarding credentials to another target. Direct service requests remain supported.</td>
+</tr>
+<tr>
+<td>Signed sessions</td>
+<td>Expired signed sessions were restored. Splitting at the first dot also broke valid cookies containing fractional timestamps or dotted data.</td>
+<td>Decoding splits at the final signature delimiter, validates the payload structure and lifetime, and starts a fresh session when the old session expires.</td>
+</tr>
+</tbody>
+</table>
+<p>The upload findings are particularly relevant when a less-privileged media user
+can publish files served from the application's own origin. Declaring a file
+as text/plain must not allow it to be stored as an HTML document.</p>
+<h2 id="upgrade-notes">Upgrade notes</h2>
+<ul>
+<li>Applications using CSRFMiddleware must explicitly submit X-CSRF-Token.
+  A cookie by itself is no longer accepted as proof of an intentional request.</li>
+<li>Configure ProxyHeadersMiddleware with the actual proxy IPs or CIDRs.
+  None and an empty list now mean trust no proxies. The explicit wildcard
+  remains available for controlled environments.</li>
+<li>Custom Admin authentication backends must return a locally registered Admin
+  account with the matching ID. Application-level request.user does not grant
+  access to Admin.</li>
+<li>AdminDashboard derives cookie security from the application's debug flag.
+  An explicit cookie_secure option is available; use secure cookies in
+  production. Standalone AdminAuth defaults to secure cookies.</li>
+<li>Password resets and password changes require existing sessions to sign in
+  again. Trusted-device credentials are revoked at the same time.</li>
+<li>Install Pillow for image uploads, for example through flaxon[admin].
+  Filenames with mismatched extensions are normalized to the allowed media
+  type. Configure remote service URLs to their final API endpoints because
+  redirects are no longer followed.</li>
+</ul>
+<h2 id="verification">Verification</h2>
+<ul>
+<li>22 regression cases exercise the security boundaries, including multipart
+  upload rejection without leftover files and a real local HTTP redirect test.</li>
+<li>Full pytest suite: <strong>321 passed, 27 skipped</strong> on Python 3.12.</li>
+<li>The full run included the Redis concurrency test using a temporary local
+  Redis server, plus available optional integrations and benchmark tests.</li>
+<li>The test environment used the current Teloce source checkout and
+  MinifyJS 0.1.3. It did not validate every published dependency combination.</li>
+<li>The new regression test file passes the repository's Ruff rules.</li>
+<li>Git whitespace validation passes.</li>
+<li>The broken Teloce documentation index link was reproduced on the starting
+  revision and corrected as part of completing the full-suite checks.</li>
+</ul>
+<h2 id="scope-and-deployment-limits">Scope and deployment limits</h2>
+<p>This is a source-level hardening pass, not certification that every deployment
+is free of vulnerabilities. The skipped tests and externally hosted services
+were not validated by this run.</p>
+<p>Admin account checks refresh from the current process's user registry.
+Multi-worker deployments must still synchronize account changes across
+processes; storing session tokens in Redis alone does not refresh each worker's
+account registry. The direct AdminAuth login failure budget is also local to
+the process, so distributed deployments need the existing shared request
+limiter configured.</p>
+<p>This patch does not redesign Admin's dashboard-wide CSRF token into a
+per-session token, change the legacy permission defaults, audit every
+third-party dependency, or perform a live deployment penetration test.
+Applications should use strict permissions, explicit proxy/origin settings,
+shared production infrastructure, and the deployment guidance.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">OWASP CSRF prevention</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP authentication</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">OWASP session management</a></li>
+<li><a href="../security.html">Flaxon security guide</a></li>
+<li><a href="../guides/admin-production.html">Admin production guide</a></li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

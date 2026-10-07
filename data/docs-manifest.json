@@ -1,0 +1,766 @@
+{
+  "repository": "https://github.com/Flaxon-Labs/flaxon",
+  "commit": "0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34",
+  "pages": [
+    {
+      "source": "docs/admin-guide.md",
+      "url": "docs/admin-guide.html",
+      "title": "Flaxon Admin Dashboard Guide",
+      "section": "Admin and CMS"
+    },
+    {
+      "source": "docs/api/admin-cms.md",
+      "url": "docs/api/admin-cms.html",
+      "title": "Admin and CMS API Reference",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/admin.md",
+      "url": "docs/api/admin.html",
+      "title": "Admin API Reference",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/application.md",
+      "url": "docs/api/application.html",
+      "title": "Application API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/graphql.md",
+      "url": "docs/api/graphql.html",
+      "title": "GraphQL API Reference",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/http.md",
+      "url": "docs/api/http.html",
+      "title": "HTTP API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/jinax.md",
+      "url": "docs/api/jinax.html",
+      "title": "Jinax API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/routing.md",
+      "url": "docs/api/routing.html",
+      "title": "Routing API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/security.md",
+      "url": "docs/api/security.html",
+      "title": "Security API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/tasks.md",
+      "url": "docs/api/tasks.html",
+      "title": "Tasks API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/teloce.md",
+      "url": "docs/api/teloce.html",
+      "title": "Teloce full-stack integration: API reference",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/testing.md",
+      "url": "docs/api/testing.html",
+      "title": "Testing API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/validation.md",
+      "url": "docs/api/validation.html",
+      "title": "Validation API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/api/websocket.md",
+      "url": "docs/api/websocket.html",
+      "title": "WebSocket API",
+      "section": "API reference"
+    },
+    {
+      "source": "docs/architecture.md",
+      "url": "docs/architecture.html",
+      "title": "Architecture",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/cheatsheet.md",
+      "url": "docs/cheatsheet.html",
+      "title": "Flaxon & Plugins - Quick Reference Cheat Sheet",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/cms.md",
+      "url": "docs/cms.html",
+      "title": "Flaxon CMS",
+      "section": "Admin and CMS"
+    },
+    {
+      "source": "docs/configuration.md",
+      "url": "docs/configuration.html",
+      "title": "Configuration",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/contributing.md",
+      "url": "docs/contributing.html",
+      "title": "Contributing to Flaxon",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/deployment.md",
+      "url": "docs/deployment.html",
+      "title": "Deployment",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/ecosystem.md",
+      "url": "docs/guides/ecosystem.html",
+      "title": "Flaxon ecosystem",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/examples/Modules/readme.md",
+      "url": "docs/examples/modules/index.html",
+      "title": "Modules Example: Catalog and Orders",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/android-Development.md",
+      "url": "docs/examples/android-backend.html",
+      "title": "Android Backend Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/basic-api.md",
+      "url": "docs/examples/basic-api.html",
+      "title": "Basic API Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/cms/admin-cms/example-cms.md",
+      "url": "docs/examples/cms/admin-cms/example-cms.html",
+      "title": "CMS Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/cms/full_admin_cms/README.md",
+      "url": "docs/examples/cms/full-admin-cms/index.html",
+      "title": "Full Admin and CMS Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/fastmcp-app.md",
+      "url": "docs/examples/fastmcp-app.html",
+      "title": "FastMCP Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/frontend-integration.md",
+      "url": "docs/examples/frontend-integration.html",
+      "title": "Frontend Integration Examples",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/grahql/readme.md",
+      "url": "docs/examples/grahql/index.html",
+      "title": "GraphQL Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/jinax-website.md",
+      "url": "docs/examples/jinax-website.html",
+      "title": "Jinax Website Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/large-application.md",
+      "url": "docs/examples/large-application.html",
+      "title": "Large Application Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/mail/readme.md",
+      "url": "docs/examples/mail/index.html",
+      "title": "Mail Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/openapi.md",
+      "url": "docs/examples/openapi.html",
+      "title": "OpenAPI API Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/pydantic-api.md",
+      "url": "docs/examples/pydantic-api.html",
+      "title": "Pydantic API Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/react-backend.md",
+      "url": "docs/examples/react-backend.html",
+      "title": "React frontend and API",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/react_backend/README.md",
+      "url": "docs/examples/react-backend/index.html",
+      "title": "Flaxon + React example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/school-portal.md",
+      "url": "docs/examples/school-portal.html",
+      "title": "School portal: Admin plus Flaxon modules",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/websocket-chat.md",
+      "url": "docs/examples/websocket-chat.html",
+      "title": "WebSocket Chat Example",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/examples/whatsapp_chat/README.md",
+      "url": "docs/examples/whatsapp-chat/index.html",
+      "title": "Flaxon WhatsApp-style Chat",
+      "section": "Examples"
+    },
+    {
+      "source": "docs/fullstack/01-first-app.md",
+      "url": "docs/fullstack/01-first-app.html",
+      "title": "Lesson 1: Understand the page lifecycle",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/02-components.md",
+      "url": "docs/fullstack/02-components.html",
+      "title": "Lesson 2: Build useful components and scoped styles",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/03-typed-api.md",
+      "url": "docs/fullstack/03-typed-api.html",
+      "title": "Lesson 3: Connect writes to validated Python endpoints",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/04-typescript.md",
+      "url": "docs/fullstack/04-typescript.html",
+      "title": "Lesson 4: Use TypeScript without sending types to browsers",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/05-head-and-cdn.md",
+      "url": "docs/fullstack/05-head-and-cdn.html",
+      "title": "Lesson 5: Configure the document head and CDN resources",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/06-routing.md",
+      "url": "docs/fullstack/06-routing.html",
+      "title": "Lesson 6: Add pages and direct-link navigation",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/07-modules.md",
+      "url": "docs/fullstack/07-modules.html",
+      "title": "Lesson 7: Organize full-stack features with modules",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/08-data-and-security.md",
+      "url": "docs/fullstack/08-data-and-security.html",
+      "title": "Lesson 8: Persist data and authorize every operation",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/09-live-updates.md",
+      "url": "docs/fullstack/09-live-updates.html",
+      "title": "Lesson 9: Add live updates and test the full boundary",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/10-production.md",
+      "url": "docs/fullstack/10-production.html",
+      "title": "Lesson 10: Build, deploy and maintain the complete application",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/index.md",
+      "url": "docs/fullstack/index.html",
+      "title": "Learn full-stack Flaxon in ten lessons",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/getting Starting.md",
+      "url": "docs/getting-starting.html",
+      "title": "Getting started",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/getting-started.md",
+      "url": "docs/getting-started/project-setup.html",
+      "title": "Getting started with Flaxon",
+      "section": "Getting started"
+    },
+    {
+      "source": "docs/graphql.md",
+      "url": "docs/graphql.html",
+      "title": "GraphQL API Example",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/guides/Modules.md",
+      "url": "docs/guides/modules.html",
+      "title": "Modules Guide",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/Teloce-Spa.md",
+      "url": "docs/guides/teloce-spa.html",
+      "title": "Teloce SPA integration",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/admin-cms.md",
+      "url": "docs/guides/admin-cms.html",
+      "title": "Admin and CMS Production Guide",
+      "section": "Admin and CMS"
+    },
+    {
+      "source": "docs/guides/admin-production.md",
+      "url": "docs/guides/admin-production.html",
+      "title": "Flaxon Admin in Production",
+      "section": "Admin and CMS"
+    },
+    {
+      "source": "docs/guides/authentication.md",
+      "url": "docs/guides/authentication.html",
+      "title": "Authentication",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/authorization.md",
+      "url": "docs/guides/authorization.html",
+      "title": "Authorization",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/databases.md",
+      "url": "docs/guides/databases.html",
+      "title": "Databases",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/debugging.md",
+      "url": "docs/guides/debugging.html",
+      "title": "Debugging",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/fastmcp.md",
+      "url": "docs/guides/fastmcp.html",
+      "title": "FastMCP Integration",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/graphql.md",
+      "url": "docs/guides/graphql.html",
+      "title": "GraphQL API Example",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/jinax.md",
+      "url": "docs/guides/jinax.html",
+      "title": "Jinax Templates",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/microservices.md",
+      "url": "docs/guides/microservices.html",
+      "title": "Admin and CMS with microservices",
+      "section": "Admin and CMS"
+    },
+    {
+      "source": "docs/guides/middleware.md",
+      "url": "docs/core-concepts/middleware.html",
+      "title": "Middleware",
+      "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/mobile-developement.md",
+      "url": "docs/guides/mobile-backends.html",
+      "title": "Mobile Development",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/openapi.md",
+      "url": "docs/guides/openapi.html",
+      "title": "OpenAPI, Swagger UI, and ReDoc",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/plugins.md",
+      "url": "docs/guides/plugins.html",
+      "title": "Plugins",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/pydantic.md",
+      "url": "docs/guides/pydantic.html",
+      "title": "Pydantic Integration",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/requests.md",
+      "url": "docs/core-concepts/requests.html",
+      "title": "Requests",
+      "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/responses.md",
+      "url": "docs/core-concepts/responses.html",
+      "title": "Responses",
+      "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/routing.md",
+      "url": "docs/core-concepts/routing.html",
+      "title": "Routing",
+      "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/scaling.md",
+      "url": "docs/guides/scaling.html",
+      "title": "Growing a Flaxon application",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/tasks.md",
+      "url": "docs/guides/tasks.html",
+      "title": "Tasks",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/testing.md",
+      "url": "docs/guides/testing.html",
+      "title": "Testing",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/validation.md",
+      "url": "docs/core-concepts/validation.html",
+      "title": "Validation",
+      "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/websockets.md",
+      "url": "docs/guides/websockets.html",
+      "title": "WebSockets",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/index.md",
+      "url": "docs/getting-started/index.html",
+      "title": "Flaxon documentation",
+      "section": "Getting started"
+    },
+    {
+      "source": "docs/installation.md",
+      "url": "docs/getting-started/installation.html",
+      "title": "Installation",
+      "section": "Getting started"
+    },
+    {
+      "source": "docs/lessons/Admin cheatsheet.md",
+      "url": "docs/lessons/admin-cheatsheet.html",
+      "title": "Admin and CMS Cheat Sheet",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Building Flaxon Plugins.md",
+      "url": "docs/lessons/building-flaxon-plugins.html",
+      "title": "Building Flaxon Plugins",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Cli.md",
+      "url": "docs/lessons/cli.html",
+      "title": "CLI Reference",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Features.md",
+      "url": "docs/lessons/features.html",
+      "title": "Flaxon Features",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Flaxon Cheat Sheet.md",
+      "url": "docs/lessons/flaxon-cheat-sheet.html",
+      "title": "Flaxon Cheat Sheet",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Industrial Admin Customization.md",
+      "url": "docs/lessons/industrial-admin-customization.html",
+      "title": "Industrial Admin Customization",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/Platform-Deployment.md",
+      "url": "docs/lessons/platform-deployment.html",
+      "title": "Deploying Flaxon Apps",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/production-app-guide.md",
+      "url": "docs/lessons/production-app-guide.html",
+      "title": "Building a Production App with Modules",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/lessons/vscode Cheatsheet.md",
+      "url": "docs/lessons/vscode-cheatsheet.html",
+      "title": "Flaxon VS Code Extension Cheat Sheet",
+      "section": "Lessons"
+    },
+    {
+      "source": "docs/mail.md",
+      "url": "docs/guides/mail.html",
+      "title": "Email",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/maintenance.md",
+      "url": "docs/maintenance.html",
+      "title": "Maintenance Guide",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/migration-guide.md",
+      "url": "docs/migration-guide.html",
+      "title": "Migration Guide",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/performance.md",
+      "url": "docs/performance.html",
+      "title": "Performance",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/philosophy.md",
+      "url": "docs/philosophy.html",
+      "title": "Philosophy",
+      "section": "Getting started"
+    },
+    {
+      "source": "docs/quickstart.md",
+      "url": "docs/getting-started/quickstart.html",
+      "title": "Full-stack quick start",
+      "section": "Getting started"
+    },
+    {
+      "source": "docs/security.md",
+      "url": "docs/security.html",
+      "title": "Security",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/tech-passport.md",
+      "url": "docs/tech-passport.html",
+      "title": "Flaxon Technical Passport",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/updates.md",
+      "url": "docs/updates.html",
+      "title": "Flaxon Update Policy",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "docs/vs Code (Extension)/Quick Cheat Sheet.md",
+      "url": "docs/editor/quick-cheat-sheet.html",
+      "title": "Flaxon VS Code Extension - Quick Cheat Sheet",
+      "section": "VS Code extension"
+    },
+    {
+      "source": "docs/vs Code (Extension)/advanced.md",
+      "url": "docs/editor/advanced.html",
+      "title": "Flaxon VS Code Extension - Advanced Guide",
+      "section": "VS Code extension"
+    },
+    {
+      "source": "docs/vs Code (Extension)/features.md",
+      "url": "docs/editor/features.html",
+      "title": "Flaxon VS Code Extension - Features Guide",
+      "section": "VS Code extension"
+    },
+    {
+      "source": "docs/vs Code (Extension)/getting-started.md",
+      "url": "docs/editor/getting-started.html",
+      "title": "Flaxon VS Code Extension - Getting Started",
+      "section": "VS Code extension"
+    },
+    {
+      "source": "examples/fastmcp_app/README.md",
+      "url": "docs/projects/fastmcp-app/index.html",
+      "title": "FastMCP integration",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/flower_shop_admin/README.md",
+      "url": "docs/projects/flower-shop-admin/index.html",
+      "title": "Petal & Stem Admin Example",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/graphql_github_clone/README.md",
+      "url": "docs/projects/graphql-github-clone/index.html",
+      "title": "Flaxon GraphQL GitHub Clone",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/guardianflow/README.md",
+      "url": "docs/projects/guardianflow/index.html",
+      "title": "GuardianFlow",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/guardianflow/docs/architecture.md",
+      "url": "docs/projects/guardianflow/docs/architecture.html",
+      "title": "GuardianFlow architecture",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/guardianflow/docs/friction-log.md",
+      "url": "docs/projects/guardianflow/docs/friction-log.html",
+      "title": "Friction log",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/pydantic_api/README.md",
+      "url": "docs/projects/pydantic-api/index.html",
+      "title": "Pydantic API",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/school_portal/README.md",
+      "url": "docs/projects/school-portal/index.html",
+      "title": "Northstar Academy school portal",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/teloce_head_ts/README.md",
+      "url": "docs/projects/teloce-head-ts/index.html",
+      "title": "Pocket Converter: TypeScript and page-head resources",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/teloce_modules_shop/README.md",
+      "url": "docs/projects/teloce-modules-shop/index.html",
+      "title": "Petal & Stem Modules + Teloce SPA",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/teloce_siteledger/README.md",
+      "url": "docs/projects/teloce-siteledger/index.html",
+      "title": "SiteLedger Teloce SPA",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "examples/teloce_taskboard/README.md",
+      "url": "docs/projects/teloce-taskboard/index.html",
+      "title": "Taskboard course example",
+      "section": "Runnable projects"
+    },
+    {
+      "source": "README.md",
+      "url": "docs/reference/framework-overview.html",
+      "title": "Readme",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "CHANGELOG.md",
+      "url": "docs/changelog.html",
+      "title": "Changelog",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "url": "docs/reference/framework-contributing.html",
+      "title": "Contributing to Flaxon",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "SECURITY.md",
+      "url": "docs/reference/security-policy.html",
+      "title": "Security Policy",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "SECURITY_HARDENING.md",
+      "url": "docs/reference/security-hardening.html",
+      "title": "Admin and framework security hardening",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/README.md",
+      "url": "docs/reference/benchmarks.html",
+      "title": "Run all benchmarks",
+      "section": "Operations and reference"
+    },
+    {
+      "url": "docs/guides/backend-only.html",
+      "title": "Use Flaxon as a backend",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/guides/jinax-flaxon-app.html",
+      "title": "Build a Flaxon app with Jinax",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/guides/mobile-apk-play-store.html",
+      "title": "Mobile backend, APK, and Play Store release",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/guides/production-case-study.html",
+      "title": "Production Case Study",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/guides/teloce-apk.html",
+      "title": "Teloce-Py: .vel to a mobile app",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/guides/vscode.html",
+      "title": "Flaxon VS Code extension",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/teloce-cheatsheet.html",
+      "title": "Teloce-Py Cheatsheet",
+      "section": "Website guides"
+    },
+    {
+      "url": "docs/teloce-py.html",
+      "title": "Teloce-Py and .vel",
+      "section": "Website guides"
+    }
+  ]
+}

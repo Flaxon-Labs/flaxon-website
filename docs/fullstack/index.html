@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Learn full-stack Flaxon in ten lessons — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Learn full-stack Flaxon in ten lessons — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Learn full-stack Flaxon in ten lessons</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/index.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/index.md" download>Markdown</a></p><h1 id="learn-full-stack-flaxon-in-ten-lessons">Learn full-stack Flaxon in ten lessons</h1>
+<p>Build a Taskboard, then explore other ways to use the same Python application:
+interactive Teloce pages, server-rendered Jinax pages, feature modules, API clients
+and live interfaces. The lessons use readable Python and TypeScript, explicit
+file names and checks you can perform yourself.</p>
+<p><strong>Flaxon</strong> owns HTTP, validation, authentication, persistence integration and
+WebSockets. <strong>Teloce</strong> compiles <code>.html</code>/<code>.vel</code> components and runs their reactive
+interface in the browser. <strong>MinifyJS</strong> optimizes production JavaScript. These are
+different jobs: TypeScript cannot replace server validation, and a browser router
+cannot authorize a database operation.</p>
+<p>Start with the <a href="../getting-started/quickstart.html">quick start</a>. Each lesson explains which files
+to change. Code marked as a fragment extends the earlier app; it is not a separate
+complete application. The <a href="../projects/teloce-taskboard/index.html">course example</a>
+provides a runnable <code>.html</code> interface with TypeScript helpers. The
+<a href="../projects/teloce-head-ts/index.html">CDN converter</a> provides a <code>.vel</code> variant.</p>
+<table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>What you learn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01-first-app.html">1. Understand the page lifecycle</a></td>
+<td>Python app, HTML component, build and browser lifecycle</td>
+</tr>
+<tr>
+<td><a href="02-components.html">2. Build useful components and scoped styles</a></td>
+<td>Props, events, slots, directives, scoped CSS and teardown</td>
+</tr>
+<tr>
+<td><a href="03-typed-api.html">3. Connect writes to validated Python endpoints</a></td>
+<td>Typed fetch helpers, validation and readable error handling</td>
+</tr>
+<tr>
+<td><a href="04-typescript.html">4. Use TypeScript without sending types to browsers</a></td>
+<td>Shared types, standalone .ts files and transpilation limits</td>
+</tr>
+<tr>
+<td><a href="05-head-and-cdn.html">5. Configure the document head and CDN resources</a></td>
+<td>Optional metadata, local assets, CDN loading and script ordering</td>
+</tr>
+<tr>
+<td><a href="06-routing.html">6. Add pages and direct-link navigation</a></td>
+<td>Client pages, dynamic parameters, server fallback and Jinax alternative</td>
+</tr>
+<tr>
+<td><a href="07-modules.html">7. Organize full-stack features with modules</a></td>
+<td>Feature modules, routers, services and browser route mapping</td>
+</tr>
+<tr>
+<td><a href="08-data-and-security.html">8. Persist data and authorize every operation</a></td>
+<td>Database transactions, authentication, authorization and uploads</td>
+</tr>
+<tr>
+<td><a href="09-live-updates.html">9. Add live updates and test the full boundary</a></td>
+<td>WebSockets, subscriptions, signals and integration tests</td>
+</tr>
+<tr>
+<td><a href="10-production.html">10. Build, deploy and maintain the complete application</a></td>
+<td>Builds, tasks, API contracts, extensions and deployment</td>
+</tr>
+</tbody>
+</table>
+<h2 id="complete-reference-coverage">Complete reference coverage</h2>
+<p>Ten lessons teach application patterns; the references below cover the broader
+API surface without pretending that every optional integration belongs in one
+starter app. Use the relevant guide when adding that capability.</p>
+<table>
+<thead>
+<tr>
+<th>Flaxon area</th>
+<th>Reference</th>
+<th>Lesson</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Application, HTTP verbs, response types, static files, lifecycle</td>
+<td><a href="../api/application.html">Application</a>, <a href="../api/http.html">HTTP</a>, <a href="../core-concepts/responses.html">Responses</a></td>
+<td>1, 3, 5, 10</td>
+</tr>
+<tr>
+<td>Parameters, query/body/form parsing, schemas, Pydantic</td>
+<td><a href="../api/routing.html">Routing</a>, <a href="../core-concepts/requests.html">Requests</a>, <a href="../api/validation.html">Validation</a>, <a href="../guides/pydantic.html">Pydantic</a></td>
+<td>3, 8</td>
+</tr>
+<tr>
+<td>Modules, routers, services, scaling</td>
+<td><a href="../guides/modules.html">Modules</a>, <a href="../guides/scaling.html">Scaling</a></td>
+<td>7</td>
+</tr>
+<tr>
+<td>Jinax, inheritance, macros, filters, templates</td>
+<td><a href="../api/jinax.html">Jinax</a></td>
+<td>6</td>
+</tr>
+<tr>
+<td>Sessions, JWT, API keys, permissions, middleware, CSRF</td>
+<td><a href="../guides/authentication.html">Authentication</a>, <a href="../guides/authorization.html">Authorization</a>, <a href="../security.html">Security</a>, <a href="../core-concepts/middleware.html">Middleware</a></td>
+<td>8</td>
+</tr>
+<tr>
+<td>Database adapters, transactions, repositories, migrations</td>
+<td><a href="../guides/databases.html">Databases</a></td>
+<td>8</td>
+</tr>
+<tr>
+<td>WebSockets, rooms, heartbeat, disconnects</td>
+<td><a href="../api/websocket.html">WebSockets</a></td>
+<td>9</td>
+</tr>
+<tr>
+<td>Tasks, workers, queues, retries and schedules</td>
+<td><a href="../api/tasks.html">Tasks</a></td>
+<td>10</td>
+</tr>
+<tr>
+<td>OpenAPI, GraphQL, Admin/CMS</td>
+<td><a href="../guides/openapi.html">OpenAPI</a>, <a href="../api/graphql.html">GraphQL</a>, <a href="../api/admin.html">Admin</a>, <a href="../api/admin-cms.html">CMS</a></td>
+<td>10</td>
+</tr>
+<tr>
+<td>ASGI mounting, FastMCP, plugins, mobile integrations</td>
+<td><a href="../guides/fastmcp.html">FastMCP</a>, <a href="../guides/plugins.html">Plugins</a>, <a href="../guides/ecosystem.html">Ecosystem</a></td>
+<td>10</td>
+</tr>
+<tr>
+<td>Testing, debugging, logs, health and metrics</td>
+<td><a href="../api/testing.html">Testing</a>, <a href="../guides/debugging.html">Debugging</a>, <a href="../deployment.html">Deployment</a></td>
+<td>9, 10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Teloce area</th>
+<th>Lesson</th>
+<th>Upstream reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.html/.vel components, props, events, slots, imports</td>
+<td>1, 2</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/components.md">Components</a></td>
+</tr>
+<tr>
+<td>Directives, models, classes, text/HTML binding</td>
+<td>2</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/vel-syntax.md">Syntax</a></td>
+</tr>
+<tr>
+<td>Data, computed, watch, signals, effects, batching</td>
+<td>2, 9</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/reactivity.md">Reactivity</a></td>
+</tr>
+<tr>
+<td>TypeScript components and helper modules</td>
+<td>3, 4</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/tree/main/docs">TypeScript</a></td>
+</tr>
+<tr>
+<td>Browser pages and routing</td>
+<td>6, 7</td>
+<td><a href="../api/teloce.html">Flaxon Teloce API</a></td>
+</tr>
+<tr>
+<td>Lifecycle, teardown, runtime modules</td>
+<td>2, 9</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/runtime-reference.md">Runtime</a></td>
+</tr>
+<tr>
+<td>Scoped CSS, compiler options, assets, production optimization</td>
+<td>2, 5, 10</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/compiler.md">Compiler</a>, <a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/minifyjs.md">MinifyJS</a></td>
+</tr>
+<tr>
+<td>Standalone runtime for server HTML, plugins and tooling</td>
+<td>6, 10</td>
+<td><a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/standalone-runtime.md">Standalone</a>, <a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/plugins.md">Plugins</a></td>
+</tr>
+</tbody>
+</table>
+<p>TypeScript support depends on the installed Teloce version. Its transpiler removes
+supported type syntax; it is not a full semantic type checker. Browser HMR,
+automatic SSR and automatic account/database setup are not implied by full-stack.</p></article>
+</main></div><div id="footer"></div></body></html>

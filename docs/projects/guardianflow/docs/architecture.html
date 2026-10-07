@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GuardianFlow architecture — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>GuardianFlow architecture — Flaxon Docs</title>
+<link rel="icon" href="../../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../../assets/css/style.css"><link rel="stylesheet" href="../../../../assets/css/docs.css">
+<script src="../../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../../assets/js/site-shell.js"></script>
+<script defer src="../../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>GuardianFlow architecture</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/guardianflow/docs/architecture.md">Framework source</a> · <a href="../../../../content/framework/examples/guardianflow/docs/architecture.md" download>Markdown</a></p><h1 id="guardianflow-architecture">GuardianFlow architecture</h1>
+<div class="highlight"><pre><span></span><code>Ring-shaped event -&gt; RingClient -&gt; VisionPipeline -&gt; Correlator -&gt; YAML policy -&gt; Alert -&gt; WebSocket -&gt; Jinjax
+</code></pre></div>
+<p>The simulator and webhook boundary produce normalized <code>GuardianEvent</code> values. The detector turns each event into a <code>VisionFact</code>; it does not decide whether a delivery happened. <code>Correlator</code> keeps a small in-memory event graph and applies ordered policy sequences. Explanations are generated only after a structured decision exists.</p>
+<p><code>FlaxonModule</code> instances make the boundaries visible in <code>app.py</code>: pages, Ring ingestion, vision facts, intelligence APIs, and notifications can be mounted independently.</p></article>
+</main></div><div id="footer"></div></body></html>

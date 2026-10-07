@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Philosophy — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Philosophy — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Philosophy</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/philosophy.md">Framework source</a> · <a href="../content/framework/docs/philosophy.md" download>Markdown</a></p><h1 id="philosophy">Philosophy</h1>
+<h2 id="core-principles">Core Principles</h2>
+<p>Flaxon is built around a set of principles that guide its design, development, and long-term direction.</p>
+<p>The goal is to create a full-stack framework that is:</p>
+<ul>
+<li>Simple to start</li>
+<li>Powerful when applications grow</li>
+<li>Technology-neutral</li>
+<li>Easy to debug</li>
+<li>Designed for modern async applications</li>
+</ul>
+<hr/>
+<h2 id="1-simple-applications-remain-simple">1. Simple Applications Remain Simple</h2>
+<p>Small applications should be easy to create without generators, complex configuration, or mandatory architecture.</p>
+<p>Flaxon provides a minimal entry point that allows developers to build quickly.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"my-app"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello"</span>
+    <span class="p">}</span>
+<span class="err">````</span>
+
+<span class="n">A</span> <span class="n">simple</span> <span class="n">application</span> <span class="n">should</span> <span class="n">remain</span> <span class="n">simple</span><span class="o">.</span>
+
+<span class="o">---</span>
+
+<span class="c1"># 2. Large Applications Gain Structure</span>
+
+<span class="n">As</span> <span class="n">applications</span> <span class="n">grow</span><span class="p">,</span> <span class="n">Flaxon</span> <span class="n">provides</span> <span class="n">optional</span> <span class="n">structure</span> <span class="n">without</span> <span class="n">forcing</span> <span class="n">developers</span> <span class="n">into</span> <span class="n">a</span> <span class="n">specific</span> <span class="n">architecture</span><span class="o">.</span>
+
+<span class="n">Developers</span> <span class="n">can</span> <span class="n">gradually</span> <span class="n">introduce</span><span class="p">:</span>
+
+<span class="o">*</span> <span class="n">Routers</span>
+<span class="o">*</span> <span class="n">Services</span>
+<span class="o">*</span> <span class="n">Middleware</span>
+<span class="o">*</span> <span class="n">Plugins</span>
+<span class="o">*</span> <span class="n">Dependency</span> <span class="n">management</span>
+
+<span class="n">Example</span><span class="p">:</span>
+
+<span class="err">```</span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1"</span><span class="p">)</span>
+
+
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</code></pre></div>
+<p>The framework should grow with the application.</p>
+<hr/>
+<h2 id="3-html-rendering-is-optional">3. HTML Rendering is Optional</h2>
+<p>Flaxon treats APIs and backend services as a first-class use case.</p>
+<p>HTML rendering through Jinax is optional and loaded only when needed.</p>
+<h2 id="api-only">API Only</h2>
+<p>No template dependencies are required:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</code></pre></div>
+<h2 id="using-templates">Using Templates</h2>
+<p>Templates can be added when required:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span>
+    <span class="n">Jinax</span><span class="p">(</span><span class="s2">"templates"</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Developers can choose between API-only applications or server-rendered applications.</p>
+<hr/>
+<h2 id="4-technology-neutrality">4. Technology Neutrality</h2>
+<p>Flaxon does not force developers to use a specific frontend, database, ORM, or client technology.</p>
+<p>You can use:</p>
+<h2 id="frontend">Frontend</h2>
+<ul>
+<li>React</li>
+<li>Vue</li>
+<li>Angular</li>
+<li>Svelte</li>
+<li>Flutter</li>
+<li>Native mobile applications</li>
+<li>Custom clients</li>
+</ul>
+<h2 id="databases">Databases</h2>
+<ul>
+<li>PostgreSQL</li>
+<li>MySQL</li>
+<li>MongoDB</li>
+<li>Redis</li>
+<li>SQLite</li>
+<li>Custom storage solutions</li>
+</ul>
+<h2 id="orms-and-data-tools">ORMs and Data Tools</h2>
+<ul>
+<li>SQLAlchemy</li>
+<li>SQLModel</li>
+<li>Tortoise ORM</li>
+<li>PyMongo</li>
+<li>Custom solutions</li>
+</ul>
+<p>The framework should adapt to your technology choices, not restrict them.</p>
+<hr/>
+<h2 id="5-explicit-and-debuggable">5. Explicit and Debuggable</h2>
+<p>Framework behavior should be clear and understandable.</p>
+<p>Flaxon avoids unnecessary hidden behavior and focuses on:</p>
+<ul>
+<li>Clear APIs</li>
+<li>Useful error messages</li>
+<li>Debugging information</li>
+<li>Request context visibility</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+    <span class="mi">404</span><span class="p">,</span>
+    <span class="s2">"User not found."</span><span class="p">,</span>
+    <span class="n">code</span><span class="o">=</span><span class="s2">"FX-USER-404"</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Errors should help developers understand what happened and how to fix it.</p>
+<hr/>
+<h2 id="design-decisions">Design Decisions</h2>
+<h2 id="why-asgi">Why ASGI?</h2>
+<p>ASGI (Asynchronous Server Gateway Interface) is the modern Python standard for asynchronous web servers.</p>
+<p>It provides support for:</p>
+<ul>
+<li>HTTP requests</li>
+<li>WebSockets</li>
+<li>Application lifecycle events</li>
+</ul>
+<p>This makes it a strong foundation for async-first applications.</p>
+<hr/>
+<h2 id="why-flask-style-routes">Why Flask-Style Routes?</h2>
+<p>Flask-style decorators are familiar to many Python developers.</p>
+<p>They provide:</p>
+<ul>
+<li>Simple syntax</li>
+<li>High readability</li>
+<li>Easy learning curve</li>
+<li>Clear application structure</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div>
+<hr/>
+<h2 id="why-async-first">Why Async-First?</h2>
+<p>Modern applications often depend on external resources:</p>
+<ul>
+<li>Databases</li>
+<li>APIs</li>
+<li>File storage</li>
+<li>WebSocket connections</li>
+</ul>
+<p>Async programming allows applications to efficiently handle many concurrent operations.</p>
+<p>This is useful for:</p>
+<ul>
+<li>Real-time applications</li>
+<li>Chat systems</li>
+<li>Dashboards</li>
+<li>Mobile backends</li>
+<li>API platforms</li>
+</ul>
+<hr/>
+<h2 id="why-no-built-in-orm">Why No Built-in ORM?</h2>
+<p>Flaxon is technology-neutral.</p>
+<p>Different projects require different database approaches, so developers should choose the tools that fit their application.</p>
+<p>Flaxon supports using:</p>
+<ul>
+<li>SQL databases</li>
+<li>NoSQL databases</li>
+<li>ORMs</li>
+<li>Query builders</li>
+<li>Custom database layers</li>
+</ul>
+<hr/>
+<h2 id="what-flaxon-is-not">What Flaxon Is Not</h2>
+<p>Flaxon is designed with a specific purpose.</p>
+<p>It is:</p>
+<ul>
+<li>Not a full-stack framework with every feature built in.</li>
+<li>Not a replacement for Node.js, Go, Rust, or other ecosystems.</li>
+<li>Not designed to claim absolute performance superiority.</li>
+<li>Not a compiled language.</li>
+</ul>
+<p>Flaxon is Python with the advantages and tradeoffs that come with Python.</p>
+<hr/>
+<h2 id="when-to-use-flaxon">When to Use Flaxon</h2>
+<p>Flaxon is a good choice for:</p>
+<ul>
+<li>Building APIs for React, Vue, Angular, or other frontends</li>
+<li>Developing mobile application backends</li>
+<li>Creating real-time applications with WebSockets</li>
+<li>Building Python microservices</li>
+<li>Creating scalable backend systems</li>
+<li>Projects that value technology freedom</li>
+<li>Teams that want clear debugging</li>
+<li>Applications that start small and grow over time</li>
+</ul>
+<hr/>
+<h2 id="when-not-to-use-flaxon">When Not to Use Flaxon</h2>
+<p>Flaxon may not be the best choice when:</p>
+<ul>
+<li>You are creating only a simple static website.</li>
+<li>You require maximum CPU performance from a compiled language.</li>
+<li>You need an ecosystem with decades of existing packages and integrations.</li>
+</ul>
+<hr/>
+<h2 id="the-flaxon-vision">The Flaxon Vision</h2>
+<p>Flaxon aims to provide a modern Python backend experience:</p>
+<p><strong>Simple enough for beginners.
+Powerful enough for production.
+Flexible enough for any technology stack.</strong></p>
+<h2 id="integrated-interfaces-explicit-choices">Integrated interfaces, explicit choices</h2>
+<p>Teloce is Flaxon's integrated component/compiler path. Python routes, UI pages
+and scoped components can live in a single feature module. Jinax remains the
+server-template path, and external frontends remain possible. Full-stack here
+means an integrated application workflow, not automatic hosting, SSR or accounts.
+See the <a href="fullstack/index.html">ten lessons</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

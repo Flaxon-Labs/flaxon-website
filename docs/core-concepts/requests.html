@@ -1,229 +1,439 @@
-<!-- docs/core-concepts/requests.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Requests – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Requests — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Requests — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Requests</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/requests.md">Framework source</a> · <a href="../../content/framework/docs/guides/requests.md" download>Markdown</a></p><h1 id="requests">Requests</h1>
+<h2 id="overview">Overview</h2>
+<p>The <code>Request</code> object provides access to everything sent by the client, including:</p>
+<ul>
+<li>HTTP method</li>
+<li>URL</li>
+<li>Headers</li>
+<li>Query parameters</li>
+<li>Path parameters</li>
+<li>Cookies</li>
+<li>Body content</li>
+<li>Form data</li>
+<li>Uploaded files</li>
+<li>Client information</li>
+<li>Request state</li>
+</ul>
+<p>A <code>Request</code> instance is automatically injected into route handlers when requested.</p>
+<hr/>
+<h2 id="accessing-the-request">Accessing the Request</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"my-app"</span><span class="p">)</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"method"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+        <span class="s2">"path"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-properties">Request Properties</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/info"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"method"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+        <span class="s2">"path"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+        <span class="s2">"url"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="s2">"scheme"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+        <span class="s2">"host"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+        <span class="s2">"client"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">,</span>
+        <span class="s2">"http_version"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">http_version</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Common properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>method</code></td>
+<td>HTTP method</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>Request path</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>Full URL</td>
+</tr>
+<tr>
+<td><code>scheme</code></td>
+<td>http or https</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>Host name</td>
+</tr>
+<tr>
+<td><code>client</code></td>
+<td>Client IP address</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td>HTTP headers</td>
+</tr>
+<tr>
+<td><code>cookies</code></td>
+<td>Cookies</td>
+</tr>
+<tr>
+<td><code>query</code></td>
+<td>Query parameters</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Request-local storage</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="http-headers">HTTP Headers</h2>
+<p>Read individual headers:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/headers"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">headers</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-    <div id="header"></div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user_agent"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user-agent"</span><span class="p">),</span>
+        <span class="s2">"accept"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"accept"</span><span class="p">),</span>
+        <span class="s2">"content_type"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"content-type"</span><span class="p">),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Return every header:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/all-headers"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">headers</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</code></pre></div>
+<p>Check for a header:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="s2">"authorization"</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+    <span class="o">...</span>
+</code></pre></div>
+<hr/>
+<h2 id="query-parameters">Query Parameters</h2>
+<p>URL:</p>
+<div class="highlight"><pre><span></span><code>/search?q=python&amp;page=2&amp;category=books
+</code></pre></div>
+<p>Access them:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/search"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"q"</span><span class="p">)</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html" class="active">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+        <span class="s2">"page"</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"category"</span>
+    <span class="p">)</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                    </div>
-                </aside>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"query"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+        <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+        <span class="s2">"category"</span><span class="p">:</span> <span class="n">category</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="typed-query-helpers">Typed Query Helpers</h2>
+<div class="highlight"><pre><span></span><code><span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="s2">"page"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-                <!-- Main Content -->
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Requests</h1>
-                        <p>The <code>Request</code> class provides access to all incoming request data.</p>
+<span class="n">price</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_float</span><span class="p">(</span><span class="s2">"price"</span><span class="p">)</span>
 
-                        <h2>Accessing the Request</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Request
+<span class="n">active</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_bool</span><span class="p">(</span><span class="s2">"active"</span><span class="p">)</span>
 
-@app.get("/")
-async def home(request: Request):
-    return {"method": request.method, "path": request.path}</code></pre>
-                        </div>
+<span class="n">tags</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span><span class="s2">"tag"</span><span class="p">)</span>
+</code></pre></div>
+<p>Available helpers:</p>
+<ul>
+<li><code>get()</code></li>
+<li><code>get_int()</code></li>
+<li><code>get_float()</code></li>
+<li><code>get_bool()</code></li>
+<li><code>get_list()</code></li>
+</ul>
+<hr/>
+<h2 id="path-parameters">Path Parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-                        <h2>Request Properties</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/info")
-async def info(request: Request):
-    return {
-        "method": request.method,
-        "path": request.path,
-        "scheme": request.scheme,
-        "host": request.host,
-        "url": request.url,
-        "client": request.client,
-    }</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user_id"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Multiple parameters:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;/posts/&lt;int:post_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">post_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">):</span>
 
-                        <h2>Headers</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/headers")
-async def get_headers(request: Request):
-    return {
-        "user_agent": request.headers.get("user-agent"),
-        "content_type": request.headers.get("content-type"),
-        "all_headers": dict(request.headers),
-    }</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">"post"</span><span class="p">:</span> <span class="n">post_id</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="cookies">Cookies</h2>
+<p>Read cookies:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/profile"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-                        <h2>Query Parameters</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/search")
-async def search(request: Request):
-    # Single value
-    q = request.query.get("q")
-    page = request.query.get("page", "1")
+    <span class="n">session</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"session_id"</span>
+    <span class="p">)</span>
 
-    # Request.query is dict[str, str] and keeps the first value for repeated keys.
-    filters = request.query.get("filter")
+    <span class="n">theme</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"theme"</span><span class="p">,</span>
+        <span class="s2">"light"</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    # Convert values explicitly.
-    page_int = int(request.query.get("page", "1"))
-    active = request.query.get("active", "false").lower() in {"1", "true", "yes", "on"}
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"session"</span><span class="p">:</span> <span class="n">session</span><span class="p">,</span>
+        <span class="s2">"theme"</span><span class="p">:</span> <span class="n">theme</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="reading-json">Reading JSON</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-    return {"query": q, "page": page, "filters": filters}</code></pre>
-                        </div>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-                        <h2>Cookies</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/profile")
-async def profile(request: Request):
-    session_id = request.cookies.get("session_id")
-    theme = request.cookies.get("theme", "light")
+    <span class="k">return</span> <span class="n">data</span>
+</code></pre></div>
+<hr/>
+<h2 id="reading-plain-text">Reading Plain Text</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/text"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-    return {"session_id": session_id, "theme": theme}</code></pre>
-                        </div>
+    <span class="n">body</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
 
-                        <h2>Reading the Body</h2>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"length"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="reading-raw-bytes">Reading Raw Bytes</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/binary"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">binary</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-                        <h3>JSON Body</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/users")
-async def create_user(request: Request):
-    data = await request.json()
-    return {"received": data}</code></pre>
-                        </div>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
 
-                        <h3>Text Body</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/text")
-async def handle_text(request: Request):
-    text = await request.text()
-    return {"length": len(text)}</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"bytes"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="form-data">Form Data</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/contact"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">contact</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-                        <h3>Raw Bytes</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/binary")
-async def handle_binary(request: Request):
-    data = await request.body()
-    return {"size": len(data)}</code></pre>
-                        </div>
+    <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
 
-                        <h3>Form Data</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/form")
-async def handle_form(request: Request):
-    form = await request.form()
-    return {"name": form.get("name"), "email": form.get("email")}</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">),</span>
+        <span class="s2">"email"</span><span class="p">:</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"email"</span><span class="p">),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="file-uploads">File Uploads</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/upload"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-                        <h2>Validation with Schemas</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+    <span class="n">form</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
 
-class CreateUser(Schema):
-    name = fields.StrField(required=True, min_length=2)
-    email = fields.EmailField(required=True)
-    age = fields.IntField(required=False, minimum=13)
+    <span class="n">file</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span>
 
-@app.post("/users")
-async def create_user(data: CreateUser):
-    # data is automatically validated
-    return {"user": data.to_dict()}</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"filename"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+        <span class="s2">"content_type"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">content_type</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="automatic-validation">Automatic Validation</h2>
+<p>Schemas automatically validate incoming data.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
 
-                        <h2>Combining Parameters</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-class SearchParams(Schema):
-    q = fields.StrField(required=True, min_length=1)
-    page = fields.IntField(default=1, minimum=1)
-    per_page = fields.IntField(default=20, minimum=1, maximum=100)
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
 
-@app.get("/api/search")
-async def search(request: Request, params: SearchParams):
-    return {
-        "query": params.q,
-        "page": params.page,
-        "per_page": params.per_page,
-    }</code></pre>
-                        </div>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Use <code>request.app.state</code> for application-scoped services such as database pools. Keep request-specific values in local variables or middleware-populated request attributes.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Use the schema:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
 
-    <div id="footer"></div>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="combining-request-and-validation">Combining Request and Validation</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">,</span>
+<span class="p">):</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"ip"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-state">Request State</h2>
+<p>Store data during request processing.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
 
-</body>
-</html>
+    <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="mi">15</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Middleware:</p>
+<div class="highlight"><pre><span></span><code><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</code></pre></div>
+<p>Route:</p>
+<div class="highlight"><pre><span></span><code><span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">start_time</span>
+</code></pre></div>
+<hr/>
+<h2 id="client-information">Client Information</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/client"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"ip"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">,</span>
+        <span class="s2">"user_agent"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user-agent"</span><span class="p">),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="authentication-information">Authentication Information</h2>
+<p>When authentication middleware is enabled:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/profile"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-context">Request Context</h2>
+<p>Access the current request anywhere in your application.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.application.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_current_request</span>
+
+<span class="n">request</span> <span class="o">=</span> <span class="n">get_current_request</span><span class="p">()</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">current_ip</span><span class="p">():</span>
+
+    <span class="n">request</span> <span class="o">=</span> <span class="n">get_current_request</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span>
+</code></pre></div>
+<hr/>
+<h2 id="reading-large-bodies">Reading Large Bodies</h2>
+<p>For very large uploads use streaming.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/upload"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+
+        <span class="n">process</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"uploaded"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Streaming avoids loading the entire request into memory.</p>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"request-demo"</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user_id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">"include_posts"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_bool</span><span class="p">(</span>
+            <span class="s2">"posts"</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">"client"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+        <span class="s2">"session"</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_id"</span><span class="p">),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Use schema validation whenever possible.</li>
+<li>Use typed query helpers instead of manual conversion.</li>
+<li>Keep request handlers lightweight.</li>
+<li>Avoid reading the body multiple times.</li>
+<li>Use streaming for large uploads.</li>
+<li>Store request-specific data in <code>request.state</code>.</li>
+<li>Never trust client input without validation.</li>
+<li>Use HTTPS in production.</li>
+<li>Protect sensitive endpoints with authentication and authorization.</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

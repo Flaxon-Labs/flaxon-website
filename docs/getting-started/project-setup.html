@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Getting started with Flaxon — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Getting started with Flaxon — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Getting started with Flaxon</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/getting-started.md">Framework source</a> · <a href="../../content/framework/docs/getting-started.md" download>Markdown</a></p><h1 id="getting-started-with-flaxon">Getting started with Flaxon</h1>
+<p>Build a complete application with Python APIs, Teloce HTML components, TypeScript, scoped styles, and a protected admin in one project.</p>
+<h2 id="create-your-first-application">Create your first application</h2>
+<p>Use Python 3.11 or newer. Install Flaxon in a virtual environment, then generate the starter:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="c1"># Linux/macOS:</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<span class="c1"># Windows PowerShell: .venv\Scripts\Activate.ps1</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>my-project
+<span class="nb">cd</span><span class="w"> </span>my-project
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+flaxon<span class="w"> </span>run
+</code></pre></div>
+<p>Open <strong>http://127.0.0.1:8000/</strong>. The welcome page's <strong>Try your Python API</strong> button calls <code>/api/welcome/status</code> through a TypeScript helper. Open <code>/admin/login</code> to sign in with the account you created.</p>
+<p>There is no preset administrator or password. Use a password of at least eight characters with upper- and lowercase letters, a number, and a special character. Password entry is hidden; passwords are hashed before storage. Create accounts before starting the server, or restart it after adding an account from the command line.</p>
+<p><code>flaxon new my-project --template basic</code> keeps the smaller Python API starter available. The default <code>fullstack</code> template includes the interface, module, database, and admin.</p>
+<h2 id="choose-your-interface">Choose your interface</h2>
+<p>Flaxon supports complete websites with <strong>Jinax</strong> (server-rendered HTML templates) and interactive applications with <strong>Teloce</strong> (compiled HTML components and TypeScript). The starter demonstrates both: <code>/</code> uses Teloce and <code>/server-page</code> uses Jinax. You can choose either for your whole application or combine them.</p>
+<p>For a Jinax-only application, keep <code>app.use_templates(...)</code>, remove <code>app.use_teloce(...)</code>, and change the root route to return <code>app.jinax.render_response("welcome.html", {"project_name": PROJECT_NAME})</code>. Your Python modules, API routes, database, and admin remain available.</p>
+<h2 id="understand-the-generated-project">Understand the generated project</h2>
+<table>
+<thead>
+<tr>
+<th>File or directory</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.py</code></td>
+<td>Compose the application, mount the module, configure Teloce, and serve <code>/</code>.</td>
+</tr>
+<tr>
+<td><code>templates/welcome.html</code></td>
+<td>Complete Jinax HTML page at <code>/server-page</code>.</td>
+</tr>
+<tr>
+<td><code>flaxon_cli.py</code></td>
+<td>Register custom commands owned by your feature modules.</td>
+</tr>
+<tr>
+<td><code>settings.py</code></td>
+<td>Project paths, SQLite location, and development mode.</td>
+</tr>
+<tr>
+<td><code>modules/welcome/module.py</code></td>
+<td>Your first module-owned Python API.</td>
+</tr>
+<tr>
+<td><code>modules/welcome/ui/Welcome.html</code></td>
+<td>Welcome component with <code>lang="ts"</code> and scoped CSS.</td>
+</tr>
+<tr>
+<td><code>modules/welcome/ui/api.ts</code></td>
+<td>Typed browser helper for the module API.</td>
+</tr>
+<tr>
+<td><code>ui/app.html</code></td>
+<td>Root component importing the welcome interface.</td>
+</tr>
+<tr>
+<td><code>public/</code></td>
+<td>Global CSS and favicon served at <code>/assets</code>.</td>
+</tr>
+<tr>
+<td><code>management.py</code></td>
+<td>Project-local migrations and administrator creation.</td>
+</tr>
+<tr>
+<td><code>migrations/0001_project_notes.json</code></td>
+<td>Example migration creating a project notes table.</td>
+</tr>
+<tr>
+<td><code>data/</code></td>
+<td>Local database and uploads; excluded from Git.</td>
+</tr>
+</tbody>
+</table>
+<p>Teloce compiles the browser code; Flaxon handles requests, Python modules, persistence, and administration. The welcome example does not need a separate Node development server.</p>
+<h2 id="run-and-extend-module-owned-commands">Run and extend module-owned commands</h2>
+<p>From the generated project directory, run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>welcome
+flaxon<span class="w"> </span>welcome-status
+</code></pre></div>
+<p>These commands live in <code>modules/welcome/module.py</code>, using <code>@welcome.cli_command(...)</code>. The first is synchronous; the second awaits the module's async status helper. <code>flaxon_cli.py</code> exposes them with <code>welcome.install_cli_commands(globals())</code>. They work without starting the web server or connecting to a database. Add commands to another feature module and install them in <code>flaxon_cli.py</code>; use unique names that do not conflict with built-in commands. See the <a href="../guides/modules.html">module guide</a> and <a href="../lessons/cli.html">CLI guide</a>.</p>
+<p>The welcome page links to the <a href="https://flaxon-website.vercel.app/docs.html">documentation website</a> and uses its hosted logo. The logo and external documentation require internet access; local routes and commands work offline.</p>
+<h2 id="change-the-application">Change the application</h2>
+<ol>
+<li>Edit <code>modules/welcome/module.py</code> to add a Python endpoint.</li>
+<li>Update <code>api.ts</code> to call that endpoint and describe its response with a TypeScript interface.</li>
+<li>Update <code>Welcome.html</code> to show the result. Its scoped styles belong to the component.</li>
+<li>Add a module for each feature and mount it in <code>app.py</code>. Keep its UI beside its Python routes.</li>
+<li>Add migrations for database schema changes, then run <code>python management.py migrate</code>.</li>
+</ol>
+<p>Check migration status with <code>python management.py migrate --status</code>. <code>python management.py createsuperuser</code> is an alias for <code>setup-admin</code>; existing usernames are never overwritten. Run <code>python management.py --help</code> for command help.</p>
+<h2 id="learn-the-rest-of-flaxon">Learn the rest of Flaxon</h2>
+<p>Follow the <a href="../fullstack/index.html">ten full-stack lessons</a> in order, from your first application through TypeScript, navigation, modules, persistence, live updates, and deployment.</p>
+<table>
+<thead>
+<tr>
+<th>Next step</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Installation and alternatives</td>
+<td><a href="installation.html">Installation</a>, <a href="quickstart.html">quick start</a></td>
+</tr>
+<tr>
+<td>Server foundations</td>
+<td><a href="../core-concepts/routing.html">Routing</a>, <a href="../core-concepts/requests.html">requests</a>, <a href="../core-concepts/responses.html">responses</a>, <a href="../core-concepts/validation.html">validation</a></td>
+</tr>
+<tr>
+<td>UI and browser code</td>
+<td><a href="../guides/teloce-spa.html">Teloce SPA guide</a>, <a href="../api/teloce.html">Teloce API</a>, <a href="../fullstack/02-components.html">components lesson</a>, <a href="../fullstack/04-typescript.html">TypeScript lesson</a></td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="../guides/modules.html">Modules</a>, <a href="../fullstack/07-modules.html">module lesson</a>, <a href="../configuration.html">configuration</a></td>
+</tr>
+<tr>
+<td>Data and users</td>
+<td><a href="../guides/databases.html">Databases</a>, <a href="../guides/authentication.html">authentication</a>, <a href="../guides/authorization.html">authorization</a></td>
+</tr>
+<tr>
+<td>Admin and content</td>
+<td><a href="../admin-guide.html">Admin guide</a>, <a href="../guides/admin-cms.html">admin/CMS</a>, <a href="../guides/admin-production.html">production admin</a></td>
+</tr>
+<tr>
+<td>Other server capabilities</td>
+<td><a href="../guides/tasks.html">Tasks</a>, <a href="../guides/websockets.html">WebSockets</a>, <a href="../guides/mail.html">mail</a>, <a href="../graphql.html">GraphQL</a>, <a href="../guides/plugins.html">plugins</a></td>
+</tr>
+<tr>
+<td>Ship and maintain</td>
+<td><a href="../guides/testing.html">Testing</a>, <a href="../security.html">security</a>, <a href="../deployment.html">deployment</a>, <a href="../maintenance.html">maintenance</a></td>
+</tr>
+<tr>
+<td>Complete reference and examples</td>
+<td><a href="index.html#complete-documentation-directory">All documentation</a></td>
+</tr>
+</tbody>
+</table>
+<p>Before deployment, set <code>FLAXON_DEBUG=0</code>, use HTTPS, review permissions, back up <code>data/</code>, and follow the deployment and production-admin guides. The starter uses local SQLite and local uploads for a single application instance. Deploy the project sources or an editable installation; packaging your own application as a wheel requires including its UI and public files.</p></article>
+</main></div><div id="footer"></div></body></html>

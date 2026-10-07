@@ -1,617 +1,358 @@
-<!-- docs/examples/large-application.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Large Application Example – Flaxon Documentation</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
-
-    <div id="header"></div>
-
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
-
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-
-                        <div class="section-title">Examples</div>
-                        <a href="/docs/examples/basic-api.html">Basic API</a>
-                        <a href="/docs/examples/react-backend.html">React Backend</a>
-                        <a href="/docs/examples/android-backend.html">Android Backend</a>
-                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
-                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
-                        <a href="/docs/examples/large-application.html" class="active">Large Application</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Large Application Example</h1>
-                        <p>A structured large application with routers, services, repositories, schemas, and middleware.</p>
-
-                        <h2>Project Structure</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">myapp/
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Large Application Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Large Application Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Large Application Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/large-application.md">Framework source</a> · <a href="../../content/framework/docs/examples/large-application.md" download>Markdown</a></p><h1 id="large-application-example">Large Application Example</h1>
+<p>This example demonstrates a production-style Flaxon application structure using:</p>
+<ul>
+<li>Routers</li>
+<li>Services</li>
+<li>Repositories</li>
+<li>Models</li>
+<li>Schemas</li>
+<li>Middleware</li>
+<li>JWT Authentication</li>
+<li>Configuration management</li>
+</ul>
+<hr/>
+<h2 id="project-structure">Project Structure</h2>
+<div class="highlight"><pre><span></span><code>myapp/
+│
 ├── app.py
 ├── config.py
+│
 ├── models/
 │   └── user.py
+│
 ├── schemas/
 │   └── user.py
+│
 ├── services/
 │   └── user_service.py
+│
 ├── repositories/
 │   └── user_repository.py
+│
 ├── routes/
 │   ├── __init__.py
 │   ├── users.py
 │   └── auth.py
+│
 ├── middleware/
 │   └── auth.py
+│
 └── utils/
-    └── db.py</code></pre>
-                        </div>
-
-                        <h2>Configuration</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># config.py
-import os
-from typing import Any
-
-class Config:
-    DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
-    SECRET_KEY = os.environ.get("SECRET_KEY", "change-me")
-    DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///app.db")
-    ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-    JWT_EXPIRATION = int(os.environ.get("JWT_EXPIRATION", 3600))
-    MAX_BODY_SIZE = int(os.environ.get("MAX_BODY_SIZE", 10 * 1024 * 1024))
-
-    @classmethod
-    def to_dict(cls) -> dict[str, Any]:
-        return {
-            "DEBUG": cls.DEBUG,
-            "SECRET_KEY": cls.SECRET_KEY,
-            "DATABASE_URL": cls.DATABASE_URL,
-            "ALLOWED_ORIGINS": cls.ALLOWED_ORIGINS,
-            "JWT_EXPIRATION": cls.JWT_EXPIRATION,
-            "MAX_BODY_SIZE": cls.MAX_BODY_SIZE,
-        }</code></pre>
-                        </div>
-
-                        <h2>Models</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># models/user.py
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional
-
-@dataclass
-class User:
-    id: Optional[int] = None
-    name: str = ""
-    email: str = ""
-    hashed_password: str = ""
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "User":
-        return cls(
-            id=data.get("id"),
-            name=data.get("name", ""),
-            email=data.get("email", ""),
-            hashed_password=data.get("hashed_password", ""),
-            created_at=data.get("created_at"),
-            updated_at=data.get("updated_at"),
-        )</code></pre>
-                        </div>
-
-                        <h2>Schemas (Validation)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># schemas/user.py
-from flaxon.validation import Schema, fields
-
-class CreateUser(Schema):
-    name = fields.StrField(required=True, min_length=2, max_length=80)
-    email = fields.EmailField(required=True)
-    password = fields.StrField(required=True, min_length=8)
-
-class UpdateUser(Schema):
-    name = fields.StrField(required=False, min_length=2, max_length=80)
-    email = fields.EmailField(required=False)
-
-class LoginRequest(Schema):
-    email = fields.EmailField(required=True)
-    password = fields.StrField(required=True, min_length=8)</code></pre>
-                        </div>
-
-                        <h2>Repository</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># repositories/user_repository.py
-from typing import Optional, List
-from models.user import User
-
-class UserRepository:
-    def __init__(self, db):
-        self.db = db
-
-    async def get_by_id(self, user_id: int) -> Optional[User]:
-        row = await self.db.fetch_one("SELECT * FROM users WHERE id = $1", user_id)
-        return User.from_dict(row) if row else None
-
-    async def get_by_email(self, email: str) -> Optional[User]:
-        row = await self.db.fetch_one("SELECT * FROM users WHERE email = $1", email)
-        return User.from_dict(row) if row else None
-
-    async def create(self, user: User) -> User:
-        row = await self.db.fetch_one(
-            "INSERT INTO users (name, email, hashed_password) VALUES ($1, $2, $3) RETURNING *",
-            user.name, user.email, user.hashed_password
-        )
-        return User.from_dict(row)
-
-    async def update(self, user: User) -> User:
-        row = await self.db.fetch_one(
-            "UPDATE users SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *",
-            user.name, user.email, user.id
-        )
-        return User.from_dict(row)
-
-    async def delete(self, user_id: int) -> bool:
-        await self.db.execute("DELETE FROM users WHERE id = $1", user_id)
-        return True
-
-    async def list(self, limit: int = 100, offset: int = 0) -> List[User]:
-        rows = await self.db.fetch_all("SELECT * FROM users LIMIT $1 OFFSET $2", limit, offset)
-        return [User.from_dict(row) for row in rows]
-
-    async def count(self) -> int:
-        return await self.db.fetch_val("SELECT COUNT(*) FROM users")</code></pre>
-                        </div>
-
-                        <h2>Service Layer</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># services/user_service.py
-from typing import Optional, List
-from flaxon.security import hash_password, verify_password
-from models.user import User
-from repositories.user_repository import UserRepository
-
-class UserService:
-    def __init__(self, repo: UserRepository):
-        self.repo = repo
-
-    async def get_user(self, user_id: int) -> Optional[User]:
-        return await self.repo.get_by_id(user_id)
-
-    async def get_user_by_email(self, email: str) -> Optional[User]:
-        return await self.repo.get_by_email(email)
-
-    async def create_user(self, name: str, email: str, password: str) -> User:
-        if await self.repo.get_by_email(email):
-            raise ValueError("Email already registered")
-
-        user = User(
-            name=name,
-            email=email,
-            hashed_password=hash_password(password),
-        )
-        return await self.repo.create(user)
-
-    async def authenticate(self, email: str, password: str) -> Optional[User]:
-        user = await self.repo.get_by_email(email)
-        if not user:
-            return None
-        if not verify_password(password, user.hashed_password):
-            return None
-        return user
-
-    async def update_user(self, user_id: int, data: dict) -> Optional[User]:
-        user = await self.repo.get_by_id(user_id)
-        if not user:
-            return None
-        if "name" in data:
-            user.name = data["name"]
-        if "email" in data:
-            user.email = data["email"]
-        return await self.repo.update(user)
-
-    async def delete_user(self, user_id: int) -> bool:
-        return await self.repo.delete(user_id)
-
-    async def list_users(self, page: int = 1, per_page: int = 20) -> dict:
-        offset = (page - 1) * per_page
-        users = await self.repo.list(per_page, offset)
-        total = await self.repo.count()
-
-        return {
-            "items": [u.to_dict() for u in users],
-            "page": page,
-            "per_page": per_page,
-            "total": total,
-            "total_pages": (total + per_page - 1) // per_page,
-        }</code></pre>
-                        </div>
-
-                        <h2>Auth Routes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># routes/auth.py
-from flaxon import Router, HTTPException, Response
-from flaxon.security import JWTBackend, User, login_required
-
-from schemas.user import CreateUser, LoginRequest
-from services.user_service import UserService
-from repositories.user_repository import UserRepository
-from utils.db import get_db
-from config import Config
-
-router = Router(prefix="/api/v1/auth")
-jwt_backend = JWTBackend(secret_key=Config.SECRET_KEY)
-
-@router.post("/register")
-async def register(data: CreateUser):
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    try:
-        user = await service.create_user(data.name, data.email, data.password)
-        return {"success": True, "user": user.to_dict()}
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-@router.post("/login")
-async def login(data: LoginRequest):
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    user = await service.authenticate(data.email, data.password)
-    if not user:
-        raise HTTPException(401, "Invalid credentials")
-
-    token = await jwt_backend.create_token(User.from_dict(user.to_dict()))
-    return {"token": token, "user": user.to_dict()}
-
-@router.post("/refresh")
-@login_required
-async def refresh(request):
-    user = getattr(request, "user")
-    token = await jwt_backend.create_token(user)
-    return {"token": token}
-
-@router.post("/logout")
-@login_required
-async def logout(request):
-    # In production, blacklist the token
-    return {"success": True}</code></pre>
-                        </div>
-
-                        <h2>User Routes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># routes/users.py
-from flaxon import Router, HTTPException
-from flaxon.security import login_required, permission_required
-
-from schemas.user import UpdateUser
-from services.user_service import UserService
-from repositories.user_repository import UserRepository
-from utils.db import get_db
-
-router = Router(prefix="/api/v1/users")
-
-@router.get("/")
-@login_required
-async def list_users(request):
-    page = int(request.query.get("page", "1"))
-    per_page = int(request.query.get("per_page", "20"))
-
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    return await service.list_users(page, per_page)
-
-@router.get("/<int:user_id>")
-@login_required
-async def get_user(user_id: int):
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    user = await service.get_user(user_id)
-    if not user:
-        raise HTTPException(404, "User not found")
-
-    return user.to_dict()
-
-@router.put("/<int:user_id>")
-@login_required
-async def update_user(user_id: int, data: UpdateUser):
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    user = await service.update_user(user_id, data.to_dict())
-    if not user:
-        raise HTTPException(404, "User not found")
-
-    return user.to_dict()
-
-@router.delete("/<int:user_id>")
-@login_required
-@permission_required("delete_user")
-async def delete_user(user_id: int):
-    db = get_db()
-    repo = UserRepository(db)
-    service = UserService(repo)
-
-    result = await service.delete_user(user_id)
-    if not result:
-        raise HTTPException(404, "User not found")
-
-    return {"deleted": True}
-
-@router.get("/me")
-@login_required
-async def get_me(request):
-    user = getattr(request, "user")
-    return user</code></pre>
-                        </div>
-
-                        <h2>Middleware</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># middleware/auth.py
-from flaxon.middleware import Middleware
-
-class AuthMiddleware(Middleware):
-    async def __call__(self, scope, receive, send):
-        if scope.get("type") != "http":
-            await self.app(scope, receive, send)
-            return
-
-        # Add user to scope for WebSocket authentication
-        if "user" not in scope:
-            scope["user"] = None
-
-        await self.app(scope, receive, send)
-
-# middleware/logging.py
-class LoggingMiddleware(Middleware):
-    async def __call__(self, scope, receive, send):
-        if scope.get("type") != "http":
-            await self.app(scope, receive, send)
-            return
-
-        import time
-        start = time.perf_counter()
-        path = scope.get("path", "/")
-        method = scope.get("method", "GET")
-
-        await self.app(scope, receive, send)
-
-        duration = (time.perf_counter() - start) * 1000
-        print(f"{method} {path} - {duration:.2f}ms")</code></pre>
-                        </div>
-
-                        <h2>Database Utilities</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># utils/db.py
-import asyncpg
-from config import Config
-
-_db_pool = None
-
-async def init_db():
-    global _db_pool
-    _db_pool = await asyncpg.create_pool(Config.DATABASE_URL)
-
-async def close_db():
-    if _db_pool:
-        await _db_pool.close()
-
-def get_db():
-    return _db_pool
-
-# utils/health.py
-from flaxon.health import HealthCheck
-
-class DatabaseHealthCheck(HealthCheck):
-    def __init__(self):
-        super().__init__("database", self._check)
-
-    async def _check(self):
-        try:
-            db = get_db()
-            await db.fetchval("SELECT 1")
-            return {"status": "healthy"}
-        except Exception as exc:
-            return {"status": "unhealthy", "message": str(exc)}</code></pre>
-                        </div>
-
-                        <h2>Application Entry Point (Complete)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># app.py
-from flaxon import Flaxon, JSONResponse
-from flaxon.middleware import RequestIDMiddleware, SecurityHeadersMiddleware, CORSMiddleware
-from flaxon.security import AuthenticationMiddleware
-
-from config import Config
-from routes import users, auth
-from middleware.auth import AuthMiddleware
-from middleware.logging import LoggingMiddleware
-from utils.db import init_db, close_db
-from utils.health import DatabaseHealthCheck
-from flaxon.health import HealthRegistry
-
-app = Flaxon("myapp", debug=Config.DEBUG)
-app.config.update(Config.to_dict())
-
-# Middleware (order matters)
-app.add_middleware(LoggingMiddleware)
-app.add_middleware(RequestIDMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(
-    CORSMiddleware,
-    allowed_origins=Config.ALLOWED_ORIGINS,
-    allow_credentials=True,
-)
-app.add_middleware(AuthMiddleware)
-
-# Authentication
-from flaxon.security import JWTBackend
-jwt_backend = JWTBackend(secret_key=Config.SECRET_KEY)
-app.add_middleware(AuthenticationMiddleware, backend=jwt_backend)
-
-# Routes
-app.include_router(auth.router)
-app.include_router(users.router)
-
-# Health Checks
-health = HealthRegistry()
-health.register(DatabaseHealthCheck())
-
-@app.get("/health")
-async def health_check():
-    results = await health.run_all()
-    return {result.name: result.to_dict() for result in results}
-
-@app.get("/health/live")
-async def liveness():
-    return {"status": "alive"}
-
-@app.get("/health/ready")
-async def readiness():
-    results = await health.run_all()
-    result = {item.name: item.to_dict() for item in results}
-    all_healthy = all(item["status"] == "healthy" for item in result.values())
-    status = 200 if all_healthy else 503
-    return JSONResponse(result, status_code=status)
-
-# Lifecycle
-@app.on_startup
-async def startup():
-    await init_db()
-    print("✅ Database connected")
-
-@app.on_shutdown
-async def shutdown():
-    await close_db()
-    print("✅ Database disconnected")
-
-@app.get("/")
-async def home():
-    return {"message": "Welcome to MyApp API", "version": "1.0.0"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)</code></pre>
-                        </div>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
-                            <ul class="mb-0 mt-1">
-                                <li><strong>Separation of Concerns:</strong> Routes, Services, Repositories</li>
-                                <li><strong>Dependency Injection:</strong> Services receive repositories</li>
-                                <li><strong>Configuration:</strong> Centralized config management with env vars</li>
-                                <li><strong>Middleware:</strong> Auth, CORS, Request ID, Security Headers, Logging</li>
-                                <li><strong>Health Checks:</strong> Liveness, readiness, and database health</li>
-                                <li><strong>Lifecycle:</strong> Startup and shutdown hooks</li>
-                                <li><strong>Validation:</strong> Schemas for request validation</li>
-                                <li><strong>Authentication:</strong> JWT with refresh tokens</li>
-                                <li><strong>Authorization:</strong> Permission-based decorators</li>
-                            </ul>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+    └── db.py
+</code></pre></div>
+<hr/>
+<h2 id="application-code">Application Code</h2>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RequestIDMiddleware</span><span class="p">,</span>
+    <span class="n">SecurityHeadersMiddleware</span><span class="p">,</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JWTBackend</span><span class="p">,</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">routes</span><span class="w"> </span><span class="kn">import</span> <span class="n">users</span><span class="p">,</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">middleware.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthMiddleware</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"myapp"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Configuration</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+
+<span class="c1"># Middleware</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">RequestIDMiddleware</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SecurityHeadersMiddleware</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">ALLOWED_ORIGINS</span><span class="p">,</span>
+    <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">AuthMiddleware</span><span class="p">)</span>
+
+
+<span class="c1"># Authentication</span>
+<span class="n">jwt_backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">SECRET_KEY</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">jwt_backend</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Routes</span>
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">auth</span><span class="o">.</span><span class="n">router</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">router</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"healthy"</span><span class="p">,</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.0.0"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome to MyApp API"</span><span class="p">,</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.0.0"</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="configpy">config.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"DEBUG"</span><span class="p">,</span>
+            <span class="s2">"false"</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="o">==</span> <span class="s2">"true"</span>
+    <span class="p">)</span>
+
+    <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"SECRET_KEY"</span><span class="p">,</span>
+        <span class="s2">"change-me"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"DATABASE_URL"</span><span class="p">,</span>
+        <span class="s2">"sqlite:///app.db"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ALLOWED_ORIGINS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"ALLOWED_ORIGINS"</span><span class="p">,</span>
+        <span class="s2">"http://localhost:3000"</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span>
+
+
+    <span class="n">JWT_EXPIRATION</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"JWT_EXPIRATION"</span><span class="p">,</span>
+            <span class="mi">3600</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"DEBUG"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+            <span class="s2">"SECRET_KEY"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">SECRET_KEY</span><span class="p">,</span>
+            <span class="s2">"DATABASE_URL"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATABASE_URL</span><span class="p">,</span>
+            <span class="s2">"ALLOWED_ORIGINS"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ALLOWED_ORIGINS</span><span class="p">,</span>
+            <span class="s2">"JWT_EXPIRATION"</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">JWT_EXPIRATION</span><span class="p">,</span>
+        <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="repositoriesuser_repositorypy">repositories/user_repository.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">models.user</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UserRepository</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_by_id</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+            <span class="s2">"SELECT * FROM users WHERE id=$1"</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">row</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_by_email</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+            <span class="s2">"SELECT * FROM users WHERE email=$1"</span><span class="p">,</span>
+            <span class="n">email</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">row</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">User</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span><span class="p">:</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            INSERT INTO users</span>
+<span class="sd">            (name,email,hashed_password)</span>
+<span class="sd">            VALUES ($1,$2,$3)</span>
+<span class="sd">            RETURNING *</span>
+<span class="sd">            """</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">hashed_password</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">):</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"DELETE FROM users WHERE id=$1"</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
+<hr/>
+<h2 id="servicesuser_servicepy">services/user_service.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">repositories.user_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models.user</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">hash_password</span><span class="p">,</span>
+    <span class="n">verify_password</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UserService</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">repo</span><span class="p">:</span> <span class="n">UserRepository</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">repo</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">existing</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">get_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">existing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Email already registered"</span>
+            <span class="p">)</span>
+
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">hashed_password</span><span class="o">=</span>
+                <span class="n">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">),</span>
+        <span class="p">)</span>
+
+
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">get_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_password</span><span class="p">(</span>
+            <span class="n">password</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">hashed_password</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+
+        <span class="k">return</span> <span class="n">user</span>
+</code></pre></div>
+<hr/>
+<h2 id="running-the-application">Running the Application</h2>
+<p>Install dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>standard,dev<span class="o">]</span>
+</code></pre></div>
+<p>Set environment variables:</p>
+<h3 id="linux-macos">Linux / macOS</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">SECRET_KEY</span><span class="o">=</span>my-secret-key
+<span class="nb">export</span><span class="w"> </span><span class="nv">DATABASE_URL</span><span class="o">=</span>postgresql://user:password@localhost/myapp
+</code></pre></div>
+<h3 id="windows-powershell">Windows PowerShell</h3>
+<div class="highlight"><pre><span></span><code><span class="nv">$env:SECRET_KEY</span><span class="p">=</span><span class="s2">"my-secret-key"</span>
+<span class="nv">$env:DATABASE_URL</span><span class="p">=</span><span class="s2">"postgresql://user:password@localhost/myapp"</span>
+</code></pre></div>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<hr/>
+<h2 id="production-improvements">Production Improvements</h2>
+<p>For production applications add:</p>
+<ul>
+<li>Database migrations</li>
+<li>PostgreSQL connection pooling</li>
+<li>Redis caching</li>
+<li>Background workers</li>
+<li>Rate limiting</li>
+<li>Logging</li>
+<li>Monitoring</li>
+<li>Automated tests</li>
+<li>Docker deployment</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

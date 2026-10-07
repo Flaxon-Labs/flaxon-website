@@ -1,224 +1,1562 @@
-<!-- docs/guides/mobile-backends.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Mobile Backends – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mobile Development — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Mobile Development — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Mobile Development</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/mobile-developement.md">Framework source</a> · <a href="../../content/framework/docs/guides/mobile-developement.md" download>Markdown</a></p><h1 id="mobile-development">Mobile Development</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon is designed to be an excellent backend framework for modern mobile applications. It provides fast JSON APIs, WebSocket support, authentication, file uploads, background tasks, and technology neutrality so you can build backends for any mobile platform.</p>
+<p>Whether you're building an Android, iOS, Flutter, React Native, or .NET MAUI application, Flaxon provides the tools needed to create scalable and maintainable APIs.</p>
+<hr/>
+<h2 id="why-flaxon-for-mobile">Why Flaxon for Mobile?</h2>
+<p>Flaxon is designed around modern mobile application requirements.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Async-first architecture</li>
+<li>High-performance JSON APIs</li>
+<li>JWT authentication</li>
+<li>Session authentication</li>
+<li>OAuth2 support</li>
+<li>API versioning</li>
+<li>Built-in validation</li>
+<li>File uploads</li>
+<li>Chunked uploads</li>
+<li>WebSocket support</li>
+<li>GraphQL support</li>
+<li>Background tasks</li>
+<li>Push notification integration</li>
+<li>Offline synchronization</li>
+<li>Rate limiting</li>
+<li>Request validation</li>
+<li>Middleware support</li>
+<li>Database agnostic</li>
+<li>Production ready</li>
+</ul>
+<hr/>
+<h2 id="supported-platforms">Supported Platforms</h2>
+<p>Flaxon works with virtually every mobile framework.</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Android (Kotlin)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Android (Java)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Swift (iOS)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Flutter</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>React Native</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Ionic</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Capacitor</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Xamarin</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>.NET MAUI</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Kotlin Multiplatform</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="architecture">Architecture</h2>
+<p>A typical Flaxon mobile backend looks like this:</p>
+<div class="highlight"><pre><span></span><code>                    Mobile Clients
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+        Android   iOS   Flutter   React Native
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+                    │
+                    ▼
 
-    <div id="header"></div>
+              HTTPS / WebSocket
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+                    │
+                    ▼
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+               Flaxon Application
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+        Routing
+        Validation
+        Authentication
+        Middleware
+        WebSockets
+        Background Tasks
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html" class="active">Mobile Backends</a>
-                    </div>
-                </aside>
+                    │
+                    ▼
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Mobile Backends</h1>
-                        <p>Flaxon is designed to be an excellent backend for mobile applications with JSON APIs, WebSocket support, and technology neutrality.</p>
+        PostgreSQL
+        MySQL
+        SQLite
+        MongoDB
+        Redis
+</code></pre></div>
+<hr/>
+<h2 id="project-structure">Project Structure</h2>
+<p>A recommended project layout:</p>
+<div class="highlight"><pre><span></span><code>mobile-backend/
 
-                        <h2>Android (Kotlin) Backend</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon, WebSocket, WebSocketDisconnect
-from flaxon.security import JWTBackend
-from flaxon.validation import Schema, fields
+├── app.py
+├── routes/
+│   ├── auth.py
+│   ├── users.py
+│   ├── posts.py
+│   ├── notifications.py
+│   ├── upload.py
+│   └── sync.py
+│
+├── services/
+│   ├── auth.py
+│   ├── user_service.py
+│   ├── notification_service.py
+│   ├── upload_service.py
+│   └── sync_service.py
+│
+├── middleware/
+│
+├── websocket/
+│
+├── schemas/
+│
+├── models/
+│
+├── uploads/
+│
+├── static/
+│
+└── tests/
+</code></pre></div>
+<hr/>
+<h2 id="creating-your-first-mobile-backend">Creating Your First Mobile Backend</h2>
+<h2 id="install-flaxon">Install Flaxon</h2>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>standard<span class="o">]</span>
+</code></pre></div>
+<hr/>
+<h2 id="create-your-application">Create Your Application</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-app = Flaxon("android-backend")
-jwt_backend = JWTBackend(secret_key="change-this-in-production")
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"mobile-backend"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="create-a-health-endpoint">Create a Health Endpoint</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
 
-class DeviceRegistration(Schema):
-    device_id = fields.StrField(required=True, min_length=8)
-    platform = fields.ChoiceField(["android", "ios"], required=True)
-    notification_token = fields.StrField(required=True, min_length=16)
+    <span class="k">return</span> <span class="p">{</span>
 
-@app.post("/api/v1/devices")
-async def register_device(data: DeviceRegistration):
-    return {"success": True, "device": data.to_dict()}
+        <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"healthy"</span><span class="p">,</span>
 
-@app.post("/api/v1/auth/login")
-async def login(request):
-    data = await request.json()
-    user = await auth_service.authenticate(data["email"], data["password"])
-    token = await jwt_backend.create_token(user)
-    return {"access_token": token, "user": user.to_dict()}</code></pre>
-                        </div>
+        <span class="s2">"framework"</span><span class="p">:</span> <span class="s2">"Flaxon"</span><span class="p">,</span>
 
-                        <h2>Real-Time Features (WebSocket)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.websocket("/ws/mobile")
-async def mobile_websocket(socket: WebSocket):
-    user = socket.scope.get("user")
-    if not user:
-        await socket.close(code=4001)
-        return
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.0.0"</span>
 
-    await socket.accept()
-    await socket.join(f"user_{user.id}")
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="run-the-server">Run the Server</h2>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Your backend will be available at:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000
+</code></pre></div>
+<hr/>
+<h2 id="creating-rest-apis">Creating REST APIs</h2>
+<p>Mobile applications usually communicate using JSON.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">():</span>
 
-    try:
-        async for message in socket.iter_json():
-            event = message.get("event")
-            if event == "ping":
-                await socket.send_json({"event": "pong"})
-            elif event == "message":
-                await handle_mobile_message(user, message["data"])
-            elif event == "location":
-                await update_user_location(user.id, message["data"])
-    except WebSocketDisconnect:
-        pass</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">[</span>
 
-                        <h2>Push Notifications (FCM)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import firebase_admin
-from firebase_admin import messaging
+        <span class="p">{</span>
 
-firebase_admin.initialize_app()
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 
-@app.post("/api/v1/notifications/send")
-async def send_notification(request):
-    data = await request.json()
-    user_id = data["user_id"]
-    tokens = await device_service.get_tokens(user_id)
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Hello"</span>
 
-    for token in tokens:
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=data["title"],
-                body=data["message"],
-            ),
-            token=token,
-        )
-        await messaging.send_async(message)
+        <span class="p">},</span>
 
-    return {"sent": len(tokens)}</code></pre>
-                        </div>
+        <span class="p">{</span>
 
-                        <h2>Offline-First Synchronization</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/api/v1/sync")
-async def sync_data(request):
-    data = await request.json()
-    last_sync = data.get("last_sync", 0)
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 
-    changes = {
-        "users": await user_service.get_changes_since(last_sync),
-        "posts": await post_service.get_changes_since(last_sync),
-    }
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Flaxon"</span>
 
-    if data.get("local_changes"):
-        await process_local_changes(data["local_changes"])
+        <span class="p">}</span>
 
-    return {"server_time": time.time(), "changes": changes}</code></pre>
-                        </div>
+    <span class="p">]</span>
+</code></pre></div>
+<p>Response:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hello"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flaxon"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre></div>
+<hr/>
+<h2 id="api-versioning">API Versioning</h2>
+<p>Version your APIs to maintain backward compatibility.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 
-                        <h2>File Uploads</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.files import FileUpload, FileStorage
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1"</span>
+<span class="p">)</span>
 
-upload_handler = FileUpload(max_size=50 * 1024 * 1024)
-storage = FileStorage("uploads")
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v2"</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Version 1:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@v1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
 
-@app.post("/api/v1/upload")
-async def upload_file(request):
-    files = await upload_handler.parse(request)
-    uploaded = []
+    <span class="k">return</span> <span class="p">{</span>
 
-    for file in files:
-        path = storage.save(file)
-        uploaded.append({
-            "filename": file.filename,
-            "url": storage.get_url(path),
-            "size": file.size,
-        })
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"v1"</span><span class="p">,</span>
 
-    return {"files": uploaded}</code></pre>
-                        </div>
+        <span class="s2">"users"</span><span class="p">:</span> <span class="p">[]</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Best Practices</strong>
-                            <ul class="mb-0 mt-1">
-                                <li>Use JWT with short expiration (15-30 minutes)</li>
-                                <li>Implement refresh token rotation</li>
-                                <li>Use pagination for all list endpoints</li>
-                                <li>Support offline-first synchronization</li>
-                                <li>Use chunked uploads for large files</li>
-                            </ul>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Version 2:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@v2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
 
-    <div id="footer"></div>
+    <span class="k">return</span> <span class="p">{</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"v2"</span><span class="p">,</span>
 
-</body>
-</html>
+        <span class="s2">"users"</span><span class="p">:</span> <span class="p">[],</span>
+
+        <span class="s2">"pagination"</span><span class="p">:</span> <span class="p">{</span>
+
+            <span class="s2">"page"</span><span class="p">:</span> <span class="mi">1</span>
+
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<p>Register routers:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-validation">Request Validation</h2>
+<p>Validation keeps APIs predictable.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">fields</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RegisterRequest</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">password</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Use the schema:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/register"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">RegisterRequest</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="authentication">Authentication</h2>
+<p>JWT authentication is recommended for mobile applications.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span>
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret-key"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="login">Login</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">authenticate</span><span class="p">(</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"email"</span><span class="p">],</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"password"</span><span class="p">]</span>
+
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+
+            <span class="mi">401</span><span class="p">,</span>
+
+            <span class="s2">"Invalid credentials"</span>
+
+        <span class="p">)</span>
+
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"access_token"</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="protecting-routes">Protecting Routes</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/profile"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+
+        <span class="n">request</span><span class="p">,</span>
+
+        <span class="s2">"user"</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="refresh-tokens">Refresh Tokens</h2>
+<p>Refresh tokens allow users to stay signed in without repeatedly entering credentials.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/auth/refresh"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">access_token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">refresh_service</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"refresh_token"</span><span class="p">]</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"access_token"</span><span class="p">:</span> <span class="n">access_token</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="device-registration">Device Registration</h2>
+<p>Register mobile devices to support push notifications.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">fields</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DeviceRegistration</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">device_id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+
+        <span class="p">[</span>
+
+            <span class="s2">"android"</span><span class="p">,</span>
+
+            <span class="s2">"ios"</span><span class="p">,</span>
+
+            <span class="s2">"flutter"</span><span class="p">,</span>
+
+            <span class="s2">"react-native"</span>
+
+        <span class="p">],</span>
+
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+
+    <span class="p">)</span>
+
+    <span class="n">notification_token</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/devices"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register_device</span><span class="p">(</span>
+
+    <span class="n">data</span><span class="p">:</span> <span class="n">DeviceRegistration</span>
+
+<span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">device_service</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">notification_token</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<h2 id="android-development-kotlin">Android Development (Kotlin)</h2>
+<p>Flaxon works seamlessly with Android applications using Retrofit, OkHttp, Ktor, or any HTTP client.</p>
+<hr/>
+<h2 id="rest-api-example">REST API Example</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="s2">"page"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="s2">"limit"</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+    <span class="n">posts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">post_service</span><span class="o">.</span><span class="n">get_posts</span><span class="p">(</span>
+        <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span>
+        <span class="s2">"pagination"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+            <span class="s2">"limit"</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="retrofit-client">Retrofit Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">interface</span><span class="w"> </span><span class="nc">ApiService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@GET</span><span class="p">(</span><span class="s">"api/v1/posts"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getPosts</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Query</span><span class="p">(</span><span class="s">"page"</span><span class="p">)</span><span class="w"> </span><span class="n">page</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">PostsResponse</span>
+
+<span class="w">    </span><span class="nd">@POST</span><span class="p">(</span><span class="s">"api/v1/login"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Body</span><span class="w"> </span><span class="n">request</span><span class="p">:</span><span class="w"> </span><span class="n">LoginRequest</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">LoginResponse</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="ios-development-swift">iOS Development (Swift)</h2>
+<p>Flaxon APIs work with URLSession, Alamofire, or any HTTP library.</p>
+<hr/>
+<h2 id="example-endpoint">Example Endpoint</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/profile"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="swift-client">Swift Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">struct</span><span class="w"> </span><span class="nc">APIClient</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span>
+<span class="w">        </span><span class="n">email</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="p">,</span>
+<span class="w">        </span><span class="n">password</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kr">throws</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="n">LoginResponse</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span>
+<span class="w">            </span><span class="n">string</span><span class="p">:</span><span class="w"> </span><span class="s">"https://example.com/api/v1/login"</span>
+<span class="w">        </span><span class="p">)</span><span class="o">!</span>
+
+<span class="w">        </span><span class="c1">// Request implementation...</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="flutter-development">Flutter Development</h2>
+<p>Flutter communicates with Flaxon using the HTTP package or Dio.</p>
+<p>Example endpoint:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Laptop"</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Keyboard"</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+</code></pre></div>
+<p>Flutter:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">final</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">http</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span>
+<span class="w">  </span><span class="n">Uri</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"https://example.com/api/v1/products"</span>
+<span class="w">  </span><span class="p">),</span>
+<span class="p">);</span>
+</code></pre></div>
+<hr/>
+<h2 id="react-native">React Native</h2>
+<p>Flaxon works with Fetch or Axios.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"https://example.com/api/v1/posts"</span>
+<span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+</code></pre></div>
+<p>Axios:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">axios</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"/api/v1/posts"</span>
+<span class="p">);</span>
+</code></pre></div>
+<hr/>
+<h2 id="graphql">GraphQL</h2>
+<p>Flaxon also supports GraphQL for mobile applications.</p>
+<p>Enable GraphQL:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLSchema</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">GraphQLSchema</span><span class="p">(</span>
+    <span class="n">query</span><span class="o">=</span><span class="n">Query</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">enable_graphql</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+</code></pre></div>
+<p>Endpoint:</p>
+<div class="highlight"><pre><span></span><code>/graphql
+</code></pre></div>
+<hr/>
+<h2 id="graphql-query">GraphQL Query</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="n">users</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="n">id</span>
+
+<span class="w">        </span><span class="n">username</span>
+
+<span class="w">        </span><span class="n">email</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="graphql-variables">GraphQL Variables</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="nf">GetUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">:</span><span class="w"> </span><span class="nb">Int</span><span class="p">!)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="n">user</span><span class="p">(</span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="nv">$id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="n">id</span>
+
+<span class="w">        </span><span class="n">username</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>Variables:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="pagination">Pagination</h2>
+<p>Large datasets should always be paginated.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+        <span class="s2">"page"</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">per_page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+        <span class="s2">"per_page"</span><span class="p">,</span>
+        <span class="mi">20</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="k">await</span> <span class="n">user_service</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
+        <span class="n">page</span><span class="p">,</span>
+        <span class="n">per_page</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span>
+
+        <span class="s2">"pagination"</span><span class="p">:</span> <span class="p">{</span>
+
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+
+            <span class="s2">"per_page"</span><span class="p">:</span> <span class="n">per_page</span><span class="p">,</span>
+
+            <span class="s2">"total"</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+
+            <span class="s2">"total_pages"</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<p>Response:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"pagination"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"per_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total_pages"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="searching">Searching</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/search"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"q"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_service</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"query"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+
+        <span class="s2">"results"</span><span class="p">:</span> <span class="n">results</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="filtering">Filtering</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">product_service</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">category</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="sorting">Sorting</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">sort</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"sort"</span><span class="p">,</span>
+        <span class="s2">"created_at"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">post_service</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+        <span class="n">sort</span><span class="o">=</span><span class="n">sort</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="single-file-upload">Single File Upload</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.files</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileUpload</span>
+
+<span class="n">upload</span> <span class="o">=</span> <span class="n">FileUpload</span><span class="p">(</span>
+    <span class="n">max_size</span><span class="o">=</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/upload"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_file</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">uploaded</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+
+        <span class="n">uploaded</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+
+            <span class="s2">"filename"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+
+            <span class="s2">"size"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">size</span>
+
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"files"</span><span class="p">:</span> <span class="n">uploaded</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="multiple-uploads">Multiple Uploads</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/uploads"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+
+            <span class="s2">"url"</span><span class="p">:</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"files"</span><span class="p">:</span> <span class="n">results</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="chunked-uploads">Chunked Uploads</h2>
+<p>Useful for videos and large files.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/upload/chunk"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_chunk</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">chunk</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+
+    <span class="k">await</span> <span class="n">chunk_storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"upload_id"</span><span class="p">],</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"index"</span><span class="p">],</span>
+
+        <span class="n">chunk</span><span class="p">,</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"received"</span><span class="p">:</span> <span class="kc">True</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="downloading-files">Downloading Files</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/files/&lt;filename&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"uploads/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="image-upload-example">Image Upload Example</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/profile/photo"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_avatar</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">avatar</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">avatar</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"avatar"</span><span class="p">:</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mobile-api-best-practices">Mobile API Best Practices</h2>
+<ul>
+<li>Always return JSON.</li>
+<li>Use pagination.</li>
+<li>Validate every request.</li>
+<li>Compress responses.</li>
+<li>Version your APIs.</li>
+<li>Return meaningful HTTP status codes.</li>
+<li>Keep payloads small.</li>
+<li>Support offline synchronization.</li>
+<li>Use HTTPS in production.</li>
+<li>Prefer JWT authentication.</li>
+</ul>
+<h2 id="android-development-kotlin_1">Android Development (Kotlin)</h2>
+<p>Flaxon works seamlessly with Android applications using Retrofit, OkHttp, Ktor, or any HTTP client.</p>
+<hr/>
+<h2 id="rest-api-example_1">REST API Example</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="s2">"page"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="s2">"limit"</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+    <span class="n">posts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">post_service</span><span class="o">.</span><span class="n">get_posts</span><span class="p">(</span>
+        <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span>
+        <span class="s2">"pagination"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+            <span class="s2">"limit"</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="retrofit-client_1">Retrofit Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">interface</span><span class="w"> </span><span class="nc">ApiService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@GET</span><span class="p">(</span><span class="s">"api/v1/posts"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getPosts</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Query</span><span class="p">(</span><span class="s">"page"</span><span class="p">)</span><span class="w"> </span><span class="n">page</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">PostsResponse</span>
+
+<span class="w">    </span><span class="nd">@POST</span><span class="p">(</span><span class="s">"api/v1/login"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Body</span><span class="w"> </span><span class="n">request</span><span class="p">:</span><span class="w"> </span><span class="n">LoginRequest</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">LoginResponse</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="ios-development-swift_1">iOS Development (Swift)</h2>
+<p>Flaxon APIs work with URLSession, Alamofire, or any HTTP library.</p>
+<hr/>
+<h2 id="example-endpoint_1">Example Endpoint</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/profile"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="swift-client_1">Swift Client</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">struct</span><span class="w"> </span><span class="nc">APIClient</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span>
+<span class="w">        </span><span class="n">email</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="p">,</span>
+<span class="w">        </span><span class="n">password</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kr">throws</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="n">LoginResponse</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span>
+<span class="w">            </span><span class="n">string</span><span class="p">:</span><span class="w"> </span><span class="s">"https://example.com/api/v1/login"</span>
+<span class="w">        </span><span class="p">)</span><span class="o">!</span>
+
+<span class="w">        </span><span class="c1">// Request implementation...</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="flutter-development_1">Flutter Development</h2>
+<p>Flutter communicates with Flaxon using the HTTP package or Dio.</p>
+<p>Example endpoint:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Laptop"</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Keyboard"</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+</code></pre></div>
+<p>Flutter:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">final</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">http</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span>
+<span class="w">  </span><span class="n">Uri</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"https://example.com/api/v1/products"</span>
+<span class="w">  </span><span class="p">),</span>
+<span class="p">);</span>
+</code></pre></div>
+<hr/>
+<h2 id="react-native_1">React Native</h2>
+<p>Flaxon works with Fetch or Axios.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"https://example.com/api/v1/posts"</span>
+<span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+</code></pre></div>
+<p>Axios:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">axios</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">"/api/v1/posts"</span>
+<span class="p">);</span>
+</code></pre></div>
+<hr/>
+<h2 id="graphql_1">GraphQL</h2>
+<p>Flaxon also supports GraphQL for mobile applications.</p>
+<p>Enable GraphQL:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLSchema</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">GraphQLSchema</span><span class="p">(</span>
+    <span class="n">query</span><span class="o">=</span><span class="n">Query</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">enable_graphql</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+</code></pre></div>
+<p>Endpoint:</p>
+<div class="highlight"><pre><span></span><code>/graphql
+</code></pre></div>
+<hr/>
+<h2 id="graphql-query_1">GraphQL Query</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="n">users</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="n">id</span>
+
+<span class="w">        </span><span class="n">username</span>
+
+<span class="w">        </span><span class="n">email</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="graphql-variables_1">GraphQL Variables</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="nf">GetUser</span><span class="p">(</span><span class="nv">$id</span><span class="p">:</span><span class="w"> </span><span class="nb">Int</span><span class="p">!)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="n">user</span><span class="p">(</span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="nv">$id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="n">id</span>
+
+<span class="w">        </span><span class="n">username</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>Variables:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="pagination_1">Pagination</h2>
+<p>Large datasets should always be paginated.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+        <span class="s2">"page"</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">per_page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span>
+        <span class="s2">"per_page"</span><span class="p">,</span>
+        <span class="mi">20</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="k">await</span> <span class="n">user_service</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
+        <span class="n">page</span><span class="p">,</span>
+        <span class="n">per_page</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span>
+
+        <span class="s2">"pagination"</span><span class="p">:</span> <span class="p">{</span>
+
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+
+            <span class="s2">"per_page"</span><span class="p">:</span> <span class="n">per_page</span><span class="p">,</span>
+
+            <span class="s2">"total"</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+
+            <span class="s2">"total_pages"</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<p>Response:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"pagination"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"per_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total_pages"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="searching_1">Searching</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/search"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"q"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_service</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"query"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+
+        <span class="s2">"results"</span><span class="p">:</span> <span class="n">results</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="filtering_1">Filtering</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">product_service</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">category</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="sorting_1">Sorting</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">sort</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"sort"</span><span class="p">,</span>
+        <span class="s2">"created_at"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">post_service</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+        <span class="n">sort</span><span class="o">=</span><span class="n">sort</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="single-file-upload_1">Single File Upload</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.files</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileUpload</span>
+
+<span class="n">upload</span> <span class="o">=</span> <span class="n">FileUpload</span><span class="p">(</span>
+    <span class="n">max_size</span><span class="o">=</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/upload"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_file</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">uploaded</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+
+        <span class="n">uploaded</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+
+            <span class="s2">"filename"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+
+            <span class="s2">"size"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">size</span>
+
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"files"</span><span class="p">:</span> <span class="n">uploaded</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="multiple-uploads_1">Multiple Uploads</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/uploads"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+
+            <span class="s2">"url"</span><span class="p">:</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"files"</span><span class="p">:</span> <span class="n">results</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="chunked-uploads_1">Chunked Uploads</h2>
+<p>Useful for videos and large files.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/upload/chunk"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_chunk</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">chunk</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+
+    <span class="k">await</span> <span class="n">chunk_storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"upload_id"</span><span class="p">],</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"index"</span><span class="p">],</span>
+
+        <span class="n">chunk</span><span class="p">,</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"received"</span><span class="p">:</span> <span class="kc">True</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="downloading-files_1">Downloading Files</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/v1/files/&lt;filename&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"uploads/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="image-upload-example_1">Image Upload Example</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/profile/photo"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_avatar</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">avatar</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">avatar</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"avatar"</span><span class="p">:</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mobile-api-best-practices_1">Mobile API Best Practices</h2>
+<ul>
+<li>Always return JSON.</li>
+<li>Use pagination.</li>
+<li>Validate every request.</li>
+<li>Compress responses.</li>
+<li>Version your APIs.</li>
+<li>Return meaningful HTTP status codes.</li>
+<li>Keep payloads small.</li>
+<li>Support offline synchronization.</li>
+<li>Use HTTPS in production.</li>
+<li>Prefer JWT authentication.</li>
+</ul>
+<h2 id="websockets">WebSockets</h2>
+<p>Flaxon includes first-class WebSocket support for real-time mobile applications such as chat, notifications, multiplayer games, live dashboards, and collaborative features.</p>
+<h2 id="basic-websocket">Basic WebSocket</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.websocket</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocket</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/mobile"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">mobile_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+                <span class="s2">"echo"</span><span class="p">:</span> <span class="n">message</span>
+            <span class="p">})</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="authenticated-websocket">Authenticated WebSocket</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span>
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span><span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret"</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/mobile"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">websocket</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">):</span>
+
+    <span class="n">token</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"token"</span><span class="p">)</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">validate_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">4001</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+            <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="s2">"message"</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+        <span class="p">})</span>
+</code></pre></div>
+<hr/>
+<h2 id="chat-rooms">Chat Rooms</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">):</span>
+
+    <span class="n">room</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"room"</span><span class="p">)</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">room</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                <span class="n">room</span><span class="p">,</span>
+                <span class="n">message</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">leave</span><span class="p">(</span><span class="n">room</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="push-notifications">Push Notifications</h2>
+<p>Flaxon integrates with Firebase Cloud Messaging (FCM), Apple Push Notification Service (APNs), or custom notification providers.</p>
+<h2 id="firebase-cloud-messaging">Firebase Cloud Messaging</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">firebase_admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firebase_admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">messaging</span>
+
+<span class="n">firebase_admin</span><span class="o">.</span><span class="n">initialize_app</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">NotificationService</span><span class="p">:</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">token</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="n">messaging</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span>
+
+            <span class="n">notification</span><span class="o">=</span><span class="n">messaging</span><span class="o">.</span><span class="n">Notification</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+            <span class="p">),</span>
+
+            <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
+
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="n">messaging</span><span class="o">.</span><span class="n">send_async</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="sending-notifications">Sending Notifications</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/notifications"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_notification</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">tokens</span> <span class="o">=</span> <span class="k">await</span> <span class="n">device_service</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"user_id"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">notification_service</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+            <span class="n">token</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"body"</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"sent"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="offline-synchronization">Offline Synchronization</h2>
+<p>Many mobile applications continue working without an internet connection.</p>
+<p>Flaxon supports synchronization endpoints for offline-first applications.</p>
+<h2 id="sync-endpoint">Sync Endpoint</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/sync"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sync</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">last_sync</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"last_sync"</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"server_time"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+
+        <span class="s2">"changes"</span><span class="p">:</span> <span class="p">{</span>
+
+            <span class="s2">"users"</span><span class="p">:</span> <span class="k">await</span> <span class="n">user_service</span><span class="o">.</span><span class="n">changed_since</span><span class="p">(</span><span class="n">last_sync</span><span class="p">),</span>
+
+            <span class="s2">"posts"</span><span class="p">:</span> <span class="k">await</span> <span class="n">post_service</span><span class="o">.</span><span class="n">changed_since</span><span class="p">(</span><span class="n">last_sync</span><span class="p">),</span>
+
+            <span class="s2">"messages"</span><span class="p">:</span> <span class="k">await</span> <span class="n">message_service</span><span class="o">.</span><span class="n">changed_since</span><span class="p">(</span><span class="n">last_sync</span><span class="p">),</span>
+
+        <span class="p">},</span>
+
+        <span class="s2">"has_more"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="conflict-resolution">Conflict Resolution</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/sync/conflict"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">conflict</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"strategy"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">"server"</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">sync_service</span><span class="o">.</span><span class="n">server_wins</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">"client"</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">sync_service</span><span class="o">.</span><span class="n">client_wins</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">"merge"</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">sync_service</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"resolved"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="background-tasks">Background Tasks</h2>
+<p>Long-running operations should not block API requests.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/v1/email"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_email</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+
+        <span class="n">email_service</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">"email"</span><span class="p">],</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">"subject"</span><span class="p">],</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">"body"</span><span class="p">],</span>
+
+        <span class="p">)</span>
+
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"queued"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mobile-middleware">Mobile Middleware</h2>
+<p>Middleware can customize behavior for mobile clients.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MobileMiddleware</span><span class="p">(</span><span class="n">Middleware</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">):</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">,</span> <span class="p">[]))</span>
+
+        <span class="n">agent</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="sa">b</span><span class="s2">"user-agent"</span><span class="p">,</span>
+            <span class="sa">b</span><span class="s2">""</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+        <span class="n">scope</span><span class="p">[</span><span class="s2">"mobile"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+
+            <span class="n">value</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span>
+
+                <span class="s2">"android"</span><span class="p">,</span>
+
+                <span class="s2">"iphone"</span><span class="p">,</span>
+
+                <span class="s2">"ipad"</span><span class="p">,</span>
+
+            <span class="p">)</span>
+
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span>
+            <span class="n">scope</span><span class="p">,</span>
+            <span class="n">receive</span><span class="p">,</span>
+            <span class="n">send</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">MobileMiddleware</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="performance-tips">Performance Tips</h2>
+<p>For the best mobile experience:</p>
+<ul>
+<li>Enable response compression.</li>
+<li>Cache frequently requested data.</li>
+<li>Keep JSON payloads small.</li>
+<li>Use pagination.</li>
+<li>Prefer async database drivers.</li>
+<li>Avoid unnecessary queries.</li>
+<li>Use connection pooling.</li>
+<li>Use Redis for caching and sessions.</li>
+<li>Batch requests when possible.</li>
+<li>Use WebSockets instead of polling.</li>
+</ul>
+<hr/>
+<h2 id="security">Security</h2>
+<p>Recommended production settings:</p>
+<ul>
+<li>HTTPS only</li>
+<li>JWT authentication</li>
+<li>Refresh tokens</li>
+<li>Secure password hashing</li>
+<li>Request validation</li>
+<li>CORS configuration</li>
+<li>Rate limiting</li>
+<li>CSRF protection (where applicable)</li>
+<li>Secure file uploads</li>
+<li>Audit logging</li>
+</ul>
+<hr/>
+<h2 id="complete-mobile-backend">Complete Mobile Backend</h2>
+<p>A production-ready mobile backend typically includes:</p>
+<ul>
+<li>JWT authentication</li>
+<li>User registration</li>
+<li>Password reset</li>
+<li>Device registration</li>
+<li>Push notifications</li>
+<li>REST API</li>
+<li>GraphQL (optional)</li>
+<li>WebSockets</li>
+<li>File uploads</li>
+<li>Offline synchronization</li>
+<li>Background jobs</li>
+<li>Health checks</li>
+<li>Metrics</li>
+<li>Logging</li>
+<li>Rate limiting</li>
+<li>API versioning</li>
+</ul>
+<hr/>
+<h2 id="project-structure_1">Project Structure</h2>
+<div class="highlight"><pre><span></span><code>mobile_backend/
+│
+├── app.py
+├── routes/
+│   ├── auth.py
+│   ├── users.py
+│   ├── posts.py
+│   ├── uploads.py
+│   ├── notifications.py
+│   └── websocket.py
+│
+├── middleware/
+├── services/
+├── models/
+├── schemas/
+├── storage/
+├── templates/
+├── static/
+└── tests/
+</code></pre></div>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with these guides:</p>
+<ul>
+<li>Authentication</li>
+<li>Databases</li>
+<li>Middleware</li>
+<li>GraphQL</li>
+<li>WebSockets</li>
+<li>Security</li>
+<li>Performance</li>
+<li>Deployment</li>
+<li>Admin Dashboard</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

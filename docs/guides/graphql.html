@@ -1,266 +1,288 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>GraphQL | Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script>
-    <style>
-        .graphql-tabs { display:flex; flex-wrap:wrap; gap:.5rem; margin:1.5rem 0 2rem; padding:.5rem; border:1px solid #e2e8f0; border-radius:.75rem; background:#fff; }
-        .dark .graphql-tabs { border-color:#334155; background:#0f172a; }
-        .graphql-tab { border:0; border-radius:.5rem; padding:.65rem .9rem; background:transparent; color:#64748b; font-weight:700; cursor:pointer; }
-        .graphql-tab:hover, .graphql-tab.active { background:#e0f2fe; color:#0369a1; }
-        .dark .graphql-tab:hover, .dark .graphql-tab.active { background:#164e63; color:#bae6fd; }
-        .graphql-panel { display:none; } .graphql-panel.active { display:block; }
-        .graphql-callout { border-left:4px solid #0ea5e9; background:#f0f9ff; padding:1rem 1.25rem; margin:1.25rem 0; }
-        .dark .graphql-callout { background:#082f49; }
-        .ide-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        .ide-grid textarea, .ide-grid input { width:100%; border:1px solid #cbd5e1; border-radius:.5rem; padding:.75rem; font-family:ui-monospace,SFMono-Regular,monospace; background:#0f172a; color:#e2e8f0; }
-        .ide-grid textarea { min-height:260px; resize:vertical; }
-        .ide-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin:1rem 0; }
-        .ide-actions button { border:0; border-radius:.5rem; padding:.65rem 1rem; background:#0284c7; color:white; font-weight:700; cursor:pointer; }
-        #graphql-ide-output { min-height:180px; white-space:pre-wrap; overflow:auto; border-radius:.5rem; padding:1rem; background:#020617; color:#cbd5e1; }
-        @media (max-width:760px) { .ide-grid { grid-template-columns:1fr; } .graphql-tabs { overflow-x:auto; flex-wrap:nowrap; } .graphql-tab { white-space:nowrap; } }
-    </style>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8">
-            <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(function (r) { return r.text(); }).then(function (h) { document.getElementById('docs-sidebar').innerHTML = h; });</script></aside>
-            <main class="lg:col-span-3"><article class="doc-content">
-                <p class="text-sm font-semibold text-sky-600 dark:text-sky-300">API guide</p>
-                <h1>GraphQL in Flaxon</h1>
-                <p class="lead">Design, expose, test, secure, and operate a production GraphQL API with Flaxon. This guide covers the native schema engine, HTTP endpoint, GraphiQL, Altair, client integration, and production boundaries.</p>
-                <div class="graphql-callout"><strong>Flaxon provides:</strong> schema types, fields, nested resolvers, queries, mutations, variables, JSON responses, GraphiQL, and Altair playgrounds. Authentication, authorization, persistence, rate limits, and observability remain application responsibilities.</div>
-                <div class="graphql-tabs" role="tablist" aria-label="GraphQL guide sections">
-                    <button class="graphql-tab active" data-tab="overview" role="tab">Overview</button>
-                    <button class="graphql-tab" data-tab="build" role="tab">Build an API</button>
-                    <button class="graphql-tab" data-tab="production" role="tab">Production</button>
-                    <button class="graphql-tab" data-tab="clients" role="tab">Clients</button>
-                    <button class="graphql-tab" data-tab="testing" role="tab">Testing</button>
-                    <button class="graphql-tab" data-tab="ide" role="tab">GraphQL IDE</button>
-                </div>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GraphQL API Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>GraphQL API Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>GraphQL API Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/graphql.md">Framework source</a> · <a href="../../content/framework/docs/guides/graphql.md" download>Markdown</a></p><h1 id="graphql-api-example">GraphQL API Example</h1>
+<p>This example demonstrates a complete Flaxon GraphQL API with:</p>
+<ul>
+<li>Queries</li>
+<li>Mutations</li>
+<li>GraphQL types with resolvers</li>
+<li>GraphiQL playground</li>
+</ul>
+<h2 id="running-the-example">Running the Example</h2>
+<p>Create a new Flaxon project:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>graphql-example
 
-                <section id="tab-overview" class="graphql-panel active" role="tabpanel">
-                    <h2>When to use GraphQL</h2>
-                    <p>GraphQL is useful when clients need different projections of related data, mobile clients need fewer round trips, or a stable schema contract is more valuable than many resource-specific URLs. Use REST when cacheability, simple public resources, or file delivery is the primary concern. Flaxon supports both styles in one application.</p>
-                    <h2>Install and enable</h2>
-                    <pre><code class="language-bash">python -m pip install -e .
-flaxon run app:app --reload</code></pre>
-                    <pre><code class="language-python">from flaxon import Flaxon
-from flaxon.graphql import GraphQLSchema
+<span class="nb">cd</span><span class="w"> </span>graphql-example
+</code></pre></div>
+<p>Install dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<p>Create <code>app.py</code> with the code below.</p>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>The CLI handles host/port automatically (defaults to <code>127.0.0.1:8000</code>) —
+<code>app.py</code> just needs to define <code>app</code> at module level. No <code>app.run(...)</code> call
+or <code>if __name__ == "__main__"</code> block is needed (there is no <code>app.run()</code>
+method on the Flaxon app object).</p>
+<hr/>
+<h2 id="application-code">Application Code</h2>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLSchema</span><span class="p">,</span> <span class="n">ObjectType</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql.scalars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ID</span>
 
-app = Flaxon("my-api", debug=False)
-schema = GraphQLSchema(query=Query, mutation=Mutation)
-app.enable_graphql(schema, url="/graphql", enable_playground=True)</code></pre>
-                    <p>The default API endpoint is <code>/graphql</code>. When playgrounds are enabled, GraphiQL is at <code>/graphql/graphiql</code> and Altair is at <code>/graphql/altair</code>.</p>
-                    <h2>Request and response shape</h2>
-                    <pre><code class="language-json">{
-  "query": "{ viewer { id login } }",
-  "variables": {},
-  "operationName": null
-}</code></pre>
-                    <pre><code class="language-json">{
-  "data": { "viewer": { "id": 1, "login": "ada" } }
-}</code></pre>
-                    <p>Execution errors are returned in an <code>errors</code> array. A valid GraphQL request normally uses HTTP 200 even when execution has errors; reserve HTTP status codes for transport and infrastructure failures.</p>
-                </section>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"graphql-example"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                <section id="tab-build" class="graphql-panel" role="tabpanel">
-                    <h2>Types, fields, and nested resolvers</h2>
-                    <p>Flaxon uses <code>ObjectType</code> with a field dictionary. Python types provide basic scalar declarations. Use <code>List(Type)</code> for collections and a resolver when a field needs arguments, joins, authorization, or asynchronous work.</p>
-                    <pre><code class="language-python">from flaxon.graphql import Field, List, ObjectType
 
-Post = ObjectType("Post", {
-    "id": Field(int),
-    "title": Field(str),
-})
+<span class="c1"># --------------------</span>
+<span class="c1"># Data Storage</span>
+<span class="c1"># --------------------</span>
 
-User = ObjectType("User", {
-    "id": Field(int),
-    "login": Field(str),
-    "posts": Field(List(Post), resolver=resolve_user_posts),
-})
+<span class="n">users</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"alice@example.com"</span><span class="p">}]</span>
+<span class="n">posts</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"First Post"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Hello GraphQL"</span><span class="p">,</span> <span class="s2">"author_id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
 
-def resolve_user_posts(parent, args, context, info):
-    return repository.posts_for_user(parent["id"])</code></pre>
-                    <h2>Queries and mutations</h2>
-                    <pre><code class="language-python">def resolve_repository(parent, args, context, info):
-    return repository.get(args["id"])
+<span class="n">user_id_counter</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">post_id_counter</span> <span class="o">=</span> <span class="mi">2</span>
 
-Query = ObjectType("Query", {
-    "repository": Field(Repository, args={"id": int}, resolver=resolve_repository),
-    "repositories": Field(List(Repository), resolver=resolve_repositories),
-})
 
-def resolve_create_repository(parent, args, context, info):
-    return repository.create(
-        name=args["name"],
-        description=args.get("description", ""),
-        actor=context["request"].state.user,
-    )
+<span class="c1"># --------------------</span>
+<span class="c1"># GraphQL Types</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># ObjectType(name, fields_dict) is a plain instance built from a dict of</span>
+<span class="c1"># Field(...) objects — it is NOT meant to be subclassed. There is no</span>
+<span class="c1"># built-in String/Int scalar; use plain Python types (str, int, float) as</span>
+<span class="c1"># field types, or the real scalars (ID, DateTime, Decimal, JSON, UUID,</span>
+<span class="c1"># URL, Email) from flaxon.graphql.scalars.</span>
+<span class="c1">#</span>
+<span class="c1"># fields dicts are mutable after construction, which lets us resolve the</span>
+<span class="c1"># User &lt;-&gt; Post forward reference below.</span>
 
-Mutation = ObjectType("Mutation", {
-    "createRepository": Field(
-        Repository,
-        args={"name": str, "description": str},
-        resolver=resolve_create_repository,
-    ),
-})</code></pre>
-                    <h2>Variables and aliases</h2>
-                    <pre><code class="language-graphql">query RepositoryPage($id: Int, $term: String) {
-  selected: repository(id: $id) { name owner { login } }
-  repositories(search: $term) { name stars }
-}</code></pre>
-                    <pre><code class="language-json">{"id": 1, "term": "flaxon"}</code></pre>
-                    <p>Declare argument types on every field. Flaxon coerces declared scalar arguments before calling resolvers. Keep resolver output shaped like the declared type and return <code>None</code> for missing optional records.</p>
-                    <h2>Custom scalars</h2>
-                    <pre><code class="language-python">from flaxon.graphql import DateTime, ID, JSON
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_user_posts</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span>
 
-Audit = ObjectType("Audit", {
-    "id": Field(ID),
-    "createdAt": Field(DateTime),
-    "metadata": Field(JSON),
-})</code></pre>
-                </section>
 
-                <section id="tab-production" class="graphql-panel" role="tabpanel">
-                    <h2>Authentication and authorization</h2>
-                    <p>GraphQL does not replace identity or permission checks. Attach the authenticated request to context through normal Flaxon middleware and enforce authorization inside every resolver that reads or changes protected data.</p>
-                    <pre><code class="language-python">def resolve_private_repository(parent, args, context, info):
-    request = context["request"]
-    user = getattr(request, "user", None)
-    if user is None:
-        raise GraphQLError("Authentication required")
-    repo = repository.get(args["id"])
-    if not permissions.can_view(user, repo):
-        raise GraphQLError("Not authorized")
-    return repo</code></pre>
-                    <p>Check ownership and action permissions at the resolver boundary. Do not rely on hiding fields in the UI. Apply CSRF protection when browser cookies authenticate mutations, use HTTPS, and configure an explicit origin policy.</p>
-                    <h2>Persistence, transactions, and N+1 queries</h2>
-                    <p>Resolvers should call a repository or service layer, not mutate process-global lists in production. Use the configured database adapter, transactions around mutations, indexes for lookup fields, and pagination for collections. Add request-scoped batching or a data-loader pattern where nested fields would otherwise create N+1 queries.</p>
-                    <h2>Limits and abuse controls</h2>
-                    <ul><li>Limit query depth, aliases, field count, and estimated complexity.</li><li>Cap collection page sizes and use cursors for large datasets.</li><li>Rate-limit by authenticated user and client address.</li><li>Disable public introspection and playgrounds unless intentionally exposed.</li><li>Set body-size, resolver, and total request timeouts.</li></ul>
-                    <h2>Errors and observability</h2>
-                    <p>Return stable messages without secrets or SQL details. Log a request ID, operation name, actor, resolver timing, database timing, and error classification. Redact variables containing tokens or passwords. Measure request count, latency, errors, depth, complexity, and cache hits.</p>
-                    <h2>Deployment checklist</h2>
-                    <pre><code class="language-bash">flaxon run app:app --host 0.0.0.0 --port 8000
-curl -fsS https://api.example.com/health
-curl -fsS https://api.example.com/graphql \
-  -H "content-type: application/json" \
-  --data '{"query":"{ __typename }"}'</code></pre>
-                    <p>Put TLS termination, compression, request limits, and access logs at the edge. Use shared sessions, database access, caches, task state, subscriptions, and rate limits before running multiple workers.</p>
-                </section>
+<span class="c1"># Build Post first, without "author" (it depends on UserType, defined next).</span>
+<span class="n">PostType</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Post"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">),</span>
+    <span class="s2">"title"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"content"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"authorId"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="k">lambda</span> <span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]),</span>
+<span class="p">})</span>
 
-                <section id="tab-clients" class="graphql-panel" role="tabpanel">
-                    <h2>Browser JavaScript</h2>
-                    <pre><code class="language-javascript">async function graphql(query, variables = {}) {
-  const response = await fetch("/graphql", {
-    method: "POST",
-    headers: {"content-type": "application/json"},
-    credentials: "include",
-    body: JSON.stringify({query, variables}),
-  });
-  const payload = await response.json();
-  if (payload.errors) throw new Error(payload.errors[0].message);
-  return payload.data;
-}</code></pre>
-                    <h2>Python client</h2>
-                    <pre><code class="language-python">import httpx
+<span class="n">UserType</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"User"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">),</span>
+    <span class="s2">"name"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"email"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"posts"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">PostType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_user_posts</span><span class="p">),</span>
+<span class="p">})</span>
 
-query = "query($id: Int) { repository(id: $id) { name stars } }"
-response = httpx.post(
-    "https://api.example.com/graphql",
-    json={"query": query, "variables": {"id": 1}},
-    headers={"authorization": "Bearer TOKEN"},
-    timeout=10,
-)
-response.raise_for_status()
-payload = response.json()
-if payload.get("errors"):
-    raise RuntimeError(payload["errors"])
-print(payload["data"])</code></pre>
-                    <h2>Mobile and PWA clients</h2>
-                    <p>Use the same HTTPS endpoint from Kotlin, Swift, Flutter, React Native, or a Teloce-Py PWA. Store tokens in platform credential storage, use persisted operations in production, handle offline and partial-data states, and never ship database credentials in a client.</p>
-                    <h2>Caching and persisted operations</h2>
-                    <p>Cache public immutable queries at the edge where safe. For private data, key caches by user and authorization scope. Persist approved query documents by hash and reject arbitrary production queries when an allowlist is required.</p>
-                </section>
 
-                <section id="tab-testing" class="graphql-panel" role="tabpanel">
-                    <h2>Endpoint and failure-path tests</h2>
-                    <pre><code class="language-python">from flaxon.testing import TestClient
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_post_author</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">users</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]),</span> <span class="kc">None</span><span class="p">)</span>
 
-def test_repository_query(app):
-    client = TestClient(app)
-    response = client.post(
-        "/graphql",
-        json_data={"query": "{ repository(id: 1) { id name owner { login } } }"},
-    )
-    assert response.status_code == 200
-    assert response.json()["data"]["repository"]["name"] == "flaxon"
 
-def test_graphql_errors_are_structured(app):
-    response = TestClient(app).post(
-        "/graphql", json_data={"query": "{ unknownField }"}
-    )
-    assert response.status_code == 200
-    assert response.json().get("errors")</code></pre>
-                    <h2>Release coverage</h2>
-                    <ul><li>Authorized, unauthorized, missing, and invalid records for every operation.</li><li>Variables, defaults, aliases, nested lists, null values, and scalar coercion.</li><li>Transaction rollback and concurrent mutation behavior.</li><li>Depth, complexity, body size, timeout, and rate-limit boundaries.</li><li>Schema snapshots and client compatibility for breaking changes.</li><li>Browser CORS, cookies, CSRF, and mobile token refresh workflows.</li></ul>
-                    <h2>Run the official example</h2>
-                    <pre><code class="language-bash">python -m pip install -e .
-flaxon run examples.graphql_github_clone.app:app --reload
-python -m pytest -o addopts="" tests/integration/test_graphql_extreme.py \
-  tests/integration/test_graphql_github_clone_example.py -q</code></pre>
-                </section>
+<span class="c1"># Patch the forward reference in now that UserType exists.</span>
+<span class="n">PostType</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">"author"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">UserType</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_post_author</span><span class="p">)</span>
+<span class="n">PostType</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">"author"</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"author"</span>
 
-                <section id="tab-ide" class="graphql-panel" role="tabpanel">
-                    <h2>GraphQL IDE</h2>
-                    <p>Run a query against a local or deployed Flaxon endpoint. The browser must be allowed to reach the endpoint through same-origin routing or configured CORS.</p>
-                    <div class="ide-actions"><label class="sr-only" for="graphql-ide-endpoint">GraphQL endpoint</label><input id="graphql-ide-endpoint" value="/graphql" aria-label="GraphQL endpoint"><button id="graphql-ide-run" type="button">Run query</button><a class="button" href="/graphql/graphiql">Open GraphiQL</a><a class="button" href="/graphql/altair">Open Altair</a></div>
-                    <div class="ide-grid"><label>Query<textarea id="graphql-ide-query" spellcheck="false">query {
-  viewer { login name }
-}</textarea></label><label>Variables<textarea id="graphql-ide-variables" spellcheck="false">{}</textarea></label></div>
-                    <h3>Response</h3><pre id="graphql-ide-output" aria-live="polite">Run a query to see the response.</pre>
-                    <p>For the included GitHub clone demo, set the endpoint to the demo server URL or open its own GraphiQL page at <code>/graphql/graphiql</code>.</p>
-                </section>
-            </article></main>
-        </div></div>
-    </section>
-    <div id="footer"></div>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (window.hljs) window.hljs.highlightAll();
-        var tabs = Array.from(document.querySelectorAll(".graphql-tab"));
-        function activate(name, updateHash) {
-            var target = document.getElementById("tab-" + name) ? name : "overview";
-            tabs.forEach(function (tab) { var active = tab.dataset.tab === target; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", active); });
-            document.querySelectorAll(".graphql-panel").forEach(function (panel) { panel.classList.toggle("active", panel.id === "tab-" + target); });
-            if (updateHash) history.replaceState(null, "", "#" + target);
-            if (window.hljs) window.hljs.highlightAll();
-        }
-        tabs.forEach(function (tab) { tab.addEventListener("click", function () { activate(tab.dataset.tab, true); }); });
-        activate(location.hash.slice(1) || "overview", false);
-        window.addEventListener("hashchange", function () { activate(location.hash.slice(1), false); });
-        var output = document.getElementById("graphql-ide-output");
-        document.getElementById("graphql-ide-run").addEventListener("click", async function () {
-            output.textContent = "Running...";
-            try {
-                var variables = JSON.parse(document.getElementById("graphql-ide-variables").value || "{}");
-                var response = await fetch(document.getElementById("graphql-ide-endpoint").value || "/graphql", { method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({query: document.getElementById("graphql-ide-query").value, variables: variables}) });
-                output.textContent = JSON.stringify(await response.json(), null, 2);
-            } catch (error) { output.textContent = String(error); }
-        });
-    });
-    </script>
-</body>
-</html>
+
+<span class="c1"># --------------------</span>
+<span class="c1"># Queries</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># Root-level fields (on Query/Mutation) MUST declare a resolver — there is</span>
+<span class="c1"># no parent object to fall back to at the root, unlike nested fields on a</span>
+<span class="c1"># dict (e.g. "id"/"name" above resolve automatically from the dict keys).</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_hello</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Hello </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'World'</span><span class="p">)</span><span class="si">}</span><span class="s2">!"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_users</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">users</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_posts</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posts</span>
+
+
+<span class="n">Query</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Query"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"hello"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_hello</span><span class="p">),</span>
+    <span class="s2">"users"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">UserType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_users</span><span class="p">),</span>
+    <span class="s2">"posts"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">PostType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_posts</span><span class="p">),</span>
+<span class="p">})</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># Mutations</span>
+<span class="c1"># --------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_create_user</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">user_id_counter</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id_counter</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="s2">"email"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"email"</span><span class="p">]}</span>
+    <span class="n">user_id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_create_post</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">post_id_counter</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">post_id_counter</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+        <span class="s2">"content"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"content"</span><span class="p">],</span>
+        <span class="c1"># GraphQL int literals arrive as strings in resolvers — cast explicitly.</span>
+        <span class="s2">"author_id"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">"authorId"</span><span class="p">]),</span>
+    <span class="p">}</span>
+    <span class="n">post_id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">posts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">post</span>
+
+
+<span class="n">Mutation</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Mutation"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"createUser"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">UserType</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+        <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_create_user</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">"createPost"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">PostType</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"authorId"</span><span class="p">:</span> <span class="nb">int</span><span class="p">},</span>
+        <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_create_post</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">})</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># GraphQL Setup</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># enable_graphql(schema, url, enable_playground) wires up POST /graphql</span>
+<span class="c1"># plus a GraphiQL playground at /graphql/graphiql. It does not take a</span>
+<span class="c1"># subscription_backend argument — subscriptions aren't wired up this way</span>
+<span class="c1"># in this framework and need manual integration with SubscriptionManager</span>
+<span class="c1"># and websockets (out of scope for this example).</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">GraphQLSchema</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">,</span> <span class="n">mutation</span><span class="o">=</span><span class="n">Mutation</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">enable_graphql</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">"/graphql"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome to Flaxon GraphQL"</span><span class="p">,</span>
+        <span class="s2">"endpoint"</span><span class="p">:</span> <span class="s2">"/graphql"</span><span class="p">,</span>
+        <span class="s2">"playground"</span><span class="p">:</span> <span class="s2">"/graphql/graphiql"</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Run the example with <code>flaxon run app:app --reload</code>.</p>
+<hr/>
+<h2 id="testing-the-api">Testing the API</h2>
+<h2 id="graphiql-playground">GraphiQL Playground</h2>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/graphql/graphiql
+</code></pre></div>
+<hr/>
+<h2 id="queries">Queries</h2>
+<h2 id="hello">Hello</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Flaxon"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="get-users">Get Users</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">users</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">email</span>
+<span class="w">    </span><span class="n">posts</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">id</span>
+<span class="w">      </span><span class="n">title</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="get-posts">Get Posts</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">posts</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">title</span>
+<span class="w">    </span><span class="n">content</span>
+<span class="w">    </span><span class="n">author</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">name</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mutations">Mutations</h2>
+<blockquote>
+<p><strong>Important:</strong> this parser does <strong>not</strong> treat commas between arguments
+as insignificant whitespace the way standard GraphQL does. Separate
+arguments with spaces or newlines only — a comma causes a parse error
+(<code>Unexpected character: ,</code>).</p>
+</blockquote>
+<h2 id="create-user">Create User</h2>
+<div class="highlight"><pre><span></span><code><span class="k">mutation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">createUser</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Bob"</span><span class="w"> </span><span class="n">email</span><span class="p">:</span><span class="w"> </span><span class="s">"bob@example.com"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">email</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="create-post">Create Post</h2>
+<div class="highlight"><pre><span></span><code><span class="k">mutation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">createPost</span><span class="p">(</span><span class="n">title</span><span class="p">:</span><span class="w"> </span><span class="s">"New Post"</span><span class="w"> </span><span class="n">content</span><span class="p">:</span><span class="w"> </span><span class="s">"GraphQL Example"</span><span class="w"> </span><span class="n">authorId</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">title</span>
+<span class="w">    </span><span class="n">author</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">name</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-curl">Using curl</h2>
+<h2 id="query">Query</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/graphql<span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span><span class="s1">'{"query":"{ hello(name: \"Flaxon\") }"}'</span>
+</code></pre></div>
+<hr/>
+<h2 id="mutation">Mutation</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/graphql<span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span><span class="s1">'{"query":"mutation { createUser(name: \"Bob\" email: \"bob@example.com\") { id name } }"}'</span>
+</code></pre></div>
+<hr/>
+<h2 id="production-improvements">Production Improvements</h2>
+<p>Recommended next steps:</p>
+<ul>
+<li>Add GraphQL authentication (see <code>flaxon.security.login_required</code>)</li>
+<li>Add database integration</li>
+<li>Add custom scalar types beyond the built-ins (<code>ID</code>, <code>DateTime</code>, <code>Decimal</code>, <code>JSON</code>, <code>UUID</code>, <code>URL</code>, <code>Email</code>)</li>
+<li>Wire up subscriptions manually via <code>flaxon.graphql.subscriptions.SubscriptionManager</code></li>
+<li>Deploy with a production ASGI server</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

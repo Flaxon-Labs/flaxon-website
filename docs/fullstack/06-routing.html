@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 6: Add pages and direct-link navigation — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 6: Add pages and direct-link navigation — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 6: Add pages and direct-link navigation</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/06-routing.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/06-routing.md" download>Markdown</a></p><h1 id="lesson-6-add-pages-and-direct-link-navigation">Lesson 6: Add pages and direct-link navigation</h1>
+<p>Create <code>ui/pages/Tasks.html</code> and <code>ui/pages/tasks/[id].html</code>. The integration
+builds a shared browser router; dynamic parameters become page props. Use a
+root shell with marked links and an outlet:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/tasks"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Tasks<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">main</span> <span class="na">data-teloce-router-view</span><span class="p">&gt;&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>The root shell mounts the router; a detail page fetches its data by the <code>id</code>
+prop. Register a server fallback after API routes:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;path:spa_path&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">page</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">spa_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">)</span>
+</code></pre></div>
+<p>Use an explicit API not-found response for unknown API paths so a catch-all
+does not turn an API typo into a successful HTML response. External links,
+downloads and modified clicks should retain normal browser behavior. Browser
+navigation guards improve flow but cannot enforce server authorization.</p>
+<p><strong>Checkpoint:</strong> navigate to a detail page, refresh it, paste its address into a
+new tab, and use Back/Forward. A route that only works after clicking inside the
+app is missing server fallback behavior. Test unknown API and client paths too.</p>
+<h2 id="alternative-server-html-with-jinax">Alternative: server HTML with Jinax</h2>
+<p>Not every page needs a client-rendered component. A public report or printable
+invoice can use Jinax while the dashboard uses Teloce in the same app.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span><span class="n">Jinax</span><span class="p">(</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">"templates"</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/report"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">"report.html"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Task report"</span><span class="p">})</span>
+</code></pre></div>
+<p>Create <code>templates/report.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"en"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Register this server route before a broad SPA fallback. Jinax's Jinja2 environment
+provides inheritance, includes, macros, filters and escaping; it does not compile
+a Teloce SFC just because a template has an <code>.html</code> extension.</p>
+<p>For a small reactive enhancement in a server-rendered page, use Teloce's
+<a href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/standalone-runtime.md">standalone runtime</a>.
+Serve its packaged browser modules through your static mount. Use one intended
+runtime path rather than accidentally loading both standalone and compiled app
+runtimes for the same DOM tree. SSR output, compiled browser components and
+standalone enhancement are separate patterns.</p>
+<p><a href="index.html">Course contents</a> · <a href="05-head-and-cdn.html">Previous lesson</a> · <a href="07-modules.html">Next lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>

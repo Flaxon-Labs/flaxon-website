@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GraphQL API Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>GraphQL API Example — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>GraphQL API Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/graphql.md">Framework source</a> · <a href="../content/framework/docs/graphql.md" download>Markdown</a></p><h1 id="graphql-api-example">GraphQL API Example</h1>
+<p>This example demonstrates a complete Flaxon GraphQL API with:</p>
+<ul>
+<li>Queries</li>
+<li>Mutations</li>
+<li>GraphQL types with resolvers</li>
+<li>GraphiQL playground</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> this replaces the previous version of this doc, which imported
+<code>String</code>/<code>Int</code> from <code>flaxon.graphql</code> (they don't exist there — this was
+the cause of an <code>ImportError</code> when following the old example) and used a
+Graphene-style declarative class syntax that doesn't match how this
+framework's <code>ObjectType</code>/<code>Field</code> actually work. Everything below has been
+run against the real <code>flaxon.graphql</code> engine.</p>
+</blockquote>
+<h2 id="running-the-example">Running the Example</h2>
+<p>Create a new Flaxon project:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>graphql-example
+
+<span class="nb">cd</span><span class="w"> </span>graphql-example
+</code></pre></div>
+<p>Install dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<p>Create <code>app.py</code> with the code below.</p>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>The CLI handles host/port automatically (defaults to <code>127.0.0.1:8000</code>) —
+<code>app.py</code> just needs to define <code>app</code> at module level. No <code>app.run(...)</code> call
+or <code>if __name__ == "__main__"</code> block is needed (there is no <code>app.run()</code>
+method on the Flaxon app object).</p>
+<hr/>
+<h2 id="application-code">Application Code</h2>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLSchema</span><span class="p">,</span> <span class="n">ObjectType</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.graphql.scalars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ID</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"graphql-example"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># Data Storage</span>
+<span class="c1"># --------------------</span>
+
+<span class="n">users</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"alice@example.com"</span><span class="p">}]</span>
+<span class="n">posts</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"First Post"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Hello GraphQL"</span><span class="p">,</span> <span class="s2">"author_id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
+
+<span class="n">user_id_counter</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">post_id_counter</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># GraphQL Types</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># ObjectType(name, fields_dict) is a plain instance built from a dict of</span>
+<span class="c1"># Field(...) objects — it is NOT meant to be subclassed. There is no</span>
+<span class="c1"># built-in String/Int scalar; use plain Python types (str, int, float) as</span>
+<span class="c1"># field types, or the real scalars (ID, DateTime, Decimal, JSON, UUID,</span>
+<span class="c1"># URL, Email) from flaxon.graphql.scalars.</span>
+<span class="c1">#</span>
+<span class="c1"># fields dicts are mutable after construction, which lets us resolve the</span>
+<span class="c1"># User &lt;-&gt; Post forward reference below.</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_user_posts</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span>
+
+
+<span class="c1"># Build Post first, without "author" (it depends on UserType, defined next).</span>
+<span class="n">PostType</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Post"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">),</span>
+    <span class="s2">"title"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"content"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"authorId"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="k">lambda</span> <span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]),</span>
+<span class="p">})</span>
+
+<span class="n">UserType</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"User"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">ID</span><span class="p">),</span>
+    <span class="s2">"name"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"email"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="s2">"posts"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">PostType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_user_posts</span><span class="p">),</span>
+<span class="p">})</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_post_author</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">users</span> <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">parent</span><span class="p">[</span><span class="s2">"author_id"</span><span class="p">]),</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="c1"># Patch the forward reference in now that UserType exists.</span>
+<span class="n">PostType</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">"author"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">UserType</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_post_author</span><span class="p">)</span>
+<span class="n">PostType</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">"author"</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"author"</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># Queries</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># Root-level fields (on Query/Mutation) MUST declare a resolver — there is</span>
+<span class="c1"># no parent object to fall back to at the root, unlike nested fields on a</span>
+<span class="c1"># dict (e.g. "id"/"name" above resolve automatically from the dict keys).</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_hello</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Hello </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'World'</span><span class="p">)</span><span class="si">}</span><span class="s2">!"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_users</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">users</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_posts</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posts</span>
+
+
+<span class="n">Query</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Query"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"hello"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_hello</span><span class="p">),</span>
+    <span class="s2">"users"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">UserType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_users</span><span class="p">),</span>
+    <span class="s2">"posts"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span><span class="n">List</span><span class="p">(</span><span class="n">PostType</span><span class="p">),</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_posts</span><span class="p">),</span>
+<span class="p">})</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># Mutations</span>
+<span class="c1"># --------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_create_user</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">user_id_counter</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id_counter</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="s2">"email"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"email"</span><span class="p">]}</span>
+    <span class="n">user_id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_create_post</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">post_id_counter</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">post_id_counter</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+        <span class="s2">"content"</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="s2">"content"</span><span class="p">],</span>
+        <span class="c1"># GraphQL int literals arrive as strings in resolvers — cast explicitly.</span>
+        <span class="s2">"author_id"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">"authorId"</span><span class="p">]),</span>
+    <span class="p">}</span>
+    <span class="n">post_id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">posts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">post</span>
+
+
+<span class="n">Mutation</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="s2">"Mutation"</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">"createUser"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">UserType</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+        <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_create_user</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">"createPost"</span><span class="p">:</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">PostType</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"authorId"</span><span class="p">:</span> <span class="nb">int</span><span class="p">},</span>
+        <span class="n">resolver</span><span class="o">=</span><span class="n">resolve_create_post</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">})</span>
+
+
+<span class="c1"># --------------------</span>
+<span class="c1"># GraphQL Setup</span>
+<span class="c1"># --------------------</span>
+<span class="c1"># enable_graphql(schema, url, enable_playground) wires up POST /graphql</span>
+<span class="c1"># plus a GraphiQL playground at /graphql/graphiql. It does not take a</span>
+<span class="c1"># subscription_backend argument — subscriptions aren't wired up this way</span>
+<span class="c1"># in this framework and need manual integration with SubscriptionManager</span>
+<span class="c1"># and websockets (out of scope for this example).</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">GraphQLSchema</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">,</span> <span class="n">mutation</span><span class="o">=</span><span class="n">Mutation</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">enable_graphql</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">"/graphql"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome to Flaxon GraphQL"</span><span class="p">,</span>
+        <span class="s2">"endpoint"</span><span class="p">:</span> <span class="s2">"/graphql"</span><span class="p">,</span>
+        <span class="s2">"playground"</span><span class="p">:</span> <span class="s2">"/graphql/graphiql"</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Run the example with <code>flaxon run app:app --reload</code>.</p>
+<hr/>
+<h2 id="testing-the-api">Testing the API</h2>
+<h2 id="graphiql-playground">GraphiQL Playground</h2>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/graphql/graphiql
+</code></pre></div>
+<hr/>
+<h2 id="queries">Queries</h2>
+<h2 id="hello">Hello</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Flaxon"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="get-users">Get Users</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">users</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">email</span>
+<span class="w">    </span><span class="n">posts</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">id</span>
+<span class="w">      </span><span class="n">title</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="get-posts">Get Posts</h2>
+<div class="highlight"><pre><span></span><code><span class="k">query</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">posts</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">title</span>
+<span class="w">    </span><span class="n">content</span>
+<span class="w">    </span><span class="n">author</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">name</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mutations">Mutations</h2>
+<blockquote>
+<p><strong>Important:</strong> this parser does <strong>not</strong> treat commas between arguments
+as insignificant whitespace the way standard GraphQL does. Separate
+arguments with spaces or newlines only — a comma causes a parse error
+(<code>Unexpected character: ,</code>).</p>
+</blockquote>
+<h2 id="create-user">Create User</h2>
+<div class="highlight"><pre><span></span><code><span class="k">mutation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">createUser</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Bob"</span><span class="w"> </span><span class="n">email</span><span class="p">:</span><span class="w"> </span><span class="s">"bob@example.com"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">email</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="create-post">Create Post</h2>
+<div class="highlight"><pre><span></span><code><span class="k">mutation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">createPost</span><span class="p">(</span><span class="n">title</span><span class="p">:</span><span class="w"> </span><span class="s">"New Post"</span><span class="w"> </span><span class="n">content</span><span class="p">:</span><span class="w"> </span><span class="s">"GraphQL Example"</span><span class="w"> </span><span class="n">authorId</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">title</span>
+<span class="w">    </span><span class="n">author</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">name</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-curl">Using curl</h2>
+<h2 id="query">Query</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/graphql<span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span><span class="s1">'{"query":"{ hello(name: \"Flaxon\") }"}'</span>
+</code></pre></div>
+<hr/>
+<h2 id="mutation">Mutation</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/graphql<span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span><span class="s1">'{"query":"mutation { createUser(name: \"Bob\" email: \"bob@example.com\") { id name } }"}'</span>
+</code></pre></div>
+<hr/>
+<h2 id="production-improvements">Production Improvements</h2>
+<p>Recommended next steps:</p>
+<ul>
+<li>Add GraphQL authentication (see <code>flaxon.security.login_required</code>)</li>
+<li>Add database integration</li>
+<li>Add custom scalar types beyond the built-ins (<code>ID</code>, <code>DateTime</code>, <code>Decimal</code>, <code>JSON</code>, <code>UUID</code>, <code>URL</code>, <code>Email</code>)</li>
+<li>Wire up subscriptions manually via <code>flaxon.graphql.subscriptions.SubscriptionManager</code></li>
+<li>Deploy with a production ASGI server</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

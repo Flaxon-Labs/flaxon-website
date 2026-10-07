@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Taskboard course example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Taskboard course example — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Taskboard course example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/teloce_taskboard/README.md">Framework source</a> · <a href="../../../content/framework/examples/teloce_taskboard/README.md" download>Markdown</a></p><h1 id="taskboard-course-example">Taskboard course example</h1>
+<p>A readable Python API with Teloce <code>.html</code> components using <code>&lt;script lang="ts"&gt;</code>.
+The browser imports <code>api.ts</code>, <code>types.ts</code>, and <code>format.ts</code>; the compiler emits <code>.js</code>.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/teloce-py<span class="w"> </span>-e<span class="w"> </span><span class="s1">'/path/to/flaxon[standard]'</span>
+<span class="nb">cd</span><span class="w"> </span>examples/teloce_taskboard
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open http://127.0.0.1:8000. Add a task, refresh the list, and inspect Network tools.
+Validation runs in Python. The typed API helper handles HTTP failures; types alone
+do not validate untrusted JSON. Tasks reset on restart. This example has no login,
+production database, delete action or globally unique concurrent IDs.</p>
+<p>Read <a href="../../fullstack/index.html">lessons 1–10</a>. The files here are the working
+baseline for lessons 1–4; later lessons describe extensions and alternative
+rendering choices. The <a href="../teloce-head-ts/index.html">converter</a> demonstrates CDN resources.</p></article>
+</main></div><div id="footer"></div></body></html>

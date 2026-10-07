@@ -1,14 +1,491 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin and CMS - Flaxon Documentation</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head><body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Admin and CMS</h1><p>Flaxon provides an authenticated model AdminDashboard and an optional schema-driven CMS SPA. The reference UI and JSON APIs cover common back-office workflows.</p><h2>Bootstrap both panels</h2><pre><code class="language-python">from flaxon import Flaxon
-from flaxon.admin import AdminConfig, AdminDashboard
-from flaxon.admin.cms import CMS, CMSField, ContentType
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Admin and CMS Production Guide — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Admin and CMS Production Guide — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Admin and CMS Production Guide</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/admin-cms.md">Framework source</a> · <a href="../../content/framework/docs/guides/admin-cms.md" download>Markdown</a></p><h1 id="admin-and-cms-production-guide">Admin and CMS Production Guide</h1>
+<p>Flaxon provides two complementary management surfaces:</p>
+<ul>
+<li><code>AdminDashboard</code> manages application models, users, roles, settings, media,
+  audit activity, search, and operational status.</li>
+<li><code>CMS</code> provides schema-driven content editing through a browser SPA, including
+  publishing workflows, revisions, taxonomies, comments, menus, and data
+  import/export.</li>
+</ul>
+<p>The bundled UI is a reference client. Every CMS action is also available as a
+JSON API, so a team can replace the SPA with React, Vue, mobile, or server-side
+clients without replacing the backend contracts.</p>
+<h2 id="quick-start">Quick Start</h2>
+<p>first pip install flaxon[admin]</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span>
 
-app = Flaxon("backoffice", debug=True)
-admin = AdminDashboard(app,
-    config=AdminConfig(site_title="Acme Admin"),
-    storage_path="admin.sqlite3",
-    users=[{"username": "admin", "password": "change-me"}],
-)
-cms = CMS(app, url_prefix="/admin/cms", auth=admin.auth)
-cms.register(ContentType("post", fields=[CMSField("title", required=True)]))</code></pre><p>Run <code>flaxon migrate --direction up</code> for migration-backed storage, then open <code>/admin/login</code> and <code>/admin/cms/</code>. Replace development credentials and enable HTTPS in production.</p><h2>Capabilities</h2><ul><li>Authentication, CSRF, roles, permissions, users, settings, activity, and model CRUD.</li><li>CMS content types, statuses, drafts, scheduling fields, revisions, taxonomies, comments, menus, media, and CSV/JSON APIs.</li><li>Search, filters, sorting, pagination, bulk actions, custom widgets, and hooks.</li></ul><h2>Extension boundary</h2><p>Register models with CRUD hooks and content types with <code>CMSField</code>. Use the JSON APIs when building a React, Vue, mobile, or custom Teloce frontend. Use a shared database or Redis-backed session/event store for multiple workers; the in-memory defaults are development-only.</p><h2>Security checklist</h2><p>Configure a strong secret, CSRF tokens, login rate limits, MFA, password reset delivery, allowed upload types and sizes, rich-text sanitization, database backups, and audit-log monitoring.</p></article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"backoffice"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span><span class="n">site_title</span><span class="o">=</span><span class="s2">"Acme Backoffice"</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s2">"UTC"</span><span class="p">),</span>
+    <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">,</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="p">[{</span><span class="s2">"username"</span><span class="p">:</span> <span class="s2">"admin"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"change-me"</span><span class="p">}],</span>
+<span class="p">)</span>
 
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Acme Content"</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
+</code></pre></div>
+<p>Run locally:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+</code></pre></div>
+<p>Use <code>/admin/login</code>, <code>/admin/</code>, and <code>/admin/cms/</code>. Development credentials
+should be replaced with environment-managed credentials before deployment.</p>
+<h2 id="persistence-and-migrations">Persistence and Migrations</h2>
+<p>For a self-contained local store, set <code>storage_path</code> (the parent directory must
+already exist). This persists users,
+roles, settings, activity, media metadata, CMS records, taxonomies, comments,
+menus, and revisions in the admin store. Do not use the default in-memory mode
+for production or multiple workers.</p>
+<p>For an application-owned database, generate and apply the migration:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_admin_migration</span>
+
+<span class="n">write_admin_migration</span><span class="p">(</span><span class="s2">"migrations"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>migrate<span class="w"> </span>--database<span class="w"> </span>sqlite://./app.db<span class="w"> </span>--migrations-dir<span class="w"> </span>migrations
+</code></pre></div>
+<p>Pass the configured <code>DatabaseManager</code> as <code>database=</code> to both <code>AdminDashboard</code>
+and <code>CMS</code>. The framework keeps the admin/CMS namespace contract separate from
+your domain repositories, so existing application tables are not modified.</p>
+<p>For PostgreSQL, MySQL, SQLAlchemy, or a custom repository, implement the
+database methods used by the services (<code>execute</code>, <code>fetch_one</code>, and
+<code>fetch_all</code>) and pass that object as <code>database=</code>. Keep writes transactional.</p>
+<h2 id="authentication-and-authorization">Authentication and Authorization</h2>
+<p>Admin routes are authenticated by the dashboard session backend. Use an
+application-owned backend when the application already has identity:</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth_backend</span><span class="o">=</span><span class="n">my_auth_backend</span><span class="p">)</span>
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
+</code></pre></div>
+<p>Permissions are checked at the route boundary. Common permissions are:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin:read</code></td>
+<td>Dashboard, model lists, activity, operations</td>
+</tr>
+<tr>
+<td><code>admin:write</code></td>
+<td>Model create/update/actions</td>
+</tr>
+<tr>
+<td><code>admin:users</code></td>
+<td>User and role management</td>
+</tr>
+<tr>
+<td><code>admin:media</code></td>
+<td>Upload and manage assets</td>
+</tr>
+<tr>
+<td><code>admin:settings</code></td>
+<td>Change site settings</td>
+</tr>
+<tr>
+<td><code>&lt;model&gt;:create</code></td>
+<td>Create a specific model</td>
+</tr>
+<tr>
+<td><code>&lt;model&gt;:read</code></td>
+<td>Read a specific model</td>
+</tr>
+<tr>
+<td><code>&lt;model&gt;:update</code></td>
+<td>Update a specific model</td>
+</tr>
+<tr>
+<td><code>&lt;model&gt;:delete</code></td>
+<td>Delete a specific model</td>
+</tr>
+<tr>
+<td><code>admin:superuser</code></td>
+<td>Full access</td>
+</tr>
+</tbody>
+</table>
+<p>Roles map to permissions through the role editor or <code>admin.roles</code>. Do not
+grant <code>admin:superuser</code> to normal editors. Use separate editor and publisher
+roles when content approval is required.</p>
+<p>Security options include login throttling, CSRF validation, TOTP MFA,
+single-use password reset tokens, optional email verification, file type and
+size validation, path traversal protection, and rich-text allowlist
+sanitization.</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">require_email_verification</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">password_reset_sender</span><span class="o">=</span><span class="n">send_reset_message</span><span class="p">,</span>
+    <span class="n">email_verification_sender</span><span class="o">=</span><span class="n">send_verification_message</span><span class="p">,</span>
+    <span class="n">max_upload_size</span><span class="o">=</span><span class="mi">10</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+    <span class="n">allowed_upload_types</span><span class="o">=</span><span class="p">{</span><span class="s2">"image/jpeg"</span><span class="p">,</span> <span class="s2">"image/png"</span><span class="p">,</span> <span class="s2">"image/webp"</span><span class="p">,</span> <span class="s2">"application/pdf"</span><span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Browser forms include a hidden <code>_csrf</code> field. SPA mutations include the same
+token in the <code>X-CSRF-Token</code> header. Custom clients must preserve this rule.</p>
+<p>The backend exposes revision comparison data, menu hierarchy data, media
+metadata operations, scheduled status fields, durable thumbnail jobs, resumable
+uploads, audit verification, and notification preferences. The bundled SPA is
+the reference client for the core workflows; applications needing a full
+editorial calendar, visual diff workspace, nested menu tree editor, or external
+notification delivery should build those views and adapters on these APIs.</p>
+<h2 id="model-admin">Model Admin</h2>
+<p>Register a model with async CRUD hooks:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin_model</span>
+
+<span class="nd">@admin_model</span><span class="p">(</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"active"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">],</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">:</span>
+    <span class="n">_items</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instances</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span> <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span> <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</code></pre></div>
+<p>The model list supports search, exact filters, sorting, pagination, selection,
+bulk actions, create, edit, detail, delete confirmation, and history links.
+Use <code>admin.register(model, ...)</code> when decorator registration is not suitable.</p>
+<p><code>admin_action</code> marks reusable action methods; attach custom callables to the
+registered <code>AdminModel</code> when an action needs custom labels or a separate
+service:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">record_id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">Product</span><span class="o">.</span><span class="n">update_instance</span><span class="p">(</span><span class="n">record_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">"active"</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"product"</span><span class="p">)</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="s2">"archive"</span><span class="p">,</span> <span class="n">archive</span><span class="p">)</span>
+</code></pre></div>
+<p>Use <code>admin_display</code> for computed read-only columns. Keep authorization in the
+dashboard permission map and business validation in the model/service layer.</p>
+<h2 id="cms-content-types">CMS Content Types</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMSField</span><span class="p">,</span> <span class="n">ContentType</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Post"</span><span class="p">,</span>
+    <span class="n">label_plural</span><span class="o">=</span><span class="s2">"Posts"</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"summary"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"textarea"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"body"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"richtext"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"hero"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"image"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"published_on"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"datetime"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"related"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"relationship"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"blocks"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"repeater"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"seo"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"json"</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"updated_at"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"summary"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">],</span>
+    <span class="n">statuses</span><span class="o">=</span><span class="p">[</span><span class="s2">"draft"</span><span class="p">,</span> <span class="s2">"review"</span><span class="p">,</span> <span class="s2">"approved"</span><span class="p">,</span> <span class="s2">"scheduled"</span><span class="p">,</span> <span class="s2">"published"</span><span class="p">,</span> <span class="s2">"archived"</span><span class="p">],</span>
+<span class="p">))</span>
+</code></pre></div>
+<p>Supported field types are <code>text</code>, <code>textarea</code>, <code>richtext</code>, <code>boolean</code>, <code>number</code>,
+<code>date</code>, <code>datetime</code>, <code>email</code>, <code>url</code>, <code>select</code>, <code>json</code>, <code>repeater</code>,
+<code>relationship</code>, <code>file</code>, and <code>image</code>. Required fields and select choices are
+validated by the content type. Slugs are generated from <code>slug_source</code> unless
+explicitly supplied.</p>
+<p>The SPA provides list search/filter/sort/pagination, bulk publish/unpublish,
+draft autosave, unsaved-change warnings, status and schedule controls, media
+fields, revision history, import/export, comments, taxonomy management, and a
+drag-and-drop menu editor.</p>
+<h2 id="editorial-workflows">Editorial Workflows</h2>
+<p>Use the status field as the editorial state machine. A typical workflow is:</p>
+<p><code>draft -&gt; review -&gt; approved -&gt; scheduled -&gt; published -&gt; archived</code></p>
+<p>The backend validates configured statuses. Records with a future <code>publish_at</code>
+are treated as scheduled until the next query after their publish time. For
+approval rules, register hooks or enforce transitions in a service before
+calling <code>ContentType.update</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">audit_content</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">record</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="s2">"after_update"</span><span class="p">,</span> <span class="n">audit_content</span><span class="p">)</span>
+</code></pre></div>
+<p>Each create, update, delete, and restore creates a revision. The history API
+returns revision metadata, before/after values, changed fields, and restore
+operations. Treat revision payloads as audit data and restrict access to
+trusted editors.</p>
+<h2 id="taxonomies-comments-and-menus">Taxonomies, Comments, and Menus</h2>
+<p>The SPA exposes these resources from the CMS header. They are also JSON APIs:</p>
+<ul>
+<li>Taxonomies: create/delete a taxonomy and add/update/delete terms.</li>
+<li>Comments: list, create, approve, reject, mark spam, and delete comments.</li>
+<li>Menus: read and replace ordered menu items, including nested <code>children</code>.</li>
+</ul>
+<p>Applications should validate public comment input, add anti-spam controls, and
+only expose approved comments on the public site. Menu item URLs should be
+validated before rendering into a public navigation.</p>
+<h2 id="media">Media</h2>
+<p>The admin media library supports upload, folders, previews/URLs, MIME and size
+validation, metadata editing, rename, and delete. Configure a durable upload
+directory or replace <code>FileStorage</code> with object storage. Never trust a client
+filename or content type; retain the allowlist and size limit at the server.</p>
+<p>For a custom picker, use the media API and store the returned stable URL or
+asset identifier in a CMS <code>image</code> or <code>file</code> field. Do not store arbitrary
+client-provided paths.</p>
+<h2 id="json-api">JSON API</h2>
+<p>With <code>url_prefix="/admin/cms"</code>, the SPA API is:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/config</code></td>
+<td>Content schemas and UI metadata</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/stats</code></td>
+<td>Per-type counts</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/&lt;type&gt;/items</code></td>
+<td>Search/filter/sort/paginate records</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/&lt;type&gt;/items</code></td>
+<td>Create</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Read</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Update</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;</code></td>
+<td>Delete</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;/history</code></td>
+<td>Revisions and comparisons</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/&lt;type&gt;/items/&lt;id&gt;/restore/&lt;revision&gt;</code></td>
+<td>Restore revision</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/&lt;type&gt;/actions/&lt;action&gt;</code></td>
+<td>Bulk action</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/export/&lt;type&gt;</code></td>
+<td>JSON or CSV export</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/import/&lt;type&gt;</code></td>
+<td>JSON/CSV import with row errors</td>
+</tr>
+<tr>
+<td>GET/POST</td>
+<td><code>/api/taxonomies</code></td>
+<td>Taxonomy collection</td>
+</tr>
+<tr>
+<td>GET/PATCH/DELETE</td>
+<td><code>/api/taxonomies/&lt;name&gt;</code></td>
+<td>Taxonomy terms</td>
+</tr>
+<tr>
+<td>GET/POST</td>
+<td><code>/api/comments</code></td>
+<td>Comment queue</td>
+</tr>
+<tr>
+<td>PATCH/DELETE</td>
+<td><code>/api/comments/&lt;id&gt;</code></td>
+<td>Moderate/delete comment</td>
+</tr>
+<tr>
+<td>GET/PUT</td>
+<td><code>/api/menus/&lt;name&gt;</code></td>
+<td>Menu management</td>
+</tr>
+</tbody>
+</table>
+<p>All mutating API calls require <code>X-CSRF-Token</code> and an authenticated session.
+Use the response <code>errors</code> array from imports to display row-level validation
+feedback. Limit <code>per_page</code> to the server-supported maximum.</p>
+<h2 id="custom-ui-and-extension-points">Custom UI and Extension Points</h2>
+<p>The SPA is intentionally replaceable. A custom client should:</p>
+<ol>
+<li>Fetch <code>/api/config</code> and generate fields from the schema.</li>
+<li>Preserve CSRF and session cookies.</li>
+<li>Render explicit loading, empty, validation, conflict, and permission states.</li>
+<li>Use history before destructive restore operations.</li>
+<li>Subscribe to Redis-backed events when running multiple workers.</li>
+</ol>
+<p>Backend extensions include <code>AdminDashboard.register_widget</code>, dashboard hooks,
+CMS hooks (<code>before_create</code>, <code>after_create</code>, <code>before_update</code>, <code>after_update</code>,
+<code>before_delete</code>, <code>after_delete</code>, and restore hooks), custom model actions,
+custom templates, <code>AuthenticationBackend</code>, storage adapters, and Redis session
+and WebSocket broadcasting.</p>
+<h2 id="production-checklist">Production Checklist</h2>
+<ul>
+<li>Apply admin/CMS migrations through <code>flaxon migrate</code>.</li>
+<li>Use PostgreSQL/MySQL or a durable SQLite deployment; do not use in-memory state.</li>
+<li>Set a strong secret and unique admin passwords through secret management.</li>
+<li>Keep CSRF enabled and serve admin over HTTPS.</li>
+<li>Configure login rate limits, MFA, reset delivery, and email verification.</li>
+<li>Use Redis or a shared database session backend for multiple workers.</li>
+<li>Configure a durable media/object-storage backend and strict MIME limits.</li>
+<li>Add public-site comment moderation and spam protection.</li>
+<li>Restrict rich text allowlists to the tags and attributes your renderer needs.</li>
+<li>Export and retain audit activity and test restore procedures.</li>
+<li>Run API tests plus browser tests for login, create/edit, publishing, media,
+  moderation, import/export, and permission boundaries.</li>
+</ul>
+<p>The complete runnable reference is
+<code>docs/examples/cms/full_admin_cms/app.py</code>.</p>
+<h2 id="production-addendum">Production Addendum</h2>
+<p>The following configuration enables the hardened Admin/CMS path without
+changing the existing registration code:</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"var/admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://localhost:6379/0"</span><span class="p">,</span>
+    <span class="n">redis_protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">redis_max_connections</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">session_idle_timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+    <span class="n">media_scanner</span><span class="o">=</span><span class="n">clamav_scan</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">,</span> <span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://localhost:6379/0"</span><span class="p">)</span>
+</code></pre></div>
+<p>Use Redis for every web and worker process. It coordinates sessions, Admin
+rate limits, CMS publishing locks, and WebSocket events. Use
+<code>flaxon migrate</code> for the application-owned schema before the first deploy.</p>
+<p>The Admin exposes durable resumable media upload endpoints, Admin model
+CSV/JSON import/export endpoints, notification preferences, audit-chain
+verification, and provider-backed WebAuthn endpoints. See the <a href="../api/admin.html">Admin API
+Reference</a> for paths and CSRF requirements.</p>
+<p>Do not claim that WebAuthn or antivirus scanning is enabled merely because the
+Flaxon adapters are present. Inject a maintained WebAuthn provider and a real
+scanner service, then test their ceremonies and failure behavior in staging.</p>
+<h2 id="how-admin-and-cms-work-together">How Admin and CMS Work Together</h2>
+<p>Admin is the authenticated operations surface. It owns users, groups,
+permissions, settings, activity, notifications, operations, media, and
+registered application models. CMS is an authenticated editorial surface
+mounted on the same application. It owns content types, records, revisions,
+taxonomies, comments, menus, publishing status, and scheduled publishing.</p>
+<p>The request flow is:</p>
+<ol>
+<li>The browser signs in at <code>/admin/login</code> and receives the configured session
+   cookie.</li>
+<li>Admin and CMS resolve the current user through the shared auth backend.</li>
+<li>The route checks the exact capability, such as
+   <code>post.view_post</code>, <code>post.change_post</code>, or <code>cms.publish_content</code>.</li>
+<li>Browser mutations include the rendered CSRF token in the form or the
+   <code>X-CSRF-Token</code> header.</li>
+<li>The model or content adapter validates and writes the record, then records
+   activity, audit data, revisions, and notifications where applicable.</li>
+<li>The response updates the Admin page or the CMS SPA; public applications
+   consume their own public routes or APIs and never use Admin credentials.</li>
+</ol>
+<p>Use Admin when a person manages the application or infrastructure. Use CMS
+when an editor creates and publishes site content. A user may have both roles,
+but the exact permission matrix remains the authority for every action.</p>
+<h2 id="media-library-workflow">Media Library Workflow</h2>
+<p>Open <code>/admin/media</code> to use the production media workspace. The page supports:</p>
+<ul>
+<li>Search across filename, original filename, title, and alt text.</li>
+<li>Filtering by folder and image/document/other type.</li>
+<li>Newest, oldest, name, and size sorting with server-side pagination.</li>
+<li>Grid and list layouts stored in the browser for the operator.</li>
+<li>Multi-select bulk deletion with CSRF protection.</li>
+<li>Upload dialog with drag-and-drop, folder selection, and upload progress.</li>
+<li>Image previews, dimensions, thumbnail status, file size, and content type.</li>
+<li>Metadata editing for alt text, title, caption, description, and credit.</li>
+<li>Rename with path sanitization and collision protection.</li>
+<li>Folder creation and folder deletion.</li>
+<li>Open, copy, and signed-object URL actions.</li>
+</ul>
+<p>The browser UI is not the security boundary. The backend rechecks the user,
+CSRF token, filename, storage path, allowed content type, size, image
+dimensions, antivirus result, and object existence for every mutation. CMS
+image/file fields use the reusable media picker, which stores the selected
+asset URL or identifier instead of accepting an unchecked path.</p>
+<p>For local development, use <code>storage_path</code> and <code>upload_dir</code>. For production,
+inject an S3-compatible adapter with <code>list</code>, <code>read</code>, <code>write</code>, <code>delete</code>,
+<code>exists</code>, <code>size</code>, <code>get_url</code>, and preferably <code>get_signed_url</code>. Configure an
+antivirus scanner and a shared AdminStore before enabling multiple workers.</p>
+<h2 id="capability-setup">Capability Setup</h2>
+<p>New installations expose named groups in <code>/admin/roles</code>: Administrator,
+Content Editor, Publisher, Media Manager, Warehouse Staff, Support Agent, and
+Read Only. The screen presents descriptions and checkboxes; developers do not
+need to make operators type permission keys. Applications can add capabilities
+with <code>admin.register_permission(...)</code> and protect custom Jinax pages with
+<code>admin.add_view(..., permission="your.capability")</code>.</p>
+<p>Model capabilities are generated when a model is registered. In strict mode,
+the four standard capabilities are <code>view</code>, <code>add</code>, <code>change</code>, and <code>delete</code> in
+the stable <code>&lt;model&gt;.&lt;action&gt;_&lt;model&gt;</code> form. Legacy keys remain readable during
+migration, but new deployments should use strict permissions and least
+privilege groups.</p>
+<h2 id="what-100-means-in-production">What 100% Means in Production</h2>
+<p>The bundled Admin/CMS workflows are functional when their required services
+are configured. “Complete” does not mean external services are silently
+invented: Redis must be supplied for shared sessions, limits, locks, and
+events; object storage must be supplied for S3 assets; a mail sender must be
+supplied for reset and verification delivery; a WebAuthn provider must be
+supplied for passkeys; and an antivirus scanner must be supplied for malware
+inspection. Without those integrations, Flaxon returns an explicit capability
+or configuration error rather than pretending the feature is active.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

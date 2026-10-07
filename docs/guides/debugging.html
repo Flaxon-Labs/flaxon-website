@@ -1,199 +1,335 @@
-<!-- docs/guides/debugging.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Debugging – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Debugging — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Debugging — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Debugging</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/debugging.md">Framework source</a> · <a href="../../content/framework/docs/guides/debugging.md" download>Markdown</a></p><h1 id="debugging">Debugging</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon includes a built-in debugging system designed to help developers identify and fix application issues quickly.</p>
+<p>The debugger provides:</p>
+<ul>
+<li>Clear error explanations</li>
+<li>Error codes</li>
+<li>Request context</li>
+<li>Stack traces during development</li>
+<li>Recorded application errors</li>
+<li>Issue history</li>
+<li>Sensitive data redaction</li>
+<li>Debugging information through a web interface</li>
+</ul>
+<p>Flaxon's goal is to make debugging easier by explaining <strong>what happened, why it happened, and where to fix it</strong>.</p>
+<hr/>
+<h2 id="debug-mode">Debug Mode</h2>
+<p>Debug mode enables detailed error reporting and the debugging dashboard.</p>
+<h2 id="enabling-debug-mode">Enabling Debug Mode</h2>
+<h3 id="using-application-configuration">Using Application Configuration</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"my-app"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="err">````</span>
 
-    <div id="header"></div>
+<span class="o">---</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="c1">### Using Configuration Options</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="err">```</span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html" class="active">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"my-app"</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"DEBUG"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="debug-dashboard">Debug Dashboard</h2>
+<p>When debug mode is enabled, Flaxon provides a local debugging dashboard.</p>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/__debug__
+</code></pre></div>
+<p>The dashboard displays:</p>
+<ul>
+<li>Recorded errors</li>
+<li>Application exceptions</li>
+<li>Request information</li>
+<li>Error timestamps</li>
+<li>Error frequency</li>
+<li>Stack traces</li>
+<li>Error codes</li>
+<li>Debug logs</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>Flaxon Debug Dashboard
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Debugging</h1>
-                        <p>Flaxon provides a comprehensive debugging system that helps you identify and fix issues quickly.</p>
+Application:
+my-app
 
-                        <h2>Debug Mode</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
+Status:
+Development Mode
 
-app = Flaxon("my-app", debug=True)
 
-# Or via configuration
-app = Flaxon("my-app", config={"DEBUG": True})</code></pre>
-                        </div>
+Recent Errors:
 
-                        <div class="note warning">
-                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Warning</strong>
-                            <p class="mb-0 mt-1">Never enable <code>debug=True</code> in production.</p>
-                        </div>
+[FX-404]
+RouteNotFoundError
 
-                        <h2>Development vs Production Errors</h2>
+Time:
+2026-08-03 10:30:15
 
-                        <h3>Development Mode</h3>
-                        <div class="code-block">
-                            <pre><code class="language-json">{
-  "success": false,
-  "error": {
-    "code": "FX-DEV-500",
-    "message": "division by zero",
-    "request_id": "fx_abc123def456",
-    "debug": {
-      "type": "ZeroDivisionError",
-      "traceback": "...",
-      "method": "GET",
-      "path": "/divide",
-      "query": {}
-    }
-  }
-}</code></pre>
-                        </div>
 
-                        <h3>Production Mode</h3>
-                        <div class="code-block">
-                            <pre><code class="language-json">{
-  "success": false,
-  "error": {
-    "code": "FX-SRV-500",
-    "message": "The request could not be completed.",
-    "request_id": "fx_abc123def456"
-  }
-}</code></pre>
-                        </div>
+[FX-500]
+DatabaseConnectionError
 
-                        <h2>Raising HTTP Exceptions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import HTTPException
+Time:
+2026-08-03 10:32:04
+</code></pre></div>
+<hr/>
+<h2 id="error-recording">Error Recording</h2>
+<p>Flaxon automatically records errors during development.</p>
+<p>Each error entry contains:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Error Code</td>
+<td>Unique Flaxon error identifier</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>Exception class</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Human-readable explanation</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>When the error occurred</td>
+</tr>
+<tr>
+<td>Route</td>
+<td>Request path</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>HTTP method</td>
+</tr>
+<tr>
+<td>Request ID</td>
+<td>Trace identifier</td>
+</tr>
+<tr>
+<td>Stack Trace</td>
+<td>Debug traceback</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="error-codes">Error Codes</h2>
+<p>Flaxon uses structured error codes to make issues easier to identify.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+    <span class="mi">404</span><span class="p">,</span>
+    <span class="s2">"User not found"</span><span class="p">,</span>
+    <span class="n">code</span><span class="o">=</span><span class="s2">"FX-USER-404"</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example codes:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FX-404</td>
+<td>Resource not found</td>
+</tr>
+<tr>
+<td>FX-401</td>
+<td>Authentication failure</td>
+</tr>
+<tr>
+<td>FX-403</td>
+<td>Permission denied</td>
+</tr>
+<tr>
+<td>FX-422</td>
+<td>Validation failure</td>
+</tr>
+<tr>
+<td>FX-500</td>
+<td>Internal application error</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="request-context">Request Context</h2>
+<p>The debugger includes useful request information:</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>Request
 
-@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    if user_id < 0:
-        raise HTTPException(400, "Invalid user ID", code="FX-INVALID-ID")
+Method:
+POST
 
-    user = await get_user_by_id(user_id)
-    if not user:
-        raise HTTPException(404, "User not found", code="FX-USER-404")
+Path:
+/api/users
 
-    return user</code></pre>
-                        </div>
+Request ID:
+fx-a82c91
 
-                        <h2>Error Codes</h2>
-                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
-                            <thead>
-                                <tr class="bg-slate-100 dark:bg-slate-800">
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Code</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Status</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="border px-4 py-2">FX-HTTP-400</td><td class="border px-4 py-2">400</td><td class="border px-4 py-2">Bad Request</td></tr>
-                                <tr><td class="border px-4 py-2">FX-HTTP-401</td><td class="border px-4 py-2">401</td><td class="border px-4 py-2">Unauthorized</td></tr>
-                                <tr><td class="border px-4 py-2">FX-HTTP-403</td><td class="border px-4 py-2">403</td><td class="border px-4 py-2">Forbidden</td></tr>
-                                <tr><td class="border px-4 py-2">FX-HTTP-404</td><td class="border px-4 py-2">404</td><td class="border px-4 py-2">Not Found</td></tr>
-                                <tr><td class="border px-4 py-2">FX-HTTP-405</td><td class="border px-4 py-2">405</td><td class="border px-4 py-2">Method Not Allowed</td></tr>
-                                <tr><td class="border px-4 py-2">FX-VAL-001</td><td class="border px-4 py-2">422</td><td class="border px-4 py-2">Validation Error</td></tr>
-                                <tr><td class="border px-4 py-2">FX-RATE-001</td><td class="border px-4 py-2">429</td><td class="border px-4 py-2">Rate Limit Exceeded</td></tr>
-                                <tr><td class="border px-4 py-2">FX-SRV-500</td><td class="border px-4 py-2">500</td><td class="border px-4 py-2">Server Error</td></tr>
-                            </tbody>
-                        </table>
+IP:
+127.0.0.1
 
-                        <h2>Redaction</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.debugging import redact
+Headers:
+Content-Type: application/json
+</code></pre></div>
+<p>Sensitive values are automatically hidden.</p>
+<hr/>
+<h2 id="sensitive-data-protection">Sensitive Data Protection</h2>
+<p>The debugger removes sensitive information from logs.</p>
+<p>Protected values include:</p>
+<ul>
+<li>Passwords</li>
+<li>Authentication tokens</li>
+<li>API keys</li>
+<li>Secrets</li>
+<li>Private keys</li>
+<li>Authorization headers</li>
+<li>Payment information</li>
+</ul>
+<p>Example:</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code>password=myPassword123
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code>password=[REDACTED]
+</code></pre></div>
+<hr/>
+<h2 id="debugging-exceptions">Debugging Exceptions</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-data = {
-    "username": "alice",
-    "password": "secret123",
-    "api_key": "key456",
-}
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">database</span><span class="o">.</span><span class="n">find_user</span><span class="p">(</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
 
-safe_data = redact(data)
-# {"username": "alice", "password": "[REDACTED]", "api_key": "[REDACTED]"}</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span>
+</code></pre></div>
+<p>If <code>user</code> is missing, the debugger provides:</p>
+<div class="highlight"><pre><span></span><code>Error:
+AttributeError
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Use <code>/debug/dashboard</code> in development to view error history.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+Message:
+User object is None
 
-    <div id="footer"></div>
+Location:
+app.py line 12
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+Suggestion:
+Check if the database query returned a valid user.
+</code></pre></div>
+<hr/>
+<h2 id="clearing-debug-records">Clearing Debug Records</h2>
+<p>During development, stored errors can be cleared.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>debug<span class="w"> </span>clear
+</code></pre></div>
+<hr/>
+<h2 id="production-safety">Production Safety</h2>
+<p>Debug mode should never be enabled in production.</p>
+<p>Disable:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"my-app"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Production mode:</p>
+<ul>
+<li>Hides stack traces</li>
+<li>Returns safe error messages</li>
+<li>Prevents debug dashboard access</li>
+<li>Protects sensitive information</li>
+</ul>
+<hr/>
+<h2 id="debugging-workflow">Debugging Workflow</h2>
+<p>Recommended workflow:</p>
+<ol>
+<li>Enable debug mode.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"my-app"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+<ol>
+<li>Start the application.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<ol>
+<li>Open:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/__debug__
+</code></pre></div>
+<ol>
+<li>
+<p>Review recorded errors.</p>
+</li>
+<li>
+<p>Fix the issue.</p>
+</li>
+<li>
+<p>Restart the application.</p>
+</li>
+</ol>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<p>For effective debugging:</p>
+<ul>
+<li>Use meaningful error codes.</li>
+<li>Include request IDs in logs.</li>
+<li>Keep debug mode limited to development.</li>
+<li>Never expose debug dashboards publicly.</li>
+<li>Review logs before deploying.</li>
+<li>Use monitoring tools for production systems.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Related documentation:</p>
+<ul>
+<li>Security</li>
+<li>Performance</li>
+<li>Configuration</li>
+<li>Architecture</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

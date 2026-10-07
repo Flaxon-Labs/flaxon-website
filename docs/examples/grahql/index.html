@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GraphQL Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>GraphQL Example — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>GraphQL Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/grahql/readme.md">Framework source</a> · <a href="../../../content/framework/docs/examples/grahql/readme.md" download>Markdown</a></p><h1 id="graphql-example">GraphQL Example</h1>
+<p>This runnable example serves a small GraphQL API and a browser demo from the
+same Flaxon application. It includes queries, mutations, nested resolvers,
+GraphiQL, and the normal Flaxon health endpoints.</p>
+<p>The directory is named <code>grahql</code> for compatibility with the existing example
+path. The application itself and the documentation use the correct GraphQL
+spelling.</p>
+<h2 id="run-it">Run it</h2>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+flaxon<span class="w"> </span>run<span class="w"> </span>docs.examples.grahql.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open:</p>
+<ul>
+<li>Demo UI: <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a></li>
+<li>GraphQL endpoint: <a href="http://127.0.0.1:8000/graphql">http://127.0.0.1:8000/graphql</a></li>
+<li>GraphiQL: <a href="http://127.0.0.1:8000/graphql/graphiql">http://127.0.0.1:8000/graphql/graphiql</a></li>
+<li>Altair: <a href="http://127.0.0.1:8000/graphql/altair">http://127.0.0.1:8000/graphql/altair</a></li>
+</ul>
+<h2 id="copyable-request">Copyable request</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:8000/graphql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"query":"{ users { id name email posts { id title } } }"}'</span>
+</code></pre></div>
+<p>Create a user. Flaxon GraphQL's current parser expects arguments separated by
+spaces or newlines, not commas:</p>
+<div class="highlight"><pre><span></span><code><span class="k">mutation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">createUser</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Bob"</span><span class="w"> </span><span class="n">email</span><span class="p">:</span><span class="w"> </span><span class="s">"bob@example.com"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">id</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">email</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The demo stores records in memory so it is deterministic and requires no
+database. For production, move the resolver reads and writes into a service or
+repository, add authentication and authorization, and use a persistent
+database. The browser page uses relative URLs, so it also works when the app
+is served on a non-local host.</p></article>
+</main></div><div id="footer"></div></body></html>

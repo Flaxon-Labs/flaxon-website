@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pocket Converter: TypeScript and page-head resources — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Pocket Converter: TypeScript and page-head resources — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Pocket Converter: TypeScript and page-head resources</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/teloce_head_ts/README.md">Framework source</a> · <a href="../../../content/framework/examples/teloce_head_ts/README.md" download>Markdown</a></p><h1 id="pocket-converter-typescript-and-page-head-resources">Pocket Converter: TypeScript and page-head resources</h1>
+<p>Use a Teloce release supporting <code>.ts</code> imports and <code>&lt;script lang="ts"&gt;</code>. For
+repository development, install both checkouts into the same virtual environment:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">'/path/to/teloce-py'</span><span class="w"> </span>-e<span class="w"> </span><span class="s1">'/path/to/flaxon[standard]'</span>
+<span class="nb">cd</span><span class="w"> </span>examples/teloce_head_ts
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Visit http://127.0.0.1:8000. Convert 1 mile to 1.609 km. Click <strong>How it works</strong>
+to exercise the CDN-hosted Bootstrap script. Inspect the tab icon, title and page
+source. The message comes from the Python <code>/api/about</code> endpoint. <code>ui/app.vel</code>
+imports <code>ui/units.ts</code>; browsers receive generated <code>.js</code>, not TypeScript.</p>
+<p><code>lang="en"</code> configures document language; <code>&lt;script lang="ts"&gt;</code> selects TypeScript.
+Teloce transpiles supported TypeScript syntax; this is not a full TypeScript type
+checker. See Teloce's supported syntax before using enums or advanced constructs.</p>
+<p>Bootstrap is pinned to 5.3.3. Internet access is required for its styling and
+collapse behavior, but conversion and the local API do not depend on Bootstrap.
+For offline deployment, download licensed resources to <code>public/</code> and use local
+URLs. CDN scripts execute with page privileges: select trusted sources, pin
+versions, and provide verified <code>integrity</code> plus <code>crossorigin="anonymous"</code> when
+using SRI. CSP must allow the selected resources and Flaxon's module bootstrap.</p>
+<p>This example is a teaching fixture, not a desktop launcher or production service.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Performance — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Performance — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Performance</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/performance.md">Framework source</a> · <a href="../content/framework/docs/performance.md" download>Markdown</a></p><h1 id="performance">Performance</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon is designed to provide efficient performance for modern backend applications.</p>
+<p>It focuses on:</p>
+<ul>
+<li>Low framework overhead</li>
+<li>Efficient asynchronous I/O</li>
+<li>Scalable request handling</li>
+<li>Developer-friendly performance optimization</li>
+</ul>
+<p>Flaxon is optimized for <strong>I/O-bound workloads</strong> such as:</p>
+<ul>
+<li>APIs</li>
+<li>Web applications</li>
+<li>Real-time applications</li>
+<li>Dashboards</li>
+<li>Chat systems</li>
+<li>Background services</li>
+</ul>
+<p>It is not designed to make CPU-heavy calculations faster. CPU-intensive workloads should use specialized tools, worker processes, or optimized services.</p>
+<hr/>
+<h2 id="performance-philosophy">Performance Philosophy</h2>
+<p>"Fast" should be measured by real-world performance.</p>
+<p>Flaxon's performance goals focus on:</p>
+<ul>
+<li>Low request overhead</li>
+<li>Efficient concurrency</li>
+<li>Reduced unnecessary processing</li>
+<li>Predictable scaling behavior</li>
+</ul>
+<p>Performance claims should be based on measurable benchmarks rather than comparing languages or frameworks in general.</p>
+<p>Flaxon does not claim that Python is always faster than Node.js, Java, Go, or Rust. Instead, it focuses on making Python practical for scalable production applications.</p>
+<hr/>
+<h2 id="optimization-areas">Optimization Areas</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Optimization</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Routing</td>
+<td>Precompiled routes and efficient route matching</td>
+<td>Requests/second, latency</td>
+</tr>
+<tr>
+<td>JSON Handling</td>
+<td>Compact encoding and optional faster serializers</td>
+<td>Serialization time, payload size</td>
+</tr>
+<tr>
+<td>Middleware</td>
+<td>Minimal processing overhead</td>
+<td>Per-layer execution time</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Cached schema metadata</td>
+<td>Validation latency</td>
+</tr>
+<tr>
+<td>Templates</td>
+<td>Compiled template caching</td>
+<td>Render time, cache hit rate</td>
+</tr>
+<tr>
+<td>WebSockets</td>
+<td>Efficient connections, queues, and room management</td>
+<td>Connections, messages/second</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="scaling-model">Scaling Model</h2>
+<p>Flaxon applications should scale using proven backend architecture patterns.</p>
+<p>Recommended approach:</p>
+<ol>
+<li>Keep HTTP workers stateless.</li>
+<li>Run multiple application processes for reliability and performance.</li>
+<li>Store persistent data in databases and object storage.</li>
+<li>Use Redis for:</li>
+<li>Caching</li>
+<li>Rate limiting</li>
+<li>Sessions</li>
+<li>WebSocket message distribution</li>
+<li>Move CPU-heavy workloads to background workers or specialized services.</li>
+<li>Use reverse proxies for:</li>
+<li>TLS termination</li>
+<li>Traffic management</li>
+<li>Health checks</li>
+<li>Rolling deployments</li>
+</ol>
+<hr/>
+<h2 id="benchmarking">Benchmarking</h2>
+<p>Flaxon provides benchmark tools inside the <code>benchmarks/</code> directory.</p>
+<p>Run all benchmarks:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/benchmark.py
+<span class="sb">````</span>
+
+Run<span class="w"> </span>a<span class="w"> </span>specific<span class="w"> </span>benchmark:
+
+<span class="sb">```</span>bash
+python<span class="w"> </span>benchmarks/routing_benchmark.py
+</code></pre></div>
+<p>Benchmark results should always be measured on the target hardware and deployment environment.</p>
+<hr/>
+<h2 id="performance-tips">Performance Tips</h2>
+<h2 id="use-async-where-possible">Use Async Where Possible</h2>
+<p>For I/O operations such as databases, APIs, and file operations, use asynchronous functions.</p>
+<h3 id="recommended">Recommended</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_row</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE id = $1"</span><span class="p">,</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h3 id="avoid-blocking-operations">Avoid Blocking Operations</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_row_sync</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE id = $1"</span><span class="p">,</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Blocking operations can reduce concurrency and slow down applications handling many requests.</p>
+<hr/>
+<h2 id="use-connection-pooling">Use Connection Pooling</h2>
+<p>Database connection pools improve performance by reusing existing connections.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_pool</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+
+    <span class="k">async</span> <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+            <span class="s2">"SELECT * FROM users"</span>
+        <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="cache-frequently-accessed-data">Cache Frequently Accessed Data</h2>
+<p>Caching reduces repeated database queries and improves response times.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_async</span>
+
+
+<span class="nd">@cached_async</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="use-redis-for-distributed-rate-limiting">Use Redis for Distributed Rate Limiting</h2>
+<p>For applications running multiple servers, distributed rate limiting can be handled with Redis.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">DistributedRateLimiter</span>
+
+
+<span class="n">limiter</span> <span class="o">=</span> <span class="n">DistributedRateLimiter</span><span class="p">(</span>
+    <span class="n">redis_client</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">api</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">allowed</span> <span class="o">=</span> <span class="k">await</span> <span class="n">limiter</span><span class="o">.</span><span class="n">check</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">requests</span><span class="o">=</span><span class="mi">60</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">allowed</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">429</span><span class="p">,</span>
+            <span class="s2">"Too many requests"</span>
+        <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="realistic-performance-goals">Realistic Performance Goals</h2>
+<p>Flaxon aims to make Python a strong choice for many production workloads, including:</p>
+<ul>
+<li>APIs</li>
+<li>Social platforms</li>
+<li>Chat applications</li>
+<li>Dashboards</li>
+<li>Mobile backends</li>
+<li>Internal enterprise systems</li>
+</ul>
+<p>For extremely high-performance components, applications can combine Flaxon with:</p>
+<ul>
+<li>Background workers</li>
+<li>Message queues</li>
+<li>Optimized databases</li>
+<li>Specialized services</li>
+<li>Other programming languages when required</li>
+</ul>
+<p>The goal is not to replace every technology, but to provide a flexible foundation for building scalable applications with Python.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="FastMCP Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>FastMCP Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>FastMCP Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/fastmcp-app.md">Framework source</a> · <a href="../../content/framework/docs/examples/fastmcp-app.md" download>Markdown</a></p><h1 id="fastmcp-example">FastMCP Example</h1>
+<p>This runnable example puts normal Flaxon routes and FastMCP tools in one
+feature module. The root application composes the feature and does not start a
+second server.</p>
+<div class="highlight"><pre><span></span><code>examples/fastmcp_app/
+|-- app.py
+`-- modules/
+    `-- store.py
+</code></pre></div>
+<p>Install and run it from the repository root:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[mcp]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>examples.fastmcp_app.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>The example exposes:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/store/status</code></td>
+<td>Normal Flaxon HTTP route</td>
+</tr>
+<tr>
+<td><code>/mcp</code></td>
+<td>FastMCP Streamable HTTP endpoint</td>
+</tr>
+</tbody>
+</table>
+<p>The example explicitly allows unauthenticated MCP access for local testing.
+For a deployed application, pass an authentication provider to
+<code>mount_fastmcp()</code> and keep <code>require_auth=True</code>. For multiple workers, use
+stateless HTTP mode and shared storage for application data and events.</p>
+<p>Source files: <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/tree/main/examples/fastmcp_app">app.py</a></p></article>
+</main></div><div id="footer"></div></body></html>

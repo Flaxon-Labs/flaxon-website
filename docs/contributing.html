@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Contributing to Flaxon — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Contributing to Flaxon — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Contributing to Flaxon</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/contributing.md">Framework source</a> · <a href="../content/framework/docs/contributing.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
+<p>Welcome! This document covers everything you need to know to contribute to Flaxon's core.</p>
+<h2 id="developer-setup">Developer Setup</h2>
+<p>To get started contributing, you need:</p>
+<ul>
+<li>Python 3.9+</li>
+<li>Poetry 1.2+</li>
+<li>PostgreSQL 12+</li>
+<li>Redis 6+</li>
+</ul>
+<p>Clone the repository and install dependencies:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/flaxon/framework.git
+<span class="nb">cd</span><span class="w"> </span>framework
+poetry<span class="w"> </span>install
+poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+</code></pre></div>
+<h2 id="running-tests">Running Tests</h2>
+<p>Run the full test suite with coverage:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>--cov<span class="o">=</span>src<span class="w"> </span>--cov-report<span class="o">=</span>html
+</code></pre></div>
+<p>Or run tests for a specific module:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_middleware_security.py<span class="w"> </span>-v
+</code></pre></div>
+<h2 id="code-style">Code Style</h2>
+<p>We use several linting tools to maintain consistency:</p>
+<ul>
+<li><strong>Ruff</strong>: For fast linting and import sorting</li>
+<li><strong>mypy</strong>: Static type checking</li>
+<li><strong>black</strong>: Code formatting (handled by Ruff)</li>
+</ul>
+<p>Run linters manually:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>src/
+poetry<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>src/
+poetry<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src/
+</code></pre></div>
+<h2 id="debugging-issues">Debugging Issues</h2>
+<p>If you encounter test failures:</p>
+<ol>
+<li>Check the test output for database connection errors</li>
+<li>Ensure Redis is running locally</li>
+<li>Verify environment variables in <code>.env</code></li>
+</ol>
+<p>For more detailed debugging, enable verbose logging:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>--log-cli-level<span class="o">=</span>DEBUG<span class="w"> </span>tests/
+</code></pre></div></article>
+</main></div><div id="footer"></div></body></html>

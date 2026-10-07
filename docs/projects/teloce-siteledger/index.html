@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SiteLedger Teloce SPA — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>SiteLedger Teloce SPA — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>SiteLedger Teloce SPA</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/teloce_siteledger/README.md">Framework source</a> · <a href="../../../content/framework/examples/teloce_siteledger/README.md" download>Markdown</a></p><h1 id="siteledger-teloce-spa">SiteLedger Teloce SPA</h1>
+<p>This example uses one central <code>ui/</code> tree. Flaxon owns the API and serves the
+startup-compiled Teloce application; Teloce owns client-side navigation and UI
+state. No separate frontend command or checked-in <code>dist/</code> directory is needed.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>teloce-py
+<span class="nb">cd</span><span class="w"> </span>examples/teloce_siteledger
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app
+</code></pre></div>
+<p>Open <code>http://127.0.0.1:8000</code>. Generated files are written to
+<code>examples/teloce_siteledger/.flaxon/build</code>.</p>
+<p>See <a href="../../api/teloce.html">the integration API and five lessons</a>. Use a Teloce release containing the MinifyJS production integration; for unreleased changes, install from your local Teloce checkout. Sample data is in memory and is not a production database.</p></article>
+</main></div><div id="footer"></div></body></html>

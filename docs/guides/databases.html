@@ -1,229 +1,529 @@
-<!-- docs/guides/databases.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Databases – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Databases — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Databases — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Databases</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/databases.md">Framework source</a> · <a href="../../content/framework/docs/guides/databases.md" download>Markdown</a></p><h1 id="databases">Databases</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon is database-agnostic.</p>
+<p>It does not force a specific database, ORM, or data access pattern. Developers can use any database technology that works with Python.</p>
+<p>Supported approaches include:</p>
+<ul>
+<li>SQLAlchemy</li>
+<li>Direct database drivers</li>
+<li>Repository patterns</li>
+<li>PostgreSQL</li>
+<li>SQLite</li>
+<li>MongoDB</li>
+<li>Redis</li>
+<li>Custom database layers</li>
+</ul>
+<p>Flaxon is designed to work with both simple applications and large production systems.</p>
+<hr/>
+<h2 id="using-sqlalchemy">Using SQLAlchemy</h2>
+<p>SQLAlchemy is one of the most popular database tools in Python.</p>
+<p>Example with async SQLAlchemy:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.ext.asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">create_async_engine</span><span class="p">,</span>
+    <span class="n">AsyncSession</span>
+<span class="p">)</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">select</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
 
-    <div id="header"></div>
+<span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"postgresql+asyncpg://user:pass@localhost/db"</span>
+<span class="p">)</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_async_engine</span><span class="p">(</span>
+    <span class="n">DATABASE_URL</span>
+<span class="p">)</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html" class="active">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="n">AsyncSessionLocal</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span>
+    <span class="n">engine</span><span class="p">,</span>
+    <span class="n">class_</span><span class="o">=</span><span class="n">AsyncSession</span><span class="p">,</span>
+    <span class="n">expire_on_commit</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Databases</h1>
-                        <p>Flaxon is database-agnostic. Use any database, ORM, or driver that works with Python.</p>
 
-                        <h2>Using SQLAlchemy</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, Integer, String, select
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
 
-DATABASE_URL = "postgresql+asyncpg://user:pass@localhost/db"
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">AsyncSessionLocal</span>
 
-engine = create_async_engine(DATABASE_URL)
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-@app.on_startup
-async def startup():
-    app.state.db = AsyncSessionLocal
 
-@app.on_shutdown
-async def shutdown():
-    await engine.dispose()
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
 
-@app.get("/users")
-async def get_users():
-    async with app.state.db() as session:
-        result = await session.execute(select(User))
-        return [user.to_dict() for user in result.scalars()]</code></pre>
-                        </div>
+    <span class="k">await</span> <span class="n">engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
 
-                        <h2>Using asyncpg (PostgreSQL)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import asyncpg
 
-@app.on_startup
-async def startup():
-    app.state.db = await asyncpg.create_pool(
-        host="localhost",
-        database="mydb",
-        user="user",
-        password="password",
-    )
 
-@app.on_shutdown
-async def shutdown():
-    await app.state.db.close()
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
 
-@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    row = await app.state.db.fetchrow(
-        "SELECT * FROM users WHERE id = $1", user_id
-    )
-    return dict(row) if row else None</code></pre>
-                        </div>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 
-                        <h2>Using SQLite (aiosqlite)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import aiosqlite
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+        <span class="p">)</span>
 
-@app.on_startup
-async def startup():
-    app.state.db = await aiosqlite.connect("app.db")
+        <span class="n">users</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scalars</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 
-@app.on_shutdown
-async def shutdown():
-    await app.state.db.close()
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span>
+        <span class="p">]</span>
+<span class="err">````</span>
 
-@app.get("/users")
-async def get_users():
-    cursor = await app.state.db.execute("SELECT * FROM users")
-    rows = await cursor.fetchall()
-    return [dict(zip(["id", "name"], row)) for row in rows]</code></pre>
-                        </div>
+<span class="o">---</span>
 
-                        <h2>Using MongoDB (Motor)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from motor.motor_asyncio import AsyncIOMotorClient
+<span class="c1"># SQLAlchemy with Repository Pattern</span>
 
-@app.on_startup
-async def startup():
-    client = AsyncIOMotorClient("mongodb://localhost:27017")
-    app.state.db = client.mydb
+<span class="n">The</span> <span class="n">repository</span> <span class="n">pattern</span> <span class="n">separates</span> <span class="n">database</span> <span class="n">logic</span> <span class="kn">from</span><span class="w"> </span><span class="nn">application</span> <span class="n">logic</span><span class="o">.</span>
 
-@app.get("/users")
-async def get_users():
-    users = await app.state.db.users.find().to_list(100)
-    return [{"id": str(user["_id"]), "name": user["name"]} for user in users]</code></pre>
-                        </div>
+<span class="n">Example</span><span class="p">:</span>
 
-                        <h2>Using Redis</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">import redis.asyncio as redis
+<span class="err">```</span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SQLAlchemyAdapter</span>
+<span class="p">)</span>
 
-@app.on_startup
-async def startup():
-    app.state.redis = redis.from_url("redis://localhost:6379")
 
-@app.on_shutdown
-async def shutdown():
-    await app.state.redis.close()
+<span class="n">adapter</span> <span class="o">=</span> <span class="n">SQLAlchemyAdapter</span><span class="p">(</span>
+    <span class="n">DATABASE_URL</span>
+<span class="p">)</span>
 
-@app.get("/cache/&lt;key&gt;")
-async def get_cache(key: str):
-    value = await app.state.redis.get(key)
-    return {"key": key, "value": value}</code></pre>
-                        </div>
 
-                        <h2>Database Health Checks</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.database.adapters.sqlite import SQLiteAdapter
-from flaxon.database.manager import DatabaseManager
-from flaxon.health import DatabaseHealthCheck
+<span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span>
+    <span class="n">adapter</span>
+<span class="p">)</span>
 
-db = DatabaseManager(SQLiteAdapter("app.db"))
-await db.initialize()
-db_check = DatabaseHealthCheck(db)
-app.health.register(db_check)
 
-@app.get("/health/db")
-async def db_health():
-    return (await db_check.run()).to_dict()</code></pre>
-                        </div>
 
-                        <h2>Transactions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/transfer")
-async def transfer(request):
-    async with app.state.db.transaction() as tx:
-        await tx.execute("UPDATE accounts SET balance = balance - 100 WHERE id = $1", 1)
-        await tx.execute("UPDATE accounts SET balance = balance + 100 WHERE id = $1", 2)
-    return {"success": True}</code></pre>
-                        </div>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserRepository</span><span class="p">(</span><span class="n">Repository</span><span class="p">):</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Flaxon includes built-in adapters for PostgreSQL, SQLite, MySQL, MongoDB, and Redis.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
 
-    <div id="footer"></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="s2">"users"</span>
+        <span class="p">)</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_by_email</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_one_by</span><span class="p">(</span>
+            <span class="s2">"email"</span><span class="p">,</span>
+            <span class="n">email</span>
+        <span class="p">)</span>
+
+
+<span class="n">repo</span> <span class="o">=</span> <span class="n">UserRepository</span><span class="p">(</span>
+    <span class="n">db</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-asyncpg-postgresql">Using asyncpg (PostgreSQL)</h2>
+<p>For applications that need direct PostgreSQL access:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncpg</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncpg</span><span class="o">.</span><span class="n">create_pool</span><span class="p">(</span>
+
+        <span class="n">host</span><span class="o">=</span><span class="s2">"localhost"</span><span class="p">,</span>
+
+        <span class="n">database</span><span class="o">=</span><span class="s2">"mydb"</span><span class="p">,</span>
+
+        <span class="n">user</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span>
+
+        <span class="n">password</span><span class="o">=</span><span class="s2">"password"</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">fetchrow</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE id = $1"</span><span class="p">,</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">if</span> <span class="n">row</span> <span class="k">else</span> <span class="kc">None</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-sqlite-aiosqlite">Using SQLite (aiosqlite)</h2>
+<p>SQLite is useful for:</p>
+<ul>
+<li>Small applications</li>
+<li>Development environments</li>
+<li>Local tools</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">aiosqlite</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="k">await</span> <span class="n">aiosqlite</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+        <span class="s2">"app.db"</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+
+    <span class="n">cursor</span> <span class="o">=</span> <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users"</span>
+    <span class="p">)</span>
+
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">],</span>
+                <span class="n">row</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span>
+    <span class="p">]</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-mongodb-motor">Using MongoDB (Motor)</h2>
+<p>Flaxon can also work with document databases.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">motor.motor_asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncIOMotorClient</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">AsyncIOMotorClient</span><span class="p">(</span>
+        <span class="s2">"mongodb://localhost:27017"</span>
+    <span class="p">)</span>
+
+
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">mydb</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">users</span>
+        <span class="o">.</span><span class="n">find</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]),</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span>
+    <span class="p">]</span>
+</code></pre></div>
+<hr/>
+<h2 id="using-redis">Using Redis</h2>
+<p>Redis is commonly used for:</p>
+<ul>
+<li>Caching</li>
+<li>Sessions</li>
+<li>Rate limiting</li>
+<li>Queues</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">redis.asyncio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">redis</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span>
+        <span class="s2">"redis://localhost:6379"</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/cache/&lt;key&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_cache</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="k">await</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">key</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"key"</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+        <span class="s2">"value"</span><span class="p">:</span> <span class="n">value</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="database-health-checks">Database Health Checks</h2>
+<p>Flaxon supports database health monitoring.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.health</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DatabaseHealthCheck</span>
+<span class="p">)</span>
+
+
+<span class="n">db_check</span> <span class="o">=</span> <span class="n">DatabaseHealthCheck</span><span class="p">(</span>
+    <span class="n">db</span>
+<span class="p">)</span>
+
+
+<span class="n">health</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="n">db_check</span>
+<span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/db"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">db_health</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db_check</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="transactions">Transactions</h2>
+<p>Transactions allow multiple operations to succeed or fail together.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/transfer"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">transfer</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="k">async</span> <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">tx</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            UPDATE accounts</span>
+<span class="sd">            SET balance = balance - 100</span>
+<span class="sd">            WHERE id = $1</span>
+<span class="sd">            """</span><span class="p">,</span>
+            <span class="mi">1</span>
+        <span class="p">)</span>
+
+
+        <span class="k">await</span> <span class="n">tx</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">"""</span>
+<span class="sd">            UPDATE accounts</span>
+<span class="sd">            SET balance = balance + 100</span>
+<span class="sd">            WHERE id = $1</span>
+<span class="sd">            """</span><span class="p">,</span>
+            <span class="mi">2</span>
+        <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="migrations">Migrations</h2>
+<p>Flaxon supports migration management.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MigrationRunner</span>
+<span class="p">)</span>
+
+
+<span class="n">runner</span> <span class="o">=</span> <span class="n">MigrationRunner</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">,</span>
+    <span class="s2">"migrations"</span>
+<span class="p">)</span>
+
+
+
+<span class="n">version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">runner</span><span class="o">.</span><span class="n">generate_migration</span><span class="p">(</span>
+
+    <span class="n">name</span><span class="o">=</span><span class="s2">"create_users_table"</span><span class="p">,</span>
+
+    <span class="n">up</span><span class="o">=</span><span class="s2">"""</span>
+<span class="s2">        CREATE TABLE users (</span>
+<span class="s2">            id SERIAL PRIMARY KEY,</span>
+<span class="s2">            name TEXT NOT NULL,</span>
+<span class="s2">            email TEXT UNIQUE NOT NULL</span>
+<span class="s2">        )</span>
+<span class="s2">    """</span>
+<span class="p">)</span>
+
+
+
+<span class="k">await</span> <span class="n">runner</span><span class="o">.</span><span class="n">migrate</span><span class="p">()</span>
+
+
+
+<span class="k">await</span> <span class="n">runner</span><span class="o">.</span><span class="n">rollback</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="database-connection-example">Database Connection Example</h2>
+<p>Complete database setup:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DatabaseManager</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.postgresql</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PostgreSQLAdapter</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"db-demo"</span>
+<span class="p">)</span>
+
+
+
+<span class="n">adapter</span> <span class="o">=</span> <span class="n">PostgreSQLAdapter</span><span class="p">(</span>
+
+    <span class="n">host</span><span class="o">=</span><span class="s2">"localhost"</span><span class="p">,</span>
+
+    <span class="n">database</span><span class="o">=</span><span class="s2">"mydb"</span><span class="p">,</span>
+
+    <span class="n">user</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span>
+
+    <span class="n">password</span><span class="o">=</span><span class="s2">"pass"</span>
+<span class="p">)</span>
+
+
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span>
+    <span class="n">adapter</span>
+<span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">startup</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_shutdown</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_users</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users"</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE id = $1"</span><span class="p">,</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        INSERT INTO users (name, email)</span>
+<span class="sd">        VALUES ($1, $2)</span>
+<span class="sd">        RETURNING *</span>
+<span class="sd">        """</span><span class="p">,</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s2">"email"</span><span class="p">]</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<p>For production applications:</p>
+<ul>
+<li>Use connection pooling.</li>
+<li>Keep database credentials in environment variables.</li>
+<li>Use migrations for schema changes.</li>
+<li>Use transactions for multi-step operations.</li>
+<li>Validate user input before database operations.</li>
+<li>Avoid raw SQL when user input is not parameterized.</li>
+<li>Monitor database health.</li>
+<li>Close connections during application shutdown.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Related documentation:</p>
+<ul>
+<li>Authentication</li>
+<li>Security</li>
+<li>Performance</li>
+<li>Configuration</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

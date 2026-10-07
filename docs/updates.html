@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon Update Policy — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon Update Policy — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon Update Policy</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/updates.md">Framework source</a> · <a href="../content/framework/docs/updates.md" download>Markdown</a></p><h1 id="flaxon-update-policy">Flaxon Update Policy</h1>
+<p>This document explains how updates are managed for the Flaxon framework and its official plugins.</p>
+<hr/>
+<h2 id="overview">Overview</h2>
+<p>Flaxon follows a predictable release cycle to ensure stability while delivering new features and improvements.</p>
+<p>Updates may include:</p>
+<ul>
+<li>New features</li>
+<li>Performance improvements</li>
+<li>Bug fixes</li>
+<li>Security patches</li>
+<li>Documentation updates</li>
+<li>New plugins</li>
+<li>CLI improvements</li>
+<li>Developer experience enhancements</li>
+</ul>
+<hr/>
+<h2 id="release-channels">Release Channels</h2>
+<h2 id="stable">Stable</h2>
+<p>Recommended for production.</p>
+<div class="highlight"><pre><span></span><code>pip install flaxon
+</code></pre></div>
+<p>Characteristics:</p>
+<ul>
+<li>Fully tested</li>
+<li>Production ready</li>
+<li>Backwards compatible</li>
+<li>Security reviewed</li>
+</ul>
+<hr/>
+<h2 id="pre-release">Pre-release</h2>
+<p>For testing upcoming features.</p>
+<div class="highlight"><pre><span></span><code>pip install --pre flaxon
+</code></pre></div>
+<p>May include:</p>
+<ul>
+<li>Beta releases</li>
+<li>Release candidates</li>
+<li>Experimental APIs</li>
+</ul>
+<p>Not recommended for production.</p>
+<hr/>
+<h2 id="development">Development</h2>
+<p>Built directly from GitHub.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/aldanedev-create/Flaxon-Backend-Framework
+
+<span class="nb">cd</span><span class="w"> </span>Flaxon-Backend-Framework
+
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div>
+<p>May contain:</p>
+<ul>
+<li>Incomplete features</li>
+<li>API changes</li>
+<li>Experimental functionality</li>
+</ul>
+<hr/>
+<h2 id="semantic-versioning">Semantic Versioning</h2>
+<p>Flaxon follows Semantic Versioning (SemVer).</p>
+<div class="highlight"><pre><span></span><code>MAJOR.MINOR.PATCH
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.0.0
+1.2.0
+1.2.5
+2.0.0
+</code></pre></div>
+<hr/>
+<h2 id="patch-releases">Patch Releases</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.3.4 → 1.3.5
+</code></pre></div>
+<p>Includes:</p>
+<ul>
+<li>Bug fixes</li>
+<li>Documentation updates</li>
+<li>Performance improvements</li>
+<li>Security fixes</li>
+<li>Internal optimizations</li>
+</ul>
+<p>No breaking changes.</p>
+<hr/>
+<h2 id="minor-releases">Minor Releases</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.3.0 → 1.4.0
+</code></pre></div>
+<p>Includes:</p>
+<ul>
+<li>New features</li>
+<li>New APIs</li>
+<li>New middleware</li>
+<li>New decorators</li>
+<li>CLI improvements</li>
+<li>Additional plugins</li>
+</ul>
+<p>Backwards compatible.</p>
+<hr/>
+<h2 id="major-releases">Major Releases</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>1.x.x → 2.0.0
+</code></pre></div>
+<p>Includes:</p>
+<ul>
+<li>Breaking API changes</li>
+<li>Removed deprecated features</li>
+<li>Large architecture improvements</li>
+<li>Major performance upgrades</li>
+</ul>
+<p>Migration guides will be provided.</p>
+<hr/>
+<h2 id="update-schedule">Update Schedule</h2>
+<table>
+<thead>
+<tr>
+<th>Release Type</th>
+<th>Typical Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patch</td>
+<td>As needed</td>
+</tr>
+<tr>
+<td>Minor</td>
+<td>Every 1–3 months</td>
+</tr>
+<tr>
+<td>Major</td>
+<td>When significant breaking changes are required</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>Immediately</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="updating-flaxon">Updating Flaxon</h2>
+<p>Upgrade to the latest stable release:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon
+</code></pre></div>
+<p>Upgrade standard extras:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<p>Upgrade all installed packages:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>list<span class="w"> </span>--outdated
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</code></pre></div>
+<hr/>
+<h2 id="updating-official-plugins">Updating Official Plugins</h2>
+<p>Update a specific plugin:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-ai
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-mobile
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-inertia
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-fyr
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-debug-toolbar
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-sentry
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-pytest
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-spring-boot
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon-ffd
+</code></pre></div>
+<hr/>
+<h2 id="checking-installed-version">Checking Installed Version</h2>
+<p>CLI:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>--version
+</code></pre></div>
+<p>Python:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">flaxon</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">flaxon</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="compatibility-policy">Compatibility Policy</h2>
+<p>Official plugins aim to remain compatible with the current stable release of Flaxon.</p>
+<p>Example:</p>
+<table>
+<thead>
+<tr>
+<th>Plugin Version</th>
+<th>Flaxon Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.2.x</td>
+<td>1.2.x</td>
+</tr>
+<tr>
+<td>1.3.x</td>
+<td>1.3.x</td>
+</tr>
+<tr>
+<td>2.0.x</td>
+<td>2.x</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="deprecation-policy">Deprecation Policy</h2>
+<p>Features are not removed immediately.</p>
+<p>The process is:</p>
+<ol>
+<li>Mark as deprecated.</li>
+<li>Emit a warning.</li>
+<li>Document the replacement.</li>
+<li>Remove in the next major release.</li>
+</ol>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>v1.8
+│
+├── Deprecated
+│
+v1.9
+│
+├── Still supported
+│
+v2.0
+│
+└── Removed
+</code></pre></div>
+<hr/>
+<h2 id="security-updates">Security Updates</h2>
+<p>Critical security issues receive immediate patch releases.</p>
+<p>Security releases may include:</p>
+<ul>
+<li>Authentication fixes</li>
+<li>Authorization fixes</li>
+<li>Dependency updates</li>
+<li>Template security improvements</li>
+<li>Request validation fixes</li>
+<li>WebSocket security patches</li>
+</ul>
+<p>Users should install security updates as soon as possible.</p>
+<hr/>
+<h2 id="breaking-changes">Breaking Changes</h2>
+<p>Major releases may include breaking changes.</p>
+<p>Every major release includes:</p>
+<ul>
+<li>Migration Guide</li>
+<li>Upgrade Notes</li>
+<li>Deprecated APIs</li>
+<li>Replacement APIs</li>
+<li>Updated examples</li>
+</ul>
+<hr/>
+<h2 id="documentation-updates">Documentation Updates</h2>
+<p>Documentation is updated alongside every release.</p>
+<p>This includes:</p>
+<ul>
+<li>API Reference</li>
+<li>Tutorials</li>
+<li>Examples</li>
+<li>CLI Documentation</li>
+<li>Plugin Documentation</li>
+</ul>
+<hr/>
+<h2 id="changelog">Changelog</h2>
+<p>Every release is documented in:</p>
+<div class="highlight"><pre><span></span><code>CHANGELOG.md
+</code></pre></div>
+<p>Each release includes:</p>
+<ul>
+<li>Added</li>
+<li>Changed</li>
+<li>Deprecated</li>
+<li>Removed</li>
+<li>Fixed</li>
+<li>Security</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="gu">## [1.4.0] - 2026-08-03</span>
+
+<span class="gu">### Added</span>
+
+<span class="k">-</span><span class="w"> </span>GraphQL subscriptions
+<span class="k">-</span><span class="w"> </span>New validation fields
+
+<span class="gu">### Changed</span>
+
+<span class="k">-</span><span class="w"> </span>Faster route matching
+
+<span class="gu">### Fixed</span>
+
+<span class="k">-</span><span class="w"> </span>WebSocket reconnect bug
+
+<span class="gu">### Security</span>
+
+<span class="k">-</span><span class="w"> </span>Improved JWT validation
+</code></pre></div>
+<hr/>
+<h2 id="upgrade-checklist">Upgrade Checklist</h2>
+<p>Before upgrading:</p>
+<ul>
+<li>Back up your project.</li>
+<li>Read the release notes.</li>
+<li>Review the migration guide (if applicable).</li>
+<li>Update dependencies.</li>
+<li>Run your test suite.</li>
+<li>Verify plugin compatibility.</li>
+</ul>
+<hr/>
+<h2 id="reporting-update-issues">Reporting Update Issues</h2>
+<p>If an update introduces unexpected behavior:</p>
+<ol>
+<li>Verify the installed version.</li>
+<li>Review the release notes.</li>
+<li>Check the migration guide.</li>
+<li>Search existing GitHub issues.</li>
+<li>Open a new issue with:</li>
+<li>Flaxon version</li>
+<li>Python version</li>
+<li>Operating system</li>
+<li>Error message</li>
+<li>Minimal reproducible example</li>
+</ol>
+<hr/>
+<h2 id="long-term-support-lts">Long-Term Support (LTS)</h2>
+<p>LTS releases receive:</p>
+<ul>
+<li>Security updates</li>
+<li>Critical bug fixes</li>
+<li>Stability improvements</li>
+</ul>
+<p>They do not receive new features.</p>
+<hr/>
+<h2 id="update-philosophy">Update Philosophy</h2>
+<p>Every Flaxon update should strive to be:</p>
+<ul>
+<li>Stable</li>
+<li>Predictable</li>
+<li>Well documented</li>
+<li>Backwards compatible where possible</li>
+<li>Fast</li>
+<li>Secure</li>
+<li>Easy to upgrade</li>
+<li>Production ready</li>
+</ul>
+<p>Our goal is to make upgrading Flaxon a smooth and reliable experience with minimal disruption to existing applications.</p></article>
+</main></div><div id="footer"></div></body></html>

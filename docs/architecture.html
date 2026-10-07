@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Architecture — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Architecture — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Architecture</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/architecture.md">Framework source</a> · <a href="../content/framework/docs/architecture.md" download>Markdown</a></p><h1 id="architecture">Architecture</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon is an <strong>ASGI-first Python web framework</strong> that sits between clients and your application services.</p>
+<p>The framework is responsible for:</p>
+<ul>
+<li>Protocol dispatch</li>
+<li>Routing</li>
+<li>Request and response handling</li>
+<li>Middleware execution</li>
+<li>Request validation</li>
+<li>Exception handling</li>
+<li>Application lifecycle events</li>
+<li>Extension and plugin registration</li>
+</ul>
+<p>Business logic belongs in your application's services, models, and domain layer—not inside the framework.</p>
+<hr/>
+<h2 id="layered-architecture">Layered Architecture</h2>
+<div class="highlight"><pre><span></span><code>┌──────────────────────────────────────────────────────┐
+│                  Client Layer                         │
+│  Web • Mobile • CLI • Desktop • Third-Party APIs     │
+└──────────────────────────────┬───────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────┐
+│                Flaxon Framework                      │
+│  Protocol → Routing → Middleware → Endpoint          │
+└──────────────────────────────┬───────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────┐
+│               Application Layer                      │
+│  Routes • Services • Schemas • Events • Business     │
+└──────────────────────────────┬───────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────┐
+│             Infrastructure Layer                     │
+│ Database • Cache • Storage • Queue • Email • Redis   │
+└──────────────────────────────────────────────────────┘
+</code></pre></div>
+<hr/>
+<h2 id="asgi-application">ASGI Application</h2>
+<p>Flaxon fully implements the <strong>ASGI 3.0 specification</strong>.</p>
+<p>Supported protocols include:</p>
+<ul>
+<li><strong>HTTP</strong> — Request and response handling</li>
+<li><strong>WebSocket</strong> — Real-time communication</li>
+<li><strong>Lifespan</strong> — Startup and shutdown events</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">scope</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"http"</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_http</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">scope</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"websocket"</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_websocket</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">scope</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"lifespan"</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_lifespan</span><span class="p">(</span><span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="request-lifecycle">Request Lifecycle</h2>
+<p>Every incoming request follows the same processing pipeline.</p>
+<div class="highlight"><pre><span></span><code>        Client
+           │
+           ▼
+    ASGI Server
+           │
+           ▼
+      Flaxon App
+           │
+           ▼
+      Middleware
+           │
+           ▼
+        Router
+           │
+           ▼
+ Parameter Resolution
+           │
+           ▼
+ Validation (Schemas)
+           │
+           ▼
+ Endpoint Function
+           │
+           ▼
+ Response Conversion
+           │
+           ▼
+ Exception Handling
+           │
+           ▼
+      ASGI Response
+</code></pre></div>
+<p>Processing steps:</p>
+<ol>
+<li>The ASGI server creates a request scope.</li>
+<li>Flaxon receives the request.</li>
+<li>Middleware executes.</li>
+<li>The router matches the path and HTTP method.</li>
+<li>Path parameters are converted.</li>
+<li>Request data is validated.</li>
+<li>The endpoint function executes.</li>
+<li>Python objects are converted into HTTP responses.</li>
+<li>Exceptions are translated into appropriate HTTP responses.</li>
+<li>The ASGI server sends the response back to the client.</li>
+</ol>
+<hr/>
+<h2 id="core-components">Core Components</h2>
+<h2 id="application">Application</h2>
+<p>The <code>Flaxon</code> class is the heart of the framework.</p>
+<p>It manages:</p>
+<ul>
+<li>Configuration</li>
+<li>Routes</li>
+<li>Middleware</li>
+<li>Application state</li>
+<li>Lifecycle events</li>
+<li>Jinax integration</li>
+<li>WebSocket rooms</li>
+<li>Debugger</li>
+<li>Extensions and plugins</li>
+</ul>
+<hr/>
+<h2 id="router">Router</h2>
+<p>The router is responsible for:</p>
+<ul>
+<li>Route registration</li>
+<li>URL matching</li>
+<li>URL generation</li>
+<li>HTTP method dispatch</li>
+<li>Path parameter conversion</li>
+</ul>
+<p>Route templates use angle-bracket parameters:</p>
+<div class="highlight"><pre><span></span><code><span class="o">/</span><span class="n">users</span><span class="o">/&lt;</span><span class="nb">int</span><span class="p">:</span><span class="nb">id</span><span class="o">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="request">Request</h2>
+<p>The <code>Request</code> object provides convenient access to:</p>
+<ul>
+<li>HTTP method</li>
+<li>URL</li>
+<li>Path</li>
+<li>Headers</li>
+<li>Cookies</li>
+<li>Query parameters</li>
+<li>Path parameters</li>
+<li>Request body</li>
+</ul>
+<p>Body methods are asynchronous for maximum performance.</p>
+<hr/>
+<h2 id="response">Response</h2>
+<p>Flaxon automatically converts common Python objects into HTTP responses.</p>
+<p>Supported return values include:</p>
+<ul>
+<li><code>dict</code></li>
+<li><code>list</code></li>
+<li><code>str</code></li>
+<li><code>bytes</code></li>
+<li><code>Response</code></li>
+<li>Streaming responses</li>
+</ul>
+<hr/>
+<h2 id="middleware">Middleware</h2>
+<p>Middleware wraps the application and executes in order.</p>
+<p>Typical middleware includes:</p>
+<ul>
+<li>CORS</li>
+<li>Security headers</li>
+<li>Authentication</li>
+<li>Rate limiting</li>
+<li>Request IDs</li>
+<li>Logging</li>
+<li>Compression</li>
+</ul>
+<hr/>
+<h2 id="validation">Validation</h2>
+<p>Flaxon uses declarative schemas for request validation.</p>
+<p>Validation automatically:</p>
+<ul>
+<li>Parses incoming data</li>
+<li>Converts types</li>
+<li>Validates values</li>
+<li>Returns HTTP 422 responses when validation fails</li>
+<li>Injects validated objects into route handlers</li>
+</ul>
+<hr/>
+<h2 id="websockets">WebSockets</h2>
+<p>Flaxon includes first-class WebSocket support.</p>
+<p>Features include:</p>
+<ul>
+<li>Room management</li>
+<li>Broadcasting</li>
+<li>Connection lifecycle</li>
+<li>JSON messaging</li>
+<li>Custom managers</li>
+</ul>
+<hr/>
+<h2 id="jinax">Jinax</h2>
+<p>Jinax is Flaxon's optional server-side template engine.</p>
+<p>It provides:</p>
+<ul>
+<li>HTML rendering</li>
+<li>Template inheritance</li>
+<li>Auto reload</li>
+<li>Jinja2 compatibility</li>
+</ul>
+<hr/>
+<h2 id="dependency-direction">Dependency Direction</h2>
+<div class="highlight"><pre><span></span><code>Client
+      │
+      ▼
+HTTP / WebSocket
+      │
+      ▼
+Flaxon Framework
+      │
+      ▼
+Application Services
+      │
+      ▼
+Repositories
+      │
+      ▼
+Infrastructure
+</code></pre></div>
+<p>Business services should avoid depending directly on <code>Request</code> objects whenever possible.</p>
+<p>Keeping services framework-independent makes them reusable from:</p>
+<ul>
+<li>HTTP endpoints</li>
+<li>WebSocket handlers</li>
+<li>Scheduled jobs</li>
+<li>CLI commands</li>
+<li>Background workers</li>
+<li>Unit tests</li>
+</ul>
+<hr/>
+<h2 id="concurrency-model">Concurrency Model</h2>
+<p>Flaxon is built on Python's <strong>asyncio</strong> event loop.</p>
+<p>All request handling is asynchronous and optimized for high-concurrency I/O workloads.</p>
+<h2 id="best-practices">Best Practices</h2>
+<p>✔ Use asynchronous database drivers.</p>
+<p>✔ Await all I/O operations.</p>
+<p>✔ Prefer async HTTP clients.</p>
+<p>✔ Keep endpoints non-blocking.</p>
+<p>Avoid:</p>
+<ul>
+<li>Long CPU-intensive operations</li>
+<li>Blocking file operations</li>
+<li>Synchronous database drivers</li>
+<li>Blocking network requests</li>
+</ul>
+<p>For CPU-intensive work, use background workers, task queues, or process pools to keep the event loop responsive.</p>
+<hr/>
+<h2 id="architecture-principles">Architecture Principles</h2>
+<p>Flaxon is designed around a few core principles:</p>
+<ul>
+<li><strong>Async-first</strong> — Built for modern asynchronous applications.</li>
+<li><strong>Technology-neutral</strong> — Use any database, frontend, ORM, or client.</li>
+<li><strong>Minimal magic</strong> — Explicit APIs that are easy to understand.</li>
+<li><strong>Scalable structure</strong> — Start with a single file and grow into large applications.</li>
+<li><strong>Composable</strong> — Add middleware, plugins, and extensions only when needed.</li>
+<li><strong>Developer-friendly</strong> — Helpful debugging, validation, and tooling out of the box.</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

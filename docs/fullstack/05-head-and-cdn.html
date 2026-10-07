@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 5: Configure the document head and CDN resources — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 5: Configure the document head and CDN resources — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 5: Configure the document head and CDN resources</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/05-head-and-cdn.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/05-head-and-cdn.md" download>Markdown</a></p><h1 id="lesson-5-configure-the-document-head-and-cdn-resources">Lesson 5: Configure the document head and CDN resources</h1>
+<p>Keep metadata in Python and application markup in Teloce:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/static"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+    <span class="n">project_root</span><span class="o">=</span><span class="n">project_root</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Taskboard"</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+    <span class="n">favicon</span><span class="o">=</span><span class="s2">"/static/favicon.svg"</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Track your team's tasks."</span><span class="p">,</span>
+    <span class="n">lang</span><span class="o">=</span><span class="s2">"en"</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">"#101827"</span><span class="p">,</span>
+    <span class="n">stylesheets</span><span class="o">=</span><span class="p">[</span><span class="s2">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"</span><span class="p">],</span>
+    <span class="n">scripts</span><span class="o">=</span><span class="p">[{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/help.js"</span><span class="p">,</span> <span class="s2">"defer"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>All extra settings are optional. The local icon must exist under the static
+mount. Resource configuration emits links; it does not copy resources or put
+your build on a CDN. Extra stylesheets follow compiled CSS, so inspect overrides.
+CDN scripts have page privileges: use trusted providers, pin versions and
+verified SRI attributes where practical. Do not load a second Teloce runtime.</p>
+<p>Avoid relying on an async script being ready in <code>mounted()</code>. Coordinate library
+readiness explicitly or use a bundled/local module when it is essential.
+For offline desktop applications, ship local fonts and assets. CSP also needs
+to account for the generated inline module bootstrap.</p>
+<p><strong>Checkpoint:</strong> inspect head tags, load the favicon, then disconnect networking.
+Confirm which external enhancements fail and that the core workflow remains
+usable. See the <a href="../api/teloce.html">resource attribute reference</a>.</p>
+<h2 id="keep-cdn-configuration-outside-component-code">Keep CDN configuration outside component code</h2>
+<p>The <a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/teloce_head_ts/app.py">converter</a> shows two separately named
+CDN variables. Multiple <code>cdn = ...</code> assignments overwrite one Python variable.
+Use lists when loading several resources:</p>
+<div class="highlight"><pre><span></span><code><span class="n">stylesheets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"/static/base.css"</span><span class="p">,</span> <span class="n">theme_cdn</span><span class="p">]</span>
+<span class="n">scripts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="n">library_cdn</span><span class="p">,</span> <span class="s2">"defer"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/help.js"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"module"</span><span class="p">},</span>
+<span class="p">]</span>
+</code></pre></div>
+<p>This fragment assumes <code>theme_cdn</code> and <code>library_cdn</code> contain pinned, trusted URLs.
+The module script can import browser modules; it cannot import Python or serve
+untranspiled TypeScript. No <code>async</code> execution order is guaranteed. If the page
+requires a third-party global, explicitly wait for readiness and show failure
+state. The converter's Bootstrap data attributes work independently of its
+Teloce calculation helper.</p>
+<h2 id="verify-the-page-not-just-the-configuration">Verify the page, not just the configuration</h2>
+<p>Inspect <code>html[lang]</code>, the title, icon link, description and theme-color metadata.
+Fetch each local URL and verify external library behavior. The repository's
+Chromium test converts miles using generated TypeScript output and opens a
+Bootstrap collapse using the CDN script. Resource links alone do not prove that
+an external library loaded or executed.</p>
+<p><a href="index.html">Course contents</a> · <a href="04-typescript.html">Previous lesson</a> · <a href="06-routing.html">Next lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>

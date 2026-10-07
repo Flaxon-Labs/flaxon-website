@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon VS Code Extension Cheat Sheet — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon VS Code Extension Cheat Sheet — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon VS Code Extension Cheat Sheet</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/vscode%20Cheatsheet.md">Framework source</a> · <a href="../../content/framework/docs/lessons/vscode Cheatsheet.md" download>Markdown</a></p><h1 id="flaxon-vs-code-extension-cheat-sheet">Flaxon VS Code Extension Cheat Sheet</h1>
+<p>A quick reference for the most commonly used features of the <strong>Flaxon VS Code Extension</strong>.</p>
+<hr/>
+<h2 id="commands">🚀 Commands</h2>
+<p>Open the <strong>Command Palette</strong> (<code>Ctrl+Shift+P</code>) and run:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Flaxon: Create Project</strong></td>
+<td>Create a new Flaxon project</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Run App</strong></td>
+<td>Run the current Flaxon application</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Debug App</strong></td>
+<td>Launch the debugger</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Generate Route</strong></td>
+<td>Create a new route</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Generate Schema</strong></td>
+<td>Generate a validation schema</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Generate Plugin</strong></td>
+<td>Generate a plugin</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Show Routes</strong></td>
+<td>Open the Route Explorer</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Restart Language Server</strong></td>
+<td>Restart the language server</td>
+</tr>
+<tr>
+<td><strong>Flaxon: Open Documentation</strong></td>
+<td>Open the Flaxon documentation</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="keyboard-shortcuts">⌨️ Keyboard Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Shift+P</code></td>
+<td>Open Command Palette</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+R</code></td>
+<td>Show Route Explorer</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+F5</code></td>
+<td>Run Flaxon Application</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+U</code></td>
+<td>Open Output Panel</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+E</code></td>
+<td>Open Explorer</td>
+</tr>
+<tr>
+<td><code>Ctrl+S</code></td>
+<td>Save file (refreshes routes)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="route-explorer">📁 Route Explorer</h2>
+<p>Displays all discovered routes.</p>
+<div class="highlight"><pre><span></span><code>Flaxon Routes
+├── app.py
+│   ├── GET /
+│   ├── POST /login
+│   └── GET /users
+├── api.py
+│   ├── GET /api/posts
+│   └── POST /api/posts
+└── admin.py
+    └── GET /admin
+</code></pre></div>
+<h3 id="method-colors">Method Colors</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>🟢</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>🟠</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>🔵</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>🔴</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>🟣</td>
+</tr>
+<tr>
+<td>WebSocket</td>
+<td>🔷</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="codelens">⚡ CodeLens</h2>
+<p>Appears above route handlers.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="c1"># ▶ Run    🐛 Debug    📍 References</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p>Available actions:</p>
+<ul>
+<li>▶ Run</li>
+<li>🐛 Debug</li>
+<li>📍 Find References</li>
+</ul>
+<hr/>
+<h2 id="intellisense">💡 IntelliSense</h2>
+<p>Type:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span>
+</code></pre></div>
+<p>Suggestions:</p>
+<div class="highlight"><pre><span></span><code>get
+post
+put
+delete
+patch
+websocket
+</code></pre></div>
+<p>Other completions:</p>
+<div class="highlight"><pre><span></span><code><span class="n">fields</span><span class="o">.</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>String
+Integer
+Float
+Boolean
+Email
+Choice
+UUID
+DateTime
+</code></pre></div>
+<hr/>
+<h2 id="snippets">📝 Snippets</h2>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Generates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>froute</code></td>
+<td>GET Route</td>
+</tr>
+<tr>
+<td><code>fpost</code></td>
+<td>POST Route</td>
+</tr>
+<tr>
+<td><code>fws</code></td>
+<td>WebSocket Route</td>
+</tr>
+<tr>
+<td><code>fschema</code></td>
+<td>Schema</td>
+</tr>
+<tr>
+<td><code>fvalidation</code></td>
+<td>Validation Route</td>
+</tr>
+<tr>
+<td><code>fmiddleware</code></td>
+<td>Middleware</td>
+</tr>
+<tr>
+<td><code>fplugin</code></td>
+<td>Plugin</td>
+</tr>
+<tr>
+<td><code>ftest</code></td>
+<td>Test</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>froute + Tab
+</code></pre></div>
+<p>↓</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"users"</span><span class="p">:</span> <span class="p">[]}</span>
+</code></pre></div>
+<hr/>
+<h2 id="hover-documentation">🔎 Hover Documentation</h2>
+<p>Hover over:</p>
+<ul>
+<li><code>@app.get</code></li>
+<li><code>@app.post</code></li>
+<li><code>Schema</code></li>
+<li><code>fields.StrField</code></li>
+<li><code>HTTPException</code></li>
+</ul>
+<p>to view documentation.</p>
+<hr/>
+<h2 id="diagnostics">🐛 Diagnostics</h2>
+<p>The extension checks for:</p>
+<ul>
+<li>Missing imports</li>
+<li>Missing <code>app = Flaxon()</code></li>
+<li>Non-async route handlers</li>
+<li>Missing return values</li>
+<li>Missing WebSocket <code>accept()</code></li>
+<li>Invalid schemas</li>
+<li>Invalid decorators</li>
+</ul>
+<hr/>
+<h2 id="running-your-app">▶ Running Your App</h2>
+<p>Command Palette:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Run App
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code>Ctrl+Shift+F5
+</code></pre></div>
+<hr/>
+<h2 id="debugging">🐞 Debugging</h2>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Debug App
+</code></pre></div>
+<p>Supports:</p>
+<ul>
+<li>Breakpoints</li>
+<li>Variable inspection</li>
+<li>Watch expressions</li>
+<li>Call stack</li>
+<li>Exceptions</li>
+</ul>
+<hr/>
+<h2 id="generate-code">🔧 Generate Code</h2>
+<p>Available generators:</p>
+<ul>
+<li>Project</li>
+<li>Route</li>
+<li>Schema</li>
+<li>Plugin</li>
+</ul>
+<hr/>
+<h2 id="important-settings">⚙️ Important Settings</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.entryPoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app:app"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableRouteExplorer"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableCodeLens"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableDiagnostics"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableCompletions"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.debug.reload"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.snippets.enable"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="status-bar">📊 Status Bar</h2>
+<table>
+<thead>
+<tr>
+<th>Icon</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ Flaxon</td>
+<td>Ready</td>
+</tr>
+<tr>
+<td>🔄 Flaxon</td>
+<td>Language Server Starting</td>
+</tr>
+<tr>
+<td>❌ Flaxon</td>
+<td>Error</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="supported-project-files">📂 Supported Project Files</h2>
+<p>The extension activates automatically when it detects:</p>
+<div class="highlight"><pre><span></span><code>app.py
+main.py
+run.py
+flaxon.py
+</code></pre></div>
+<hr/>
+<h2 id="development-workflow">🚀 Development Workflow</h2>
+<div class="highlight"><pre><span></span><code>Create Project
+      │
+      ▼
+Write Routes
+      │
+      ▼
+Use Snippets
+      │
+      ▼
+View Route Explorer
+      │
+      ▼
+Run Application
+      │
+      ▼
+Debug
+      │
+      ▼
+Test
+      │
+      ▼
+Commit
+</code></pre></div>
+<hr/>
+<h2 id="troubleshooting">🛠 Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extension not activating</td>
+<td>Open a Python file</td>
+</tr>
+<tr>
+<td>No routes</td>
+<td>Save file</td>
+</tr>
+<tr>
+<td>No CodeLens</td>
+<td>Enable <code>flaxon.enableCodeLens</code></td>
+</tr>
+<tr>
+<td>No completions</td>
+<td>Enable <code>flaxon.enableCompletions</code></td>
+</tr>
+<tr>
+<td>LSP stopped</td>
+<td>Run <strong>Flaxon: Restart Language Server</strong></td>
+</tr>
+<tr>
+<td>Debug not working</td>
+<td>Install the Python extension</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="recommended-extensions">📦 Recommended Extensions</h2>
+<table>
+<thead>
+<tr>
+<th>Extension</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>Python support</td>
+</tr>
+<tr>
+<td>Pylance</td>
+<td>IntelliSense</td>
+</tr>
+<tr>
+<td>GitHub Pull Requests</td>
+<td>Git integration</td>
+</tr>
+<tr>
+<td>Error Lens</td>
+<td>Better diagnostics</td>
+</tr>
+<tr>
+<td>Better Comments</td>
+<td>Comment highlighting</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="best-practices">✅ Best Practices</h2>
+<ul>
+<li>Keep Route Explorer open.</li>
+<li>Use snippets whenever possible.</li>
+<li>Save files frequently.</li>
+<li>Enable diagnostics.</li>
+<li>Restart the Language Server if IntelliSense stops.</li>
+<li>Use CodeLens to run and debug routes quickly.</li>
+</ul>
+<hr/>
+<h2 id="quick-reference">Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Shortcut / Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Command Palette</td>
+<td><code>Ctrl+Shift+P</code></td>
+</tr>
+<tr>
+<td>Route Explorer</td>
+<td><code>Ctrl+Shift+R</code></td>
+</tr>
+<tr>
+<td>Run App</td>
+<td><code>Ctrl+Shift+F5</code></td>
+</tr>
+<tr>
+<td>Output Panel</td>
+<td><code>Ctrl+Shift+U</code></td>
+</tr>
+<tr>
+<td>Restart Language Server</td>
+<td><code>Flaxon: Restart Language Server</code></td>
+</tr>
+<tr>
+<td>Create Project</td>
+<td><code>Flaxon: Create Project</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<p>Happy coding with <strong>Flaxon</strong>! 🚀</p></article>
+</main></div><div id="footer"></div></body></html>

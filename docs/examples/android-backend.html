@@ -1,221 +1,518 @@
-<!-- docs/examples/android-backend.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Android Backend Example – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Android Backend Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Android Backend Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Android Backend Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/android-Development.md">Framework source</a> · <a href="../../content/framework/docs/examples/android-Development.md" download>Markdown</a></p><h1 id="android-backend-example">Android Backend Example</h1>
+<p>Complete Android backend example using:</p>
+<ul>
+<li>Flaxon REST API</li>
+<li>JWT Authentication</li>
+<li>Flaxon Mobile Plugin</li>
+<li>Device Registration</li>
+<li>Firebase Push Notifications</li>
+<li>Offline Synchronization</li>
+<li>Android Kotlin Client</li>
+</ul>
+<hr/>
+<h2 id="project-setup">Project Setup</h2>
+<p>Install:</p>
+<p><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-mobile<span class="o">[</span>fcm<span class="o">]</span>
+<span class="sb">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+Project:
+</code></pre></div>
+android-backend/
+│
+├── app.py
+├── requirements.txt
+└── .env
+<div class="highlight"><pre><span></span><code>---
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+# Backend Application
 
-    <div id="header"></div>
+## app.py
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
-
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-
-                        <div class="section-title">Examples</div>
-                        <a href="/docs/examples/basic-api.html">Basic API</a>
-                        <a href="/docs/examples/react-backend.html">React Backend</a>
-                        <a href="/docs/examples/android-backend.html" class="active">Android Backend</a>
-                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
-                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
-                        <a href="/docs/examples/large-application.html">Large Application</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Android Backend Example</h1>
-                        <p>A mobile-optimized backend for Android applications with JWT authentication, device registration, and data synchronization.</p>
-
-                        <h2>Application Code</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># app.py
+```python
+import os
 import time
+
 from flaxon import Flaxon, HTTPException
-from flaxon.security import JWTBackend, User, login_required
+from flaxon.security import JWTBackend, login_required
 from flaxon.validation import Schema, fields
 
-app = Flaxon("android-backend")
+from flaxon_mobile import (
+    FlaxonMobilePlugin,
+    mobile_required,
+)
 
-# JWT Authentication
-jwt_backend = JWTBackend(secret_key="your-secret-key")
 
-# Schemas
-class LoginRequest(Schema):
-    email = fields.EmailField(required=True)
-    password = fields.StrField(required=True, min_length=8)
+app = Flaxon(
+    "android-backend"
+)
 
-class RegisterRequest(Schema):
-    username = fields.StrField(required=True, min_length=3, max_length=30)
-    email = fields.EmailField(required=True)
-    password = fields.StrField(required=True, min_length=8)
 
-class DeviceRegistration(Schema):
-    device_id = fields.StrField(required=True, min_length=8)
-    platform = fields.ChoiceField(["android", "ios"], required=True)
-    notification_token = fields.StrField(required=True, min_length=16)
-    app_version = fields.StrField(required=False)
+# ============================
+# Mobile Plugin
+# ============================
 
-class SyncRequest(Schema):
-    last_sync = fields.IntField(required=False, default=0)
-    local_changes = fields.ListField(required=False)
+mobile = FlaxonMobilePlugin(
+    fcm_api_key=os.environ.get(
+        "FCM_API_KEY"
+    ),
+    enable_device_middleware=True,
+)
 
-# In-memory storage
+
+await app.plugins.load_plugin(
+    mobile
+)
+
+
+# ============================
+# Authentication
+# ============================
+
+jwt = JWTBackend(
+    secret_key="secret-key"
+)
+
+
+# ============================
+# Database Simulation
+# ============================
+
 users = {}
+
 devices = {}
+
 posts = []
-user_id_counter = 1
-post_id_counter = 1
 
-@app.post("/api/v1/auth/register")
-async def register(data: RegisterRequest):
+
+
+# ============================
+# Schemas
+# ============================
+
+class LoginRequest(Schema):
+
+    email = fields.EmailField(
+        required=True
+    )
+
+    password = fields.StrField(
+        required=True
+    )
+
+
+
+class DeviceSchema(Schema):
+
+    device_id = fields.StrField(
+        required=True
+    )
+
+    platform = fields.ChoiceField(
+        [
+            "android",
+            "ios"
+        ],
+        required=True
+    )
+
+    fcm_token = fields.StrField(
+        required=True
+    )
+
+    app_version = fields.StrField(
+        required=False
+    )
+
+
+
+# ============================
+# Register User
+# ============================
+
+@app.post(
+    "/api/mobile/register"
+)
+async def register(data: LoginRequest):
+
     if data.email in users:
-        raise HTTPException(400, "Email already registered")
 
-    user = data.to_dict()
-    user["id"] = user_id_counter
-    user_id_counter += 1
-    user["created_at"] = int(time.time())
+        raise HTTPException(
+            400,
+            "User exists"
+        )
+
+
+    user = {
+
+        "id": len(users)+1,
+
+        "email": data.email,
+
+        "password": data.password,
+
+    }
+
+
     users[data.email] = user
 
-    token = await jwt_backend.create_token(User.from_dict(user))
-    return {"user": user, "token": token}
 
-@app.post("/api/v1/auth/login")
+    token = await jwt.create_token(
+        {
+            "id": user["id"],
+            "email": user["email"],
+        }
+    )
+
+
+    return {
+
+        "user": user,
+
+        "token": token,
+
+    }
+
+
+
+# ============================
+# Login
+# ============================
+
+@app.post(
+    "/api/mobile/login"
+)
 async def login(data: LoginRequest):
-    user = users.get(data.email)
+
+    user = users.get(
+        data.email
+    )
+
+
     if not user:
-        raise HTTPException(401, "Invalid credentials")
 
-    if user["password"] != data.password:
-        raise HTTPException(401, "Invalid credentials")
+        raise HTTPException(
+            401,
+            "Invalid login"
+        )
 
-    token = await jwt_backend.create_token(User.from_dict(user))
-    return {"user": user, "token": token}
 
-@app.post("/api/v1/devices")
+    token = await jwt.create_token(
+        {
+            "id": user["id"],
+            "email": user["email"],
+        }
+    )
+
+
+    return {
+
+        "token": token,
+
+        "user": user
+
+    }
+
+
+
+# ============================
+# Device Registration
+# ============================
+
+@app.post(
+    "/api/mobile/device"
+)
 @login_required
-async def register_device(request, data: DeviceRegistration):
-    user = getattr(request, "user")
+async def register_device(
+    request,
+    data: DeviceSchema
+):
+
     device = data.to_dict()
-    device["user_id"] = user.id
-    device["registered_at"] = int(time.time())
 
-    devices[data.device_id] = device
-    return {"success": True, "device": device}
 
-@app.get("/api/v1/profile")
+    device["user_id"] = (
+        request.user["id"]
+    )
+
+
+    devices[
+        device["device_id"]
+    ] = device
+
+
+
+    return {
+
+        "success": True,
+
+        "device": device
+
+    }
+
+
+
+# ============================
+# Send Push Notification
+# ============================
+
+@app.post(
+    "/api/mobile/notify"
+)
 @login_required
-async def get_profile(request):
-    user = getattr(request, "user")
-    return {"user": users.get(user.email)}
+async def notify(request):
 
-@app.put("/api/v1/profile")
-@login_required
-async def update_profile(request):
-    user = getattr(request, "user")
     data = await request.json()
 
-    stored_user = users.get(user.email)
-    if stored_user:
-        stored_user.update(data)
-        return {"updated": True, "user": stored_user}
 
-    raise HTTPException(404, "User not found")</code></pre>
-                        </div>
+    success = await mobile.send_push(
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
-                            <ul class="mb-0 mt-1">
-                                <li><strong>JWT Authentication:</strong> Secure token-based auth</li>
-                                <li><strong>Device Registration:</strong> Track mobile devices</li>
-                                <li><strong>Mobile-Optimized:</strong> Versioned API routes</li>
-                                <li><strong>Profile Management:</strong> User profile CRUD</li>
-                            </ul>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+        device_id=data["device_id"],
 
-    <div id="footer"></div>
+        title=data["title"],
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+        body=data["body"],
 
-</body>
-</html>
+    )
+
+
+    return {
+
+        "sent": success
+
+    }
+
+
+
+# ============================
+# Posts API
+# ============================
+
+@app.get(
+    "/api/mobile/posts"
+)
+async def posts_list():
+
+    return {
+
+        "data": posts
+
+    }
+
+
+
+@app.post(
+    "/api/mobile/posts"
+)
+@login_required
+async def create_post(
+    request
+):
+
+    data = await request.json()
+
+
+    post = {
+
+        "id": len(posts)+1,
+
+        "content":
+        data["content"],
+
+        "created":
+        int(time.time())
+
+    }
+
+
+    posts.append(post)
+
+
+    return {
+
+        "created": True,
+
+        "post": post
+
+    }
+
+
+
+# ============================
+# Mobile Health
+# ============================
+
+@app.get(
+    "/api/mobile/health"
+)
+async def health():
+
+    return {
+
+        "status":
+        "healthy",
+
+        "service":
+        "mobile"
+
+    }
+</code></pre></div></p>
+<hr/>
+<h2 id="android-kotlin-client">Android Kotlin Client</h2>
+<h2 id="retrofit-api">Retrofit API</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">interface</span><span class="w"> </span><span class="nc">ApiService</span><span class="w"> </span><span class="p">{</span>
+
+
+<span class="w">    </span><span class="nd">@POST</span><span class="p">(</span><span class="s">"api/mobile/login"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Body</span><span class="w"> </span><span class="n">request</span><span class="p">:</span><span class="w"> </span><span class="n">LoginRequest</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">LoginResponse</span>
+
+
+
+<span class="w">    </span><span class="nd">@POST</span><span class="p">(</span><span class="s">"api/mobile/device"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">registerDevice</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Header</span><span class="p">(</span><span class="s">"Authorization"</span><span class="p">)</span>
+<span class="w">        </span><span class="n">token</span><span class="p">:</span><span class="kt">String</span><span class="p">,</span>
+
+<span class="w">        </span><span class="nd">@Body</span>
+<span class="w">        </span><span class="n">device</span><span class="p">:</span><span class="n">DeviceRequest</span>
+
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">DeviceResponse</span>
+
+
+
+<span class="w">    </span><span class="nd">@GET</span><span class="p">(</span><span class="s">"api/mobile/posts"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">posts</span><span class="p">():</span>
+
+<span class="w">        </span><span class="n">PostsResponse</span>
+
+
+
+<span class="w">    </span><span class="nd">@POST</span><span class="p">(</span><span class="s">"api/mobile/posts"</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">createPost</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@Body</span><span class="w"> </span><span class="n">post</span><span class="p">:</span><span class="n">PostRequest</span>
+<span class="w">    </span><span class="p">):</span><span class="n">PostResponse</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="offline-synchronization">Offline Synchronization</h2>
+<p>Android stores changes locally:</p>
+<div class="highlight"><pre><span></span><code>Room Database
+       |
+       |
+Sync API
+       |
+       |
+Flaxon Backend
+</code></pre></div>
+<p>Endpoint:</p>
+<div class="highlight"><pre><span></span><code>POST /api/mobile/sync
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w"> </span><span class="nt">"changes"</span><span class="p">:[</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="s2">"post"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"content"</span><span class="p">:</span><span class="s2">"Hello"</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w"> </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="firebase-push-flow">Firebase Push Flow</h2>
+<div class="highlight"><pre><span></span><code>Android App
+
+    |
+    |
+FCM Token
+
+    |
+    |
+Flaxon Mobile Plugin
+
+    |
+    |
+Firebase Cloud Messaging
+
+    |
+    |
+Android Device
+</code></pre></div>
+<hr/>
+<h2 id="mobile-security">Mobile Security</h2>
+<p>Production checklist:</p>
+<p>✅ JWT authentication</p>
+<p>✅ HTTPS only</p>
+<p>✅ Device token encryption</p>
+<p>✅ Rate limiting</p>
+<p>✅ Token rotation</p>
+<p>✅ Device expiration</p>
+<p>✅ API versioning</p>
+<hr/>
+<h2 id="running">Running</h2>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>API:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000/api/mobile/health
+</code></pre></div>
+<hr/>
+<h2 id="features-demonstrated">Features Demonstrated</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Android API</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>JWT Login</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Device Registration</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>FCM Push</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Mobile Middleware</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Kotlin Retrofit Client</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Offline Sync</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Health Checks</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></article>
+</main></div><div id="footer"></div></body></html>
