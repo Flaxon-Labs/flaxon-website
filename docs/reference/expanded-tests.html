@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Expanded behavioral tests — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Expanded behavioral tests — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Expanded behavioral tests</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/tests/expanded/README.md">Framework source</a> · <a href="../../content/framework/tests/expanded/README.md" download>Markdown</a></p><h1 id="expanded-behavioral-tests">Expanded behavioral tests</h1>
+<p>This suite adds 100 test modules and 514 collected test cases. Each module
+covers a behavior or boundary of the real framework. Tests exercise HTTP
+responses, persistence, authorization, malformed input, expiration, and
+concurrency; they contain no placeholders, expected failures, or skipped cases.</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th style="text-align: right;">Test modules</th>
+<th style="text-align: right;">Cases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Validation fields and schemas</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">141</td>
+</tr>
+<tr>
+<td>HTTP routing, requests, responses, and streams</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">73</td>
+</tr>
+<tr>
+<td>Admin authentication, permissions, CMS, and durable state</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr>
+<td>Security middleware, credentials, CSRF, and rate limits</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">69</td>
+</tr>
+<tr>
+<td>Files, SQLite transactions, and migrations</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">41</td>
+</tr>
+<tr>
+<td>Caching, session lifecycle, signatures, and serialization</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr>
+<td>Modules, Jinax templates, context, loaders, and escaping</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr>
+<td>Health checks, metrics, mail, tasks, and WebSocket routing</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">41</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>100</strong></td>
+<td style="text-align: right;"><strong>514</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="run">Run</h2>
+<p>Use Python 3.11 or newer and install the framework's test dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard,dev,admin]"</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/expanded<span class="w"> </span>-q<span class="w"> </span>-o<span class="w"> </span><span class="nv">addopts</span><span class="o">=</span><span class="s1">''</span>
+python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>tests/expanded
+python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>tests/expanded
+</code></pre></div>
+<p>The command clears the repository's default coverage options to run this suite
+independently; it does not assert a coverage percentage. Tests use isolated
+applications and temporary storage. Expiration tests control clocks instead of
+sleeping, and mail adapter tests send no external email. The new suite needs
+no external database or Redis server. The existing full suite includes a Redis
+integration test and optional dependency, browser, and Python-version checks.</p>
+<h2 id="regressions-fixed-alongside-these-tests">Regressions fixed alongside these tests</h2>
+<ul>
+<li>Invalid UUID HTTP and WebSocket path values now fail route matching instead
+  of raising during converter casts.</li>
+<li>Non-ASCII JWT signatures raise <code>Unauthorized</code>; malformed password hashes
+  return <code>False</code> instead of leaking <code>TypeError</code>.</li>
+<li>Trusted hosts reject userinfo, paths, query strings, fragments, malformed
+  IPv6, invalid ports, and whitespace in HTTP authorities.</li>
+<li>Signed-cookie decoding splits at the final signature separator, preserving
+  fractional timestamps and dots in application data. Malformed signatures
+  return <code>None</code>.</li>
+<li>Composite template loaders fall through when Jinja2 raises
+  <code>TemplateNotFound</code>, allowing module templates to supply missing app pages.</li>
+<li>CSS escaping imports its regex dependency and terminates hexadecimal
+  escapes so following characters cannot extend them.</li>
+</ul>
+<p>These regression tests strengthen the existing suite; they are not a claim
+that every framework feature or security boundary has been exhaustively tested.</p>
+<h2 id="verification">Verification</h2>
+<p>On Python 3.12, the expanded suite passed all 514 cases. The full repository
+suite passed with 836 passed and 26 skipped, using a temporary local Redis
+server, the current local Teloce source checkout, and MinifyJS 0.1.3. The skipped
+checks require optional drivers, browser setup, or newer Python versions.
+The full run used <code>python -m pytest -q -o addopts=''</code>.</p>
+<p>All new tests pass Ruff lint and format checks. Repository-wide Ruff still
+reports existing findings; comparison against main found no new findings.
+<code>mypy .</code> stops on duplicate example modules named <code>app</code> on both this branch
+and unchanged main. This change does not claim a passing repository-wide
+type check or coverage threshold.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -39,6 +39,10 @@ ALIASES = {
     "SECURITY.md": "docs/reference/security-policy.html",
     "SECURITY_HARDENING.md": "docs/reference/security-hardening.html",
     "benchmarks/README.md": "docs/reference/benchmarks.html",
+    "ROADMAP.md": "docs/reference/roadmap.html",
+    "SUPPORT.md": "docs/reference/support.html",
+    "CODE_OF_CONDUCT.md": "docs/reference/code-of-conduct.html",
+    "tests/expanded/README.md": "docs/reference/expanded-tests.html",
 }
 for name in ["routing", "requests", "responses", "middleware", "validation"]:
     ALIASES[f"docs/guides/{name}.md"] = f"docs/core-concepts/{name}.html"
@@ -82,7 +86,13 @@ def target_path(source):
 def section(source, url):
     if "/fullstack/" in url:
         return "Full-stack course"
-    if "/core-concepts/" in url:
+    if source in {
+        "docs/architecture.md", "docs/configuration.md",
+        "docs/guides/authentication.md", "docs/guides/authorization.md",
+        "docs/guides/databases.md", "docs/guides/Modules.md",
+        "docs/guides/jinax.md", "docs/guides/websockets.md",
+        "docs/guides/tasks.md", "docs/guides/testing.md",
+    } or "/core-concepts/" in url:
         return "Core concepts"
     if "/getting-started/" in url or source == "docs/philosophy.md":
         return "Getting started"
@@ -259,20 +269,11 @@ def sync(checkout):
     commit = subprocess.check_output(
         ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
     ).strip()
-    sources = sorted(
-        set(checkout.joinpath("docs").rglob("*.md"))
-        | set(checkout.joinpath("examples").rglob("*.md"))
-    )
-    for name in [
-        "README.md",
-        "CHANGELOG.md",
-        "CONTRIBUTING.md",
-        "SECURITY.md",
-        "SECURITY_HARDENING.md",
-        "benchmarks/README.md",
-    ]:
-        if (checkout / name).is_file():
-            sources.append(checkout / name)
+    # Every tracked Markdown document belongs in the published inventory.
+    tracked = subprocess.check_output(
+        ["git", "-C", str(checkout), "ls-files", "-z", "*.md"], text=True
+    ).split("\0")
+    sources = [checkout / path for path in sorted(tracked) if path]
     entries = []
     symbols = {}
     outputs = set()

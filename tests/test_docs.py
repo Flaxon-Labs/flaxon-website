@@ -38,6 +38,15 @@ class DocumentationTests(unittest.TestCase):
         self.assertTrue(expected.issubset({a["href"] for a in nav.select("a[href]")}))
         self.assertEqual(len(expected), len(self.manifest["pages"]))
 
+    def test_core_concepts_are_discoverable_without_removing_old_urls(self):
+        core = {e.get("source") for e in self.source["pages"] if e["section"] == "Core concepts"}
+        for name in ("routing", "requests", "responses", "middleware", "validation",
+                     "authentication", "authorization", "databases", "Modules",
+                     "jinax", "websockets", "tasks", "testing"):
+            self.assertIn(f"docs/guides/{name}.md", core)
+        self.assertIn("docs/architecture.md", core)
+        self.assertIn("docs/configuration.md", core)
+
     def test_examples_keep_fullstack_and_backend_paths(self):
         page = self.html[ROOT / "examples.html"]
         text = page.get_text(" ", strip=True)

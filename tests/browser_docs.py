@@ -64,6 +64,9 @@ def main():
                     assert page.locator(".doc-content").evaluate(
                         "(el) => el.getBoundingClientRect().right <= innerWidth + 1"
                     ), entry["url"]
+                    assert page.locator(".doc-content pre code").evaluate_all(
+                        "els => els.every(el => getComputedStyle(el).backgroundColor === 'rgba(0, 0, 0, 0)')"
+                    ), ("Code blocks must not inherit inline backgrounds", entry["url"])
                     assert len(page.locator('[aria-current="page"]').all()) == 1, entry[
                         "url"
                     ]
