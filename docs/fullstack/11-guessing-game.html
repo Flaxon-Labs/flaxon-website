@@ -42,6 +42,7 @@ python management.py createsuperuser
 flaxon run app:app --reload
 </code></pre>
 <p>Enter your own Admin username, email, and strong password when prompted. Password input is hidden. There are no default credentials. Open <a href="http://127.0.0.1:8000/play">http://127.0.0.1:8000/play</a>. You can also start with <code>python -m flaxon run app:app --reload</code>.</p>
+<p>The <code>.python-version</code> file selects Python 3.12 on Render and allows its latest available security patch. Keep your local Python installation updated as well.</p>
 <p>The requirements pin the exact framework Git commit used to verify this tutorial, rather than assuming that a PyPI package with the same version number contains these APIs. Upgrade the pin deliberately after running the tests.</p>
 <h2 id="2-understand-the-spa-and-api">2. Understand the SPA and API</h2>
 <p>Jinax serves the same document at <code>/</code>, <code>/play</code>, and <code>/results</code>, so opening or refreshing a deep link works. JavaScript intercepts ordinary navigation clicks and uses <code>history.pushState()</code>; the browser Back button updates the visible view. API requests go to the same origin.</p>
@@ -52,6 +53,9 @@ flaxon run app:app --reload
 <p>Create each file at the path shown. The download already contains this exact structure.</p>
 <h3 id="requirementstxt"><code>requirements.txt</code></h3>
 <pre><code class="language-text">flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34
+</code></pre>
+<h3 id="python-version"><code>.python-version</code></h3>
+<pre><code class="language-text">3.12
 </code></pre>
 <h3 id="gitignore"><code>.gitignore</code></h3>
 <pre><code class="language-text">.venv/
@@ -333,8 +337,6 @@ if(current){$('guess-form').hidden=false;$('message').textContent=`Round restore
     startCommand: python management.py migrate &amp;&amp; uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1 --no-proxy-headers
     healthCheckPath: /healthz
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.8
       - key: APP_ENV
         value: production
       - key: DATA_DIR

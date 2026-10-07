@@ -47,6 +47,8 @@ flaxon run app:app --reload
 
 Enter your own Admin username, email, and strong password when prompted. Password input is hidden. There are no default credentials. Open <http://127.0.0.1:8000/play>. You can also start with `python -m flaxon run app:app --reload`.
 
+The `.python-version` file selects Python 3.12 on Render and allows its latest available security patch. Keep your local Python installation updated as well.
+
 The requirements pin the exact framework Git commit used to verify this tutorial, rather than assuming that a PyPI package with the same version number contains these APIs. Upgrade the pin deliberately after running the tests.
 
 ## 2. Understand the SPA and API
@@ -67,6 +69,12 @@ Create each file at the path shown. The download already contains this exact str
 
 ```text
 flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34
+```
+
+### `.python-version`
+
+```text
+3.12
 ```
 
 ### `.gitignore`
@@ -372,8 +380,6 @@ services:
     startCommand: python management.py migrate && uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1 --no-proxy-headers
     healthCheckPath: /healthz
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.8
       - key: APP_ENV
         value: production
       - key: DATA_DIR
