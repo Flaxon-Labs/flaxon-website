@@ -133,7 +133,7 @@ The site uses `flaxon.dev`. Configure your DNS:
 
 The website includes:
 
-* 134 documentation pages covering full-stack and backend development
+* 135 documentation pages covering full-stack and backend development
 * 6 interactive examples demonstrating real-world usage
 * 4 blog posts with news and updates
 * Complete API reference for all modules

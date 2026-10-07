@@ -757,6 +757,11 @@
       "section": "Full-stack course"
     },
     {
+      "url": "docs/fullstack/13-html-spa-routing.html",
+      "title": "Lesson 13: Complete SPA routing with Flaxon and Teloce .html",
+      "section": "Full-stack course"
+    },
+    {
       "url": "docs/guides/backend-only.html",
       "title": "Use Flaxon as a backend",
       "section": "Website guides"

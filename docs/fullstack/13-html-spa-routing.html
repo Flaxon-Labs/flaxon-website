@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 13: Complete SPA routing with Flaxon and Teloce .html — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 13: Complete SPA routing with Flaxon and Teloce .html — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 13: Complete SPA routing with Flaxon and Teloce .html</span></nav>
+<article class="doc-content"><h1 id="lesson-13-complete-spa-routing-with-flaxon-and-teloce-html">Lesson 13: Complete SPA routing with Flaxon and Teloce .html</h1>
+<p>Build a working three-page SPA using <code>.html</code> single-file components, <code>data-teloce-link</code>, and Flaxon's Teloce integration. This lesson supplies every application file. Use the dependency pins from the <a href="11-guessing-game.html">guessing game</a>, which includes a larger module-based project and production deployment.</p>
+<h2 id="how-flaxon-works-with-teloce">How Flaxon works with Teloce</h2>
+<ol>
+<li>You author <code>.html</code> components containing <code>&lt;template&gt;</code>, optional <code>&lt;script&gt;</code>, and optional <code>&lt;style&gt;</code> sections. They are compiler inputs, not raw static HTML or Jinax templates.</li>
+<li><code>app.use_teloce()</code> registers the source trees and a startup build. It compiles components, emits the shared browser runtime, discovers <code>pages/</code>, and generates a router. It also registers the generated asset endpoint at <code>/_flaxon</code>.</li>
+<li>A Flaxon page endpoint returns <code>await request.compile("app.html", context)</code>. The response is an HTML document that loads the compiled root component and mounts the generated router into the marked outlet.</li>
+<li>Teloce runs in the browser. A normal click on a matching <code>data-teloce-link</code> anchor changes the current page without reloading the document. Back and Forward use the same router.</li>
+<li><code>fetch()</code> requests still reach Python endpoints. Flaxon owns validation, authentication, authorization, secrets, and database work.</li>
+</ol>
+<p>Flaxon's integration defaults to history routing. The browser and server must both recognize direct page URLs. This tutorial uses explicit server routes so unknown APIs cannot accidentally return a successful SPA document.</p>
+<h2 id="1-create-the-project">1. Create the project</h2>
+<p>Create a folder containing these paths:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>requirements.txt</code></td>
+<td>Verified dependency pins; copy from the capstone</td>
+</tr>
+<tr>
+<td><code>app.py</code></td>
+<td>Configure Flaxon, serve page URLs, and implement JSON APIs</td>
+</tr>
+<tr>
+<td><code>ui/app.html</code></td>
+<td>Persistent navigation and router outlet</td>
+</tr>
+<tr>
+<td><code>ui/pages/Home.html</code></td>
+<td><code>/</code></td>
+</tr>
+<tr>
+<td><code>ui/pages/About.html</code></td>
+<td><code>/about</code></td>
+</tr>
+<tr>
+<td><code>ui/pages/users/[id].html</code></td>
+<td><code>/users/:id</code></td>
+</tr>
+</tbody>
+</table>
+<p>Install and run from the project folder:</p>
+<pre><code class="language-bash">python -m venv .venv
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# Or macOS/Linux:
+# source .venv/bin/activate
+python -m pip install -r requirements.txt
+flaxon run app:app --reload
+</code></pre>
+<p>You can also run <code>python -m flaxon run app:app --reload</code>. No separate Teloce CLI build or hand-written router initialization is needed for this Flaxon application.</p>
+<h2 id="2-apppy">2. app.py</h2>
+<pre><code class="language-python">from pathlib import Path
+from flaxon import Flaxon, Request
+from flaxon.http import JSONResponse
+
+ROOT = Path(__file__).resolve().parent
+app = Flaxon("Routing lesson", debug=True)
+app.use_teloce(project_root=ROOT, ui_dir="ui", title="Routing lesson")
+
+@app.get("/api/users/&lt;int:user_id&gt;")
+async def user(user_id: int):
+    # Public fixture data; replace with authenticated database access later.
+    users = {1: {"id": 1, "name": "Avery"}, 2: {"id": 2, "name": "Jordan"}}
+    if user_id not in users:
+        return JSONResponse({"error": "User not found."}, status_code=404)
+    return users[user_id]
+
+@app.get("/")
+@app.get("/about")
+@app.get("/users/&lt;int:user_id&gt;")
+async def page(request: Request, user_id: int = 0):
+    return await request.compile("app.html", {"siteName": "Flaxon routing lesson"})
+</code></pre>
+<p>The Python route <code>/users/&lt;int:user_id&gt;</code> serves the shell on a direct visit. Teloce's generated <code>/users/:id</code> route selects the browser page and passes the <code>id</code> parameter as a prop. The <code>/api/users/&lt;int:user_id&gt;</code> route returns JSON. These routes have different jobs.</p>
+<p>Unknown server page URLs and unknown APIs return framework errors; they do not become the home page. If you choose a broad SPA catch-all later, register explicit API-not-found behavior and keep Admin/static namespaces out of that fallback.</p>
+<h2 id="3-uiapphtml">3. ui/app.html</h2>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;div class="shell"&gt;
+        &lt;header&gt;
+            &lt;h1&gt;{{ siteName }}&lt;/h1&gt;
+            &lt;nav aria-label="Main navigation"&gt;
+                &lt;a href="/" data-teloce-link&gt;Home&lt;/a&gt;
+                &lt;a href="/about" data-teloce-link&gt;About&lt;/a&gt;
+                &lt;a href="/users/1" data-teloce-link&gt;Avery&lt;/a&gt;
+                &lt;a href="/users/2" data-teloce-link&gt;Jordan&lt;/a&gt;
+            &lt;/nav&gt;
+        &lt;/header&gt;
+        &lt;main data-teloce-router-view&gt;&lt;/main&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default { props: ["siteName"] };
+&lt;/script&gt;
+&lt;style&gt;
+body { margin: 0; font-family: system-ui, sans-serif; color: #172338; }
+.shell { max-width: 48rem; margin: 2rem auto; padding: 1rem; }
+nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+main { padding-top: 2rem; }
+a { color: #17638a; }
+a:focus-visible, button:focus-visible { outline: 3px solid #0ea5e9; }
+&lt;/style&gt;
+</code></pre>
+<p>The root component remains mounted while the outlet swaps pages. Use one outlet and let Flaxon mount its router once. Do not add a competing <code>pushState()</code> click handler.</p>
+<h2 id="4-uipageshomehtml">4. ui/pages/Home.html</h2>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;section&gt;
+        &lt;h2&gt;Home&lt;/h2&gt;
+        &lt;p&gt;The navigation above changes pages without reloading this document.&lt;/p&gt;
+        &lt;a href="/about" data-teloce-link&gt;Read about this application&lt;/a&gt;
+    &lt;/section&gt;
+&lt;/template&gt;
+</code></pre>
+<h2 id="5-uipagesabouthtml">5. ui/pages/About.html</h2>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;section&gt;
+        &lt;h2&gt;About&lt;/h2&gt;
+        &lt;p&gt;Flaxon serves HTTP and APIs. Teloce compiles and runs the browser UI.&lt;/p&gt;
+        &lt;a href="/users/1" data-teloce-link&gt;Open a dynamic user page&lt;/a&gt;
+    &lt;/section&gt;
+&lt;/template&gt;
+</code></pre>
+<h2 id="6-uipagesusersidhtml">6. ui/pages/users/[id].html</h2>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;section&gt;
+        &lt;h2&gt;User details&lt;/h2&gt;
+        &lt;p v-if="loading" role="status"&gt;Loading user…&lt;/p&gt;
+        &lt;p v-else-if="error" role="alert"&gt;{{ error }}&lt;/p&gt;
+        &lt;p v-else&gt;{{ user.name }} (user {{ user.id }})&lt;/p&gt;
+        &lt;a href="/" data-teloce-link&gt;Back home&lt;/a&gt;
+    &lt;/section&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+    props: ["id"],
+    data() { return { user: null, loading: true, error: "" }; },
+    async mounted() {
+        try {
+            const response = await fetch(`/api/users/${encodeURIComponent(this.id)}`);
+            const body = await response.json();
+            if (!response.ok) throw new Error(body.error || "Could not load this user.");
+            this.user = body;
+        } catch (error) {
+            this.error = error.message;
+        } finally {
+            this.loading = false;
+        }
+    },
+};
+&lt;/script&gt;
+</code></pre>
+<p>The router mounts a new page when navigation changes. Its <code>mounted()</code> hook loads that user's data. Server authorization is still required for private users, even if the browser page is hidden behind a navigation guard.</p>
+<h2 id="7-understand-data-teloce-link-precisely">7. Understand data-teloce-link precisely</h2>
+<table>
+<thead>
+<tr>
+<th>Anchor</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;a href="/about" data-teloce-link&gt;</code></td>
+<td>Client navigation when the router matches <code>/about</code></td>
+</tr>
+<tr>
+<td><code>&lt;a href="/users/2" data-teloce-link&gt;</code></td>
+<td>Dynamic client navigation with <code>id="2"</code></td>
+</tr>
+<tr>
+<td><code>&lt;a href="/users/2?tab=profile" data-teloce-link&gt;</code></td>
+<td>Route params and query values are passed to the page; declare the props you need</td>
+</tr>
+<tr>
+<td><code>&lt;a href="/admin/login"&gt;</code></td>
+<td>Normal navigation to protected server-rendered Admin</td>
+</tr>
+<tr>
+<td>External URL</td>
+<td>Normal browser navigation, even if accidentally marked</td>
+</tr>
+<tr>
+<td><code>download</code> or another <code>target</code></td>
+<td>Normal browser behavior</td>
+</tr>
+<tr>
+<td>Ctrl/Command/Shift click</td>
+<td>Normal browser behavior, including opening another tab</td>
+</tr>
+<tr>
+<td>Same-page fragment</td>
+<td>Normal fragment behavior</td>
+</tr>
+<tr>
+<td>Marked URL with no matching client route</td>
+<td>Normal server navigation; ensure the server returns the intended 404/page</td>
+</tr>
+</tbody>
+</table>
+<p>The attribute belongs on an anchor with a real <code>href</code>, not on an arbitrary button. Real links remain useful for opening a new tab, copying a URL, and accessibility. Do not set every link to <code>href="#"</code>.</p>
+<h2 id="8-programmatic-navigation-guards-and-cleanup">8. Programmatic navigation, guards, and cleanup</h2>
+<p>When a workflow needs navigation after saving, use the existing integration router:</p>
+<pre><code class="language-javascript">await window.__TELOCE_ROUTER__.push("/about");
+await window.__TELOCE_ROUTER__.replace({ path: "/users/1", query: { tab: "profile" } });
+window.__TELOCE_ROUTER__.back();
+</code></pre>
+<p><code>push</code> adds history; <code>replace</code> replaces the current entry. <code>resolve</code> checks a route without navigating. <code>beforeEach</code> and <code>afterEach</code> return removal functions. Store and call those removers from <code>beforeUnmount()</code> if a page registers hooks. Do not destroy the application router when a single page leaves.</p>
+<p>Stop owned effects, intervals, observers, and sockets when a page unmounts. Ordinary <code>signal()</code>, <code>effect()</code>, and related calls inside compiled <code>.html</code> scripts receive compiler-generated imports; they do not require hand-written runtime URLs. See <a href="12-teloce-flaxon-apis.html">the corrected API lesson</a> for the difference between automatic signal bindings and explicit data-helper imports.</p>
+<h2 id="9-move-pages-into-flaxon-modules">9. Move pages into Flaxon modules</h2>
+<p>For a feature-owned UI:</p>
+<pre><code class="language-python">from pathlib import Path
+from flaxon.modules import FlaxonModule
+
+users = FlaxonModule(
+    "users",
+    ui_dir=Path(__file__).parent / "ui",
+    ui_routes={"Details/[id].js": "/users/:id"},
+)
+
+@users.get("/&lt;int:user_id&gt;")
+async def user(user_id: int):
+    return {"id": user_id}
+
+# In app.py, before startup:
+app.mount_module(users, prefix="/api/users")
+</code></pre>
+<p>The <code>ui_routes</code> key is the <strong>generated</strong> filename under that module's <code>pages/</code>: author <code>ui/pages/Details/[id].html</code>, map <code>Details/[id].js</code>. All module UI trees participate in one build and one router. Backend prefixes do not automatically prefix browser routes. Duplicate client routes fail the build; avoid naming two module pages <code>Home.html</code> unless you explicitly give them distinct paths.</p>
+<p>Use the <a href="11-guessing-game.html">complete guessing game</a> to see two working feature modules, the root shell, protected Admin, persistence, setup, and Render deployment together.</p>
+<h2 id="10-test-the-complete-flow">10. Test the complete flow</h2>
+<ul>
+<li>Open <code>/</code>, then click About and both user links. Confirm the browser has no module errors.</li>
+<li>In DevTools, set <code>window.navigationCheck = 42</code>, click a marked link, and read it again. It remains <code>42</code> because the document was not reloaded.</li>
+<li>Refresh <code>/users/2</code> and open the same URL in a new tab. Both must work.</li>
+<li>Use Back and Forward; verify the selected user changes correctly.</li>
+<li>Open <code>/users/99</code> and confirm a visible data error, not a broken component.</li>
+<li>Request <code>/api/missing</code>; confirm it returns an error instead of the SPA shell.</li>
+<li>Check modified clicks, mobile navigation, keyboard focus, and production-generated assets.</li>
+</ul>
+<p><a href="12-teloce-flaxon-apis.html">Previous: Teloce and Flaxon APIs</a> · <a href="index.html">Course contents</a></p></article>
+</main></div><div id="footer"></div></body></html>
