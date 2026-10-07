@@ -205,7 +205,7 @@
 }
 
 /* ----- Inline Code ----- */
-.doc-content code:not(.hljs) {
+.doc-content :not(pre) > code:not(.hljs) {
     background: #e2e8f0;
     padding: 0.1rem 0.4rem;
     border-radius: 4px;
@@ -213,7 +213,7 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-.dark .doc-content code:not(.hljs) {
+.dark .doc-content :not(pre) > code:not(.hljs) {
     background: #334155;
     color: #e2e8f0;
 }

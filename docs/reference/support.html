@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Support — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Support — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Support</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/SUPPORT.md">Framework source</a> · <a href="../../content/framework/SUPPORT.md" download>Markdown</a></p><h1 id="support">Support</h1>
+<p>Welcome to Flaxon! This document explains where developers can get help,
+report issues, and contribute to the project.</p>
+<h2 id="documentation">Documentation</h2>
+<p>Start with the official Flaxon documentation:</p>
+<ul>
+<li><a href="https://flaxon.dev/quickstart">Quick Start Guide</a></li>
+<li><a href="https://flaxon.dev/api">API Reference</a></li>
+<li><a href="https://flaxon.dev/guides">Guides</a></li>
+<li><a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/tree/main/examples">Examples</a></li>
+</ul>
+<p>For the latest source code, releases, documentation, and development
+information, visit the
+<a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework">Flaxon GitHub repository</a>.</p>
+<h2 id="community-and-development">Community and Development</h2>
+<h3 id="github">GitHub</h3>
+<p>The GitHub repository is the primary location for project development.</p>
+<ul>
+<li><strong>Issues</strong> — <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/issues">Report bugs and technical problems</a></li>
+<li><strong>Discussions</strong> — <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/discussions">Ask questions and discuss ideas</a></li>
+<li><strong>Pull Requests</strong> — <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/pulls">Submit code and documentation contributions</a></li>
+</ul>
+<h2 id="when-to-use-each-channel">When to Use Each Channel</h2>
+<table>
+<thead>
+<tr>
+<th>Issue Type</th>
+<th>Best Channel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bug report</td>
+<td>GitHub Issues</td>
+</tr>
+<tr>
+<td>Feature request</td>
+<td>GitHub Discussions</td>
+</tr>
+<tr>
+<td>General question</td>
+<td>GitHub Discussions</td>
+</tr>
+<tr>
+<td>Documentation issue</td>
+<td>GitHub Issues</td>
+</tr>
+<tr>
+<td>Code contribution</td>
+<td>Pull Request</td>
+</tr>
+<tr>
+<td>Security vulnerability</td>
+<td><code>SECURITY.md</code></td>
+</tr>
+<tr>
+<td>Plugin issue</td>
+<td>GitHub Issues</td>
+</tr>
+<tr>
+<td>Plugin contribution</td>
+<td>Pull Request</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-project-status">Current Project Status</h2>
+<p>Flaxon 2.0 is the current major development version.</p>
+<p>The <strong>core framework API is largely stable</strong> and the project has an established
+plugin architecture.</p>
+<p>Ongoing development focuses on:</p>
+<ul>
+<li>Bug fixes and maintenance</li>
+<li>Plugin stabilization</li>
+<li>Compatibility testing</li>
+<li>Security improvements</li>
+<li>Performance testing</li>
+<li>Documentation</li>
+<li>Developer tooling</li>
+<li>Example applications</li>
+<li>Ecosystem development</li>
+</ul>
+<p>Individual plugins may have different levels of maturity and may require
+additional testing before being used in critical production systems.</p>
+<p>For important applications, users should test the specific Flaxon version
+and plugins they intend to deploy.</p>
+<h2 id="how-is-flaxon-different-from-flask">How Is Flaxon Different from Flask?</h2>
+<p>Flaxon is designed as an <strong>async-first Python backend framework built around
+ASGI</strong>.</p>
+<p>It provides Flask-style routing and application development while providing
+built-in support for asynchronous applications, WebSockets, middleware,
+validation, testing, debugging, and extensibility.</p>
+<h2 id="how-is-flaxon-different-from-django">How Is Flaxon Different from Django?</h2>
+<p>Flaxon is designed to be <strong>technology-neutral</strong>.</p>
+<p>It does not require developers to use a particular:</p>
+<ul>
+<li>Database</li>
+<li>ORM</li>
+<li>Frontend framework</li>
+<li>Authentication system</li>
+<li>Template engine</li>
+</ul>
+<p>Developers can select the technologies appropriate for their application
+while using Flaxon for the backend application layer.</p>
+<h2 id="do-i-need-to-use-jinax">Do I Need to Use Jinax?</h2>
+<p>No.</p>
+<p>Jinax is optional. Flaxon can be used as a pure JSON/API framework without
+using a template engine.</p>
+<h2 id="what-databases-are-supported">What Databases Are Supported?</h2>
+<p>Flaxon does not require a specific ORM or database system.</p>
+<p>Developers can integrate Flaxon with technologies such as:</p>
+<ul>
+<li>SQLAlchemy</li>
+<li>SQLModel</li>
+<li>Tortoise ORM</li>
+<li>asyncpg</li>
+<li>Motor</li>
+<li>Other Python database libraries</li>
+</ul>
+<p>The goal is to keep the framework independent of a single database technology.</p>
+<h2 id="plugins">Plugins</h2>
+<p>Flaxon's core includes an extensible plugin architecture.</p>
+<p>Plugins can provide additional functionality without requiring the core
+framework to contain every possible integration.</p>
+<p>The plugin ecosystem is actively being developed and stabilized. Plugin
+documentation and testing are therefore an ongoing area of development.</p>
+<h2 id="security">Security</h2>
+<p>Security vulnerabilities should <strong>not</strong> be reported through public GitHub
+issues.</p>
+<p>Please follow the instructions in
+<a href="security-policy.html"><code>SECURITY.md</code></a> for responsible vulnerability reporting.</p>
+<h2 id="contributing">Contributing</h2>
+<p>Flaxon is an open-source project and welcomes contributions to:</p>
+<ul>
+<li>Core framework development</li>
+<li>Plugins</li>
+<li>Documentation</li>
+<li>Tests</li>
+<li>Examples</li>
+<li>Developer tooling</li>
+<li>Bug fixes</li>
+<li>Performance improvements</li>
+</ul>
+<p>Before contributing, please read the
+<a href="framework-contributing.html">Contributing Guide</a>.</p>
+<h2 id="commercial-support">Commercial Support</h2>
+<p>Commercial support, consulting, or enterprise services may be available in
+the future.</p>
+<p>For project-related support, please use the public GitHub project channels
+described above.</p>
+<hr/>
+<p>Flaxon is built in the open, and contributions, feedback, bug reports, and
+documentation improvements are welcome.</p>
+<p>Thank you for helping improve Flaxon. 💙</p></article>
+</main></div><div id="footer"></div></body></html>

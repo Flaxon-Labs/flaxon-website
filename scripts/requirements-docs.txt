@@ -1,3 +1,5 @@
 Markdown==3.11
 pymdown-extensions==12.1
 beautifulsoup4==4.15.0
+
+Pygments==2.19.2

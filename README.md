@@ -133,7 +133,7 @@ The site uses `flaxon.dev`. Configure your DNS:
 
 The website includes:
 
-* 56+ documentation pages covering all aspects of Flaxon
+* 132 documentation pages covering full-stack and backend development
 * 6 interactive examples demonstrating real-world usage
 * 4 blog posts with news and updates
 * Complete API reference for all modules
@@ -203,7 +203,7 @@ Built with ❤️ for the Python community.
 
 ## Framework documentation
 
-The site publishes 120 Markdown documents from the framework, plus eight
+The site publishes 124 Markdown documents from the framework, plus eight
 website-specific guides. The documentation home links to every page, including
 the ten-lesson full-stack course, Jinax, Admin/CMS, APIs, and runnable projects.
 The shared header, theme toggle, sidebar, search, and code-copy controls work

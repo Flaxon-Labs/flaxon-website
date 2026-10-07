@@ -3,6 +3,60 @@
   "commit": "0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34",
   "pages": [
     {
+      "source": "CHANGELOG.md",
+      "url": "docs/changelog.html",
+      "title": "Changelog",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "CODE_OF_CONDUCT.md",
+      "url": "docs/reference/code-of-conduct.html",
+      "title": "Code of Conduct",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "url": "docs/reference/framework-contributing.html",
+      "title": "Contributing to Flaxon",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "README.md",
+      "url": "docs/reference/framework-overview.html",
+      "title": "Readme",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "ROADMAP.md",
+      "url": "docs/reference/roadmap.html",
+      "title": "Roadmap",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "SECURITY.md",
+      "url": "docs/reference/security-policy.html",
+      "title": "Security Policy",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "SECURITY_HARDENING.md",
+      "url": "docs/reference/security-hardening.html",
+      "title": "Admin and framework security hardening",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "SUPPORT.md",
+      "url": "docs/reference/support.html",
+      "title": "Support",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/README.md",
+      "url": "docs/reference/benchmarks.html",
+      "title": "Run all benchmarks",
+      "section": "Operations and reference"
+    },
+    {
       "source": "docs/admin-guide.md",
       "url": "docs/admin-guide.html",
       "title": "Flaxon Admin Dashboard Guide",
@@ -90,7 +144,7 @@
       "source": "docs/architecture.md",
       "url": "docs/architecture.html",
       "title": "Architecture",
-      "section": "Operations and reference"
+      "section": "Core concepts"
     },
     {
       "source": "docs/cheatsheet.md",
@@ -108,7 +162,7 @@
       "source": "docs/configuration.md",
       "url": "docs/configuration.html",
       "title": "Configuration",
-      "section": "Operations and reference"
+      "section": "Core concepts"
     },
     {
       "source": "docs/contributing.md",
@@ -324,7 +378,7 @@
       "source": "docs/guides/Modules.md",
       "url": "docs/guides/modules.html",
       "title": "Modules Guide",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/Teloce-Spa.md",
@@ -348,19 +402,19 @@
       "source": "docs/guides/authentication.md",
       "url": "docs/guides/authentication.html",
       "title": "Authentication",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/authorization.md",
       "url": "docs/guides/authorization.html",
       "title": "Authorization",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/databases.md",
       "url": "docs/guides/databases.html",
       "title": "Databases",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/debugging.md",
@@ -384,7 +438,7 @@
       "source": "docs/guides/jinax.md",
       "url": "docs/guides/jinax.html",
       "title": "Jinax Templates",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/microservices.md",
@@ -450,13 +504,13 @@
       "source": "docs/guides/tasks.md",
       "url": "docs/guides/tasks.html",
       "title": "Tasks",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/testing.md",
       "url": "docs/guides/testing.html",
       "title": "Testing",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/guides/validation.md",
@@ -468,7 +522,7 @@
       "source": "docs/guides/websockets.md",
       "url": "docs/guides/websockets.html",
       "title": "WebSockets",
-      "section": "Feature guides"
+      "section": "Core concepts"
     },
     {
       "source": "docs/index.md",
@@ -687,39 +741,9 @@
       "section": "Runnable projects"
     },
     {
-      "source": "README.md",
-      "url": "docs/reference/framework-overview.html",
-      "title": "Readme",
-      "section": "Operations and reference"
-    },
-    {
-      "source": "CHANGELOG.md",
-      "url": "docs/changelog.html",
-      "title": "Changelog",
-      "section": "Operations and reference"
-    },
-    {
-      "source": "CONTRIBUTING.md",
-      "url": "docs/reference/framework-contributing.html",
-      "title": "Contributing to Flaxon",
-      "section": "Operations and reference"
-    },
-    {
-      "source": "SECURITY.md",
-      "url": "docs/reference/security-policy.html",
-      "title": "Security Policy",
-      "section": "Operations and reference"
-    },
-    {
-      "source": "SECURITY_HARDENING.md",
-      "url": "docs/reference/security-hardening.html",
-      "title": "Admin and framework security hardening",
-      "section": "Operations and reference"
-    },
-    {
-      "source": "benchmarks/README.md",
-      "url": "docs/reference/benchmarks.html",
-      "title": "Run all benchmarks",
+      "source": "tests/expanded/README.md",
+      "url": "docs/reference/expanded-tests.html",
+      "title": "Expanded behavioral tests",
       "section": "Operations and reference"
     },
     {
