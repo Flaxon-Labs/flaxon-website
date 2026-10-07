@@ -416,6 +416,9 @@ def build():
     api_lesson_url = "docs/fullstack/12-teloce-flaxon-apis.html"
     api_lesson_body = markdown.markdown((ROOT / "content/tutorials/teloce-flaxon-apis.md").read_text(), extensions=["tables", "fenced_code", "toc"])
     preserved.append({"url": api_lesson_url, "title": "Lesson 12: Using Teloce and Flaxon APIs", "section": "Full-stack course", "body": api_lesson_body})
+    routing_url = "docs/fullstack/13-html-spa-routing.html"
+    routing_body = markdown.markdown((ROOT / "content/tutorials/html-spa-routing.md").read_text(), extensions=["tables", "fenced_code", "toc"])
+    preserved.append({"url": routing_url, "title": "Lesson 13: Complete SPA routing with Flaxon and Teloce .html", "section": "Full-stack course", "body": routing_body})
     downloads = ROOT / "downloads"
     downloads.mkdir(exist_ok=True)
     with zipfile.ZipFile(downloads / "flaxon-guessing-game.zip", "w", zipfile.ZIP_DEFLATED) as archive:
@@ -427,7 +430,7 @@ def build():
                 archive.writestr(entry, source.read_bytes())
     for file in sorted((ROOT / "docs").rglob("*.html")):
         url = file.relative_to(ROOT).as_posix()
-        if url in imported or url in {tutorial_url, api_lesson_url}:
+        if url in imported or url in {tutorial_url, api_lesson_url, routing_url}:
             continue
         soup = BeautifulSoup(file.read_text(), "html.parser")
         content = soup.select_one(".doc-content")
@@ -486,6 +489,9 @@ def build():
         output = ROOT / entry["url"]
         output.parent.mkdir(parents=True, exist_ok=True)
         if entry["url"].startswith("docs/fullstack/") and (entry["url"].endswith("index.html") or "/10" in entry["url"]):
+            usage_note = soup.new_tag("p")
+            usage_note.string = "Flaxon full-stack examples use .html Teloce single-file components. app.use_teloce() compiles them; request.compile() serves their browser application shell. See lesson 13 for the complete data-teloce-link routing workflow."
+            soup.append(usage_note)
             capstone = soup.new_tag("p")
             link = soup.new_tag("a", href="11-guessing-game.html")
             link.string = "Next: build the complete guessing-game SPA with Admin and Render deployment"
