@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: flaxon-guessing-game
+    runtime: python
+    plan: starter
+    numInstances: 1
+    buildCommand: pip install -r requirements.txt
+    startCommand: python management.py migrate && uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1 --no-proxy-headers
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: APP_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+      - key: FLAXON_SECRET_KEY
+        generateValue: true
+    disk:
+      name: game-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -1,0 +1,34 @@
+{
+  "api": {
+    "title": "JSON API",
+    "files": {
+      "app.py": "from flaxon import Flaxon\n\napp = Flaxon(\"hello-api\", debug=True)\n\n@app.get(\"/\")\nasync def home():\n    return {\"message\": \"Hello from Flaxon\"}\n\n@app.get(\"/users/<int:user_id>\")\nasync def user(user_id: int):\n    return {\"id\": user_id}\n",
+      "requirements.txt": "flaxon[standard]\n"
+    }
+  },
+  "jinax": {
+    "title": "Jinax pages",
+    "files": {
+      "app.py": "from flaxon import Flaxon, Request\nfrom flaxon.jinax import Jinax\n\napp = Flaxon(\"jinax-site\", debug=True)\napp.use_templates(Jinax(\"templates\", auto_reload=True))\n\n@app.get(\"/\")\nasync def home(request: Request):\n    return await request.render(\"home.html\", {\"title\": \"Welcome\"})\n",
+      "templates/home.html": "<!doctype html>\n<html lang=\"en\">\n<title>{{ title }}</title>\n<h1>{{ title }} to Flaxon</h1>\n<p>A server-rendered page with Jinax.</p>\n</html>\n",
+      "requirements.txt": "flaxon[standard]\n"
+    }
+  },
+  "teloce": {
+    "title": "Teloce full stack",
+    "files": {
+      "app.py": "from pathlib import Path\nfrom flaxon import Flaxon, Request\n\napp = Flaxon(\"counter\", debug=True)\napp.use_teloce(project_root=Path(__file__).parent, ui_dir=\"ui\", title=\"Counter\")\n\n@app.get(\"/\")\nasync def home(request: Request):\n    return await request.compile(\"app.html\")\n\n@app.get(\"/api/hello\")\nasync def hello():\n    return {\"message\": \"Hello from the API\"}\n",
+      "ui/app.html": "<template>\n  <main>\n    <h1>Flaxon counter</h1>\n    <button @click=\"count++\">Count: {{ count }}</button>\n  </main>\n</template>\n<script>\nexport default { data() { return { count: 0 }; } };\n</script>\n<style scoped>\nmain { max-width: 40rem; margin: 3rem auto; }\n</style>\n",
+      "requirements.txt": "flaxon[standard]\n"
+    }
+  },
+  "modules": {
+    "title": "Application modules",
+    "files": {
+      "app.py": "from flaxon import Flaxon\nfrom modules.users import users\n\napp = Flaxon(\"modular-api\", debug=True)\napp.mount_module(users, prefix=\"/api/users\")\n",
+      "modules/__init__.py": "",
+      "modules/users.py": "from flaxon.modules import FlaxonModule\n\nusers = FlaxonModule(\"users\")\n\n@users.get(\"/\")\nasync def list_users():\n    return {\"users\": []}\n\n@users.get(\"/<int:user_id>\")\nasync def get_user(user_id: int):\n    return {\"id\": user_id}\n",
+      "requirements.txt": "flaxon[standard]\n"
+    }
+  }
+}

@@ -133,7 +133,7 @@ The site uses `flaxon.dev`. Configure your DNS:
 
 The website includes:
 
-* 132 documentation pages covering full-stack and backend development
+* 133 documentation pages covering full-stack and backend development
 * 6 interactive examples demonstrating real-world usage
 * 4 blog posts with news and updates
 * Complete API reference for all modules
@@ -239,3 +239,9 @@ These checks visit all documentation pages at desktop and mobile widths and
 exercise theme persistence, navigation, search, copy buttons, blocked browser
 storage, and project-prefix hosting. Search data and both navigation views are
 built from the same manifest, so added framework docs stay discoverable.
+
+## Playground and capstone
+
+The [playground](playground.html) offers editable API, Jinax, Teloce, and module projects with file tabs, syntax highlighting, browser-saved drafts, route inspection, and ZIP downloads. It does not execute Python.
+
+The [guessing-game capstone](docs/fullstack/11-guessing-game.html) includes the complete SPA, protected Admin, SQLite persistence, tests, and Render deployment. Its source lives in `examples/guessing-game/`; the guide source is `content/tutorials/guessing-game.md`. Rebuild published pages and the project download with `python scripts/sync_docs.py`.

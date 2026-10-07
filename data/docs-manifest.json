@@ -747,6 +747,11 @@
       "section": "Operations and reference"
     },
     {
+      "url": "docs/fullstack/11-guessing-game.html",
+      "title": "Full-stack capstone: a guessing-game SPA",
+      "section": "Full-stack course"
+    },
+    {
       "url": "docs/guides/backend-only.html",
       "title": "Use Flaxon as a backend",
       "section": "Website guides"
