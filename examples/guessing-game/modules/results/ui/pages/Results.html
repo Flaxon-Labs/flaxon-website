@@ -1,0 +1,61 @@
+<template>
+    <section id="results-view" aria-labelledby="results-title">
+        <h1 id="results-title">Your results</h1>
+        <p>Rounds played in this browser tab. Admin keeps all completed results.</p>
+        <button type="button" @click="refreshResults" :disabled="loading">
+            {{ loading ? "Loading…" : "Refresh results" }}
+        </button>
+        <p v-if="error" role="alert">{{ error }}</p>
+        <p v-if="loading" role="status">Checking your results with the server…</p>
+        <ul id="results-list" v-else>
+            <li v-for="result in results" :key="result.id">
+                {{ describeResult(result) }}
+            </li>
+            <li v-if="results.length === 0">No completed rounds yet.</li>
+        </ul>
+        <a href="/play" data-teloce-link>Play another round</a>
+    </section>
+</template>
+
+<script>
+import { loadRounds, readResult } from "../../../game/ui/client.ts";
+
+export default {
+    data() {
+        return { results: [], loading: false, error: "" };
+    },
+    mounted() {
+        this.refreshResults();
+    },
+    methods: {
+        describeResult(result) {
+            const outcome = result.outcome === "won" ? "Won" : "Lost";
+            const unit = result.attempts === 1 ? "guess" : "guesses";
+            const completed = new Date(result.completed_at * 1000).toLocaleString();
+            return `${outcome} in ${result.attempts} ${unit} — ${completed}`;
+        },
+        async refreshResults() {
+            if (this.loading) return;
+            this.loading = true;
+            this.error = "";
+            this.results = [];
+            try {
+                const savedRounds = loadRounds().filter((round) => round.outcome !== "playing");
+                const verifiedResults = [];
+                for (const round of savedRounds) {
+                    verifiedResults.push(await readResult(round));
+                }
+                this.results = verifiedResults;
+            } catch (error) {
+                this.error = error.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+    },
+};
+</script>
+
+<style scoped>
+li { padding: 0.7rem 0; }
+</style>

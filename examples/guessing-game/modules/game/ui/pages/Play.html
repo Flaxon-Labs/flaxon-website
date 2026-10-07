@@ -1,0 +1,111 @@
+<template>
+    <section id="play-view" aria-labelledby="play-title">
+        <h1 id="play-title">Guess the number</h1>
+        <p>A number from 1 to 100. Ten guesses. Can you find it?</p>
+        <button id="start" type="button" :disabled="busy" @click="startGame">
+            {{ busy ? "Please wait…" : "Start new game" }}
+        </button>
+        <form id="guess-form" v-if="isPlaying" @submit.prevent="submitGuess">
+            <label for="guess">Your guess</label>
+            <input id="guess" type="number" min="1" max="100" required
+                   inputmode="numeric" v-model="guess" :disabled="busy" />
+            <button type="submit" :disabled="busy">Guess</button>
+        </form>
+        <p id="message" role="status" aria-live="polite">{{ message }}</p>
+        <p v-if="storageWarning" class="note">{{ storageWarning }}</p>
+        <a href="/results" data-teloce-link>See your completed rounds</a>
+    </section>
+</template>
+
+<script>
+import { loadRounds, saveRound, removeRound, startRound, readRound, sendGuess } from "../client.ts";
+
+export default {
+    data() {
+        return {
+            round: null,
+            guess: "",
+            message: "Start a game to play.",
+            storageWarning: "",
+            busy: false,
+        };
+    },
+    computed: {
+        isPlaying() {
+            return this.round !== null && this.round.outcome === "playing";
+        },
+    },
+    async mounted() {
+        const savedRound = loadRounds().find((round) => round.outcome === "playing");
+        if (!savedRound) return;
+
+        this.busy = true;
+        try {
+            const serverRound = await readRound(savedRound);
+            this.round = { ...savedRound, ...serverRound };
+            this.rememberRound();
+            this.message = serverRound.outcome === "playing"
+                ? `Round restored. ${10 - serverRound.attempts} guesses left.`
+                : "This round has finished. See your results or start a new game.";
+        } catch (error) {
+            removeRound(savedRound.id);
+            this.message = `${error.message} Start a new game.`;
+        } finally {
+            this.busy = false;
+        }
+    },
+    methods: {
+        rememberRound() {
+            if (!saveRound(this.round)) {
+                this.storageWarning = "Browser storage is unavailable. Keep this page open to finish the round.";
+            }
+        },
+        async startGame() {
+            if (this.busy) return;
+            this.busy = true;
+            try {
+                this.round = await startRound();
+                this.guess = "";
+                this.message = "Your number is ready. You have 10 guesses.";
+                this.rememberRound();
+            } catch (error) {
+                this.message = error.message;
+            } finally {
+                this.busy = false;
+            }
+        },
+        async submitGuess() {
+            if (this.busy || !this.isPlaying) return;
+            const value = Number(this.guess);
+            if (!Number.isInteger(value) || value < 1 || value > 100) {
+                this.message = "Enter a whole number from 1 to 100.";
+                return;
+            }
+
+            this.busy = true;
+            try {
+                const serverRound = await sendGuess(this.round, value);
+                this.round = { ...this.round, ...serverRound };
+                this.guess = "";
+                this.rememberRound();
+                if (serverRound.outcome === "won") {
+                    const unit = serverRound.attempts === 1 ? "guess" : "guesses";
+                    this.message = `You won in ${serverRound.attempts} ${unit}!`;
+                } else if (serverRound.outcome === "lost") {
+                    this.message = `Round finished. The answer was ${serverRound.answer}.`;
+                } else {
+                    this.message = `Try ${serverRound.hint}. ${10 - serverRound.attempts} guesses left.`;
+                }
+            } catch (error) {
+                this.message = error.message;
+            } finally {
+                this.busy = false;
+            }
+        },
+    },
+};
+</script>
+
+<style scoped>
+#message { min-height: 3rem; font-weight: 600; }
+</style>

@@ -133,7 +133,7 @@ The site uses `flaxon.dev`. Configure your DNS:
 
 The website includes:
 
-* 133 documentation pages covering full-stack and backend development
+* 134 documentation pages covering full-stack and backend development
 * 6 interactive examples demonstrating real-world usage
 * 4 blog posts with news and updates
 * Complete API reference for all modules
@@ -245,3 +245,5 @@ built from the same manifest, so added framework docs stay discoverable.
 The [playground](playground.html) offers editable API, Jinax, Teloce, and module projects with file tabs, syntax highlighting, browser-saved drafts, route inspection, and ZIP downloads. It does not execute Python.
 
 The [guessing-game capstone](docs/fullstack/11-guessing-game.html) includes the complete SPA, protected Admin, SQLite persistence, tests, and Render deployment. Its source lives in `examples/guessing-game/`; the guide source is `content/tutorials/guessing-game.md`. Rebuild published pages and the project download with `python scripts/sync_docs.py`.
+
+The game uses module-owned Teloce pages and `data-teloce-link`. [Lesson 12](docs/fullstack/12-teloce-flaxon-apis.html) maps Teloce component, router, signal, compiler, data, runtime, and Flaxon server APIs to practical uses.

@@ -1,1 +1,3 @@
-flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34
+flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@403d571eb6e35ac7a24fb9972fb2d3e3ccb19e62
+teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@10f786b9ce99cf62cb2e154a913843b027b20ee7
+minifyjs==0.1.3

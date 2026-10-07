@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 12: Using Teloce and Flaxon APIs — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 12: Using Teloce and Flaxon APIs — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 12: Using Teloce and Flaxon APIs</span></nav>
+<article class="doc-content"><h1 id="lesson-12-using-teloce-and-flaxon-apis">Lesson 12: Using Teloce and Flaxon APIs</h1>
+<p>This lesson is a practical map of the public APIs used to build full-stack applications. Start with the <a href="11-guessing-game.html">complete guessing game</a>, then use the tables below to choose the API for your next feature. Each group links to its detailed reference.</p>
+<p>The examples target the exact Flaxon and Teloce-Py commits pinned by the guessing-game project. Teloce's npm runtime, standalone runtime, compiler, and generated Flaxon router are different entry points. Use the APIs for the entry point your application actually loads.</p>
+<h2 id="1-know-where-each-api-runs">1. Know where each API runs</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Use it for</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teloce component, in the browser</td>
+<td>State, forms, rendering, navigation</td>
+<td><code>data()</code>, <code>computed</code>, <code>@click</code>, <code>v-model</code>, <code>data-teloce-link</code></td>
+</tr>
+<tr>
+<td>Browser platform</td>
+<td>HTTP, storage, sockets</td>
+<td><code>fetch</code>, <code>sessionStorage</code>, <code>WebSocket</code>, <code>AbortController</code></td>
+</tr>
+<tr>
+<td>Flaxon, on the Python server</td>
+<td>HTTP, validation, authorization, persistence, Admin</td>
+<td><code>Flaxon</code>, <code>FlaxonModule</code>, <code>Schema</code>, <code>JSONResponse</code>, <code>AdminDashboard</code></td>
+</tr>
+<tr>
+<td>Teloce-Py, during compilation</td>
+<td>Generate JavaScript, CSS, and routers</td>
+<td><code>compile</code>, <code>compile_file</code>, <code>Builder</code>, <code>generate_spa_router</code></td>
+</tr>
+</tbody>
+</table>
+<p>A component does not call a Python function directly. It sends an HTTP request; Flaxon validates and authorizes it. Anything placed in component state, browser storage, or <code>request.compile(..., context)</code> is visible to the browser.</p>
+<h2 id="2-compile-a-teloce-application-with-flaxon">2. Compile a Teloce application with Flaxon</h2>
+<pre><code class="language-python">from pathlib import Path
+from flaxon import Flaxon, Request
+
+app = Flaxon("My application", debug=True)
+app.use_teloce(project_root=Path(__file__).parent, ui_dir="ui")
+
+@app.get("/")
+async def home(request: Request):
+    return await request.compile("app.html", {"title": "Welcome"})
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>How to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.use_teloce(...)</code></td>
+<td>Register the root UI directory once, before startup. Returns the integration and sets <code>app.teloce</code>.</td>
+</tr>
+<tr>
+<td><code>project_root</code>, <code>ui_dir</code>, <code>entry</code></td>
+<td>Select the project boundary, source tree, and root component. Source directories must remain inside the project.</td>
+</tr>
+<tr>
+<td><code>build_dir</code>, <code>static_url</code></td>
+<td>Choose the generated output location and browser asset URL; defaults are <code>.flaxon/build</code> and <code>/_flaxon</code>.</td>
+</tr>
+<tr>
+<td><code>title</code>, <code>description</code>, <code>lang</code>, <code>theme_color</code>, <code>favicon</code></td>
+<td>Set document metadata. Serve the favicon separately.</td>
+</tr>
+<tr>
+<td><code>stylesheets</code>, <code>scripts</code></td>
+<td>Add trusted resources with supported attributes such as <code>integrity</code>, <code>crossorigin</code>, <code>defer</code>, or <code>async</code>. These do not bundle or download the resources.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td>Pass compiler/build settings and routing settings such as <code>spa_mode</code> and <code>spa_base</code>. Test changes to bundling or runtime options.</td>
+</tr>
+<tr>
+<td><code>await request.compile(entry, context, title=...)</code></td>
+<td>Return the generated client-rendered shell, not server-rendered component HTML. Pass only public props in context.</td>
+</tr>
+<tr>
+<td><code>app.teloce.build()</code></td>
+<td>Build registered sources explicitly. Normal Flaxon startup already does this.</td>
+</tr>
+<tr>
+<td><code>app.teloce.register_source(name, directory, routes=...)</code></td>
+<td>Register an additional unique UI source before serving traffic.</td>
+</tr>
+</tbody>
+</table>
+<p>Development rebuilds on process reload; do not promise browser HMR from <code>flaxon run --reload</code>. Production uses <code>debug=False</code>, optimized assets, and one build lifecycle per worker. Keep generated output writable.</p>
+<p><a href="../api/teloce.html">Complete integration reference</a> · <a href="10-production.html">Production lesson</a></p>
+<h2 id="3-compose-features-with-flaxon-modules">3. Compose features with Flaxon modules</h2>
+<pre><code class="language-python">from pathlib import Path
+from flaxon.modules import FlaxonModule
+
+catalog = FlaxonModule(
+    "catalog",
+    ui_dir=Path(__file__).parent / "ui",
+    ui_routes={"ProductDetails/[id].js": "/products/:id"},
+)
+
+@catalog.get("/products")
+async def products():
+    return {"items": []}
+
+# In app.py:
+app.mount_module(catalog, prefix="/api/catalog")
+</code></pre>
+<p>The API URL becomes <code>/api/catalog/products</code>. The browser page path is <code>/products/:id</code>. The two route namespaces are independent. <code>ui_routes</code> keys name generated page files relative to that module's <code>pages/</code> directory.</p>
+<table>
+<thead>
+<tr>
+<th>Module API</th>
+<th>When to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FlaxonModule(name, ui_dir=..., ui_routes=...)</code></td>
+<td>Keep backend routes and Teloce UI together.</td>
+</tr>
+<tr>
+<td><code>template_dir</code>, <code>static_dir</code></td>
+<td>Add module-owned Jinax templates or static files.</td>
+</tr>
+<tr>
+<td><code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code>, <code>websocket</code></td>
+<td>Register module-owned HTTP or WebSocket endpoints.</td>
+</tr>
+<tr>
+<td><code>app.mount_module(module, prefix=...)</code></td>
+<td>Attach the feature to the application.</td>
+</tr>
+<tr>
+<td><code>module.register_module(child, prefix=...)</code></td>
+<td>Compose nested features. Cycles are rejected.</td>
+</tr>
+<tr>
+<td><code>module.requires("db")</code></td>
+<td>Declare a dependency that must exist in the application container at mount time.</td>
+</tr>
+<tr>
+<td><code>before_request</code>, <code>after_request</code>, <code>errorhandler</code></td>
+<td>Apply request hooks and error handling to that module's routes.</td>
+</tr>
+<tr>
+<td><code>on_startup</code>, <code>on_shutdown</code></td>
+<td>Manage module resources such as connections or workers.</td>
+</tr>
+<tr>
+<td><code>cli_command</code>, <code>as_commands</code>, <code>install_cli_commands</code></td>
+<td>Add module-owned commands. Expose command instances from a project <code>cli/*.py</code> file for installed-console discovery.</td>
+</tr>
+</tbody>
+</table>
+<p>In the game, <code>modules/game</code> owns the Play page and guessing endpoints. <code>modules/results</code> owns Results, the completed-result endpoint, and the Admin adapter.</p>
+<p><a href="07-modules.html">Module lesson</a> · <a href="../guides/modules.html">Module reference</a></p>
+<h2 id="4-build-pages-with-template-apis">4. Build pages with template APIs</h2>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Syntax</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Escaped text</td>
+<td><code>{{ message }}</code></td>
+<td>Display state or server data.</td>
+</tr>
+<tr>
+<td>Condition</td>
+<td><code>&lt;if condition="ready"&gt;...&lt;/if&gt;</code> or <code>v-if="ready"</code></td>
+<td>Add/remove a branch.</td>
+</tr>
+<tr>
+<td>Alternate branches</td>
+<td><code>v-else-if</code>, <code>v-else</code></td>
+<td>Place next to the preceding conditional branch.</td>
+</tr>
+<tr>
+<td>List</td>
+<td><code>&lt;for each="item in items"&gt;</code> or <code>v-for="item in items"</code></td>
+<td>Render repeated content.</td>
+</tr>
+<tr>
+<td>Stable identity</td>
+<td><code>:key="item.id"</code></td>
+<td>Preserve identity when a list changes.</td>
+</tr>
+<tr>
+<td>Event</td>
+<td><code>@click="save"</code> or <code>v-on:click="save"</code></td>
+<td>Run a method.</td>
+</tr>
+<tr>
+<td>Event modifier</td>
+<td><code>@submit.prevent="save"</code></td>
+<td>Prevent the browser's form submission. Other documented modifiers include <code>.stop</code>, <code>.once</code>, <code>.self</code>, and applicable key modifiers.</td>
+</tr>
+<tr>
+<td>Attribute</td>
+<td><code>:disabled="busy"</code> or <code>v-bind:disabled="busy"</code></td>
+<td>Bind an attribute to state.</td>
+</tr>
+<tr>
+<td>Classes/styles</td>
+<td><code>:class="classes"</code>, <code>:style="styles"</code></td>
+<td>Update appearance from state.</td>
+</tr>
+<tr>
+<td>Visibility</td>
+<td><code>:show="visible"</code> or <code>v-show="visible"</code></td>
+<td>Hide/show an existing element.</td>
+</tr>
+<tr>
+<td>Input</td>
+<td><code>:model="guess"</code> or <code>v-model="guess"</code></td>
+<td>Synchronize form state.</td>
+</tr>
+<tr>
+<td>Text content</td>
+<td><code>v-text="message"</code></td>
+<td>Set escaped text.</td>
+</tr>
+<tr>
+<td>Trusted markup</td>
+<td><code>v-html="trustedHtml"</code></td>
+<td>Only use previously sanitized HTML; never raw user content.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;form @submit.prevent="save"&gt;
+        &lt;input v-model="name" required /&gt;
+        &lt;button :disabled="busy"&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p role="status"&gt;{{ message }}&lt;/p&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+    data() {
+        return { name: "", busy: false, message: "" };
+    },
+    methods: {
+        async save() {
+            this.busy = true;
+            try {
+                const response = await fetch("/api/items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: this.name }),
+                });
+                if (!response.ok) throw new Error("Could not save the item.");
+                this.message = "Saved.";
+            } catch (error) {
+                this.message = error.message;
+            } finally {
+                this.busy = false;
+            }
+        },
+    },
+};
+&lt;/script&gt;
+</code></pre>
+<p>This is a component pattern: add the corresponding authenticated/validated Python endpoint and your application's CSRF policy. The guessing game's <code>client.ts</code> contains its complete request policy.</p>
+<p><a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/directives.md">Teloce directives</a> · <a href="02-components.html">Components lesson</a></p>
+<h2 id="5-use-component-state-and-lifecycle">5. Use component state and lifecycle</h2>
+<table>
+<thead>
+<tr>
+<th>Component option</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>Name the component for diagnostics.</td>
+</tr>
+<tr>
+<td><code>props</code></td>
+<td>Accept parent input; array syntax or documented typed/default/required descriptors.</td>
+</tr>
+<tr>
+<td><code>data()</code></td>
+<td>Return local reactive state. This is the easiest starting point.</td>
+</tr>
+<tr>
+<td><code>computed</code></td>
+<td>Derive values such as <code>isPlaying</code> without storing duplicate state.</td>
+</tr>
+<tr>
+<td><code>watch</code></td>
+<td>Run side effects when a watched value changes. Avoid loops that keep rewriting the same value.</td>
+</tr>
+<tr>
+<td><code>methods</code></td>
+<td>Define readable event handlers and request helpers.</td>
+</tr>
+<tr>
+<td><code>components</code></td>
+<td>Register imported local child components.</td>
+</tr>
+<tr>
+<td><code>emits</code>, <code>$emit(name, detail)</code></td>
+<td>Declare and dispatch child events. The compiled runtime emits bubbling <code>teloce:name</code> DOM events.</td>
+</tr>
+<tr>
+<td><code>filters</code></td>
+<td>Register presentation transforms, not authorization decisions.</td>
+</tr>
+<tr>
+<td><code>beforeMount</code>, <code>mounted</code></td>
+<td>Initialize DOM-dependent work or fetch initial data.</td>
+</tr>
+<tr>
+<td><code>beforeUpdate</code>, <code>updated</code></td>
+<td>Coordinate external widgets around updates.</td>
+</tr>
+<tr>
+<td><code>beforeUnmount</code>, <code>unmounted</code></td>
+<td>Stop timers, observers, subscriptions, editors, and sockets.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-html">&lt;script&gt;
+import ResultCard from "../components/ResultCard.html";
+export default {
+    props: ["playerName"],
+    components: { ResultCard },
+    data() { return { results: [] }; },
+    computed: {
+        wins() { return this.results.filter(result =&gt; result.outcome === "won").length; },
+    },
+};
+&lt;/script&gt;
+&lt;template&gt;
+    &lt;p&gt;{{ playerName }} has {{ wins }} wins.&lt;/p&gt;
+    &lt;ResultCard v-for="result in results" :key="result.id" :result="result" /&gt;
+&lt;/template&gt;
+</code></pre>
+<p>Keep a child's props owned by its parent. Use <code>&lt;slot&gt;</code> for parent-supplied content. Use <code>&lt;style scoped&gt;</code> for component rules and global shell styles for the shared theme. <code>&lt;script lang="ts"&gt;</code> and <code>.ts</code> helper imports support transpilation; run a separate type checker if you require type diagnostics.</p>
+<p><a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/components.md">Teloce components</a> · <a href="04-typescript.html">TypeScript lesson</a></p>
+<h2 id="6-navigate-with-the-generated-spa-router">6. Navigate with the generated SPA router</h2>
+<pre><code class="language-html">&lt;nav&gt;
+    &lt;a href="/play" data-teloce-link&gt;Play&lt;/a&gt;
+    &lt;a href="/results" data-teloce-link&gt;Results&lt;/a&gt;
+    &lt;a href="/admin/login"&gt;Admin&lt;/a&gt;
+&lt;/nav&gt;
+&lt;main data-teloce-router-view&gt;&lt;/main&gt;
+</code></pre>
+<p><code>data-teloce-link</code> marks same-origin anchors for client navigation to matched Teloce pages. External links, downloads, modified clicks, other targets, nonmatching routes, and same-page fragments retain normal browser behavior. Do not mark Admin as a SPA page.</p>
+<p>The integration mounts the router and exposes it as <code>window.__TELOCE_ROUTER__</code>. Use this existing instance for programmatic navigation rather than creating another router:</p>
+<pre><code class="language-javascript">const router = window.__TELOCE_ROUTER__;
+await router.push("/results");
+await router.replace({ path: "/play", query: { mode: "practice" } });
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Router API</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>push(target)</code>, <code>navigate(target)</code></td>
+<td>Navigate and add browser history; return whether navigation was accepted.</td>
+</tr>
+<tr>
+<td><code>replace(target)</code></td>
+<td>Navigate without adding a history entry.</td>
+</tr>
+<tr>
+<td><code>back()</code>, <code>forward()</code>, <code>go(delta)</code></td>
+<td>Use browser history.</td>
+</tr>
+<tr>
+<td><code>resolve(path)</code></td>
+<td>Inspect a route match without navigation; returns no match for unknown paths.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Read <code>path</code>, <code>params</code>, <code>query</code>, <code>route</code>, and <code>fullPath</code>.</td>
+</tr>
+<tr>
+<td><code>path</code>, <code>params</code>, <code>query</code>, <code>currentRoute</code></td>
+<td>Read callable route signals.</td>
+</tr>
+<tr>
+<td><code>beforeEach(guard)</code></td>
+<td>Register a navigation guard; returns a removal function. Guards improve flow but never authorize server data.</td>
+</tr>
+<tr>
+<td><code>afterEach(hook)</code></td>
+<td>Observe completed navigation; returns a removal function.</td>
+</tr>
+<tr>
+<td><code>subscribe(listener)</code></td>
+<td>Observe route state; returns an unsubscribe function.</td>
+</tr>
+<tr>
+<td><code>mount(container, context)</code></td>
+<td>Mount an outlet and return its cleanup function. Flaxon's shell already calls this.</td>
+</tr>
+<tr>
+<td><code>destroy()</code></td>
+<td>Release router listeners when you own its complete lifecycle. Do not destroy Flaxon's shared router on ordinary page unmount.</td>
+</tr>
+</tbody>
+</table>
+<p>File conventions include <code>Home.html</code> → <code>/</code>, <code>Play.html</code> → <code>/play</code>, <code>games/[id].html</code> → <code>/games/:id</code>, optional <code>[[id]]</code> segments, and <code>[...path]</code> catch-all segments. Route params and query values are passed to page props by the generated router. Do not treat string route parameters as validated database IDs.</p>
+<p>Flaxon's integration defaults to history mode; standalone Teloce builds default to hash mode. History pages require server routes that return the shell on a direct visit. The game registers explicit <code>/</code>, <code>/play</code>, and <code>/results</code> routes so unknown <code>/api</code> paths still return 404.</p>
+<p><a href="06-routing.html">Routing lesson</a> · <a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/router.md">Teloce router reference</a></p>
+<h2 id="7-use-explicit-signals-when-state-must-be-shared">7. Use explicit signals when state must be shared</h2>
+<p>Normal component <code>data()</code> is already reactive. Use signals for shared browser modules or standalone enhancements. Flaxon's generated build exposes <code>signals.js</code> at <code>/_flaxon/static/signals.js</code> with its scheduler beside it:</p>
+<pre><code class="language-javascript">import { createSignal, createComputed, createEffect, batch } from "/_flaxon/static/signals.js";
+
+const score = createSignal(0);
+const doubled = createComputed(() =&gt; score() * 2);
+const logger = createEffect(() =&gt; console.log(doubled()));
+batch(() =&gt; {
+    score.set(1);
+    score.update(value =&gt; value + 1);
+});
+// When this feature is destroyed:
+logger.stop();
+doubled.effect.stop();
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Signal API</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createSignal(initial)</code></td>
+<td>Create callable state; <code>signal()</code> reads it.</td>
+</tr>
+<tr>
+<td><code>.get()</code>, <code>.set(value)</code>, <code>.update(fn)</code></td>
+<td>Read, replace, or update a value.</td>
+</tr>
+<tr>
+<td><code>.peek()</code></td>
+<td>Read without collecting a dependency.</td>
+</tr>
+<tr>
+<td><code>.subscribe(listener)</code></td>
+<td>Listen for changes; returns an unsubscribe function.</td>
+</tr>
+<tr>
+<td><code>createComputed(fn)</code>, <code>createMemo(fn)</code></td>
+<td>Create derived callable state. Stop its <code>.effect</code> when you own its lifecycle.</td>
+</tr>
+<tr>
+<td><code>createEffect(fn)</code></td>
+<td>Run a reactive side effect; returns an object with <code>.run()</code> and <code>.stop()</code>.</td>
+</tr>
+<tr>
+<td><code>batch(fn)</code>, <code>untracked(fn)</code></td>
+<td>Group updates or suppress dependency collection.</td>
+</tr>
+<tr>
+<td><code>reactive(object)</code>, <code>isReactive</code></td>
+<td>Create/detect a reactive object.</td>
+</tr>
+<tr>
+<td><code>isSignal</code>, <code>isComputed</code>, <code>toSignal</code>, <code>getValue</code></td>
+<td>Inspect or normalize signal/plain values.</td>
+</tr>
+</tbody>
+</table>
+<p>Do not persist server secrets or trust browser state as a score. The game's Results page rechecks scores with the server.</p>
+<p><a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/reactivity.md">Teloce reactivity</a></p>
+<h2 id="8-add-advanced-ui-behavior-deliberately">8. Add advanced UI behavior deliberately</h2>
+<table>
+<thead>
+<tr>
+<th>API family</th>
+<th>How to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transition:fade</code>, <code>in:slide</code>, <code>out:fade</code>, <code>animate:flip</code></td>
+<td>Animate branch entry/exit or keyed-list movement. Built-in helpers include fade, slide, and scale. Respect reduced-motion preferences.</td>
+</tr>
+<tr>
+<td><code>use:name="params"</code></td>
+<td>Attach an action to a DOM node. Return a cleanup function or an object with <code>update</code>/<code>destroy</code>.</td>
+</tr>
+<tr>
+<td><code>v-virtual-for</code>, <code>item-height</code></td>
+<td>Bound rendered DOM for large lists; normal <code>v-for</code> remains the default.</td>
+</tr>
+<tr>
+<td><code>v-memo</code></td>
+<td>Skip a subtree when its key is unchanged; include every value the subtree reads.</td>
+</tr>
+<tr>
+<td><code>v-data-table</code></td>
+<td>Add a data table. <code>createDataTable</code> offers <code>update</code>, <code>setRows</code>, <code>getVisibleRows</code>, <code>exportCsv</code>, and <code>unmount</code>.</td>
+</tr>
+<tr>
+<td><code>v-scrolly</code>, <code>v-step</code></td>
+<td>Observe story steps; the runtime emits <code>teloce:step</code>.</td>
+</tr>
+<tr>
+<td><code>v-chart-annotation</code></td>
+<td>Add accessible chart annotations.</td>
+</tr>
+<tr>
+<td><code>poll</code>, <code>interval</code>, <code>poll-target</code></td>
+<td>Poll a JSON endpoint, with visibility pausing and cleanup. Secure the Python endpoint.</td>
+</tr>
+<tr>
+<td><code>live</code></td>
+<td>Use WebSocket URLs or registered live adapters; connections reconnect with backoff and close on teardown.</td>
+</tr>
+</tbody>
+</table>
+<p>Data helper exports include <code>parseDelimited</code>, <code>coerce</code>, <code>loadCsv</code>, <code>exportRowsToCsv</code>, <code>downloadText</code>, <code>downloadRowsAsCsv</code>, <code>exportChartToPng</code>, and <code>exportChartToSvg</code>. They are emitted beside the shared runtime in <code>/_flaxon/static/data.js</code>; table helpers live in <code>/_flaxon/static/table.js</code>.</p>
+<pre><code class="language-javascript">import { loadCsv, downloadRowsAsCsv } from "/_flaxon/static/data.js";
+const rows = await loadCsv("/static/example.csv", { headers: true });
+downloadRowsAsCsv(rows, "example.csv");
+</code></pre>
+<p>Serve the CSV yourself and authorize private exports on the server. The game does not need these advanced APIs; add them only for a feature that benefits from them.</p>
+<p><a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/api.md">Teloce public API</a></p>
+<h2 id="9-compiler-build-static-rendering-and-extension-apis">9. Compiler, build, static-rendering, and extension APIs</h2>
+<p>Most Flaxon applications use <code>app.use_teloce()</code> instead of writing a separate pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Python API</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>from teloce import compile, compile_file, compile_project</code></td>
+<td>Compile source text, a file, or a component project. Check diagnostics before serving output.</td>
+</tr>
+<tr>
+<td><code>from teloce.build import Builder, build_project</code></td>
+<td>Build a project and inspect <code>compiled</code>, <code>failed</code>, <code>errors</code>, <code>files</code>, and generated runtime metadata.</td>
+</tr>
+<tr>
+<td><code>generate_router</code>, <code>generate_spa_router</code> from <code>teloce.router</code></td>
+<td>Generate a custom declarative router or discover page files.</td>
+</tr>
+<tr>
+<td><code>RouterCompiler</code>, <code>RouterGenerator</code></td>
+<td>Lower-level router building for framework integrations.</td>
+</tr>
+<tr>
+<td><code>to_frontend_data</code>, <code>frontend_json</code>, <code>DataShapeError</code> from <code>teloce</code></td>
+<td>Convert server records into browser-safe shapes. A field schema is an allowlist; leave private columns out.</td>
+</tr>
+<tr>
+<td><code>render_ssr</code>, <code>render_static</code>, <code>render_static_component</code>, <code>to_jinax_template</code></td>
+<td>Use Teloce's documented server/static-rendering paths. These do not mean <code>request.compile()</code> performs SSR.</td>
+</tr>
+<tr>
+<td>Python plugins</td>
+<td>Extend AST transforms, filters, directives, and compiler hooks through the documented plugin contract.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">from teloce import compile_file
+result = compile_file("ui/components/Counter.vel")
+if not result["success"]:
+    raise RuntimeError(result["diagnostics"])
+print(result["code"])
+</code></pre>
+<p>Build configuration includes source maps, target syntax, shared runtime, minification, asset hashing, CSS extraction, optional bundling, lazy components, and embed mode. Verify supported options in the pinned source before changing a pipeline. Never compile arbitrary user-submitted source inside a public request.</p>
+<p>For a Jinax page enhanced by Teloce, the <strong>standalone runtime</strong> exposes <code>teloce.createApp</code> (aliases <code>create</code>/<code>mount</code>), <code>registerComponent</code>, <code>registerHelper</code>, <code>use(plugin)</code>, and its documented directives, filters, and instance lifecycle. The separate ES-module runtime offers <code>createComponent</code>, <code>createApp</code>, and <code>defineAsyncComponent</code>. Serve the required runtime modules deliberately; do not load standalone and compiled runtimes over the same DOM tree or assume npm-only APIs exist in a compiled Flaxon page.</p>
+<p><a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/runtime-reference.md">Runtime reference</a> · <a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/standalone-runtime.md">Standalone runtime</a> · <a href="https://github.com/aldanedev-create/teloce-py/blob/10f786b9ce99cf62cb2e154a913843b027b20ee7/docs/plugins.md">Plugins</a></p>
+<h2 id="10-choose-the-flaxon-server-api-for-your-feature">10. Choose the Flaxon server API for your feature</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Public entry points</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP and routing</td>
+<td><code>Flaxon</code>, route decorators, <code>Request</code>, typed paths</td>
+<td><a href="../core-concepts/routing.html">Routing</a></td>
+</tr>
+<tr>
+<td>Request input</td>
+<td>JSON, form, query, headers, cookies, uploaded files</td>
+<td><a href="../core-concepts/requests.html">Requests</a></td>
+</tr>
+<tr>
+<td>Validation</td>
+<td><code>Schema</code>, <code>fields</code>, typed body parameters</td>
+<td><a href="../core-concepts/validation.html">Validation</a></td>
+</tr>
+<tr>
+<td>Responses</td>
+<td>JSON, HTML, redirects, files, streams</td>
+<td><a href="../core-concepts/responses.html">Responses</a></td>
+</tr>
+<tr>
+<td>Middleware</td>
+<td><code>app.add_middleware</code>, CORS, trusted hosts, rate limits, security headers</td>
+<td><a href="../core-concepts/middleware.html">Middleware</a></td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>Sessions, JWT, API keys, identity</td>
+<td><a href="../guides/authentication.html">Authentication</a></td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Roles, permissions, server-side checks</td>
+<td><a href="../guides/authorization.html">Authorization</a></td>
+</tr>
+<tr>
+<td>Database work</td>
+<td>Adapters, transactions, migrations</td>
+<td><a href="../guides/databases.html">Databases</a></td>
+</tr>
+<tr>
+<td>Admin/CMS</td>
+<td><code>AdminDashboard</code>, <code>AdminConfig</code>, <code>Registry</code>, model adapters</td>
+<td><a href="../guides/admin-cms.html">Admin and CMS</a></td>
+</tr>
+<tr>
+<td>Live updates</td>
+<td><code>app.websocket</code>, <code>WebSocket</code>, rooms and broadcast helpers</td>
+<td><a href="../guides/websockets.html">WebSockets</a></td>
+</tr>
+<tr>
+<td>Server templates</td>
+<td><code>Jinax</code>, <code>app.use_templates</code>, <code>request.render</code></td>
+<td><a href="../guides/jinax.html">Jinax</a></td>
+</tr>
+<tr>
+<td>Background work</td>
+<td>Framework tasks and worker integrations</td>
+<td><a href="../guides/tasks.html">Tasks</a></td>
+</tr>
+<tr>
+<td>Application composition</td>
+<td><code>FlaxonModule</code>, container dependencies, hooks and commands</td>
+<td><a href="../guides/modules.html">Modules</a></td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>HTTP and WebSocket test clients</td>
+<td><a href="../guides/testing.html">Testing</a></td>
+</tr>
+</tbody>
+</table>
+<p>The guessing game shows a real <code>Schema</code> body, token authorization, <code>JSONResponse</code>, transactions, module routes, and read/delete Admin. For larger applications, consult the linked full references rather than adding client-side authorization shortcuts.</p>
+<h2 id="11-check-your-understanding">11. Check your understanding</h2>
+<ol>
+<li>Change the Play page's message using <code>data()</code> and interpolation.</li>
+<li>Add a read-only derived value with <code>computed</code>.</li>
+<li>Navigate to Results through <code>data-teloce-link</code> and confirm there is no document reload.</li>
+<li>Refresh <code>/results</code> directly and confirm Flaxon serves the shell.</li>
+<li>Add an optional module-owned page with <code>ui_routes</code> while keeping its API prefix unchanged.</li>
+<li>Confirm an unauthenticated request cannot read another round or enter protected Admin.</li>
+<li>Build with <code>debug=False</code> and test the generated production assets.</li>
+</ol>
+<p><a href="11-guessing-game.html">Previous: complete guessing game</a> · <a href="index.html">Course contents</a></p></article>
+</main></div><div id="footer"></div></body></html>

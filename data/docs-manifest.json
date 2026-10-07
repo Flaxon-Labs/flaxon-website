@@ -752,6 +752,11 @@
       "section": "Full-stack course"
     },
     {
+      "url": "docs/fullstack/12-teloce-flaxon-apis.html",
+      "title": "Lesson 12: Using Teloce and Flaxon APIs",
+      "section": "Full-stack course"
+    },
+    {
       "url": "docs/guides/backend-only.html",
       "title": "Use Flaxon as a backend",
       "section": "Website guides"
