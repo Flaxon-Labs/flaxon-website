@@ -4,3 +4,4 @@ data/
 backups/
 .env
 .pytest_cache/
+.flaxon/
