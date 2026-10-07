@@ -15,6 +15,7 @@ import posixpath
 import re
 import shutil
 import subprocess
+import zipfile
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit
 
@@ -405,10 +406,22 @@ def build():
     pages = manifest["pages"]
     mapping = {e["source"]: e["url"] for e in pages}
     imported = {e["url"] for e in pages}
-    preserved = []
+    tutorial_url = "docs/fullstack/11-guessing-game.html"
+    tutorial_text = (ROOT / "content/tutorials/guessing-game.md").read_text()
+    tutorial_body = markdown.markdown(tutorial_text, extensions=["tables", "fenced_code", "toc"])
+    preserved = [{"url": tutorial_url, "title": "Full-stack capstone: a guessing-game SPA", "section": "Full-stack course", "body": tutorial_body}]
+    downloads = ROOT / "downloads"
+    downloads.mkdir(exist_ok=True)
+    with zipfile.ZipFile(downloads / "flaxon-guessing-game.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+        for source in sorted((ROOT / "examples/guessing-game").rglob("*")):
+            if source.is_file() and not any(part in {"__pycache__", ".pytest_cache", "data", ".venv"} for part in source.parts):
+                entry = zipfile.ZipInfo(source.relative_to(ROOT / "examples/guessing-game").as_posix(), date_time=(2000, 1, 1, 0, 0, 0))
+                entry.compress_type = zipfile.ZIP_DEFLATED
+                entry.external_attr = 0o100644 << 16
+                archive.writestr(entry, source.read_bytes())
     for file in sorted((ROOT / "docs").rglob("*.html")):
         url = file.relative_to(ROOT).as_posix()
-        if url in imported:
+        if url in imported or url == tutorial_url:
             continue
         soup = BeautifulSoup(file.read_text(), "html.parser")
         content = soup.select_one(".doc-content")
@@ -466,6 +479,12 @@ def build():
             heading.name = "h2"
         output = ROOT / entry["url"]
         output.parent.mkdir(parents=True, exist_ok=True)
+        if entry["url"].startswith("docs/fullstack/") and (entry["url"].endswith("index.html") or "/10" in entry["url"]):
+            capstone = soup.new_tag("p")
+            link = soup.new_tag("a", href="11-guessing-game.html")
+            link.string = "Next: build the complete guessing-game SPA with Admin and Render deployment"
+            capstone.append(link)
+            soup.append(capstone)
         output.write_text(page_shell(entry, str(soup), manifest))
     for entry in preserved:
         (ROOT / entry["url"]).write_text(page_shell(entry, entry["body"]))
@@ -493,7 +512,7 @@ def build():
         )
     grouped = {name: [e for e in all_pages if e["section"] == name] for name in GROUPS}
     nav = '<nav id="docs-navigation" aria-label="Flaxon documentation"><label for="docs-nav-filter">Find a page</label><input id="docs-nav-filter" type="search" placeholder="Filter navigation…" autocomplete="off"><a href="/docs.html" class="docs-home">Documentation home</a>'
-    catalog = '<h1>Flaxon documentation</h1><p>Build complete applications with Python and Teloce, server-rendered pages with Jinax, or combine both. Flaxon includes Admin, CMS, authentication, WebSockets, database tools, and reusable modules.</p><div class="doc-paths"><a href="docs/getting-started/project-setup.html"><strong>Create your first project</strong><span>Welcome app, management.py, migrations, and protected Admin.</span></a><a href="docs/fullstack/index.html"><strong>Learn full-stack development</strong><span>Ten lessons covering components, TypeScript, APIs, data, and deployment.</span></a><a href="docs/guides/jinax.html"><strong>Build with Jinax</strong><span>Complete server-rendered applications and reusable templates.</span></a><a href="docs/guides/admin-cms.html"><strong>Configure Admin and CMS</strong><span>Users, permissions, content, media, and operational tools.</span></a></div><p>Using a separate frontend? Start with the <a href="docs/guides/backend-only.html">backend-only quick start</a> and the <a href="examples.html">examples directory</a>.</p><h2>Complete documentation directory</h2>'
+    catalog = '<h1>Flaxon documentation</h1><p>Build complete applications with Python and Teloce, server-rendered pages with Jinax, or combine both. Flaxon includes Admin, CMS, authentication, WebSockets, database tools, and reusable modules.</p><div class="doc-paths"><a href="docs/getting-started/project-setup.html"><strong>Create your first project</strong><span>Welcome app, management.py, migrations, and protected Admin.</span></a><a href="docs/fullstack/index.html"><strong>Learn full-stack development</strong><span>Ten lessons plus a complete guessing-game SPA, Admin, and Render capstone.</span></a><a href="docs/guides/jinax.html"><strong>Build with Jinax</strong><span>Complete server-rendered applications and reusable templates.</span></a><a href="docs/guides/admin-cms.html"><strong>Configure Admin and CMS</strong><span>Users, permissions, content, media, and operational tools.</span></a></div><p>Using a separate frontend? Start with the <a href="docs/guides/backend-only.html">backend-only quick start</a> and the <a href="examples.html">examples directory</a>.</p><h2>Complete documentation directory</h2>'
     for name, entries in grouped.items():
         if not entries:
             continue

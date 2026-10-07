@@ -17,7 +17,7 @@ class DocumentationTests(unittest.TestCase):
         cls.source = json.loads((ROOT / "content/framework/manifest.json").read_text())
         cls.search = json.loads((ROOT / "data/search-index.json").read_text())["pages"]
         cls.html = {
-            p: BeautifulSoup(p.read_text(), "html.parser") for p in ROOT.rglob("*.html")
+            p: BeautifulSoup(p.read_text(), "html.parser") for p in ROOT.rglob("*.html") if "templates" not in p.relative_to(ROOT).parts
         }
 
     def test_all_synced_markdown_has_a_published_page(self):
@@ -65,7 +65,8 @@ class DocumentationTests(unittest.TestCase):
             for e in self.manifest["pages"]
             if e["section"] == "Full-stack course"
         ]
-        self.assertEqual(len(paths), 11)
+        self.assertEqual(len(paths), 12)
+        self.assertIn("docs/fullstack/11-guessing-game.html", paths)
         for number in range(1, 11):
             self.assertTrue(any(f"/fullstack/{number:02d}-" in p for p in paths))
 

@@ -1,0 +1,1 @@
+flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34
