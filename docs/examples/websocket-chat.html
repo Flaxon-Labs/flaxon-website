@@ -1,236 +1,446 @@
-<!-- docs/examples/websocket-chat.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>WebSocket Chat Example – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="WebSocket Chat Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>WebSocket Chat Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>WebSocket Chat Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/websocket-chat.md">Framework source</a> · <a href="../../content/framework/docs/examples/websocket-chat.md" download>Markdown</a></p><h1 id="websocket-chat-example">WebSocket Chat Example</h1>
+<p>This example demonstrates a real-time chat application using WebSockets with room support.</p>
+<h2 id="application-code">Application Code</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># app.py</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_qs</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">WebSocketDisconnect</span>
 
-    <div id="header"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"chat-app"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="c1"># In-memory storage</span>
+<span class="n">rooms</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">users</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">message_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+<span class="n">MAX_MESSAGES_PER_ROOM</span> <span class="o">=</span> <span class="mi">100</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
 
-                        <div class="section-title">Examples</div>
-                        <a href="/docs/examples/basic-api.html">Basic API</a>
-                        <a href="/docs/examples/react-backend.html">React Backend</a>
-                        <a href="/docs/examples/android-backend.html">Android Backend</a>
-                        <a href="/docs/examples/websocket-chat.html" class="active">WebSocket Chat</a>
-                        <a href="/docs/examples/jinax-website.html">Jinax Website</a>
-                        <a href="/docs/examples/large-application.html">Large Application</a>
-                    </div>
-                </aside>
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat/&lt;room_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">room_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>WebSocket Chat Example</h1>
-                        <p>A real-time chat application with room support, user presence, and message history.</p>
+    <span class="c1"># Parse username from query string</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"query_string"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">""</span><span class="p">)</span>
 
-                        <h2>Application Code</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># app.py
-import json
-from datetime import datetime
-from urllib.parse import parse_qs
-from flaxon import Flaxon, WebSocket, WebSocketDisconnect
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
 
-app = Flaxon("chat-app", debug=True)
+    <span class="n">params</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 
-# In-memory storage
-rooms = {}
-users = {}
-message_history = {}
-max_messages_per_room = 100
+    <span class="n">username</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"user"</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">"Anonymous"</span><span class="p">]</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-@app.websocket("/ws/chat/&lt;room_id&gt;")
-async def chat(socket: WebSocket, room_id: str):
-    raw_query = socket.scope.get("query_string", b"")
-    if isinstance(raw_query, bytes):
-        raw_query = raw_query.decode("utf-8", "ignore")
-    username = parse_qs(raw_query).get("user", ["Anonymous"])[0][:40] or "Anonymous"
-    user_id = f"{username}-{id(socket)}"
+    <span class="n">user_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
 
-    await socket.accept()
-    await socket.join(room_id)
 
-    if room_id not in rooms:
-        rooms[room_id] = []
-        message_history[room_id] = []
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
 
-    rooms[room_id].append(user_id)
-    users[user_id] = {"username": username, "room": room_id, "socket": socket}
 
-    # Notify others
-    await socket.broadcast_json(room_id, {
-        "type": "system",
-        "event": "user_joined",
-        "user": username,
-        "users": rooms[room_id],
-        "timestamp": datetime.now().isoformat(),
-    })
+    <span class="c1"># Create room</span>
+    <span class="k">if</span> <span class="n">room_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+        <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">message_history</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-    # Send message history
-    await socket.send_json({
-        "type": "system",
-        "event": "history",
-        "messages": message_history[room_id][-max_messages_per_room:],
-    })
 
-    try:
-        async for message in socket.iter_json():
-            if not isinstance(message, dict):
-                continue
-            if message.get("type") == "message":
-                msg = {
-                    "type": "message",
-                    "user": username,
-                    "content": message.get("content"),
-                    "timestamp": datetime.now().isoformat(),
-                }
-                message_history[room_id].append(msg)
-                await socket.broadcast_json(room_id, msg)
+    <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
 
-            elif message.get("type") == "typing":
-                await socket.broadcast_json(room_id, {
-                    "type": "typing",
-                    "user": username,
-                    "is_typing": message.get("is_typing", False),
-                })
+    <span class="n">users</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"username"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+        <span class="s2">"room"</span><span class="p">:</span> <span class="n">room_id</span><span class="p">,</span>
+        <span class="s2">"socket"</span><span class="p">:</span> <span class="n">socket</span><span class="p">,</span>
+    <span class="p">}</span>
 
-    except WebSocketDisconnect:
-        pass
-    finally:
-        users.pop(user_id, None)
-        if room_id in rooms:
-            rooms[room_id] = [u for u in rooms[room_id] if u != user_id]
 
-        await socket.leave(room_id)
+    <span class="c1"># Notify room</span>
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+        <span class="n">room_id</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span>
+            <span class="s2">"event"</span><span class="p">:</span> <span class="s2">"user_joined"</span><span class="p">,</span>
+            <span class="s2">"user"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+            <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
 
-        await socket.broadcast_json(room_id, {
-            "type": "system",
-            "event": "user_left",
-            "user": username,
-            "users": rooms.get(room_id, []),
-        })
 
-@app.get("/rooms")
-async def list_rooms():
-    return {
-        "rooms": [
-            {
-                "name": room_id,
-                "users": len(users_in_room),
-                "messages": len(message_history.get(room_id, [])),
-            }
-            for room_id, users_in_room in rooms.items()
-        ]
-    }
+    <span class="c1"># Send history</span>
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"history"</span><span class="p">,</span>
+            <span class="s2">"messages"</span><span class="p">:</span> <span class="n">message_history</span><span class="p">[</span><span class="n">room_id</span><span class="p">][</span><span class="o">-</span><span class="n">MAX_MESSAGES_PER_ROOM</span><span class="p">:],</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
 
-@app.get("/rooms/&lt;room_id&gt;/messages")
-async def get_messages(room_id: str):
-    return {"messages": message_history.get(room_id, [])}
 
-@app.get("/rooms/&lt;room_id&gt;/users")
-async def get_users(room_id: str):
-    if room_id in rooms:
-        usernames = [users.get(u_id, {}).get("username", "Unknown") for u_id in rooms[room_id]]
-        return {"users": usernames}
-    return {"users": []}</code></pre>
-                        </div>
+    <span class="k">try</span><span class="p">:</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
-                            <ul class="mb-0 mt-1">
-                                <li><strong>WebSocket Rooms:</strong> Separate chat rooms</li>
-                                <li><strong>User Presence:</strong> Join/leave notifications</li>
-                                <li><strong>Message History:</strong> Store last 100 messages</li>
-                                <li><strong>Typing Indicators:</strong> Real-time typing status</li>
-                            </ul>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
 
-    <div id="footer"></div>
+            <span class="n">message_type</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+            <span class="k">if</span> <span class="n">message_type</span> <span class="o">==</span> <span class="s2">"message"</span><span class="p">:</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"message"</span><span class="p">,</span>
+                    <span class="s2">"user"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                    <span class="s2">"content"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s2">"content"</span><span class="p">,</span>
+                        <span class="s2">""</span>
+                    <span class="p">),</span>
+                    <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="p">}</span>
+
+
+                <span class="n">message_history</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+                <span class="c1"># Limit history</span>
+                <span class="n">message_history</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">message_history</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span>
+                    <span class="p">[</span><span class="o">-</span><span class="n">MAX_MESSAGES_PER_ROOM</span><span class="p">:]</span>
+                <span class="p">)</span>
+
+
+                <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                    <span class="n">room_id</span><span class="p">,</span>
+                    <span class="n">msg</span>
+                <span class="p">)</span>
+
+
+            <span class="k">elif</span> <span class="n">message_type</span> <span class="o">==</span> <span class="s2">"typing"</span><span class="p">:</span>
+
+                <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                    <span class="n">room_id</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"typing"</span><span class="p">,</span>
+                        <span class="s2">"user"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                        <span class="s2">"is_typing"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                            <span class="s2">"is_typing"</span><span class="p">,</span>
+                            <span class="kc">False</span>
+                        <span class="p">),</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+
+            <span class="k">elif</span> <span class="n">message_type</span> <span class="o">==</span> <span class="s2">"ping"</span><span class="p">:</span>
+
+                <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"pong"</span><span class="p">,</span>
+                        <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+
+    <span class="k">except</span> <span class="n">WebSocketDisconnect</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+
+    <span class="k">finally</span><span class="p">:</span>
+
+        <span class="n">users</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="p">,</span>
+            <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">room_id</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+
+            <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                <span class="n">user_id</span>
+            <span class="p">)</span>
+
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span>
+
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+            <span class="n">room_id</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span>
+                <span class="s2">"event"</span><span class="p">:</span> <span class="s2">"user_left"</span><span class="p">,</span>
+                <span class="s2">"user"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/rooms"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_rooms</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"rooms"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="n">room_id</span><span class="p">,</span>
+                <span class="s2">"users"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">room_users</span><span class="p">),</span>
+                <span class="s2">"messages"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">message_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">room_id</span><span class="p">,</span>
+                        <span class="p">[]</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">room_id</span><span class="p">,</span> <span class="n">room_users</span> <span class="ow">in</span> <span class="n">rooms</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/rooms/&lt;room_id&gt;/messages"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_messages</span><span class="p">(</span><span class="n">room_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"messages"</span><span class="p">:</span> <span class="n">message_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">room_id</span><span class="p">,</span>
+            <span class="p">[]</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/rooms/&lt;room_id&gt;/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">(</span><span class="n">room_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+    <span class="n">room_users</span> <span class="o">=</span> <span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">room_id</span><span class="p">,</span>
+        <span class="p">[]</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"users"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">users</span><span class="p">[</span><span class="n">user_id</span><span class="p">][</span><span class="s2">"username"</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="n">room_users</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="n">users</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="err">````</span>
+
+<span class="o">---</span>
+
+<span class="c1">## Running the Application</span>
+
+<span class="err">```</span><span class="n">bash</span>
+<span class="c1"># Install dependencies</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="s2">"flaxon[standard]"</span>
+
+<span class="c1"># Run server</span>
+<span class="n">flaxon</span> <span class="n">run</span> <span class="n">app</span><span class="p">:</span><span class="n">app</span> <span class="o">--</span><span class="n">reload</span>
+</code></pre></div>
+<hr/>
+<h2 id="html-client-example">HTML Client Example</h2>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- index.html --&gt;</span>
+
+<span class="cp">&lt;!doctype html&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Flaxon Chat<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+
+<span class="nt">body</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">system-ui</span><span class="p">;</span>
+<span class="w">    </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">800</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">    </span><span class="k">margin</span><span class="p">:</span><span class="kc">auto</span><span class="p">;</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">messages</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">height</span><span class="p">:</span><span class="mi">400</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">    </span><span class="k">overflow-y</span><span class="p">:</span><span class="kc">auto</span><span class="p">;</span>
+<span class="w">    </span><span class="k">border</span><span class="p">:</span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#ccc</span><span class="p">;</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">message</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">margin-bottom</span><span class="p">:</span><span class="mi">8</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">system</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="mh">#666</span><span class="p">;</span>
+<span class="w">    </span><span class="k">font-style</span><span class="p">:</span><span class="kc">italic</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">username</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-weight</span><span class="p">:</span><span class="kc">bold</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+Chat Room:
+<span class="p">&lt;</span><span class="nt">span</span> <span class="na">id</span><span class="o">=</span><span class="s">"room"</span><span class="p">&gt;</span>
+general
+<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"messages"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">"message-input"</span>
+<span class="na">placeholder</span><span class="o">=</span><span class="s">"Type message..."</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">"send-btn"</span><span class="p">&gt;</span>
+Send
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">room</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"general"</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="nx">prompt</span><span class="p">(</span><span class="s2">"Username:"</span><span class="p">)</span>
+<span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="s2">"Anonymous"</span><span class="p">;</span>
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebSocket</span><span class="p">(</span>
+<span class="w">        </span><span class="sb">`ws://localhost:8000/ws/chat/</span><span class="si">${</span><span class="nx">room</span><span class="si">}</span><span class="sb">?user=</span><span class="si">${</span><span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span>
+<span class="w">    </span><span class="p">);</span>
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">messages</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span>
+<span class="w">        </span><span class="s2">"messages"</span>
+<span class="w">    </span><span class="p">);</span>
+
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">input</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span>
+<span class="w">        </span><span class="s2">"message-input"</span>
+<span class="w">    </span><span class="p">);</span>
+
+
+<span class="nb">document</span>
+<span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"send-btn"</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">onclick</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">content</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">content</span><span class="p">){</span>
+
+<span class="w">        </span><span class="nx">socket</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span>
+<span class="w">            </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">                </span><span class="nx">type</span><span class="o">:</span><span class="s2">"message"</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">content</span>
+<span class="w">            </span><span class="p">})</span>
+<span class="w">        </span><span class="p">);</span>
+
+
+<span class="w">        </span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span><span class="o">=</span><span class="s2">""</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">};</span>
+
+
+
+<span class="nx">socket</span><span class="p">.</span><span class="nx">onmessage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span>
+<span class="w">            </span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span>
+<span class="w">        </span><span class="p">);</span>
+
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">div</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span>
+<span class="w">            </span><span class="s2">"div"</span>
+<span class="w">        </span><span class="p">);</span>
+
+
+<span class="w">    </span><span class="nx">div</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="s2">"message"</span><span class="p">;</span>
+
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">type</span><span class="o">===</span><span class="s2">"message"</span><span class="p">){</span>
+
+<span class="w">        </span><span class="nx">div</span><span class="p">.</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="sb">`</span><span class="si">${</span><span class="nx">data</span><span class="p">.</span><span class="nx">user</span><span class="si">}</span><span class="sb">: </span><span class="si">${</span><span class="nx">data</span><span class="p">.</span><span class="nx">content</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">type</span><span class="o">===</span><span class="s2">"system"</span><span class="p">){</span>
+
+<span class="w">        </span><span class="nx">div</span><span class="p">.</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="sb">`🔔 </span><span class="si">${</span><span class="nx">data</span><span class="p">.</span><span class="nx">event</span><span class="si">}</span><span class="sb">: </span><span class="si">${</span><span class="nx">data</span><span class="p">.</span><span class="nx">user</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+
+<span class="w">        </span><span class="nx">div</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="s2">"message system"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="nx">messages</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nx">messages</span><span class="p">.</span><span class="nx">scrollTop</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="nx">messages</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+
+<span class="p">};</span>
+
+
+<span class="nx">input</span><span class="p">.</span><span class="nx">onkeydown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">key</span><span class="o">===</span><span class="s2">"Enter"</span><span class="p">){</span>
+
+<span class="w">        </span><span class="nb">document</span>
+<span class="w">        </span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"send-btn"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="nx">click</span><span class="p">();</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">};</span>
+
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="production-notes">Production Notes</h2>
+<p>For production deployments:</p>
+<ul>
+<li>Replace in-memory rooms with Redis.</li>
+<li>Use authentication middleware.</li>
+<li>Use <code>wss://</code> behind HTTPS.</li>
+<li>Add rate limiting.</li>
+<li>Store messages in PostgreSQL.</li>
+<li>Use Redis Pub/Sub for multiple server instances.</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

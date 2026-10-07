@@ -1,91 +1,310 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Admin API - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>Admin API</h1>
-                        <p>The Admin API provides authenticated model management, CMS operations, production services, and a microservice control plane. Browser mutations require the Admin session cookie and <code>X-CSRF-Token</code>.</p>
-                        <h2>Dashboard and extension API</h2>
-                        <pre><code class="language-python">from flaxon.admin import AdminDashboard
-
-admin = AdminDashboard(
-    app,
-    storage_path="admin.sqlite3",
-    redis_url="redis://127.0.0.1:6379/0",
-)
-
-# Register model adapters and mount custom FlaxonModule pages.
-admin.register(products, name="product", fields=["id", "name"])
-admin.mount_module(reports, prefix="/admin/extensions/reports")</code></pre>
-                        <h2>Production service objects</h2>
-                        <pre><code class="language-python">from flaxon.admin import (
-    DurableJobStore, DurableJobWorker, ImmutableAuditLog,
-    NotificationService, ResumableUploadStore, WebAuthnService,
-)</code></pre>
-                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
-                            <thead><tr class="bg-slate-100 dark:bg-slate-800"><th class="border px-4 py-2 text-left">Service</th><th class="border px-4 py-2 text-left">Purpose</th></tr></thead>
-                            <tbody>
-                                <tr><td class="border px-4 py-2"><code>DurableJobStore</code></td><td class="border px-4 py-2">Persist queued, running, completed, and failed jobs with retry metadata.</td></tr>
-                                <tr><td class="border px-4 py-2"><code>DurableJobWorker</code></td><td class="border px-4 py-2">Register named handlers and process due jobs.</td></tr>
-                                <tr><td class="border px-4 py-2"><code>ImmutableAuditLog</code></td><td class="border px-4 py-2">Append hash-chained records and verify tamper evidence.</td></tr>
-                                <tr><td class="border px-4 py-2"><code>NotificationService</code></td><td class="border px-4 py-2">Store notification preferences and per-user delivery records.</td></tr>
-                                <tr><td class="border px-4 py-2"><code>ResumableUploadStore</code></td><td class="border px-4 py-2">Persist upload sessions, chunks, expiry, and final SHA-256 validation.</td></tr>
-                                <tr><td class="border px-4 py-2"><code>WebAuthnService</code></td><td class="border px-4 py-2">Delegate credential registration and assertion ceremonies to an injected provider.</td></tr>
-                            </tbody>
-                        </table>
-                        <h2>Important endpoints</h2>
-                        <ul>
-                            <li><code>/admin/media/resumable</code> creates and completes chunked uploads.</li>
-                            <li><code>/admin/media/{filename}</code> updates metadata, signed URLs, and deletes media.</li>
-                            <li><code>/admin/notifications/preferences</code> manages per-user delivery preferences.</li>
-                            <li><code>/admin/audit/verify</code> verifies the persisted audit hash chain.</li>
-                            <li><code>/admin/profile/webauthn/*</code> handles provider-backed WebAuthn ceremonies.</li>
-                            <li><code>/admin/profile/trusted-devices</code> lists and revokes trusted devices.</li>
-                            <li><code>/admin/cms/api/scheduler/jobs</code> exposes scheduled-publication history and retries.</li>
-                            <li><code>/admin/cms/api/media</code> lists reusable media for CMS fields.</li>
-                        </ul>
-                        <h2>Authorization</h2>
-                        <p><code>PermissionCatalog</code> exposes readable model <code>view</code>, <code>add</code>, <code>change</code>, and <code>delete</code> capabilities plus CMS capabilities. Use <code>strict_permissions=True</code> when exact action permissions are required. <code>CasbinAuthorizationProvider</code> is available as an optional adapter; PyCasbin is not a core dependency.</p>
-                        <h2>Microservice control plane</h2>
-                        <p>The control plane is enabled by default and is rooted at <code>/admin/api/control-plane/</code>. Use <code>ServiceRegistry</code> for service metadata, <code>RemoteServiceClient</code> for authenticated API calls, and <code>RemoteModelAdapter</code> for service-owned Admin models. Each service owns its database; Admin should not query another service's database directly.</p>
-                        <pre><code class="language-python">from flaxon.admin import RemoteModelAdapter, RemoteServiceClient
-
-catalog = RemoteServiceClient(
-    "https://catalog.internal",
-    token=service_token,
-    timeout=3,
-    retries=2,
-)
-admin.register(
-    RemoteModelAdapter(catalog, "products"),
-    name="product",
-    fields=["id", "name", "price", "status"],
-)</code></pre>
-                        <p>See the <a href="/docs/guides/microservices.html">microservice control-plane guide</a> for gateways, events, outbox delivery, Redis, object storage, and multi-worker deployment.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Admin API Reference — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Admin API Reference — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Admin API Reference</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/admin.md">Framework source</a> · <a href="../../content/framework/docs/api/admin.md" download>Markdown</a></p><h1 id="admin-api-reference">Admin API Reference</h1>
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<div class="api-symbol"><pre><code class="language-python">AdminDashboard(self, app: Any, config: AdminConfig | None=None, url_prefix: str='/admin', template_dir: str | None=None, registry: Registry | None=None, users: list[dict[str, Any]] | None=None, auth_backend: Any | None=None, upload_dir: str='uploads', store: AdminStore | None=None, storage_path: str | None=None, redis_url: str | None=None, database: Any | None=None, password_reset_sender: Any | None=None, email_verification_sender: Any | None=None, require_email_verification: bool=False, max_upload_size: int=10 * 1024 * 1024, allowed_upload_types: set[str] | None=None, media_storage: Any | None=None, redis_protocol: int=2, redis_max_connections: int=100, thumbnail_sync_limit: int=2 * 1024 * 1024, session_idle_timeout: int | None=None, media_scanner: Any | None=None, media_retention_days: int=365, webauthn_provider: Any | None=None, permission_provider: AuthorizationProvider | None=None, strict_permissions: bool=False, max_image_dimensions: tuple[int, int]=(10000, 10000), password_hasher: PasswordHasher | None=None, microservices: bool | dict[str, Any]=True, cookie_secure: bool | None=None)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/dashboard.py#L35">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="register"><code>register</code></h4><pre><code class="language-python">def register(self, model: Any, **options: Any) -&gt; None</code></pre><p>Register a model with the dashboard's registry.</p><h4 id="register-widget"><code>register_widget</code></h4><pre><code class="language-python">def register_widget(self, widget: Any) -&gt; Any</code></pre><h4 id="register-permission"><code>register_permission</code></h4><pre><code class="language-python">def register_permission(self, key: str, label: str, category: str='Custom', description: str='', *, dangerous: bool=False) -&gt; Any</code></pre><p>Register an application capability for the role editor.</p><h4 id="permission-for-action"><code>permission_for_action</code></h4><pre><code class="language-python">def permission_for_action(self, model_name: str, action: str) -&gt; str</code></pre><p>Return and lazily register a model action capability.</p><h4 id="add-view"><code>add_view</code></h4><pre><code class="language-python">def add_view(self, view: Any, name: str, *, url: str | None=None, category: str='Custom', icon: str='fa-puzzle-piece', methods: set[str] | None=None, permission: str='admin.view_dashboard') -&gt; Any</code></pre><p>Register a Flask-Admin-style custom page and navigation item.</p>
+<p>The page is protected by <code>permission</code> before the callback runs. The
+callback may still perform additional object-level authorization.</p><h4 id="mount-module"><code>mount_module</code></h4><pre><code class="language-python">def mount_module(self, module: Any, *, prefix: str | None=None, name: str | None=None, navigation: list[dict[str, Any]] | None=None) -&gt; Any</code></pre><p>Mount a normal :class:<code>FlaxonModule</code> as an Admin extension.</p>
+<p>The module keeps its own routes, hooks, templates, static assets and
+dependencies. Admin only supplies the mount boundary and optional
+navigation metadata, so extension code does not need to reach into
+Admin internals or query another service's database.</p><h4 id="add-hook"><code>add_hook</code></h4><pre><code class="language-python">def add_hook(self, name: str, callback: Any) -&gt; Any</code></pre><h4 id="run-hook"><code>run_hook</code></h4><pre><code class="language-python">def run_hook(self, name: str, value: Any) -&gt; Any</code></pre><h4 id="unregister"><code>unregister</code></h4><pre><code class="language-python">def unregister(self, model: Any) -&gt; None</code></pre><p>Unregister a model from the dashboard's registry.</p><h4 id="can-access-model"><code>can_access_model</code></h4><pre><code class="language-python">def can_access_model(self, user: Any, model_name: str, action: str='read') -&gt; bool</code></pre><p>Return whether a template or extension may show a model action.</p><h4 id="index"><code>index</code></h4><pre><code class="language-python">async def index(self, request: Request) -&gt; Response</code></pre><h4 id="list-view"><code>list_view</code></h4><pre><code class="language-python">async def list_view(self, request: Request, model_name: str) -&gt; Response</code></pre><h4 id="model-add-view"><code>model_add_view</code></h4><pre><code class="language-python">async def model_add_view(self, request: Request, model_name: str) -&gt; Response</code></pre><h4 id="detail-view-2"><code>detail_view</code></h4><pre><code class="language-python">async def detail_view(self, request: Request, model_name: str, object_id: str) -&gt; Response</code></pre><h4 id="edit-view"><code>edit_view</code></h4><pre><code class="language-python">async def edit_view(self, request: Request, model_name: str, object_id: str) -&gt; Response</code></pre><h4 id="delete-view-2"><code>delete_view</code></h4><pre><code class="language-python">async def delete_view(self, request: Request, model_name: str, object_id: str) -&gt; Response</code></pre><h4 id="model-action"><code>model_action</code></h4><pre><code class="language-python">async def model_action(self, request: Request, model_name: str, action_name: str) -&gt; Response</code></pre><h4 id="record-activity"><code>record_activity</code></h4><pre><code class="language-python">def record_activity(self, action: str, resource: str, request: Request, record_id: str | None=None, **details: Any) -&gt; None</code></pre><h4 id="csrf-token"><code>csrf_token</code></h4><pre><code class="language-python">def csrf_token(self) -&gt; str</code></pre><h4 id="validate-csrf"><code>validate_csrf</code></h4><pre><code class="language-python">def validate_csrf(self, data: dict[str, Any]) -&gt; dict[str, Any]</code></pre><h4 id="login"><code>login</code></h4><pre><code class="language-python">async def login(self, request: Request) -&gt; Response</code></pre><h4 id="logout"><code>logout</code></h4><pre><code class="language-python">async def logout(self, request: Request) -&gt; Response</code></pre><h4 id="password-reset"><code>password_reset</code></h4><pre><code class="language-python">async def password_reset(self, request: Request) -&gt; Response</code></pre><h4 id="verify-email"><code>verify_email</code></h4><pre><code class="language-python">async def verify_email(self, request: Request) -&gt; Response</code></pre><h4 id="profile"><code>profile</code></h4><pre><code class="language-python">async def profile(self, request: Request) -&gt; Response</code></pre><h4 id="users-view"><code>users_view</code></h4><pre><code class="language-python">async def users_view(self, request: Request) -&gt; Response</code></pre><h4 id="roles-view"><code>roles_view</code></h4><pre><code class="language-python">async def roles_view(self, request: Request) -&gt; Response</code></pre><h4 id="user-api"><code>user_api</code></h4><pre><code class="language-python">async def user_api(self, request: Request, username: str) -&gt; Response</code></pre><h4 id="media-view"><code>media_view</code></h4><pre><code class="language-python">async def media_view(self, request: Request) -&gt; Response</code></pre><h4 id="resumable-media"><code>resumable_media</code></h4><pre><code class="language-python">async def resumable_media(self, request: Request, upload_id: str | None=None) -&gt; Response</code></pre><h4 id="media-folders-api"><code>media_folders_api</code></h4><pre><code class="language-python">async def media_folders_api(self, request: Request) -&gt; Response</code></pre><h4 id="media-bulk-api"><code>media_bulk_api</code></h4><pre><code class="language-python">async def media_bulk_api(self, request: Request) -&gt; Response</code></pre><p>Apply an explicit action to selected media records.</p><h4 id="media-signed-url"><code>media_signed_url</code></h4><pre><code class="language-python">async def media_signed_url(self, request: Request, filename: str) -&gt; Response</code></pre><h4 id="media-api"><code>media_api</code></h4><pre><code class="language-python">async def media_api(self, request: Request, filename: str) -&gt; Response</code></pre><h4 id="search"><code>search</code></h4><pre><code class="language-python">async def search(self, request: Request) -&gt; Response</code></pre><h4 id="model-export"><code>model_export</code></h4><pre><code class="language-python">async def model_export(self, request: Request, model_name: str) -&gt; Response</code></pre><h4 id="model-import"><code>model_import</code></h4><pre><code class="language-python">async def model_import(self, request: Request, model_name: str) -&gt; Response</code></pre><h4 id="settings-view"><code>settings_view</code></h4><pre><code class="language-python">async def settings_view(self, request: Request) -&gt; Response</code></pre><h4 id="history"><code>history</code></h4><pre><code class="language-python">async def history(self, request: Request, model_name: str, object_id: str) -&gt; Response</code></pre><h4 id="activity-view"><code>activity_view</code></h4><pre><code class="language-python">async def activity_view(self, request: Request) -&gt; Response</code></pre><h4 id="activity-export"><code>activity_export</code></h4><pre><code class="language-python">async def activity_export(self, request: Request) -&gt; Response</code></pre><h4 id="notifications-api"><code>notifications_api</code></h4><pre><code class="language-python">async def notifications_api(self, request: Request) -&gt; Response</code></pre><p>Return and update durable per-user admin notifications.</p><h4 id="notification-preferences"><code>notification_preferences</code></h4><pre><code class="language-python">async def notification_preferences(self, request: Request) -&gt; Response</code></pre><h4 id="audit-verify"><code>audit_verify</code></h4><pre><code class="language-python">async def audit_verify(self, request: Request) -&gt; Response</code></pre><h4 id="webauthn-api"><code>webauthn_api</code></h4><pre><code class="language-python">async def webauthn_api(self, request: Request) -&gt; Response</code></pre><h4 id="trusted-devices-api"><code>trusted_devices_api</code></h4><pre><code class="language-python">async def trusted_devices_api(self, request: Request, device_id: str | None=None) -&gt; Response</code></pre><h4 id="mfa-recovery-api"><code>mfa_recovery_api</code></h4><pre><code class="language-python">async def mfa_recovery_api(self, request: Request) -&gt; Response</code></pre><h4 id="operations-view"><code>operations_view</code></h4><pre><code class="language-python">async def operations_view(self, request: Request) -&gt; Response</code></pre><h4 id="operations-tasks-api"><code>operations_tasks_api</code></h4><pre><code class="language-python">async def operations_tasks_api(self, request: Request) -&gt; Response</code></pre><h4 id="get-urls"><code>get_urls</code></h4><pre><code class="language-python">def get_urls(self) -&gt; list[tuple[str, str, Any]]</code></pre></details></div>
+<hr/>
+<h2 id="admin-configuration">Admin Configuration</h2>
+<div class="api-symbol"><pre><code class="language-python">AdminConfig(self, site_title: str='Flaxon Admin', site_header: str='Flaxon Administration', index_title: str='Welcome to Flaxon Admin', enable_dark_mode: bool=True, enable_search: bool=True, enable_actions: bool=True, enable_filters: bool=True, enable_pagination: bool=True, logo_url: str | None=None, custom_styles: str | None=None, custom_scripts: str | None=None, timezone: str='UTC', settings: dict[str, Any] | None=None)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/config.py#L4">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="to-dict"><code>to_dict</code></h4><pre><code class="language-python">def to_dict(self) -&gt; dict[str, Any]</code></pre></details></div>
+<hr/>
+<h2 id="registry">Registry</h2>
+<div class="api-symbol"><pre><code class="language-python">Registry(self)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/registry.py#L78">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="register-2"><code>register</code></h4><pre><code class="language-python">def register(self, model: Any, **options: Any) -&gt; None</code></pre><h4 id="unregister-2"><code>unregister</code></h4><pre><code class="language-python">def unregister(self, model: Any) -&gt; None</code></pre><h4 id="get"><code>get</code></h4><pre><code class="language-python">def get(self, name: str) -&gt; AdminModel | None</code></pre><h4 id="get-by-model"><code>get_by_model</code></h4><pre><code class="language-python">def get_by_model(self, model: Any) -&gt; AdminModel | None</code></pre><h4 id="get-all"><code>get_all</code></h4><pre><code class="language-python">def get_all(self) -&gt; list[AdminModel]</code></pre><h4 id="clear"><code>clear</code></h4><pre><code class="language-python">def clear(self) -&gt; None</code></pre></details></div>
+<hr/>
+<h2 id="admin-model">Admin Model</h2>
+<div class="api-symbol"><pre><code class="language-python">AdminModel(self, model: Any, *, list_display: list[str] | None=None, list_filter: list[str] | None=None, search_fields: list[str] | None=None, fields: list[str] | None=None, readonly_fields: list[str] | None=None, ordering: list[str] | None=None, name: str | None=None, icon: str | None=None, actions: dict[str, Any] | list[Any] | tuple[Any, ...] | None=None, can_view: Any | None=None, can_add: Any | None=None, can_change: Any | None=None, can_delete: Any | None=None, validate_import: Any | None=None)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/registry.py#L6">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="get-name"><code>get_name</code></h4><pre><code class="language-python">def get_name(self) -&gt; str</code></pre><h4 id="get-verbose-name"><code>get_verbose_name</code></h4><pre><code class="language-python">def get_verbose_name(self) -&gt; str</code></pre><h4 id="get-verbose-name-plural"><code>get_verbose_name_plural</code></h4><pre><code class="language-python">def get_verbose_name_plural(self) -&gt; str</code></pre><h4 id="add-action"><code>add_action</code></h4><pre><code class="language-python">def add_action(self, name: str, func: Any) -&gt; None</code></pre><h4 id="get-actions"><code>get_actions</code></h4><pre><code class="language-python">def get_actions(self) -&gt; dict[str, Any]</code></pre><h4 id="get-permission-hook"><code>get_permission_hook</code></h4><pre><code class="language-python">def get_permission_hook(self, action: str) -&gt; Any | None</code></pre><h4 id="display-value"><code>display_value</code></h4><pre><code class="language-python">def display_value(obj: Any, field: Any) -&gt; Any</code></pre><p>Resolve a list column like Flask-Admin's <code>column_formatters</code>.</p></details></div>
+<hr/>
+<h2 id="admin-views">Admin Views</h2>
+<h2 id="base-view">Base View</h2>
+<div class="api-symbol"><pre><code class="language-python">AdminView(self, admin_model: Any, request: Request, dashboard: Any)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L9">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse | RedirectResponse</code></pre></details></div>
+<hr/>
+<h2 id="change-list-view">Change List View</h2>
+<div class="api-symbol"><pre><code class="language-python">class ChangeListView</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L29">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render-2"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse</code></pre></details></div>
+<hr/>
+<h2 id="detail-view">Detail View</h2>
+<div class="api-symbol"><pre><code class="language-python">DetailView(self, admin_model: Any, request: Request, dashboard: Any, object_id: str)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L115">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render-3"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse</code></pre></details></div>
+<hr/>
+<h2 id="create-view">Create View</h2>
+<div class="api-symbol"><pre><code class="language-python">class CreateView</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L141">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render-4"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse | RedirectResponse</code></pre></details></div>
+<hr/>
+<h2 id="update-view">Update View</h2>
+<div class="api-symbol"><pre><code class="language-python">UpdateView(self, admin_model: Any, request: Request, dashboard: Any, object_id: str)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L176">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render-5"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse | RedirectResponse</code></pre></details></div>
+<hr/>
+<h2 id="delete-view">Delete View</h2>
+<div class="api-symbol"><pre><code class="language-python">DeleteView(self, admin_model: Any, request: Request, dashboard: Any, object_id: str)</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/views.py#L312">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="render-6"><code>render</code></h4><pre><code class="language-python">async def render(self) -&gt; HTMLResponse | RedirectResponse</code></pre></details></div>
+<hr/>
+<h2 id="decorators">Decorators</h2>
+<h2 id="admin_model">admin_model</h2>
+<div class="api-symbol"><pre><code class="language-python">def admin_model(**options: Any) -&gt; Callable[[type], type]</code></pre><p>Decorator to register a model class with the default admin registry.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/decorators.py#L9">View implementation</a></p></div>
+<hr/>
+<h2 id="admin_action">admin_action</h2>
+<div class="api-symbol"><pre><code class="language-python">def admin_action(name: str | None=None) -&gt; Callable[[Callable[..., Any]], Callable[..., Any]]</code></pre><p>Decorator to mark a function or method as an admin bulk action.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/decorators.py#L17">View implementation</a></p></div>
+<hr/>
+<h2 id="admin_display">admin_display</h2>
+<div class="api-symbol"><pre><code class="language-python">def admin_display(header: str | None=None) -&gt; Callable[[Callable[..., Any]], Callable[..., Any]]</code></pre><p>Decorator to mark a method as a custom column display in admin views.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/decorators.py#L28">View implementation</a></p></div>
+<hr/>
+<h2 id="exceptions">Exceptions</h2>
+<h2 id="adminerror">AdminError</h2>
+<div class="api-symbol"><pre><code class="language-python">class AdminError</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/exceptions.py#L6">View implementation</a></p></div>
+<hr/>
+<h2 id="modelnotfounderror">ModelNotFoundError</h2>
+<div class="api-symbol"><pre><code class="language-python">class ModelNotFoundError</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/exceptions.py#L10">View implementation</a></p></div>
+<hr/>
+<h2 id="permissiondeniederror">PermissionDeniedError</h2>
+<div class="api-symbol"><pre><code class="language-python">class PermissionDeniedError</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/exceptions.py#L14">View implementation</a></p></div>
+<hr/>
+<h2 id="validationerror">ValidationError</h2>
+<div class="api-symbol"><pre><code class="language-python">class ValidationError</code></pre><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/exceptions.py#L18">View implementation</a></p></div>
+<h2 id="production-services">Production Services</h2>
+<p>These services are available for durable Admin integrations:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DurableJobStore</span><span class="p">,</span> <span class="n">DurableJobWorker</span><span class="p">,</span> <span class="n">ImmutableAuditLog</span><span class="p">,</span>
+    <span class="n">NotificationService</span><span class="p">,</span> <span class="n">ResumableUploadStore</span><span class="p">,</span> <span class="n">WebAuthnService</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DurableJobStore</code></td>
+<td>Persist queued, running, completed, and failed jobs with retry metadata.</td>
+</tr>
+<tr>
+<td><code>DurableJobWorker</code></td>
+<td>Register named handlers and process due jobs.</td>
+</tr>
+<tr>
+<td><code>ImmutableAuditLog</code></td>
+<td>Append hash-chained records and verify tamper evidence.</td>
+</tr>
+<tr>
+<td><code>NotificationService</code></td>
+<td>Store preferences and per-user channel delivery records.</td>
+</tr>
+<tr>
+<td><code>ResumableUploadStore</code></td>
+<td>Persist upload sessions, chunks, and final SHA-256 validation.</td>
+</tr>
+<tr>
+<td><code>WebAuthnService</code></td>
+<td>Delegate registration and assertion ceremonies to an injected provider.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="http-endpoints">HTTP Endpoints</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/media/resumable</code></td>
+<td>Create a resumable upload session.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/media/resumable/{upload_id}</code></td>
+<td>Read the current upload offset and expiry.</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/admin/media/resumable/{upload_id}</code></td>
+<td>Upload a raw byte chunk using <code>Upload-Offset</code>.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/media/resumable/{upload_id}/complete</code></td>
+<td>Validate and persist the completed upload.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/media/folders</code></td>
+<td>List configured media folders.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/media/folders</code></td>
+<td>Create a media folder with a CSRF header.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/admin/media/folders/{folder}</code></td>
+<td>Delete a folder and its stored files.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/media/bulk</code></td>
+<td>Delete selected media names with a CSRF header.</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/admin/media/{filename}</code></td>
+<td>Rename an asset or update allowed metadata.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/admin/media/{filename}</code></td>
+<td>Delete one asset with a CSRF header.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/media/{filename}/signed-url</code></td>
+<td>Return a storage signed URL when the adapter supports it.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/notifications/preferences</code></td>
+<td>Read the current user’s notification preferences.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/notifications/preferences</code></td>
+<td>Update preferences with a CSRF header.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/audit/verify</code></td>
+<td>Verify the persisted audit hash chain.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/webauthn/register/begin</code></td>
+<td>Start provider-backed credential registration.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/webauthn/register/finish</code></td>
+<td>Complete credential registration.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/webauthn/authenticate/begin</code></td>
+<td>Start provider-backed authentication.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/webauthn/authenticate/finish</code></td>
+<td>Verify an authentication assertion.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/profile/trusted-devices</code></td>
+<td>List the signed-in user's trusted devices.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/trusted-devices</code></td>
+<td>Issue one opaque trusted-device token after MFA.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/admin/profile/trusted-devices/{device_id}</code></td>
+<td>Revoke one trusted device.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/profile/mfa/recovery-codes</code></td>
+<td>Rotate MFA recovery codes and revoke trusted devices.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/cms/api/scheduler/jobs</code></td>
+<td>Inspect durable scheduled-publication jobs.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/cms/api/scheduler/jobs/{job_id}/retry</code></td>
+<td>Requeue a failed scheduled-publication job.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/cms/api/media</code></td>
+<td>List reusable Admin media for CMS fields.</td>
+</tr>
+</tbody>
+</table>
+<p>All authenticated Admin mutations require the session cookie and
+<code>X-CSRF-Token</code>. Use <code>redis_url</code> for shared sessions, rate limits, and
+multi-worker coordination.</p>
+<h2 id="authorization">Authorization</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncAuthorizationProvider</span><span class="p">,</span>
+    <span class="n">CasbinAuthorizationProvider</span><span class="p">,</span>
+    <span class="n">DefaultAuthorizationProvider</span><span class="p">,</span>
+    <span class="n">PermissionCatalog</span><span class="p">,</span>
+    <span class="n">RedisPolicySynchronizer</span><span class="p">,</span>
+    <span class="n">default_group_definitions</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p><code>PermissionCatalog</code> exposes readable definitions for model <code>view</code>, <code>add</code>,
+<code>change</code>, and <code>delete</code> actions plus CMS capabilities. <code>DefaultAuthorizationProvider</code>
+is dependency-free and supports legacy aliases during migration. Set
+<code>strict_permissions=True</code> on <code>AdminDashboard</code> to require exact capabilities.
+<code>CasbinAuthorizationProvider</code> is an optional adapter for an application-owned
+PyCasbin enforcer; Casbin is not a Flaxon runtime dependency.</p>
+<p>Use <code>default_group_definitions()</code> to seed the named <code>Administrator</code>, <code>Content
+Editor</code>, <code>Publisher</code>, <code>Media Manager</code>, <code>Warehouse Staff</code>, <code>Support Agent</code>, and
+<code>Read Only</code> groups. The legacy <code>staff</code> and <code>editor</code> names remain available for
+migrations. A provider may implement async <code>has_permission</code>; Admin awaits it
+at every protected request boundary. <code>RedisPolicySynchronizer</code> publishes
+policy-change events and calls the enforcer's <code>load_policy()</code> in every worker.</p>
+<h2 id="optional-production-dependencies">Optional production dependencies</h2>
+<p>Install the feature groups explicitly:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[admin,policy,scheduler]"</span>
+</code></pre></div>
+<p>The <code>admin</code> group adds <code>nh3</code>, Pillow, <code>python-magic</code>, Argon2, and WebAuthn;
+<code>policy</code> adds PyCasbin; <code>scheduler</code> adds APScheduler. <code>python-magic</code> also
+requires the platform's libmagic runtime. <code>bandit</code> and <code>pip-audit</code> are part of
+the development tools for CI security checks.</p>
+<h2 id="microservice-control-plane">Microservice control plane</h2>
+<p>The control plane is enabled by default when <code>AdminDashboard</code> is created. The
+JSON API is rooted at <code>/admin/api/control-plane/</code> and the browser pages use
+the same persistent records.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AdminControlPlane</span><span class="p">,</span>
+    <span class="n">RemoteModelAdapter</span><span class="p">,</span>
+    <span class="n">RemoteServiceClient</span><span class="p">,</span>
+    <span class="n">ServiceRegistry</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<div class="api-symbol"><pre><code class="language-python">ServiceRegistry(self, store: Any | None=None, namespace: str='control_plane')</code></pre><p>Atomic persistent catalog for services, instances and dependencies.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/microservices.py#L59">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="register-3"><code>register</code></h4><pre><code class="language-python">def register(self, service: dict[str, Any] | ServiceRecord) -&gt; dict[str, Any]</code></pre><h4 id="unregister-3"><code>unregister</code></h4><pre><code class="language-python">def unregister(self, name: str) -&gt; bool</code></pre><h4 id="get-2"><code>get</code></h4><pre><code class="language-python">def get(self, name: str) -&gt; dict[str, Any] | None</code></pre><h4 id="list"><code>list</code></h4><pre><code class="language-python">def list(self) -&gt; list[dict[str, Any]]</code></pre><h4 id="set-instance"><code>set_instance</code></h4><pre><code class="language-python">def set_instance(self, service: str, instance: dict[str, Any]) -&gt; dict[str, Any]</code></pre><h4 id="instances"><code>instances</code></h4><pre><code class="language-python">def instances(self, service: str | None=None) -&gt; list[dict[str, Any]]</code></pre><h4 id="set-dependencies"><code>set_dependencies</code></h4><pre><code class="language-python">def set_dependencies(self, service: str, dependencies: list[str]) -&gt; list[dict[str, str]]</code></pre><h4 id="dependencies"><code>dependencies</code></h4><pre><code class="language-python">def dependencies(self, service: str | None=None) -&gt; list[dict[str, str]]</code></pre></details></div>
+<div class="api-symbol"><pre><code class="language-python">RemoteServiceClient(self, base_url: str, *, token: str | None=None, timeout: float=5.0, retries: int=2)</code></pre><p>Dependency-free JSON client for service-owned APIs.</p>
+<p>It uses standard-library HTTP so the Admin does not require a second web
+framework or client package. Applications can subclass it for mTLS or
+replace it with their preferred async HTTP transport.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/microservices.py#L242">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="request"><code>request</code></h4><pre><code class="language-python">async def request(self, method: str, path: str='/', *, body: Any=None, headers: dict[str, str] | None=None) -&gt; Any</code></pre><h4 id="get-3"><code>get</code></h4><pre><code class="language-python">async def get(self, path: str='/') -&gt; Any</code></pre><h4 id="post"><code>post</code></h4><pre><code class="language-python">async def post(self, path: str, body: Any=None) -&gt; Any</code></pre><h4 id="patch"><code>patch</code></h4><pre><code class="language-python">async def patch(self, path: str, body: Any=None) -&gt; Any</code></pre><h4 id="delete"><code>delete</code></h4><pre><code class="language-python">async def delete(self, path: str) -&gt; Any</code></pre></details></div>
+<div class="api-symbol"><pre><code class="language-python">RemoteModelAdapter(self, client: RemoteServiceClient, resource: str)</code></pre><p>Model-shaped adapter for Admin registry entries backed by a service.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/microservices.py#L310">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="get-instances"><code>get_instances</code></h4><pre><code class="language-python">async def get_instances(self) -&gt; list[dict[str, Any]]</code></pre><h4 id="get-instance"><code>get_instance</code></h4><pre><code class="language-python">async def get_instance(self, object_id: str) -&gt; dict[str, Any] | None</code></pre><h4 id="create-instance"><code>create_instance</code></h4><pre><code class="language-python">async def create_instance(self, data: dict[str, Any]) -&gt; Any</code></pre><h4 id="update-instance"><code>update_instance</code></h4><pre><code class="language-python">async def update_instance(self, object_id: str, data: dict[str, Any]) -&gt; Any</code></pre><h4 id="delete-instance"><code>delete_instance</code></h4><pre><code class="language-python">async def delete_instance(self, object_id: str) -&gt; Any</code></pre></details></div>
+<div class="api-symbol"><pre><code class="language-python">AdminControlPlane(self, dashboard: Any)</code></pre><p>Admin pages and APIs for service-owned microservice deployments.</p><p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/src/flaxon/admin/microservices.py#L334">View implementation</a></p><details><summary>Public methods and properties</summary><h4 id="page"><code>page</code></h4><pre><code class="language-python">async def page(self, request: Request, section: str) -&gt; Response</code></pre><h4 id="new-service-page"><code>new_service_page</code></h4><pre><code class="language-python">async def new_service_page(self, request: Request) -&gt; Response</code></pre><h4 id="service-page"><code>service_page</code></h4><pre><code class="language-python">async def service_page(self, request: Request, service_name: str) -&gt; Response</code></pre><h4 id="access-page"><code>access_page</code></h4><pre><code class="language-python">async def access_page(self, request: Request, username: str) -&gt; Response</code></pre><h4 id="api"><code>api</code></h4><pre><code class="language-python">async def api(self, request: Request, resource: str) -&gt; Response</code></pre></details></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

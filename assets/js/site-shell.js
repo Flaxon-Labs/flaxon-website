@@ -64,11 +64,8 @@
             scripts.push(loadScript("/assets/js/main.js"));
         }
 
-        // The sidebar uses Alpine for its mobile disclosure. Load it only on
-        // pages that actually received that component and do not already have
-        // Alpine in the document head.
-        if (document.getElementById("docs-sidebar") && !window.Alpine && !hasLoadedScript("alpinejs")) {
-            scripts.push(loadScript("https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"));
+        if (!hasLoadedScript("dark-mode.js")) {
+            scripts.push(loadScript("/assets/js/dark-mode.js"));
         }
 
         if (scripts.length) {
@@ -99,6 +96,7 @@
         await Promise.all([
             loadComponent("header", "/components/header.html"),
             loadComponent("footer", "/components/footer.html"),
+            loadComponent("docs-sidebar", "/components/sidebar.html"),
         ]);
         await ensureSharedInteractions();
         initializeMobileMenu();

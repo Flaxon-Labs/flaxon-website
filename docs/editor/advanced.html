@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon VS Code Extension - Advanced Guide — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon VS Code Extension - Advanced Guide — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon VS Code Extension - Advanced Guide</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/vs%20Code%20%28Extension%29/advanced.md">Framework source</a> · <a href="../../content/framework/docs/vs Code (Extension)/advanced.md" download>Markdown</a></p><h1 id="flaxon-vs-code-extension-advanced-guide">Flaxon VS Code Extension - Advanced Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This guide covers advanced usage, customization, performance tuning, debugging, and troubleshooting for the <strong>Flaxon VS Code Extension</strong>.</p>
+<hr/>
+<h2 id="extending-the-extension">🧩 Extending the Extension</h2>
+<h2 id="custom-snippets">Custom Snippets</h2>
+<p>You can create your own snippets by editing:</p>
+<div class="highlight"><pre><span></span><code>snippets/flaxon.json
+</code></pre></div>
+<h3 id="example">Example</h3>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"Custom Route"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"prefix"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"croute"</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"@app.${1:get}(\"${2:/api/${3:resource}}\")"</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"async def ${4:handler}(request):"</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"    \"\"\"${5:Custom handler}.\"\"\""</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"    return {\"message\": \"${6:Custom response}\"}"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Custom route template"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-commands">Custom Commands</h2>
+<p>Add custom commands to your extension's <code>package.json</code>.</p>
+<h3 id="example_1">Example</h3>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"contributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"commands"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flaxon.customCommand"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flaxon: Custom Command"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flaxon"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="language-server">🔧 Language Server</h2>
+<h2 id="how-it-works">How It Works</h2>
+<p>The Flaxon Language Server (LSP) runs as a background Python process and provides intelligent editor features.</p>
+<p>It performs the following tasks:</p>
+<ul>
+<li>Parses Python source files</li>
+<li>Builds an Abstract Syntax Tree (AST)</li>
+<li>Detects routes, schemas, and imports</li>
+<li>Provides auto-completion</li>
+<li>Generates diagnostics</li>
+<li>Displays hover documentation</li>
+</ul>
+<hr/>
+<h2 id="language-server-lifecycle">Language Server Lifecycle</h2>
+<div class="highlight"><pre><span></span><code>1. Extension activates
+        │
+        ▼
+2. Language Server starts
+        │
+        ▼
+3. Python file is opened
+        │
+        ▼
+4. Routes and symbols are indexed
+        │
+        ▼
+5. Completions and diagnostics become available
+        │
+        ▼
+6. File changes trigger automatic updates
+        │
+        ▼
+7. VS Code closes → Language Server exits
+</code></pre></div>
+<hr/>
+<h2 id="restarting-the-language-server">Restarting the Language Server</h2>
+<p>Open the Command Palette and run:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Restart Language Server
+</code></pre></div>
+<hr/>
+<h2 id="viewing-server-logs">Viewing Server Logs</h2>
+<ol>
+<li>Open the <strong>Output</strong> panel (<code>Ctrl+Shift+U</code>).</li>
+<li>Select <strong>Flaxon</strong> from the dropdown.</li>
+<li>Enable verbose logging:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.trace.server"</span><span class="p">:</span><span class="w"> </span><span class="s2">"verbose"</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="customizing-the-route-explorer">🎯 Customizing the Route Explorer</h2>
+<h2 id="route-grouping">Route Grouping</h2>
+<p>Routes can be grouped in different ways.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.routeExplorer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"groupBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"file"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"showMethods"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"showLineNumbers"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="available-grouping-options">Available Grouping Options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>file</code></td>
+<td>Group routes by source file.</td>
+</tr>
+<tr>
+<td><code>prefix</code></td>
+<td>Group routes by URL prefix.</td>
+</tr>
+<tr>
+<td><code>tag</code></td>
+<td>Group routes by route tag.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="adding-route-metadata">Adding Route Metadata</h2>
+<p>Named routes improve organization and navigation.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/users"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"user.list"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"users"</span><span class="p">:</span> <span class="p">[]}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/users/&lt;int:id&gt;"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"user.detail"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="advanced-debugging">🐛 Advanced Debugging</h2>
+<h2 id="attach-to-a-running-process">Attach to a Running Process</h2>
+<p>Start your Flaxon application, then attach the debugger.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Python: Attach"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attach"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"connect"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">5678</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="debug-with-environment-variables">Debug with Environment Variables</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flaxon: Debug with Environment"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flaxon"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"run"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"app:app"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"FLASK_ENV"</span><span class="p">:</span><span class="w"> </span><span class="s2">"development"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"DATABASE_URL"</span><span class="p">:</span><span class="w"> </span><span class="s2">"postgresql://localhost/mydb"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="debug-with-command-line-arguments">Debug with Command-Line Arguments</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flaxon: Debug with Arguments"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flaxon"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"run"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"app:app"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"--host"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"0.0.0.0"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"--port"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"5000"</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="performance-optimization">📊 Performance Optimization</h2>
+<h2 id="large-projects">Large Projects</h2>
+<p>For larger projects, the following settings are recommended.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Recommended Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>flaxon.enableRouteExplorer</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>flaxon.enableCodeLens</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>flaxon.enableDiagnostics</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>flaxon.enableCompletions</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>flaxon.trace.server</code></td>
+<td><code>"off"</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="increase-language-server-memory">Increase Language Server Memory</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.languageServer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"memoryLimit"</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="exclude-large-directories">Exclude Large Directories</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"files.watcherExclude"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"**/.venv/**"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"**/node_modules/**"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"**/__pycache__/**"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="integration-with-other-extensions">🔗 Integration with Other Extensions</h2>
+<h2 id="python-extension">Python Extension</h2>
+<p>The Flaxon extension works best alongside:</p>
+<table>
+<thead>
+<tr>
+<th>Extension</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ms-python.python</code></td>
+<td>Python language support</td>
+</tr>
+<tr>
+<td><code>ms-python.vscode-pylance</code></td>
+<td>Type checking and IntelliSense</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="git-integration">Git Integration</h2>
+<p>Flaxon integrates with Git by:</p>
+<ul>
+<li>Refreshing the Route Explorer after changes</li>
+<li>Tracking modified route files</li>
+<li>Working seamlessly with Git diff views</li>
+</ul>
+<hr/>
+<h2 id="testing-extensions">Testing Extensions</h2>
+<table>
+<thead>
+<tr>
+<th>Extension</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vscode.pytest</code></td>
+<td>Run Python tests</td>
+</tr>
+<tr>
+<td><code>hbenl.vscode-test-explorer</code></td>
+<td>View test results</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="security">🛡️ Security</h2>
+<h2 id="trusted-workspaces">Trusted Workspaces</h2>
+<p>The extension only activates in trusted workspaces.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"security.workspace.trust.enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="privacy">Privacy</h2>
+<p>The extension <strong>does not</strong>:</p>
+<ul>
+<li>Send your source code to external servers</li>
+<li>Track personal usage</li>
+<li>Store credentials</li>
+</ul>
+<hr/>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>Configure environment variables for the integrated terminal.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"terminal.integrated.env.windows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"FLAXON_ENV"</span><span class="p">:</span><span class="w"> </span><span class="s2">"production"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="cicd-integration">🔄 CI/CD Integration</h2>
+<h2 id="cli-commands">CLI Commands</h2>
+<p>The extension uses the Flaxon CLI internally.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Validate project</span>
+flaxon<span class="w"> </span>doctor<span class="w"> </span>app:app
+
+<span class="c1"># List routes</span>
+flaxon<span class="w"> </span>routes<span class="w"> </span>app:app
+
+<span class="c1"># Run tests</span>
+pytest
+</code></pre></div>
+<hr/>
+<h2 id="github-actions">GitHub Actions</h2>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check Flaxon Project</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">pip install flaxon</span>
+<span class="w">    </span><span class="no">flaxon doctor app:app</span>
+<span class="w">    </span><span class="no">flaxon routes app:app</span>
+</code></pre></div>
+<hr/>
+<h2 id="daily-workflow">📚 Daily Workflow</h2>
+<h2 id="typical-development-workflow">Typical Development Workflow</h2>
+<ol>
+<li>Open your project.</li>
+<li>Route Explorer loads automatically.</li>
+<li>Create a new route using snippets.</li>
+<li>View discovered routes.</li>
+<li>Run or debug your application.</li>
+<li>Test your code.</li>
+<li>Commit your changes.</li>
+</ol>
+<hr/>
+<h2 id="advanced-workflow">Advanced Workflow</h2>
+<ul>
+<li>Multiple workspace folders</li>
+<li>Shared snippets</li>
+<li>Shared workspace settings</li>
+<li>Route Explorer during code reviews</li>
+<li>Automatic API documentation support</li>
+</ul>
+<hr/>
+<h2 id="productivity-tips">🎯 Productivity Tips</h2>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Shift+R</code></td>
+<td>Quickly open Route Explorer</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+F5</code></td>
+<td>Run the application</td>
+</tr>
+<tr>
+<td>Snippets</td>
+<td>Use <code>froute</code>, <code>fschema</code>, and <code>fws</code></td>
+</tr>
+<tr>
+<td>CodeLens</td>
+<td>Run and debug directly from routes</td>
+</tr>
+<tr>
+<td>Route Explorer</td>
+<td>Click routes to navigate instantly</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="advanced-tips">Advanced Tips</h2>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Custom Snippets</td>
+<td>Create project-specific templates</td>
+</tr>
+<tr>
+<td>Workspace Settings</td>
+<td>Customize behavior per project</td>
+</tr>
+<tr>
+<td>Multi-root Workspaces</td>
+<td>Work with multiple Flaxon projects</td>
+</tr>
+<tr>
+<td>Remote Development</td>
+<td>Compatible with VS Code Remote</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="common-issues">🐛 Common Issues</h2>
+<h2 id="language-server-crashes">Language Server Crashes</h2>
+<h3 id="symptoms">Symptoms</h3>
+<ul>
+<li>Auto-completion stops working</li>
+<li>Diagnostics disappear</li>
+<li>Hover documentation is unavailable</li>
+</ul>
+<h3 id="solutions">Solutions</h3>
+<ul>
+<li>Restart the Language Server.</li>
+<li>Verify Python and Flaxon are installed.</li>
+<li>Increase the Language Server memory limit.</li>
+</ul>
+<hr/>
+<h2 id="route-explorer-not-updating">Route Explorer Not Updating</h2>
+<h3 id="symptoms_1">Symptoms</h3>
+<p>Routes do not appear or refresh.</p>
+<h3 id="solutions_1">Solutions</h3>
+<ul>
+<li>Save the file.</li>
+<li>Refresh the Route Explorer.</li>
+<li>Restart VS Code.</li>
+</ul>
+<hr/>
+<h2 id="codelens-missing">CodeLens Missing</h2>
+<h3 id="symptoms_2">Symptoms</h3>
+<p>Run and Debug buttons are not visible.</p>
+<h3 id="solutions_2">Solutions</h3>
+<ul>
+<li>Enable <code>flaxon.enableCodeLens</code>.</li>
+<li>Save the file.</li>
+<li>Restart the Language Server.</li>
+</ul>
+<hr/>
+<h2 id="auto-completion-missing">Auto-Completion Missing</h2>
+<h3 id="symptoms_3">Symptoms</h3>
+<p>No suggestions appear while typing.</p>
+<h3 id="solutions_3">Solutions</h3>
+<ul>
+<li>Enable <code>flaxon.enableCompletions</code>.</li>
+<li>Ensure the Python Language Server is running.</li>
+<li>Restart VS Code.</li>
+</ul>
+<hr/>
+<h2 id="telemetry">📊 Telemetry</h2>
+<h2 id="data-collection">Data Collection</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Collected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commands Used</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Errors</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Performance Metrics</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Source Code</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>File Contents</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="disable-telemetry">Disable Telemetry</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.telemetry.enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="version-history">🔄 Version History</h2>
+<h2 id="version-012">Version 0.1.2</h2>
+<p>Initial release including:</p>
+<ul>
+<li>Route Explorer</li>
+<li>CodeLens</li>
+<li>Auto-completion</li>
+<li>Hover Documentation</li>
+<li>Diagnostics</li>
+<li>Code Snippets</li>
+<li>Commands</li>
+<li>Language Server</li>
+</ul>
+<hr/>
+<h2 id="planned-features">Planned Features</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Target Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GraphQL Schema Explorer</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>Admin Dashboard Preview</td>
+<td>0.3.0</td>
+</tr>
+<tr>
+<td>Plugin Development Tools</td>
+<td>0.4.0</td>
+</tr>
+<tr>
+<td>Performance Profiling</td>
+<td>0.5.0</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="resources">📚 Resources</h2>
+<h2 id="official-resources">Official Resources</h2>
+<ul>
+<li>📚 Documentation</li>
+<li>🌐 Website</li>
+<li>🐙 GitHub</li>
+<li>📦 Visual Studio Marketplace</li>
+</ul>
+<hr/>
+<h2 id="community">Community</h2>
+<ul>
+<li>💬 Discussions</li>
+<li>🐛 Issue Tracker</li>
+</ul>
+<hr/>
+<p>The <strong>Flaxon VS Code Extension</strong> is designed to make Flaxon development faster, smarter, and more enjoyable. Happy coding! 🚀</p></article>
+</main></div><div id="footer"></div></body></html>

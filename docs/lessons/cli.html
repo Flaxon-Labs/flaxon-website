@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CLI Reference — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>CLI Reference — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>CLI Reference</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Cli.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Cli.md" download>Markdown</a></p><h1 id="cli-reference">CLI Reference</h1>
+<p>The <code>flaxon</code> command is installed automatically with the framework. Every command that takes an <code>application</code> argument expects it in <code>module:variable</code> form — the Python file (without <code>.py</code>) before the colon, the <code>Flaxon(...)</code> instance's variable name after it. Run these from the directory containing that file, or the app won't be importable.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>--help<span class="w">          </span><span class="c1"># list every command</span>
+flaxon<span class="w"> </span>--version<span class="w">       </span><span class="c1"># show the installed Flaxon version</span>
+flaxon<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--help<span class="w">  </span><span class="c1"># full options for one command</span>
+</code></pre></div>
+<h2 id="flaxon-run"><code>flaxon run</code></h2>
+<p>Starts your app with Uvicorn.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--host HOST</code></td>
+<td>bind address (default <code>127.0.0.1</code>)</td>
+</tr>
+<tr>
+<td><code>--port PORT</code></td>
+<td>bind port (default <code>8000</code>)</td>
+</tr>
+<tr>
+<td><code>--reload</code></td>
+<td>auto-reload on file changes</td>
+</tr>
+<tr>
+<td><code>--workers N</code></td>
+<td>number of worker processes</td>
+</tr>
+<tr>
+<td><code>--log-level LEVEL</code></td>
+<td>logging verbosity</td>
+</tr>
+<tr>
+<td><code>--env-file FILE</code></td>
+<td>load environment variables from a file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="flaxon-routes"><code>flaxon routes</code></h2>
+<p>Lists every registered HTTP and WebSocket route.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>routes<span class="w"> </span>app:app
+Routes<span class="w"> </span><span class="k">for</span><span class="w"> </span>bookstore
+Method<span class="w">  </span>Path<span class="w">                  </span>Name
+-----------------------------------------
+GET<span class="w">     </span>/<span class="w">                     </span>home
+GET<span class="w">     </span>/books<span class="w">                </span>list_books
+POST<span class="w">    </span>/books<span class="w">                </span>create_book
+DELETE<span class="w">  </span>/books/&lt;int:book_id&gt;<span class="w">  </span>delete_book
+</code></pre></div>
+<p><code>--format json</code> or <code>--format csv</code> for machine-readable output, <code>--output FILE</code> to save instead of printing.</p>
+<h2 id="flaxon-doctor"><code>flaxon doctor</code></h2>
+<p>Runs diagnostics against your app: confirms it imports, counts routes, flags missing configuration.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>doctor<span class="w"> </span>app:app
+Flaxon<span class="w"> </span>Doctor<span class="w"> </span>-<span class="w"> </span>bookstore
+<span class="o">[</span>PASS<span class="o">]</span><span class="w"> </span>Application<span class="w"> </span>imported<span class="w"> </span>successfully
+<span class="o">[</span>PASS<span class="o">]</span><span class="w"> </span><span class="m">4</span><span class="w"> </span>HTTP<span class="w"> </span>route<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>registered
+<span class="o">[</span>PASS<span class="o">]</span><span class="w"> </span><span class="m">0</span><span class="w"> </span>WebSocket<span class="w"> </span>route<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>registered
+<span class="o">[</span>WARN<span class="o">]</span><span class="w"> </span>A<span class="w"> </span>strong<span class="w"> </span>production<span class="w"> </span>SECRET_KEY<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>configured.
+Result:<span class="w"> </span><span class="m">1</span><span class="w"> </span>warning<span class="o">(</span>s<span class="o">)</span>,<span class="w"> </span><span class="m">0</span><span class="w"> </span>failure<span class="o">(</span>s<span class="o">)</span>
+</code></pre></div>
+<p><code>--fix</code> attempts automatic fixes for what it finds.</p>
+<h2 id="flaxon-new"><code>flaxon new</code></h2>
+<p>Scaffolds a modular Flaxon + Teloce welcome application by default, including TypeScript, scoped component styles, a Python API, SQLite migrations, and a protected admin.</p>
+<p>After generation, install the project, run <code>python management.py migrate</code>, and create your administrator with <code>python management.py setup-admin</code>. There is no default password. The generated project also includes <code>flaxon welcome</code> and <code>flaxon welcome-status</code>, registered by its welcome module through <code>flaxon_cli.py</code>. Use <code>--template basic</code> for the smaller API-only starter. See <a href="../getting-started/project-setup.html">getting started</a> for the complete workflow.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>my-project
+</code></pre></div>
+<p><code>--template NAME</code> picks a starter template, <code>--no-venv</code> skips creating a virtualenv.</p>
+<h2 id="flaxon-generate"><code>flaxon generate</code></h2>
+<p>Scaffolds a single component — not a full project.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>generate<span class="w"> </span>model<span class="w"> </span>Product
+flaxon<span class="w"> </span>generate<span class="w"> </span>controller<span class="w"> </span>ProductController
+flaxon<span class="w"> </span>generate<span class="w"> </span>service<span class="w"> </span>EmailService
+</code></pre></div>
+<p>Valid types: <code>controller</code>, <code>schema</code>, <code>service</code>, <code>middleware</code>, <code>model</code>, <code>task</code>. <code>--path DIR</code> sets where it's written (defaults to the current directory).</p>
+<h2 id="flaxon-docs"><code>flaxon docs</code></h2>
+<p>Generates an OpenAPI spec by reading your actual routes, endpoint docstrings, and <code>Schema</code>-typed parameters — no manual descriptions required for the basics.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>docs<span class="w"> </span>app:app<span class="w"> </span>--title<span class="w"> </span><span class="s2">"Bookstore API"</span>
+✓<span class="w"> </span>Wrote<span class="w"> </span>OpenAPI<span class="w"> </span>spec<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>path<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>to<span class="w"> </span>openapi.json
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-o, --output FILE</code></td>
+<td>output path (default <code>openapi.json</code>)</td>
+</tr>
+<tr>
+<td><code>--title TITLE</code></td>
+<td>API title (default: your app's name)</td>
+</tr>
+<tr>
+<td><code>--version VERSION</code></td>
+<td>API version (default <code>1.0.0</code>)</td>
+</tr>
+<tr>
+<td><code>--indent N</code></td>
+<td>JSON indent width, <code>0</code> for compact (default <code>2</code>)</td>
+</tr>
+<tr>
+<td><code>--include-internal</code></td>
+<td>include Flaxon's own system routes (<code>/health</code>, <code>/metrics</code>, <code>/docs</code>, etc.) — excluded by default</td>
+</tr>
+</tbody>
+</table>
+<p>What actually gets extracted, automatically, from your code:
+- <strong>Summary/description</strong> — your endpoint's docstring (first line = summary, rest = description).
+- <strong>Request body schema</strong> — any parameter typed as a <code>Schema</code> subclass gets its fields, types, and constraints (<code>min_length</code>, <code>minimum</code>, etc.) pulled straight from the class definition.
+- <strong>Path parameters</strong> — Flaxon's <code>&lt;int:id&gt;</code>-style converters get correctly typed and converted to OpenAPI's <code>{id}</code> format.</p>
+<p>The output is a plain JSON file — hand-edit it afterward for anything auto-detection can't infer (security schemes, examples, descriptions on bare <code>int</code>/<code>str</code> parameters), or just re-run the command to regenerate the parts that come from your code.</p>
+<h2 id="flaxon-inspect"><code>flaxon inspect</code></h2>
+<p>Shows detailed information about a running app's configuration.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>inspect<span class="w"> </span>app:app<span class="w"> </span>--middleware<span class="w"> </span>--config
+Application:<span class="w"> </span>bookstore
+Debug:<span class="w"> </span>False
+Middleware:
+<span class="w">  </span>-<span class="w"> </span><span class="o">(</span>&lt;class<span class="w"> </span><span class="s1">'flaxon.middleware.request_id.RequestIDMiddleware'</span>&gt;,<span class="w"> </span><span class="o">{})</span>
+<span class="w">  </span>-<span class="w"> </span><span class="o">(</span>&lt;class<span class="w"> </span><span class="s1">'flaxon.middleware.security_headers.SecurityHeadersMiddleware'</span>&gt;,<span class="w"> </span><span class="o">{})</span>
+Config:
+<span class="w">  </span>ENV:<span class="w"> </span>development
+<span class="w">  </span>DEBUG:<span class="w"> </span>False
+<span class="w">  </span>SECRET_KEY:<span class="w"> </span>None
+<span class="w">  </span>ALLOWED_HOSTS:<span class="w"> </span><span class="o">[</span><span class="s1">'localhost'</span>,<span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="o">]</span>
+<span class="w">  </span>MAX_BODY_SIZE:<span class="w"> </span><span class="m">10485760</span>
+<span class="w">  </span>TRUSTED_PROXIES:<span class="w"> </span><span class="o">[]</span>
+<span class="w">  </span>PROXY_HEADERS:<span class="w"> </span><span class="o">[</span><span class="s1">'x-forwarded-for'</span>,<span class="w"> </span><span class="s1">'x-forwarded-proto'</span>,<span class="w"> </span><span class="s1">'x-forwarded-host'</span><span class="o">]</span>
+</code></pre></div>
+<p><code>--middleware</code> / <code>--config</code> toggle those sections; <code>--format {json,yaml,table}</code> controls output format.</p>
+<h2 id="flaxon-build"><code>flaxon build</code></h2>
+<p>Wraps <code>python -m build</code> to produce a wheel and/or sdist for publishing.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>build<span class="w"> </span>--format<span class="w"> </span>wheel
+</code></pre></div>
+<p><code>--format {wheel,sdist,all}</code> (default <code>all</code>), <code>--output DIR</code> for the output directory.</p>
+<h2 id="flaxon-test"><code>flaxon test</code></h2>
+<p>Wraps <code>pytest</code>.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span><span class="nb">test</span>
+flaxon<span class="w"> </span><span class="nb">test</span><span class="w"> </span>tests/test_routing.py<span class="w"> </span>--coverage<span class="w"> </span>-v
+</code></pre></div>
+<p><code>--coverage</code> generates a coverage report, <code>--verbose</code>/<code>-v</code> for verbose output, <code>--keep-env</code> keeps the test environment around after the run. Requires <code>pytest</code> installed (<code>pip install flaxon[dev]</code> covers this).</p>
+<h2 id="flaxon-shell"><code>flaxon shell</code></h2>
+<p>Launches a Python REPL with your application already imported and available.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>shell<span class="w"> </span>app:app
+</code></pre></div>
+<p><code>--no-import</code> skips loading the application, for a plain Python shell.</p>
+<h2 id="flaxon-migrate"><code>flaxon migrate</code></h2>
+<p>Applies or rolls back database migrations.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>migrate<span class="w"> </span>--direction<span class="w"> </span>up
+flaxon<span class="w"> </span>migrate<span class="w"> </span>--direction<span class="w"> </span>down<span class="w"> </span>--target<span class="w"> </span><span class="m">0003</span><span class="w"> </span>--dry-run
+</code></pre></div>
+<p><code>--direction {up,down}</code>, <code>--target VERSION</code> to migrate to a specific version, <code>--dry-run</code> to preview without applying.</p>
+<h2 id="flaxon-schedule"><code>flaxon schedule</code></h2>
+<p>Runs your app's scheduled tasks (see <code>flaxon.tasks</code>).</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>schedule<span class="w"> </span>app:app<span class="w"> </span>--once
+</code></pre></div>
+<p><code>--once</code> runs due tasks a single time and exits, instead of running continuously.</p>
+<h2 id="flaxon-worker"><code>flaxon worker</code></h2>
+<p>Starts a background worker process to consume tasks from a queue (see <code>flaxon.tasks</code>).</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>worker<span class="w"> </span>app:app<span class="w"> </span>--concurrency<span class="w"> </span><span class="m">4</span><span class="w"> </span>--queue<span class="w"> </span>default
+</code></pre></div>
+<p><code>--concurrency N</code> sets how many tasks run at once, <code>--queue NAME</code> picks which queue to consume from.</p>
+<h2 id="flaxon-version"><code>flaxon --version</code></h2>
+<p>Prints the installed version.</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>--version
+Flaxon<span class="w"> </span><span class="m">0</span>.1.4
+</code></pre></div></article>
+</main></div><div id="footer"></div></body></html>

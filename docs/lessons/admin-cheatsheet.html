@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Admin and CMS Cheat Sheet — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Admin and CMS Cheat Sheet — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Admin and CMS Cheat Sheet</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Admin%20cheatsheet.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Admin cheatsheet.md" download>Markdown</a></p><h1 id="admin-and-cms-cheat-sheet">Admin and CMS Cheat Sheet</h1>
+<p>Current quick reference for Flaxon's model admin and CMS. For full
+production guidance, see <a href="../guides/admin-cms.html">Admin and CMS Production Guide</a>.</p>
+<h2 id="mount-both-panels">Mount Both Panels</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"backoffice"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span><span class="n">site_title</span><span class="o">=</span><span class="s2">"Acme Backoffice"</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s2">"UTC"</span><span class="p">),</span>
+    <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">,</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"var/admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="p">[{</span><span class="s2">"username"</span><span class="p">:</span> <span class="s2">"admin"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"change-me"</span><span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Acme Content"</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
+</code></pre></div>
+<p>Run locally:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open <code>/admin/login</code>, <code>/admin/</code>, and <code>/admin/cms/</code>. Use <code>database=</code> instead of
+<code>storage_path</code> when the project owns the database connection.</p>
+<h2 id="persist-and-migrate">Persist and Migrate</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_admin_migration</span>
+<span class="n">write_admin_migration</span><span class="p">(</span><span class="s2">"migrations"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>migrate<span class="w"> </span>--database<span class="w"> </span>sqlite://./app.db<span class="w"> </span>--migrations-dir<span class="w"> </span>migrations
+</code></pre></div>
+<p>Never use default in-memory state for production or multiple workers. Use a
+shared database or durable <code>storage_path</code>; use Redis for shared session/event
+broadcasting when configured in the application.</p>
+<h2 id="register-a-model">Register a Model</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin_model</span>
+
+<span class="nd">@admin_model</span><span class="p">(</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"active"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">],</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">],</span>
+    <span class="n">readonly_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"created_at"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">:</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instances</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span> <span class="o">...</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span> <span class="o">...</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span> <span class="o">...</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span> <span class="o">...</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span> <span class="o">...</span>
+</code></pre></div>
+<p>The five CRUD hooks may be sync or async. Register on a dashboard instead when
+you need an explicit registry:</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Product</span><span class="p">,</span> <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">])</span>
+</code></pre></div>
+<h2 id="model-urls-and-controls">Model URLs and Controls</h2>
+<div class="highlight"><pre><span></span><code>/admin/                         dashboard
+/admin/&lt;model&gt;                  list, search, filters, sorting, pagination
+/admin/&lt;model&gt;/add              create form
+/admin/&lt;model&gt;/&lt;id&gt;              detail
+/admin/&lt;model&gt;/&lt;id&gt;/edit        update form
+/admin/&lt;model&gt;/&lt;id&gt;/delete      delete confirmation
+/admin/&lt;model&gt;/&lt;id&gt;/history     audit history
+/admin/&lt;model&gt;/actions/&lt;name&gt;   bulk action
+/admin/search?q=...             global model search
+</code></pre></div>
+<p>The dashboard also provides <code>/users</code>, <code>/roles</code>, <code>/media</code>, <code>/settings</code>,
+<code>/activity</code>, <code>/activity/export</code>, <code>/notifications</code>, and <code>/operations</code>.</p>
+<h2 id="custom-bulk-actions">Custom Bulk Actions</h2>
+<p>Actions receive selected record IDs. Attach them to the registered model:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">record_id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">Product</span><span class="o">.</span><span class="n">update_instance</span><span class="p">(</span><span class="n">record_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">"active"</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"product"</span><span class="p">)</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="s2">"archive"</span><span class="p">,</span> <span class="n">archive</span><span class="p">)</span>
+</code></pre></div>
+<p>The list UI submits selected IDs to the action route. Keep authorization and
+business validation in the service called by the action.</p>
+<h2 id="permissions">Permissions</h2>
+<p>Built-in permissions include <code>admin:read</code>, <code>admin:write</code>, <code>admin:users</code>,
+<code>admin:media</code>, <code>admin:settings</code>, and <code>admin:superuser</code>. Model permissions use
+<code>&lt;model&gt;:create</code>, <code>&lt;model&gt;:read</code>, <code>&lt;model&gt;:update</code>, and <code>&lt;model&gt;:delete</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span><span class="o">.</span><span class="n">roles</span><span class="p">[</span><span class="s2">"publisher"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"admin:read"</span><span class="p">,</span> <span class="s2">"admin:write"</span><span class="p">,</span> <span class="s2">"post:read"</span><span class="p">,</span> <span class="s2">"post:update"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">role_permissions</span> <span class="o">=</span> <span class="n">admin</span><span class="o">.</span><span class="n">roles</span>
+</code></pre></div>
+<p>Do not give editors <code>admin:superuser</code>. The role editor and user editor expose
+the same changes through the UI.</p>
+<h2 id="cms-schema">CMS Schema</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMSField</span><span class="p">,</span> <span class="n">ContentType</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"body"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"richtext"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"hero"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"image"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"published_on"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"datetime"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"related"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"relationship"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"blocks"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"repeater"</span><span class="p">),</span>
+        <span class="n">CMSField</span><span class="p">(</span><span class="s2">"seo"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"json"</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"updated_at"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">],</span>
+    <span class="n">statuses</span><span class="o">=</span><span class="p">[</span><span class="s2">"draft"</span><span class="p">,</span> <span class="s2">"review"</span><span class="p">,</span> <span class="s2">"approved"</span><span class="p">,</span> <span class="s2">"scheduled"</span><span class="p">,</span> <span class="s2">"published"</span><span class="p">,</span> <span class="s2">"archived"</span><span class="p">],</span>
+<span class="p">))</span>
+</code></pre></div>
+<p>Field types: <code>text</code>, <code>textarea</code>, <code>richtext</code>, <code>boolean</code>, <code>number</code>, <code>date</code>,
+<code>datetime</code>, <code>email</code>, <code>url</code>, <code>select</code>, <code>json</code>, <code>repeater</code>, <code>relationship</code>,
+<code>file</code>, and <code>image</code>.</p>
+<p>The SPA supports autosave, unsaved-change warnings, media workflows, revision
+restore, scheduling fields, bulk publish/unpublish, taxonomy, comments, menus,
+and CSV/JSON import/export. Revision comparison data, menu hierarchy data, and
+media metadata are available through APIs; visual diffing, nested drag-and-drop
+editing, thumbnails, editorial calendars, and a full notification inbox are not
+provided as complete built-in workflows.</p>
+<h2 id="cms-api-shortcuts">CMS API Shortcuts</h2>
+<div class="highlight"><pre><span></span><code>GET    /admin/cms/api/config
+GET    /admin/cms/api/stats
+GET    /admin/cms/api/post/items?q=hello&amp;filter_status=draft&amp;page=1
+POST   /admin/cms/api/post/items
+PUT    /admin/cms/api/post/items/&lt;id&gt;
+DELETE /admin/cms/api/post/items/&lt;id&gt;
+GET    /admin/cms/api/post/items/&lt;id&gt;/history
+POST   /admin/cms/api/post/items/&lt;id&gt;/restore/&lt;revision&gt;
+POST   /admin/cms/api/post/actions/publish
+GET    /admin/cms/api/export/post?format=csv
+POST   /admin/cms/api/import/post
+GET/POST /admin/cms/api/taxonomies
+GET/POST /admin/cms/api/comments
+GET/PUT /admin/cms/api/menus/main
+</code></pre></div>
+<p>Every mutation requires an authenticated session and the <code>X-CSRF-Token</code>
+header. Custom clients must send cookies with <code>credentials: "same-origin"</code>.</p>
+<h2 id="hooks-and-widgets">Hooks and Widgets</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_post</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Title is required"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">record</span>
+
+<span class="n">cms</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="s2">"before_create"</span><span class="p">,</span> <span class="n">validate_post</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">register_widget</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Queue"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="s2">"ready"</span><span class="p">})</span>
+</code></pre></div>
+<p>Available CMS lifecycle hooks include <code>before_create</code>, <code>after_create</code>,
+<code>before_update</code>, <code>after_update</code>, <code>before_delete</code>, <code>after_delete</code>, and restore
+hooks. Use a custom <code>AuthenticationBackend</code>, <code>template_dir</code>, or <code>template_path</code>
+when integrating with an existing application shell.</p>
+<h2 id="security-rules">Security Rules</h2>
+<ul>
+<li>Keep CSRF enabled on all browser forms and SPA writes.</li>
+<li>Use HTTPS, strong secrets, login throttling, and MFA in production.</li>
+<li>Configure password reset and optional email verification senders.</li>
+<li>Restrict upload MIME types and maximum size; use durable object storage.</li>
+<li>Keep rich-text sanitization enabled with the smallest required allowlist.</li>
+<li>Treat imported CSV/JSON and public comments as untrusted input.</li>
+<li>Use shared sessions and Redis events for multiple workers.</li>
+</ul>
+<h2 id="test-the-workflow">Test the Workflow</h2>
+<p>Test login, permissions, create/edit/delete, revision restore, media upload,
+moderation, scheduled publishing, import/export, and menu persistence through
+both API tests and browser automation. The complete runnable example is
+<code>docs/examples/cms/full_admin_cms/app.py</code>.</p>
+<h2 id="admin-production-hardening-cheatsheet">Admin Production Hardening Cheatsheet</h2>
+<h2 id="shared-deployment">Shared deployment</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminDashboard</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"var/admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://127.0.0.1:6379/0"</span><span class="p">,</span>
+    <span class="n">redis_protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">redis_max_connections</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">session_idle_timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Use the same Redis URL and persistent database for every worker. Never use the
+default in-memory session backend in production.</p>
+<h2 id="durable-jobs">Durable jobs</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">DurableJobStore</span><span class="p">,</span> <span class="n">DurableJobWorker</span>
+
+<span class="n">jobs</span> <span class="o">=</span> <span class="n">DurableJobStore</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">store</span><span class="p">)</span>
+<span class="n">worker</span> <span class="o">=</span> <span class="n">DurableJobWorker</span><span class="p">(</span><span class="n">jobs</span><span class="p">)</span>
+<span class="n">worker</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"reports.generate"</span><span class="p">,</span> <span class="n">generate_report</span><span class="p">)</span>
+<span class="n">jobs</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="s2">"reports.generate"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="s2">"42"</span><span class="p">},</span> <span class="n">max_attempts</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">worker</span><span class="o">.</span><span class="n">run_once</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="resumable-upload-protocol">Resumable upload protocol</h2>
+<div class="highlight"><pre><span></span><code>POST  /admin/media/resumable
+PATCH /admin/media/resumable/{upload_id}       Upload-Offset: 0
+POST  /admin/media/resumable/{upload_id}/complete
+</code></pre></div>
+<p>Send <code>filename</code>, <code>total_size</code>, and optional <code>sha256</code> when creating the
+session. Send raw bytes for each chunk and include <code>X-CSRF-Token</code>.</p>
+<h2 id="audit-and-notifications">Audit and notifications</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImmutableAuditLog</span><span class="p">,</span> <span class="n">NotificationService</span>
+
+<span class="n">audit</span> <span class="o">=</span> <span class="n">ImmutableAuditLog</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">store</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">audit</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+<span class="n">audit</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">before_timestamp</span><span class="p">)</span>
+
+<span class="n">notifications</span> <span class="o">=</span> <span class="n">NotificationService</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">store</span><span class="p">)</span>
+<span class="n">notifications</span><span class="o">.</span><span class="n">set_preferences</span><span class="p">(</span><span class="s2">"editor"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"email"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"webhook"</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="n">notifications</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">"editor"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"subject"</span><span class="p">:</span> <span class="s2">"Review needed"</span><span class="p">},</span> <span class="n">send_email</span><span class="p">)</span>
+</code></pre></div>
+<p>Verify audit integrity after restore operations and retain the database using
+your organization’s retention policy.</p>
+<h2 id="webauthn">WebAuthn</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebAuthnService</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">webauthn</span> <span class="o">=</span> <span class="n">WebAuthnService</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="n">my_webauthn_provider</span><span class="p">)</span>
+</code></pre></div>
+<p>The provider must implement registration and assertion verification using a
+maintained WebAuthn library. Do not implement assertion verification in the
+browser or trust client-provided credential IDs without provider validation.</p>
+<h2 id="api-and-ui-rules">API and UI rules</h2>
+<ul>
+<li>Include <code>_csrf</code> in browser forms and <code>X-CSRF-Token</code> in SPA mutations.</li>
+<li>Enforce <code>&lt;model&gt;:create</code>, <code>&lt;model&gt;:read</code>, <code>&lt;model&gt;:update</code>, and
+  <code>&lt;model&gt;:delete</code> permissions server-side.</li>
+<li>Run <code>flaxon migrate</code> before starting workers and web processes.</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

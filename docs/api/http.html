@@ -1,216 +1,366 @@
-<!-- docs/api/http.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>HTTP API – Flaxon Documentation</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
-
-    <div id="header"></div>
-
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
-
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html" class="active">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>HTTP API</h1>
-
-                        <h2>Request</h2>
-                        <p>HTTP request object.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Request(scope: dict[str, Any], receive: Any, app: Any)</code></pre>
-                        </div>
-
-                        <h3>Properties</h3>
-                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
-                            <thead>
-                                <tr class="bg-slate-100 dark:bg-slate-800">
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Property</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Type</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="border px-4 py-2"><code>method</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">HTTP method</td></tr>
-                                <tr><td class="border px-4 py-2"><code>path</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">Request path</td></tr>
-                                <tr><td class="border px-4 py-2"><code>headers</code></td><td class="border px-4 py-2"><code>Headers</code></td><td class="border px-4 py-2">Request headers</td></tr>
-                                <tr><td class="border px-4 py-2"><code>query</code></td><td class="border px-4 py-2"><code>QueryParams</code></td><td class="border px-4 py-2">Query parameters</td></tr>
-                                <tr><td class="border px-4 py-2"><code>cookies</code></td><td class="border px-4 py-2"><code>Cookies</code></td><td class="border px-4 py-2">Cookies</td></tr>
-                                <tr><td class="border px-4 py-2"><code>client</code></td><td class="border px-4 py-2"><code>tuple[str, int] | None</code></td><td class="border px-4 py-2">Client address</td></tr>
-                                <tr><td class="border px-4 py-2"><code>url</code></td><td class="border px-4 py-2"><code>str</code></td><td class="border px-4 py-2">Full URL</td></tr>
-                                <tr><td class="border px-4 py-2"><code>user</code></td><td class="border px-4 py-2"><code>Any</code></td><td class="border px-4 py-2">Authenticated user</td></tr>
-                            </tbody>
-                        </table>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async body() -> bytes</code> — Get request body as bytes</li>
-                            <li><code>async json() -> Any</code> — Get request body as JSON</li>
-                            <li><code>async text() -> str</code> — Get request body as text</li>
-                            <li><code>async form() -> dict[str, Any]</code> — Get request body as form data</li>
-                            <li><code>async render(template_name, context) -> Any</code> — Render a template</li>
-                        </ul>
-
-                        <h2>Response</h2>
-                        <p>HTTP response.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Response(content: bytes | str = b"", *, status_code: int = 200, headers: dict[str, str] | None = None, media_type: str | None = None)</code></pre>
-                        </div>
-
-                        <h3>Class Methods</h3>
-                        <ul>
-                            <li><code>from_value(value: Any) -> Response</code> — Convert a value to a response</li>
-                        </ul>
-
-                        <h2>Response Types</h2>
-
-                        <h3>JSONResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">JSONResponse(content: Any, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
-                        </div>
-
-                        <h3>HTMLResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">HTMLResponse(content: str, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
-                        </div>
-
-                        <h3>TextResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">TextResponse(content: str, *, status_code: int = 200, headers: dict[str, str] | None = None)</code></pre>
-                        </div>
-
-                        <h3>RedirectResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">RedirectResponse(url: str, status_code: int = 307, headers: dict[str, str] | None = None)</code></pre>
-                        </div>
-
-                        <h3>StreamingResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">StreamingResponse(content: AsyncIterator[bytes] | Iterable[bytes], *, status_code: int = 200, headers: dict[str, str] | None = None, media_type: str = "application/octet-stream")</code></pre>
-                        </div>
-
-                        <h2>Headers</h2>
-                        <p>HTTP headers dictionary.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Headers(raw: list[tuple[bytes, bytes]] | None = None)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>get(key, default)</code> — Get a header value</li>
-                            <li><code>get_raw(key)</code> — Get header as bytes</li>
-                            <li><code>to_list()</code> — Convert to raw ASGI format</li>
-                            <li><code>to_dict()</code> — Convert to dictionary</li>
-                        </ul>
-
-                        <h2>Cookies</h2>
-                        <p>HTTP cookies dictionary.</p>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>get(key, default)</code> — Get a cookie value</li>
-                            <li><code>set(key, value, **options)</code> — Set a cookie with options</li>
-                            <li><code>delete(key)</code> — Delete a cookie</li>
-                            <li><code>to_dict()</code> — Convert to dictionary</li>
-                            <li><code>to_headers()</code> — Convert to Set-Cookie headers</li>
-                        </ul>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Cookie Options</strong>
-                            <p class="mb-0 mt-1"><code>max_age</code>, <code>expires</code>, <code>path</code>, <code>domain</code>, <code>secure</code>, <code>httponly</code>, <code>samesite</code></p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="HTTP API — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>HTTP API — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>HTTP API</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/http.md">Framework source</a> · <a href="../../content/framework/docs/api/http.md" download>Markdown</a></p><h1 id="http-api">HTTP API</h1>
+<hr/>
+<h2 id="request">Request</h2>
+<p>HTTP request object.</p>
+<hr/>
+<h2 id="constructor">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Request</span><span class="p">(</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">receive</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">app</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="properties">Properties</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>method</code></td>
+<td><code>str</code></td>
+<td>HTTP method</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td><code>str</code></td>
+<td>Request path</td>
+</tr>
+<tr>
+<td><code>root_path</code></td>
+<td><code>str</code></td>
+<td>Root path</td>
+</tr>
+<tr>
+<td><code>scheme</code></td>
+<td><code>str</code></td>
+<td>URL scheme</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>Headers</code></td>
+<td>Request headers</td>
+</tr>
+<tr>
+<td><code>path_params</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Path parameters</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td><code>SimpleNamespace</code></td>
+<td>Request state</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td><code>Any</code></td>
+<td>Authenticated user</td>
+</tr>
+<tr>
+<td><code>query</code></td>
+<td><code>QueryParams</code></td>
+<td>Query parameters</td>
+</tr>
+<tr>
+<td><code>cookies</code></td>
+<td><code>Cookies</code></td>
+<td>Cookies</td>
+</tr>
+<tr>
+<td><code>client</code></td>
+<td><code>tuple[str, int] \| None</code></td>
+<td>Client address</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td><code>str</code></td>
+<td>Host header</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td><code>str</code></td>
+<td>Full URL</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="methods">Methods</h2>
+<h3 id="body">body</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bytes</span>
+</code></pre></div>
+<p>Get the request body as bytes.</p>
+<hr/>
+<h3 id="json">json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Get the request body as JSON.</p>
+<hr/>
+<h3 id="text">text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Get the request body as text.</p>
+<hr/>
+<h3 id="form">form</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">form</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Get the request body as form data.</p>
+<hr/>
+<h3 id="render">render</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span>
+    <span class="n">template_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Render a template using Jinax.</p>
+<hr/>
+<h2 id="response">Response</h2>
+<p>HTTP response object.</p>
+<hr/>
+<h2 id="constructor_1">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Response</span><span class="p">(</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">""</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="class-methods">Class Methods</h2>
+<h3 id="from_value">from_value</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_value</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span>
+</code></pre></div>
+<p>Convert a value to a response.</p>
+<hr/>
+<h2 id="response-types">Response Types</h2>
+<hr/>
+<h2 id="jsonresponse">JSONResponse</h2>
+<p>JSON response.</p>
+<h3 id="constructor_2">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">JSONResponse</span><span class="p">(</span>
+    <span class="n">content</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="htmlresponse">HTMLResponse</h2>
+<p>HTML response.</p>
+<h3 id="constructor_3">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">HTMLResponse</span><span class="p">(</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="textresponse">TextResponse</h2>
+<p>Plain text response.</p>
+<h3 id="constructor_4">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">TextResponse</span><span class="p">(</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="redirectresponse">RedirectResponse</h2>
+<p>Redirect response.</p>
+<h3 id="constructor_5">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">RedirectResponse</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">307</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="streamingresponse">StreamingResponse</h2>
+<p>Streaming response.</p>
+<h3 id="constructor_6">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">StreamingResponse</span><span class="p">(</span>
+    <span class="n">content</span><span class="p">:</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"application/octet-stream"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="headers">Headers</h2>
+<p>HTTP headers dictionary.</p>
+<hr/>
+<h2 id="constructor_7">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Headers</span><span class="p">(</span>
+    <span class="n">raw</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="methods_1">Methods</h2>
+<h3 id="get">get</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Get a header value with a default.</p>
+<hr/>
+<h3 id="get_raw">get_raw</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_raw</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a header value as bytes.</p>
+<hr/>
+<h3 id="to_list">to_list</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]</span>
+</code></pre></div>
+<p>Convert headers to raw ASGI format.</p>
+<hr/>
+<h3 id="to_dict">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert headers to a regular dictionary.</p>
+<hr/>
+<h2 id="cookies">Cookies</h2>
+<p>HTTP cookies dictionary.</p>
+<hr/>
+<h2 id="methods_2">Methods</h2>
+<h3 id="get_1">get</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Get a cookie value with a default.</p>
+<hr/>
+<h3 id="set">set</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">set</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">max_age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">expires</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">secure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">httponly</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">samesite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Set a cookie with options.</p>
+<hr/>
+<h3 id="delete">delete</h3>
+<div class="highlight"><pre><span></span><code><span class="n">delete</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Delete a cookie.</p>
+<hr/>
+<h3 id="set_delete">set_delete</h3>
+<div class="highlight"><pre><span></span><code><span class="n">set_delete</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Set a cookie to be deleted.</p>
+<hr/>
+<h3 id="to_dict_1">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert cookies to a dictionary.</p>
+<hr/>
+<h3 id="to_headers">to_headers</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_headers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert cookies to <code>Set-Cookie</code> headers.</p>
+<hr/>
+<h2 id="queryparams">QueryParams</h2>
+<p>Query parameters dictionary.</p>
+<hr/>
+<h2 id="methods_3">Methods</h2>
+<h3 id="get_2">get</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Get a parameter value.</p>
+<hr/>
+<h3 id="get_list">get_list</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_list</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Get a parameter as a list.</p>
+<hr/>
+<h3 id="get_int">get_int</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_int</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a parameter as an integer.</p>
+<hr/>
+<h3 id="get_float">get_float</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_float</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a parameter as a float.</p>
+<hr/>
+<h3 id="get_bool">get_bool</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_bool</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a parameter as a boolean.</p>
+<hr/>
+<h3 id="get_all">get_all</h3>
+<div class="highlight"><pre><span></span><code><span class="n">get_all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</code></pre></div>
+<p>Get all parameters as a dictionary of lists.</p>
+<hr/>
+<h3 id="to_dict_2">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</code></pre></div>
+<p>Convert to a dictionary.</p>
+<hr/>
+<h3 id="to_query_string">to_query_string</h3>
+<div class="highlight"><pre><span></span><code><span class="n">to_query_string</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Convert to a query string.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

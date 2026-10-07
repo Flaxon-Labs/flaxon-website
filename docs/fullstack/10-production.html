@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 10: Build, deploy and maintain the complete application — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 10: Build, deploy and maintain the complete application — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 10: Build, deploy and maintain the complete application</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/10-production.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/10-production.md" download>Markdown</a></p><h1 id="lesson-10-build-deploy-and-maintain-the-complete-application">Lesson 10: Build, deploy and maintain the complete application</h1>
+<p>Set <code>debug=False</code> for deployment. Flaxon requests production Teloce compilation,
+asset hashes and extracted CSS; MinifyJS optimizes generated JavaScript and the
+router. Bundling is an explicit choice, not automatically enabled for every
+project. Test lazy pages and shared modules before selecting a bundle entry.</p>
+<p>Startup needs a writable build directory. Multiple workers currently build at
+startup, so isolate their output directories or arrange a single build lifecycle
+instead of concurrent writes. Keep stable aliases and router assets revalidated;
+only apply immutable caching to verified content-hashed files. The integration
+uses no-cache for assets and production HTML.</p>
+<p>Deploy through the <a href="../deployment.html">deployment guide</a>, with HTTPS, trusted
+hosts, environment-held secrets, persistent database storage, backups and logs.
+Pin and review dependencies. CDN resource URLs are separate from your own asset
+deployment; changing <code>static_url</code> does not upload your compiled files.</p>
+<p>Flaxon's full-stack positioning describes the integrated Python/Teloce workflow.
+It does not imply automatic SSR, HMR, authentication, hosting or database setup.
+Those choices remain explicit and documented.</p>
+<p><strong>Checkpoint:</strong> test a production build, deep-link refresh, failed API requests,
+missing CDN access and a process restart. Restore a backup in a test environment
+before relying on the production backup plan.</p>
+<h2 id="choose-the-remaining-framework-capabilities-deliberately">Choose the remaining framework capabilities deliberately</h2>
+<p>A production full-stack app can add these features without replacing its UI:</p>
+<ul>
+<li><strong>OpenAPI:</strong> document API contracts and expose interactive API documentation.</li>
+<li><strong>GraphQL:</strong> provide a separate data-query interface where it fits the client.</li>
+<li><strong>Admin/CMS:</strong> manage application content and operations with its authorization.</li>
+<li><strong>Tasks:</strong> move expensive work to workers, with retries and scheduling.</li>
+<li><strong>Plugins/FastMCP/ASGI mounts:</strong> integrate distinct services through supported lifecycles.</li>
+<li><strong>Health, metrics and logs:</strong> observe readiness and failures without publishing secrets.</li>
+</ul>
+<p>Use the <a href="index.html#complete-reference-coverage">course coverage map</a> to reach the
+actual configuration APIs. These are opt-in application choices, not features
+automatically activated by <code>use_teloce()</code>.</p>
+<p>For Teloce, review compiler options, shared runtime selection, scoped CSS,
+asset hashing, source maps and MinifyJS bundling. Verify output with actual pages
+and lazy imports before enabling a new optimization. Teloce plugins/tooling and
+standalone runtime features have their own documented scope; they are not
+interchangeable with Flaxon server plugins.</p>
+<h2 id="repeatable-checks">Repeatable checks</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-o<span class="w"> </span><span class="nv">addopts</span><span class="o">=</span><span class="s1">''</span><span class="w"> </span>tests/integration/test_teloce_integration.py
+</code></pre></div>
+<p>The integration suite builds both examples, checks generated assets and validates
+API behavior. GitHub Actions also launches Chromium for UI interactions. For your
+own production application, add authorization, persistence and worker tests;
+the course fixtures do not cover your business rules.</p>
+<p><a href="index.html">Course contents</a> · <a href="09-live-updates.html">Previous lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>

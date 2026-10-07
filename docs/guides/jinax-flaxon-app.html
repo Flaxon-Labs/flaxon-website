@@ -1,8 +1,20 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Build a Flaxon app with Jinax</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><link rel="icon" href="/assets/images/logo/flaxon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head>
-<body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Build a Flaxon app with Jinax</h1><p>This is a complete server-rendered starter. Jinax renders HTML on the server; Flaxon owns routing and APIs. Add a database and authentication before deploying user data.</p><h2>1. Create the project</h2><pre><code>flaxon new store
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Build a Flaxon app with Jinax — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Build a Flaxon app with Jinax — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Build a Flaxon app with Jinax</span></nav>
+<article class="doc-content"><h1 id="build-a-flaxon-app-with-jinax">Build a Flaxon app with Jinax</h1><p>This is a complete server-rendered starter. Jinax renders HTML on the server; Flaxon owns routing and APIs. Add a database and authentication before deploying user data.</p><h2 id="1-create-the-project">1. Create the project</h2><pre><code>flaxon new store
 cd store
-python -m pip install "flaxon[standard,templates]"</code></pre><h2>2. Add <code>app.py</code></h2><pre><code>from datetime import datetime
+python -m pip install "flaxon[standard,templates]"</code></pre><h2 id="2-add-app-py">2. Add <code>app.py</code></h2><pre><code>from datetime import datetime
 from flaxon import Flaxon
 from flaxon.jinax import Jinax
 
@@ -18,19 +30,14 @@ async def home(request):
 async def products():
     return {"data": [{"name": "Flaxon Mug", "price": 14.99}]}
 
-# Run with: flaxon run app:app --reload</code></pre><h2>3. Add <code>templates/home.html</code></h2><pre><code>&lt;!doctype html&gt;
+# Run with: flaxon run app:app --reload</code></pre><h2 id="3-add-templates-home-html">3. Add <code>templates/home.html</code></h2><pre><code>&lt;!doctype html&gt;
 &lt;html&gt;&lt;head&gt;&lt;title&gt;{{ title }}&lt;/title&gt;&lt;/head&gt;
 &lt;body&gt;
   &lt;h1&gt;{{ title }}&lt;/h1&gt;
   {% for product in products %}
-    &lt;article&gt;&lt;h2&gt;{{ product.name }}&lt;/h2&gt;&lt;p&gt;&#36;{{ product.price }}&lt;/p&gt;&lt;/article&gt;
+    &lt;article&gt;&lt;h2&gt;{{ product.name }}&lt;/h2&gt;&lt;p&gt;${{ product.price }}&lt;/p&gt;&lt;/article&gt;
   {% endfor %}
   &lt;small&gt;{{ year }}&lt;/small&gt;
-&lt;/body&gt;&lt;/html&gt;</code></pre><h2>Run and deploy</h2><pre><code>flaxon run app:app --reload
-curl http://127.0.0.1:8000/api/products</code></pre><p>Use HTTPS, a production ASGI process, a persistent database, environment variables for secrets, CSRF protection for cookie-authenticated mutations, and authorization on every private route.</p><div class="note"><strong>Next:</strong> use the <a href="/docs/guides/mobile-apk-play-store.html">mobile API and Play Store guide</a> when a native client will consume the API.</div></article></main></div></div></section><div id="footer"></div><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
-
-
-
-
-
-
+&lt;/body&gt;&lt;/html&gt;</code></pre><h2 id="run-and-deploy">Run and deploy</h2><pre><code>flaxon run app:app --reload
+curl http://127.0.0.1:8000/api/products</code></pre><p>Use HTTPS, a production ASGI process, a persistent database, environment variables for secrets, CSRF protection for cookie-authenticated mutations, and authorization on every private route.</p><div class="note"><strong>Next:</strong> use the <a href="mobile-apk-play-store.html">mobile API and Play Store guide</a> when a native client will consume the API.</div></article>
+</main></div><div id="footer"></div></body></html>

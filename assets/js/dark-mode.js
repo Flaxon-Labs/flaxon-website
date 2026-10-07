@@ -1,142 +1,60 @@
-// assets/js/dark-mode.js
-/**
- * Flaxon Website - Dark Mode
- * Manages dark/light theme toggle with localStorage persistence
- */
-
-(function() {
+/** Persistent user theme; shared controls can arrive at any time. */
+(function () {
     'use strict';
-
-    // ============================================================
-    // Configuration
-    // ============================================================
-    const STORAGE_KEY = 'flaxon-dark-mode';
-    const CLASS_NAME = 'dark';
-    const TOGGLE_SELECTOR = '#dark-mode-toggle, .dark-mode-toggle';
-
-    // ============================================================
-    // Core Functions
-    // ============================================================
-    function getPreferredTheme() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored !== null) {
-            return stored === 'true';
-        }
-        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (window.flaxonDarkMode) return;
+    const key = 'flaxon-dark-mode';
+    const preference = window.matchMedia('(prefers-color-scheme: dark)');
+    const selector = '#dark-mode-toggle, .dark-mode-toggle';
+    function storedTheme() {
+        try { return localStorage.getItem(key); } catch (_) { return null; }
     }
-
-    function setTheme(isDark) {
-        if (isDark) {
-            document.documentElement.classList.add(CLASS_NAME);
-        } else {
-            document.documentElement.classList.remove(CLASS_NAME);
-        }
-        localStorage.setItem(STORAGE_KEY, String(isDark));
-        updateToggleButton(isDark);
-        updateMetaThemeColor(isDark);
-        return isDark;
+    function preferredTheme() {
+        const value = storedTheme();
+        return value === null ? preference.matches : value === 'true';
     }
-
-    function toggleTheme() {
-        const isDark = document.documentElement.classList.contains(CLASS_NAME);
-        return setTheme(!isDark);
-    }
-
-    function getCurrentTheme() {
-        return document.documentElement.classList.contains(CLASS_NAME);
-    }
-
-    // ============================================================
-    // UI Updates
-    // ============================================================
-    function updateToggleButton(isDark) {
-        const toggles = document.querySelectorAll(TOGGLE_SELECTOR);
-        toggles.forEach(function(toggle) {
-            const icon = toggle.querySelector('i');
-            const text = toggle.querySelector('.toggle-text');
-            if (icon) {
-                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            }
-            if (text) {
-                text.textContent = isDark ? 'Light' : 'Dark';
-            }
-            toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    function updateButtons() {
+        const dark = document.documentElement.classList.contains('dark');
+        document.querySelectorAll(selector).forEach(function (button) {
+            button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+            button.setAttribute('aria-pressed', String(dark));
+            const text = button.querySelector('.toggle-text');
+            if (text) text.textContent = dark ? 'Light' : 'Dark';
+            const icon = button.querySelector('i');
+            if (icon) icon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+            const svg = button.querySelector('.theme-icon');
+            if (svg) svg.innerHTML = dark
+                ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>'
+                : '<path d="M21 12.7A9 9 0 0 1 11.3 3a9 9 0 1 0 9.7 9.7Z"/>';
         });
     }
-
-    function updateMetaThemeColor(isDark) {
+    function setTheme(dark, persist = true) {
+        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        if (persist) {
+            try { localStorage.setItem(key, String(dark)); } catch (_) { /* Private storage may be disabled. */ }
+        }
         const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-            meta.content = isDark ? '#0f172a' : '#ffffff';
-        }
+        if (meta) meta.content = dark ? '#0f172a' : '#ffffff';
+        updateButtons();
+        document.dispatchEvent(new CustomEvent('themechange', {detail: {dark}}));
+        return dark;
     }
-
-    // ============================================================
-    // Initialize
-    // ============================================================
-    // NOTE: header.html and footer.html are fetched independently and
-    // injected asynchronously, so this file can start running before
-    // the toggle button (which lives in header.html) exists yet, and
-    // DOMContentLoaded has already fired by the time we get here.
-    // So instead of a one-shot DOMContentLoaded listener, retry until
-    // the button actually shows up.
-    let systemThemeListenerAttached = false;
-
-    function init(attemptsLeft) {
-        // Set initial theme (safe to call repeatedly)
-        const initialTheme = getPreferredTheme();
-        setTheme(initialTheme);
-
-        const toggles = document.querySelectorAll(TOGGLE_SELECTOR);
-
-        if (toggles.length === 0) {
-            if (attemptsLeft > 0) {
-                setTimeout(function() { init(attemptsLeft - 1); }, 100);
-            }
-            return;
-        }
-
-        // Attach toggle events (guard against double-binding on retry)
-        toggles.forEach(function(toggle) {
-            if (toggle.dataset.darkModeBound === 'true') return;
-            toggle.dataset.darkModeBound = 'true';
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const newTheme = toggleTheme();
-                // Dispatch event for other components
-                document.dispatchEvent(new CustomEvent('themechange', {
-                    detail: { dark: newTheme }
-                }));
-            });
-        });
-
-        // Listen for system theme changes (only once)
-        if (!systemThemeListenerAttached) {
-            systemThemeListenerAttached = true;
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (localStorage.getItem(STORAGE_KEY) === null) {
-                    setTheme(e.matches);
-                }
-            });
-        }
-
-        // Log current state
-        console.log('Dark mode initialized:', getCurrentTheme() ? 'dark' : 'light');
-    }
-
-    // Try for up to ~5 seconds (50 x 100ms) in case header.html is slow to load
-    init(50);
-
-    // ============================================================
-    // Expose API
-    // ============================================================
+    function toggleTheme() { return setTheme(!document.documentElement.classList.contains('dark')); }
+    // Delegation removes races with asynchronously fetched headers.
+    document.addEventListener('click', function (event) {
+        if (event.target.closest(selector)) { event.preventDefault(); toggleTheme(); }
+    });
+    document.addEventListener('DOMContentLoaded', updateButtons);
+    document.addEventListener('flaxon:header-ready', updateButtons);
+    preference.addEventListener('change', function (event) {
+        if (storedTheme() === null) setTheme(event.matches, false);
+    });
+    window.addEventListener('storage', function (event) {
+        if (event.key === key) setTheme(preferredTheme(), false);
+    });
+    setTheme(preferredTheme(), false);
     window.flaxonDarkMode = {
-        getCurrent: getCurrentTheme,
-        set: setTheme,
-        toggle: toggleTheme,
-        getPreferred: getPreferredTheme,
+        getCurrent: () => document.documentElement.classList.contains('dark'),
+        set: setTheme, toggle: toggleTheme, getPreferred: preferredTheme
     };
-
-    console.log('Flaxon dark mode initialized! 🌓');
-
-})();
+}());

@@ -1,221 +1,289 @@
-<!-- docs/api/security.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Security API – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Security API — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Security API — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security API</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/security.md">Framework source</a> · <a href="../../content/framework/docs/api/security.md" download>Markdown</a></p><h1 id="security-api">Security API</h1>
+<h2 id="jwtbackend">JWTBackend</h2>
+<p>JWT authentication backend.</p>
+<h2 id="constructor">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">algorithm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"HS256"</span>
+<span class="p">)</span>
+<span class="err">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="c1">## Methods</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="c1">### authenticate</span>
 
-    <div id="header"></div>
-
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
-
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html" class="active">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Security API</h1>
-
-                        <h2>JWTBackend</h2>
-                        <p>JWT authentication backend.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">JWTBackend(secret_key: str, algorithm: str = "HS256")</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async authenticate(request: Request) -> User | None</code> — Authenticate a request</li>
-                            <li><code>async create_token(user: User, expires_in: int | None = None) -> str</code> — Create a JWT token</li>
-                            <li><code>async validate_token(token: str) -> User | None</code> — Validate a JWT token</li>
-                            <li><code>async revoke_token(token: str) -> None</code> — Revoke a token</li>
-                        </ul>
-
-                        <h2>SessionBackend</h2>
-                        <p>Session authentication backend.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">SessionBackend(session_store: dict[str, dict[str, Any]] | None = None)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async authenticate(request: Request) -> User | None</code></li>
-                            <li><code>async create_token(user: User, expires_in: int | None = None) -> str</code></li>
-                            <li><code>async validate_token(token: str) -> User | None</code></li>
-                            <li><code>async revoke_token(token: str) -> None</code></li>
-                        </ul>
-
-                        <h2>User</h2>
-                        <p>User object.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">User(id: str | int, username: str | None = None, email: str | None = None, roles: list[str] | None = None, permissions: list[str] | None = None, metadata: dict[str, Any] | None = None)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>has_role(role: str) -> bool</code> — Check if user has a role</li>
-                            <li><code>has_permission(permission: str) -> bool</code> — Check if user has a permission</li>
-                            <li><code>to_dict() -> dict[str, Any]</code> — Convert to dictionary</li>
-                        </ul>
-
-                        <h2>Decorators</h2>
-
-                        <h4>login_required</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">login_required(func: Callable) -> Callable</code></pre>
-                        </div>
-                        <p>Require authentication.</p>
-
-                        <h4>permission_required</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">permission_required(permission: str) -> Callable</code></pre>
-                        </div>
-                        <p>Require a permission.</p>
-
-                        <h4>role_required</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">role_required(role: str) -> Callable</code></pre>
-                        </div>
-                        <p>Require a role.</p>
-
-                        <h4>authorize</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">authorize(permission: str | None = None, role: str | None = None) -> Callable</code></pre>
-                        </div>
-                        <p>Require both permission and role.</p>
-
-                        <h2>CSRF</h2>
-                        <p>CSRF protection.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">CSRF(secret_key: str, cookie_name: str = "_csrf", header_name: str = "x-csrf-token")</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>generate_token() -> str</code> — Generate a CSRF token</li>
-                            <li><code>verify_token(token: str) -> bool</code> — Verify a CSRF token</li>
-                            <li><code>get_token_from_request(request: Request) -> str | None</code></li>
-                            <li><code>validate_request(request: Request) -> None</code></li>
-                        </ul>
-
-                        <h2>RateLimiter</h2>
-                        <p>Rate limiter.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">RateLimiter(requests: int = 60, window_seconds: int = 60, key_func: Callable[[dict[str, Any]], str] | None = None)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async check(scope) -> bool</code> — Check if rate limit is exceeded</li>
-                            <li><code>get_remaining(scope) -> int</code> — Get remaining requests</li>
-                            <li><code>get_retry_after(scope) -> int</code> — Get retry-after seconds</li>
-                        </ul>
-
-                        <h2>Password Hashing</h2>
-                        <ul>
-                            <li><code>hash_password(password: str) -> str</code> — Hash a password</li>
-                            <li><code>verify_password(password: str, hashed: str) -> bool</code> — Verify a password</li>
-                            <li><code>needs_rehash(hashed: str) -> bool</code> — Check if rehash is needed</li>
-                        </ul>
-
-                        <div class="note warning">
-                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Security Reminder</strong>
-                            <p class="mb-0 mt-1">Always store <code>SECRET_KEY</code> in environment variables, never in code.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="err">```</span><span class="n">python</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Authenticate a request.</p>
+<hr/>
+<h3 id="create_token">create_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_token</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span>
+    <span class="n">expires_in</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Create a JWT token.</p>
+<hr/>
+<h3 id="validate_token">validate_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">validate_token</span><span class="p">(</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate a JWT token.</p>
+<hr/>
+<h3 id="revoke_token">revoke_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">revoke_token</span><span class="p">(</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Revoke a token.</p>
+<hr/>
+<h2 id="sessionbackend">SessionBackend</h2>
+<p>Session authentication backend.</p>
+<h2 id="constructor_1">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">SessionBackend</span><span class="p">(</span>
+    <span class="n">session_store</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods">Methods</h2>
+<h3 id="authenticate">authenticate</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Authenticate a request.</p>
+<hr/>
+<h3 id="create_token_1">create_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_token</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span>
+    <span class="n">expires_in</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Create a session token.</p>
+<hr/>
+<h3 id="validate_token_1">validate_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">validate_token</span><span class="p">(</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate a session token.</p>
+<hr/>
+<h3 id="revoke_token_1">revoke_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">revoke_token</span><span class="p">(</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Revoke a session.</p>
+<hr/>
+<h2 id="user">User</h2>
+<p>Authenticated user object.</p>
+<h2 id="constructor_2">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">User</span><span class="p">(</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">roles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_1">Methods</h2>
+<h3 id="has_role">has_role</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">has_role</span><span class="p">(</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if the user has a role.</p>
+<hr/>
+<h3 id="has_permission">has_permission</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span>
+    <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if the user has a permission.</p>
+<hr/>
+<h3 id="to_dict">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert user data into a dictionary.</p>
+<hr/>
+<h2 id="authentication-decorators">Authentication Decorators</h2>
+<h2 id="login_required">login_required</h2>
+<div class="highlight"><pre><span></span><code><span class="n">login_required</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span>
+</code></pre></div>
+<p>Decorator requiring authentication.</p>
+<hr/>
+<h2 id="permission_required">permission_required</h2>
+<div class="highlight"><pre><span></span><code><span class="n">permission_required</span><span class="p">(</span>
+    <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span>
+</code></pre></div>
+<p>Decorator requiring a specific permission.</p>
+<hr/>
+<h2 id="role_required">role_required</h2>
+<div class="highlight"><pre><span></span><code><span class="n">role_required</span><span class="p">(</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span>
+</code></pre></div>
+<p>Decorator requiring a specific role.</p>
+<hr/>
+<h2 id="authorize">authorize</h2>
+<div class="highlight"><pre><span></span><code><span class="n">authorize</span><span class="p">(</span>
+    <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span>
+</code></pre></div>
+<p>Decorator requiring permission and/or role authorization.</p>
+<hr/>
+<h2 id="csrf">CSRF</h2>
+<p>Cross-Site Request Forgery protection.</p>
+<h2 id="constructor_3">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">CSRF</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cookie_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"_csrf"</span><span class="p">,</span>
+    <span class="n">header_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"x-csrf-token"</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_2">Methods</h2>
+<h3 id="generate_token">generate_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_token</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Generate a CSRF token.</p>
+<hr/>
+<h3 id="verify_token">verify_token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">verify_token</span><span class="p">(</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Verify a CSRF token.</p>
+<hr/>
+<h3 id="get_token_from_request">get_token_from_request</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_token_from_request</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a CSRF token from a request.</p>
+<hr/>
+<h3 id="validate_request">validate_request</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_request</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate a request's CSRF token.</p>
+<hr/>
+<h2 id="ratelimiter">RateLimiter</h2>
+<p>Rate limiting utility.</p>
+<h2 id="constructor_4">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">RateLimiter</span><span class="p">(</span>
+    <span class="n">requests</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+    <span class="n">window_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+    <span class="n">key_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_3">Methods</h2>
+<h3 id="check">check</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check whether the request exceeds the rate limit.</p>
+<hr/>
+<h3 id="get_remaining">get_remaining</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_remaining</span><span class="p">(</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get remaining allowed requests.</p>
+<hr/>
+<h3 id="get_retry_after">get_retry_after</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_retry_after</span><span class="p">(</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get retry-after time in seconds.</p>
+<hr/>
+<h2 id="apikeymanager">APIKeyManager</h2>
+<p>API key management.</p>
+<h2 id="methods_4">Methods</h2>
+<h3 id="generate_key">generate_key</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_key</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"flx"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Generate a new API key.</p>
+<hr/>
+<h3 id="register">register</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Register an API key.</p>
+<hr/>
+<h3 id="validate">validate</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate an API key.</p>
+<hr/>
+<h3 id="revoke">revoke</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">revoke</span><span class="p">(</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Revoke an API key.</p>
+<hr/>
+<h3 id="list_keys">list_keys</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">list_keys</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+</code></pre></div>
+<p>List registered API keys.</p>
+<hr/>
+<h2 id="password-utilities">Password Utilities</h2>
+<h2 id="hash_password">hash_password</h2>
+<div class="highlight"><pre><span></span><code><span class="n">hash_password</span><span class="p">(</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Hash a password securely.</p>
+<hr/>
+<h2 id="verify_password">verify_password</h2>
+<div class="highlight"><pre><span></span><code><span class="n">verify_password</span><span class="p">(</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">hashed</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Verify a password against a hash.</p>
+<hr/>
+<h2 id="needs_rehash">needs_rehash</h2>
+<div class="highlight"><pre><span></span><code><span class="n">needs_rehash</span><span class="p">(</span>
+    <span class="n">hashed</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check whether a password hash needs to be regenerated.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

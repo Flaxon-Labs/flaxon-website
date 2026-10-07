@@ -1,308 +1,306 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="google-site-verification" content="l5zab0NHk3lbRe6HAabq8PNIt4BbzaHUr1Sao5YM5yc" />
-    <title>Flaxon – Security</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Security — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Security — Flaxon Docs</title>
+<link rel="icon" href="assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/docs.css">
+<script src="assets/js/dark-mode.js"></script>
+<script defer src="assets/js/site-shell.js"></script>
+<script defer src="assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security</span></nav>
+<article class="doc-content"><h1 id="security">Security</h1>
+<h2 id="overview">Overview</h2>
+<p>Security is an important part of Flaxon's design.</p>
+<p>Flaxon provides secure defaults and documentation to help developers build safer applications.</p>
+<p>The framework includes support for:</p>
+<ul>
+<li>Template autoescaping</li>
+<li>Request validation</li>
+<li>Security headers</li>
+<li>Request identifiers</li>
+<li>Sensitive data redaction</li>
+<li>Production-safe error handling</li>
+<li>Rate limiting</li>
+</ul>
+<p>Security features reduce common risks, but developers are still responsible for following secure application practices.</p>
+<hr/>
+<h2 id="built-in-security-features">Built-in Security Features</h2>
+<h2 id="autoescaping">Autoescaping</h2>
+<p>Jinax templates automatically escape HTML and XML content to help prevent Cross-Site Scripting (XSS) attacks.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>{{ user_input }}
+````
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+Unsafe characters are escaped before being rendered.
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+---
 
-    <!-- Google Fonts (Inter) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+# Request Validation
 
-    <!-- Font Awesome 6 (free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+Flaxon supports declarative schemas for validating incoming data before processing.
 
-    <!-- Highlight.js (light + dark) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+Example:
 
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
-    </script>
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/secure.css">
-
-  
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: {
-                            blue: '#3776AB',
-                            electric: '#00D4FF',
-                            dark: '#0F172A',
-                            light: '#F8FAFC',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-    <script defer src="/assets/js/secure.js"></script></head>
-
-<body>
-
-    <!-- ============================================================ -->
-    <!-- THREE.JS CANVAS                                               -->
-    <!-- ============================================================ -->
-    <div id="three-canvas"></div>
-
-    <!-- ============================================================ -->
-    <!-- MAIN CONTENT                                                  -->
-    <!-- ============================================================ -->
-    <div class="content">
-
-        <!-- ============================================================ -->
-        <!-- HEADER                                                         -->
-        <!-- ============================================================ -->
-        <div id="header"></div>
-
-        <!-- ============================================================ -->
-        <!-- SECURITY HERO                                                 -->
-        <!-- ============================================================ -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-8">
-            <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
-                <span class="security-badge">
-                    <span class="dot"></span>
-                    Security First
-                </span>
-                <span class="text-gray-600">/</span>
-                <span class="text-gray-500">Zero-Trust Architecture</span>
-            </div>
-
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight">
-                Security at the
-                <span class="gradient-text">Core</span>
-            </h1>
-            <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mt-4 leading-relaxed">
-                Built-in security from the ground up. Flaxon implements industry-standard
-                security practices so you can focus on building your application.
-            </p>
-
-            <div class="flex flex-wrap gap-4 mt-6">
-                <a href="#features" class="btn-primary">
-                    Explore Features
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security" target="_blank" class="btn-outline">
-                    <i class="fas fa-shield-alt"></i>
-                    Security Policy
-                </a>
-            </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- STATS                                                         -->
-        <!-- ============================================================ -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="glass-card rounded-2xl p-5 text-center">
-                    <div class="stat-number">100%</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Open Source</div>
-                </div>
-                <div class="glass-card rounded-2xl p-5 text-center">
-                    <div class="stat-number text-[#60a5fa]">MIT</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">License</div>
-                </div>
-                <div class="glass-card rounded-2xl p-5 text-center">
-                    <div class="stat-number">22</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">GitHub Stars</div>
-                </div>
-                <div class="glass-card rounded-2xl p-5 text-center">
-                    <div class="stat-number text-[#a78bfa]">11</div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">PyPI Downloads</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- FEATURES                                                      -->
-        <!-- ============================================================ -->
-        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl sm:text-3xl font-bold text-white">Security Features</h2>
-                <p class="text-gray-400 mt-2">Built-in protections that work out of the box</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-5">
-
-                <!-- Feature 1 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon">🛡️</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Autoescaping</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                Jinja2 templates automatically escape content to prevent XSS attacks.
-                                Raw HTML requires explicit opt-in.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon green">✅</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Request Validation</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                Declarative schemas validate all incoming data with automatic
-                                422 responses for invalid requests.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon purple">🔐</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Security Headers</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and
-                                Permissions-Policy headers set by default.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon orange">🚫</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Rate Limiting</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                Configurable rate limiting to prevent abuse and DoS attacks.
-                                Distributed rate limiting support via Redis.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon red">🔍</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Data Redaction</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                Passwords, tokens, and secrets are automatically redacted from
-                                debug output and error responses.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="glass-card rounded-2xl p-6 md:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="feature-icon cyan">🔑</div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">CSRF Protection</h3>
-                            <p class="text-sm text-gray-400 mt-1 leading-relaxed">
-                                Built-in CSRF token validation for state-changing operations.
-                                Seamless integration with forms and APIs.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SECURITY POLICY SECTION                                       -->
-        <!-- ============================================================ -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="glass-card rounded-2xl p-8 md:p-12 text-center">
-                <div class="text-4xl mb-4">🛡️</div>
-                <h2 class="text-2xl font-bold text-white">Security Policy</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto mt-2">
-                    Flaxon follows responsible disclosure. We take security seriously and
-                    respond to vulnerability reports promptly.
-                </p>
-                <div class="flex flex-wrap justify-center gap-4 mt-6">
-                    <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/policy" target="_blank"
-                    class="btn-primary">
-                    <i class="fas fa-shield-alt"></i>
-                    View Security Policy
-                </a>
-                <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/security/advisories" target="_blank"
-                class="btn-outline">
-                <i class="fas fa-exclamation-triangle"></i>
-                Security Advisories
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- CTA                                                            -->
-<!-- ============================================================ -->
-<div id="cta" x-data="{}" x-init="fetch('/partials/cta.html').then(r=>r.text()).then(html=>$el.innerHTML=html)"></div>
-
-<!-- ============================================================ -->
-<!-- FOOTER                                                         -->
-<!-- ============================================================ -->
-<div id="footer"></div>
-
-</div>
-<!-- END content -->
-
-<!-- ============================================================ -->
-<!-- SCRIPTS                                                       -->
-<!-- ============================================================ -->
-<script>
-    // Load partials
-    document.addEventListener('DOMContentLoaded', function() {
-        const partials = [
-            { id: 'cta', path: '/partials/cta.html' },
-        ];
-
-        partials.forEach(function(partial) {
-            fetch(partial.path)
-                .then(r => r.text())
-                .then(html => {
-                    const el = document.getElementById(partial.id);
-                    if (el) el.innerHTML = html;
-                })
-                .catch(err => console.error('Failed to load partial:', partial.path, err));
-        });
-
-        // Init Highlight.js
-        hljs.highlightAll();
-    });
-
-    // Dark mode toggle (persistent)
-    if (localStorage.getItem('dark-mode') === 'true') {
-        document.documentElement.classList.add('dark');
-    }
-</script>
+```python
+from flaxon.validation import Schema, fields
 
 
-</body>
-</html>
+class CreateUser(Schema):
+
+    name = fields.StrField(
+        required=True,
+        min_length=2
+    )
+
+    email = fields.EmailField(
+        required=True
+    )
+</code></pre></div>
+<p>Validation helps prevent malformed or unexpected input from reaching application logic.</p>
+<hr/>
+<h2 id="security-headers">Security Headers</h2>
+<p>Flaxon can apply recommended security headers.</p>
+<p>Common headers include:</p>
+<div class="highlight"><pre><span></span><code>X-Content-Type-Options: nosniff
+
+X-Frame-Options: DENY
+
+Referrer-Policy: strict-origin-when-cross-origin
+
+Permissions-Policy:
+geolocation=(),
+microphone=(),
+camera=()
+</code></pre></div>
+<p>These headers help protect against:</p>
+<ul>
+<li>Content type attacks</li>
+<li>Clickjacking</li>
+<li>Unnecessary browser permissions</li>
+</ul>
+<hr/>
+<h2 id="request-ids">Request IDs</h2>
+<p>Every request can receive a unique identifier.</p>
+<p>Request IDs help with:</p>
+<ul>
+<li>Debugging</li>
+<li>Logging</li>
+<li>Distributed tracing</li>
+<li>Production troubleshooting</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>Request-ID: fx-8a72c91d
+</code></pre></div>
+<hr/>
+<h2 id="sensitive-data-redaction">Sensitive Data Redaction</h2>
+<p>Flaxon avoids exposing sensitive information in logs and debug output.</p>
+<p>Sensitive values should be protected, including:</p>
+<ul>
+<li>Passwords</li>
+<li>Secrets</li>
+<li>Authentication tokens</li>
+<li>API keys</li>
+<li>Private keys</li>
+<li>Credit card information</li>
+<li>Authorization headers</li>
+</ul>
+<hr/>
+<h2 id="production-safe-errors">Production-Safe Errors</h2>
+<p>In production mode, Flaxon returns safe error responses.</p>
+<p>Production errors should:</p>
+<ul>
+<li>Hide internal tracebacks</li>
+<li>Avoid exposing application details</li>
+<li>Provide useful error identifiers</li>
+</ul>
+<p>Detailed debugging information should only be enabled in development environments.</p>
+<hr/>
+<h2 id="rate-limiting">Rate Limiting</h2>
+<p>Rate limiting helps prevent abuse by restricting excessive requests.</p>
+<p>Use cases include:</p>
+<ul>
+<li>API protection</li>
+<li>Login protection</li>
+<li>Resource management</li>
+<li>Abuse prevention</li>
+</ul>
+<hr/>
+<h2 id="security-recommendations">Security Recommendations</h2>
+<h2 id="admin-and-cms-hardening">Admin and CMS Hardening</h2>
+<p>For Admin deployments, configure a shared Redis backend for sessions and
+distributed request limits, keep CSRF enabled, and use <code>session_idle_timeout</code>
+with HTTPS-only deployment. Password-reset and MFA operations are separately
+limited by account and IP when Redis is configured.</p>
+<p>Media uploads can use a scanner callback, SHA-256 metadata, EXIF removal, and
+S3 presigned URLs. A scanner callback is only production antivirus protection
+when connected to an actual engine such as ClamAV; returning <code>True</code> from a test
+callback does not scan files.</p>
+<p>Audit records are hash chained and can be checked with
+<code>GET /admin/audit/verify</code>. Keep audit storage append-only at the database and
+infrastructure layers, and define a retention policy before deployment.</p>
+<h2 id="production-checklist">Production Checklist</h2>
+<p>Before deploying a Flaxon application:</p>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> Set <code>FLAXON_DEBUG=false</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Set <code>FLAXON_SECRET_KEY</code> with 32+ random bytes</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Configure <code>FLAXON_ALLOWED_HOSTS</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Enable HTTPS</li>
+<li class="task-list-item">
+<p><input disabled="" type="checkbox"/> Use secure cookies:</p>
+</li>
+<li>
+<p><code>Secure</code></p>
+</li>
+<li><code>HttpOnly</code></li>
+<li><code>SameSite</code></li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Implement authentication and authorization</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Enable rate limiting</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Validate all user input</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Use parameterized database queries</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Keep dependencies updated</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Scan dependencies for vulnerabilities</li>
+</ul>
+<hr/>
+<h2 id="authentication">Authentication</h2>
+<p>Flaxon supports authentication backends for securing protected routes.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTBackend</span><span class="p">,</span> <span class="n">login_required</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"secure-app"</span>
+<span class="p">)</span>
+
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret"</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">authenticate_user</span><span class="p">(</span>
+        <span class="n">data</span>
+    <span class="p">)</span>
+
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span>
+        <span class="n">user</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"token"</span><span class="p">:</span> <span class="n">token</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/protected"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">protected</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">,</span>
+        <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="csrf-protection">CSRF Protection</h2>
+<p>For applications using cookies and browser sessions, enable CSRF protection.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSRFMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CSRFMiddleware</span><span class="p">,</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="cors-configuration">CORS Configuration</h2>
+<p>Configure Cross-Origin Resource Sharing (CORS) carefully.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"https://example.com"</span>
+    <span class="p">],</span>
+    <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Avoid allowing unrestricted origins in production environments.</p>
+<hr/>
+<h2 id="rate-limiting-configuration">Rate Limiting Configuration</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">RateLimitMiddleware</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">RateLimitMiddleware</span><span class="p">,</span>
+    <span class="n">requests</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">window_seconds</span><span class="o">=</span><span class="mi">60</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="threat-mitigation">Threat Mitigation</h2>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XSS</td>
+<td>Template escaping, Content Security Policy</td>
+</tr>
+<tr>
+<td>SQL Injection</td>
+<td>Parameterized queries, validation</td>
+</tr>
+<tr>
+<td>Credential Theft</td>
+<td>Secure password hashing, MFA</td>
+</tr>
+<tr>
+<td>Token Abuse</td>
+<td>Short-lived tokens, refresh rotation</td>
+</tr>
+<tr>
+<td>CSRF</td>
+<td>CSRF tokens</td>
+</tr>
+<tr>
+<td>DDoS</td>
+<td>Rate limiting, timeouts</td>
+</tr>
+<tr>
+<td>Data Leakage</td>
+<td>Redaction, safe error handling</td>
+</tr>
+<tr>
+<td>Supply Chain Attacks</td>
+<td>Dependency pinning, security scanning</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="reporting-vulnerabilities">Reporting Vulnerabilities</h2>
+<p>If you discover a security vulnerability in Flaxon:</p>
+<p>Please report it responsibly.</p>
+<p>Contact:</p>
+<p><code>aldanehutchinson5@gmail.com</code></p>
+<p>or create a private security advisory through the Flaxon GitHub repository.</p>
+<p>Please do not publicly disclose security issues before they are reviewed and addressed.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,140 +1,217 @@
-<!-- installation.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Installation – Flaxon</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Installation — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Installation — Flaxon Docs</title>
+<link rel="icon" href="assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/docs.css">
+<script src="assets/js/dark-mode.js"></script>
+<script defer src="assets/js/site-shell.js"></script>
+<script defer src="assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Installation</span></nav>
+<article class="doc-content"><h1 id="installation">Installation</h1>
+<h2 id="requirements">Requirements</h2>
+<p>Before installing Flaxon, ensure your system has:</p>
+<ul>
+<li><strong>Python 3.11</strong> or newer</li>
+<li><strong>pip</strong> (Python package installer)</li>
+</ul>
+<p>You can verify your Python version with:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>--version
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>--version
+</code></pre></div>
+<hr/>
+<h2 id="installing-flaxon">Installing Flaxon</h2>
+<h2 id="basic-installation">Basic Installation</h2>
+<p>Install the core framework:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<p>This installs Flaxon with its core functionality and no optional extras.</p>
+<hr/>
+<h2 id="optional-feature-sets">Optional Feature Sets</h2>
+<p>Flaxon uses optional dependency groups so you only install what you need.</p>
+<h2 id="standard-installation">Standard Installation</h2>
+<p>Includes the recommended packages for most projects.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<hr/>
+<h2 id="asgi-server-support">ASGI Server Support</h2>
+<p>Installs an ASGI server for running production applications.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[server]"</span>
+</code></pre></div>
+<hr/>
+<h2 id="template-support-jinax">Template Support (Jinax)</h2>
+<p>Adds support for server-side HTML rendering with Jinax.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[templates]"</span>
+</code></pre></div>
+<hr/>
+<h2 id="development-tools">Development Tools</h2>
+<p>Installs tools useful for contributing to Flaxon.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[dev]"</span>
+</code></pre></div>
+<p>Includes development utilities such as:</p>
+<ul>
+<li>Pytest</li>
+<li>Ruff</li>
+<li>MyPy</li>
+<li>Development dependencies</li>
+</ul>
+<hr/>
+<h2 id="install-everything">Install Everything</h2>
+<p>Install all commonly used features.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard,dev,server]"</span>
+</code></pre></div>
+<hr/>
+<h2 id="optional-dependency-groups">Optional Dependency Groups</h2>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server</code></td>
+<td>ASGI server support (Uvicorn)</td>
+</tr>
+<tr>
+<td><code>templates</code></td>
+<td>Jinax template rendering (Jinja2)</td>
+</tr>
+<tr>
+<td><code>standard</code></td>
+<td>Recommended packages for most applications</td>
+</tr>
+<tr>
+<td><code>dev</code></td>
+<td>Development tools (Pytest, Ruff, MyPy, etc.)</td>
+</tr>
+<tr>
+<td><code>docs</code></td>
+<td>Documentation tools (MkDocs)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="verify-the-installation">Verify the Installation</h2>
+<p>Check that Flaxon is installed correctly.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import flaxon; print(flaxon.__version__)"</span>
+</code></pre></div>
+<p>You should see the installed version printed to the terminal.</p>
+<hr/>
+<h2 id="create-your-first-project">Create Your First Project</h2>
+<p>After installation, create your application.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"hello-world"</span><span class="p">)</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
-
-    <div id="header"></div>
-
-    <!-- Installation Page -->
-    <section class="bg-slate-50 dark:bg-slate-950 py-16">
-        <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto">
-                <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white">Installation</h1>
-                <p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">Get Flaxon up and running in minutes.</p>
-
-                <div class="mt-10 space-y-8">
-
-                    <!-- PyPI -->
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                            <i class="fas fa-box text-flaxon-blue"></i> Install from PyPI
-                        </h2>
-                        <div class="code-block mt-3">
-                            <pre><code class="language-bash">pip install flaxon</code></pre>
-                        </div>
-                        <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Installs the core framework with no optional dependencies.</p>
-                    </div>
-
-                    <!-- Optional Dependencies -->
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                            <i class="fas fa-cubes text-flaxon-blue"></i> Optional Dependencies
-                        </h2>
-                        <div class="code-block mt-3">
-                            <pre><code class="language-bash"># With server (Uvicorn)
-pip install flaxon[server]
-
-# With templates (Jinja2)
-pip install flaxon[templates]
-
-# Standard (server + templates)
-pip install flaxon[standard]
-
-# Development tools
-pip install flaxon[dev]
-
-# All extras
-pip install flaxon[standard,dev,server]</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- GitHub -->
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                            <i class="fab fa-github text-flaxon-blue"></i> Install from GitHub
-                        </h2>
-                        <div class="code-block mt-3">
-                            <pre><code class="language-bash">git clone https://github.com/aldanedev-create/Flaxon-Backend-Framework.git
-cd Flaxon-Backend-Framework
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -e ".[standard,dev]"</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Verify -->
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                            <i class="fas fa-check-circle text-emerald-500"></i> Verify Installation
-                        </h2>
-                        <div class="code-block mt-3">
-                            <pre><code class="language-bash">python -c "import flaxon; print(flaxon.__version__)"</code></pre>
-                        </div>
-                        <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Should output the version number.</p>
-                    </div>
-
-                    <!-- Next Steps -->
-                    <div class="bg-gradient-to-r from-flaxon-blue/10 to-flaxon-electric/10 dark:from-flaxon-blue/20 dark:to-flaxon-electric/20 rounded-2xl p-6 border border-flaxon-blue/20 dark:border-flaxon-blue/30">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                            <i class="fas fa-arrow-right text-flaxon-blue"></i> Next Steps
-                        </h2>
-                        <p class="text-slate-600 dark:text-slate-400 mt-2">Now that Flaxon is installed, check out the Quick Start guide to build your first application.</p>
-                        <div class="flex flex-wrap gap-4 mt-4">
-                            <a href="/docs.html#quickstart" class="gradient-btn text-white font-medium px-5 py-2.5 rounded-xl text-sm inline-flex items-center">
-                                <i class="fas fa-rocket mr-2"></i> Quick Start
-                            </a>
-                            <a href="/docs.html" class="border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 px-5 py-2.5 rounded-xl text-sm font-medium transition inline-flex items-center">
-                                <i class="fas fa-book mr-2"></i> Read Docs
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello, Flaxon!"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Run the application:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Visit:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000
+</code></pre></div>
+<hr/>
+<h2 id="virtual-environments">Virtual Environments</h2>
+<p>Using a virtual environment is strongly recommended.</p>
+<p>Create one:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+<p>Activate it.</p>
+<h3 id="linux-macos">Linux / macOS</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</code></pre></div>
+<h3 id="windows-command-prompt">Windows (Command Prompt)</h3>
+<div class="highlight"><pre><span></span><code>.venv\Scripts\activate.bat
+</code></pre></div>
+<h3 id="windows-powershell">Windows (PowerShell)</h3>
+<div class="highlight"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p>Then install Flaxon:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<hr/>
+<h2 id="development-installation">Development Installation</h2>
+<p>If you want to contribute to Flaxon or work from source:</p>
+<p>Clone the repository:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/aldanedev-create/Flaxon-Backend-Framework.git
+</code></pre></div>
+<p>Move into the project directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>Flaxon-Backend-Framework
+</code></pre></div>
+<p>Create a virtual environment:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+<p>Activate it:</p>
+<p>Linux/macOS</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</code></pre></div>
+<p>Windows</p>
+<div class="highlight"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p>Install Flaxon in editable mode:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard,dev]"</span>
+</code></pre></div>
+<p>Run the test suite:</p>
+<div class="highlight"><pre><span></span><code>pytest
+</code></pre></div>
+<hr/>
+<h2 id="upgrading-flaxon">Upgrading Flaxon</h2>
+<p>To upgrade to the latest version:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>flaxon
+</code></pre></div>
+<p>Or upgrade with optional features:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<hr/>
+<h2 id="uninstalling">Uninstalling</h2>
+<p>Remove Flaxon from your environment:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>uninstall<span class="w"> </span>flaxon
+</code></pre></div>
+<hr/>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="pip-is-not-recognized"><code>pip</code> is not recognized</h3>
+<p>Ensure Python is installed and added to your system's <code>PATH</code>.</p>
+<hr/>
+<h3 id="python-version-is-too-old">Python version is too old</h3>
+<p>Flaxon requires <strong>Python 3.11 or newer</strong>.</p>
+<p>Check your version:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>--version
+</code></pre></div>
+<hr/>
+<h3 id="virtual-environment-not-activated">Virtual environment not activated</h3>
+<p>Activate your virtual environment before installing packages.</p>
+<hr/>
+<h3 id="permission-denied">Permission denied</h3>
+<p>Try upgrading <code>pip</code> first:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+</code></pre></div>
+<p>Then reinstall Flaxon.</p>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Now that Flaxon is installed, continue with:</p>
+<ul>
+<li><strong>Quick Start</strong> — Build your first application.</li>
+<li><strong>Configuration</strong> — Configure your project.</li>
+<li><strong>Routing</strong> — Learn how to define routes.</li>
+<li><strong>Architecture</strong> — Understand how Flaxon works.</li>
+<li><strong>Deployment</strong> — Prepare your application for production.</li>
+</ul>
+<p>You're ready to start building modern Python applications with Flaxon.</p>
+<h2 id="build-the-complete-application">Build the complete application</h2>
+<p>After installation, follow the <a href="docs/getting-started/quickstart.html">full-stack quick start</a>.
+Teloce compiles the interface and Flaxon serves it alongside your APIs.
+See <a href="docs/fullstack/index.html">10 lessons</a> for the full application workflow.</p></article>
+</main></div><div id="footer"></div></body></html>

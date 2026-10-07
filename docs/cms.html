@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon CMS — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon CMS — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon CMS</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/cms.md">Framework source</a> · <a href="../content/framework/docs/cms.md" download>Markdown</a></p><h1 id="flaxon-cms">Flaxon CMS</h1>
+<p>This page is kept as a stable entry point for existing links. The current CMS
+implementation, production setup, API contract, persistence, security model,
+SPA behavior, editorial workflows, and customization examples are maintained
+in the <a href="guides/admin-cms.html">Admin and CMS Production Guide</a>.</p>
+<p>For a runnable editable application, see
+<a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/cms/full_admin_cms/app.py"><code>docs/examples/cms/full_admin_cms/app.py</code></a>.</p>
+<p>The CMS is mounted with:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span>
+
+<span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
+</code></pre></div>
+<p>Use <code>CMSField</code> and <code>ContentType</code> to define schemas. The bundled SPA is a
+replaceable client of the authenticated JSON API; custom frontends must send
+the <code>X-CSRF-Token</code> header for every mutation.</p></article>
+</main></div><div id="footer"></div></body></html>

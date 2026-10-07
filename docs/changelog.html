@@ -1,53 +1,207 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Changelog - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside>
-                    <div id="docs-sidebar"></div>
-                    <script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script>
-                </aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>Changelog</h1>
-                        <p>Release notes for the Flaxon documentation site and the framework documentation published here.</p>
-                        <h2>2026-09-24</h2>
-                        <ul>
-                            <li>Added OpenAPI 3.1 generation with Swagger UI, ReDoc, protected documentation guards, and CLI schema export/check examples.</li>
-                            <li>Added optional Pydantic request/response models and FastMCP ASGI mounting with authentication and multi-worker guidance.</li>
-                            <li>Added a production Admin guide and Admin API reference covering durable jobs, audit verification, notifications, resumable media, WebAuthn, permissions, and service-owned model adapters.</li>
-                            <li>Added a microservice control-plane guide covering service-owned databases, remote Admin models, service accounts, events, gateways, and Flaxon modules.</li>
-                            <li>Updated the framework introduction to describe the current production boundary and active-development status accurately.</li>
-                            <li>Linked the Admin control-plane guide from the shared documentation navigation.</li>
-                        </ul>
-                        <h2>2026-08-27</h2>
-                        <ul>
-                            <li>Added Admin/CMS, email, Teloce-Py, VS Code, and cheatsheet documentation pages.</li>
-                            <li>Added copy-paste examples for mounting a Teloce-Py <code>.vel</code> component in a Flaxon Jinax page.</li>
-                            <li>Documented migration, persistence, API, security, and multi-worker boundaries for Admin/CMS.</li>
-                            <li>Added links to Teloce-Py in the Flaxon Labs organization.</li>
-                        </ul>
-                        <h2>Documentation policy</h2>
-                        <p>Examples should match the current source APIs. Claims about production behavior must identify required drivers, services, configuration, and remaining reference-UI boundaries.</p>
-                        <p>Framework release history is maintained in the <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Flaxon repository changelog</a>.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Changelog — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Changelog — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<h2 id="unreleased">Unreleased</h2>
+<ul>
+<li>Add synchronous and asynchronous module-owned starter commands, exposed through project CLI discovery.</li>
+<li>
+<p>Refresh the welcome page with an installation-success design, hosted Flaxon logo and website links, and a working Jinax page alongside Teloce. Explain both complete-app options in the generated README and getting-started guide.</p>
+</li>
+<li>
+<p>Default <code>flaxon new</code> to a modular Teloce full-stack welcome application with TypeScript, scoped styles, a module API, persistent protected admin, and project-local migration/admin commands. Keep <code>--template basic</code> available.</p>
+</li>
+<li>Package the starter assets in Flaxon distributions and correct the generated Flaxon dependency name.</li>
+<li>Add a canonical getting-started guide and a complete documentation directory.</li>
+</ul>
+<h2 id="unreleased-readable-full-stack-course">Unreleased — Readable full-stack course</h2>
+<ul>
+<li>Shorten the README around Python server and Teloce browser development, keeping the logo.</li>
+<li>Split the full-stack course into ten numbered lesson files with navigation and API coverage maps.</li>
+<li>Add a runnable typed Taskboard using HTML components, TypeScript helpers, validation and reusable components.</li>
+<li>Add compilation/API and browser tests for the Taskboard.</li>
+</ul>
+<h2 id="unreleased-full-stack-page-configuration">Unreleased — Full-stack page configuration</h2>
+<ul>
+<li>Add optional favicon, description, language, theme color, stylesheet and script settings to Teloce page shells.</li>
+<li>Escape head values and validate resource schemes and supported attributes.</li>
+<li>Add a TypeScript/CDN converter example and integration coverage.</li>
+<li>Position Flaxon as a Python full-stack framework; add a full-stack quick start and ten lessons.</li>
+</ul>
+<p>All notable changes to Flaxon will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
+and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<h2 id="unreleased_1">[Unreleased]</h2>
+<h3 id="teloce-integration">Teloce integration</h3>
+<ul>
+<li>Generated assets revalidate instead of caching stable router/aliases as immutable.</li>
+<li>Client links respect downloads, targets, same-page fragments and unmatched routes.</li>
+<li>Production router optimization uses MinifyJS, alongside Teloce's native production backend.</li>
+<li>Reload watching includes <code>.vel</code> sources and ignores <code>.flaxon</code> build output.</li>
+<li>Added integration API documentation and five lessons; shortened the README.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Fixed Jinax <code>CompositeLoader</code> so custom Admin and module templates can fall
+  back to framework package templates such as <code>admin/base.html</code>.</li>
+<li>Admin login now redirects authenticated users back to the dashboard instead
+  of rendering a second login form after public-site navigation.</li>
+<li>Expanded the school portal example with a responsive institutional website,
+  CMS-backed events, admissions, academics, student-life, contact, calendar,
+  and public news pages.</li>
+<li>Updated the root README with the current production boundary, optional
+  integrations, Admin/CMS capabilities, modules, and microservice guidance.</li>
+<li>Added a zero-to-hero guide matrix and cross-document navigation to the
+  documentation landing page and Quick Start.</li>
+<li>Added documentation for the Admin control plane, service-owned databases,
+  remote model adapters, service accounts, events, and Flaxon modules.</li>
+</ul>
+<h2 id="025-2026-09-24">[0.2.5] - 2026-09-24</h2>
+<p>This release consolidates the Admin/CMS, module, router, OpenAPI, and testing
+work completed after 0.2.4. It is the current development baseline for the
+framework.</p>
+<h3 id="added">Added</h3>
+<ul>
+<li>Admin control plane routes and pages for service registration, health,
+  metrics, logs, traces, queues, events, deployments, API keys, audit, storage,
+  backups, and status.</li>
+<li><code>ServiceRegistry</code>, <code>RemoteServiceClient</code>, and <code>RemoteModelAdapter</code> for
+  integrating service-owned APIs without direct cross-service database access.</li>
+<li><code>AdminDashboard.mount_module()</code> for custom Admin pages and extensions built
+  with <code>FlaxonModule</code> and Jinax.</li>
+<li>CMS workspace APIs for calendar, editorial review, publishing, models,
+  media, SEO, comments, menus, transfers, and audit data.</li>
+<li>OpenAPI, Swagger UI, ReDoc, Pydantic, FastMCP, GraphQL, and module examples
+  with runnable documentation coverage.</li>
+</ul>
+<h3 id="changed_1">Changed</h3>
+<ul>
+<li>Admin control-plane routes are enabled by default. Pass
+  <code>microservices=False</code> to <code>AdminDashboard</code> when an application does not want
+  those routes mounted.</li>
+<li>Documentation now distinguishes development defaults from production
+  deployments that require persistent storage, Redis, workers, object storage,
+  and external delivery services.</li>
+</ul>
+<h2 id="024">[0.2.4]</h2>
+<p>A large amount of work landed between 0.1.0 and this release without
+intermediate changelog entries being kept up to date. This entry
+consolidates that work rather than reconstructing exact per-commit history.</p>
+<h3 id="added_1">Added</h3>
+<ul>
+<li>Admin dashboard: user accounts, sessions, role-based access control,
+  TOTP-based multi-factor authentication with recovery codes, password
+  reset, profile management, and CSRF protection on admin forms</li>
+<li>CMS module (<code>flaxon.admin.cms</code>): registrable content types with typed
+  fields, full CRUD plus bulk actions, taxonomies (categories/tags),
+  comments with a moderation queue, revision history with restore,
+  scheduled publishing (safe across multiple worker processes via a
+  distributed lock), import/export, an extensibility hook system
+  (<code>add_hook</code>/<code>run_hook</code>), and per-content-type WebSocket live-update
+  broadcasting</li>
+<li><code>flaxon.modules</code> -- a Flask-blueprint-style <code>FlaxonModule</code> composition
+  system: route registration, <code>requires()</code> dependency validation against
+  the DI container at mount time, prefix decided at mount time (not at
+  authoring time), module-scoped <code>before_request</code>/<code>after_request</code> hooks
+  and error handlers, nested modules, module-owned CLI commands, and an
+  isolated <code>ModuleTestClient</code></li>
+<li><code>flaxon.static</code> -- real static file serving via <code>app.mount_static()</code>,
+  path-traversal safe and idempotent across repeated mounts</li>
+<li>Router: specificity-based route matching (a literal path segment now
+  always wins over a <code>&lt;param&gt;</code> pattern, regardless of registration
+  order), <code>include_router(prefix=...)</code> re-prefixing support, and
+  ambiguous-route collision warnings logged at registration time</li>
+<li><code>flaxon migrate</code> wired to a real <code>MigrationRunner</code> engine, supporting
+  SQLite/PostgreSQL/MySQL via <code>--database</code>, plus <code>--status</code>, <code>--target</code>,
+  <code>--steps</code>, and <code>--dry-run</code></li>
+<li><code>WebSocketManager</code> now accepts a pluggable <code>broadcaster</code>, enabling
+  Redis-backed broadcasting across multiple worker processes</li>
+<li>A real browser-based end-to-end test suite (<code>tests/browser/</code>) using
+  Playwright</li>
+<li>Allowlist HTML sanitizer (<code>Sanitizer.allow_html</code>) wired into CMS
+  richtext field validation</li>
+<li>Rate limiting on admin/CMS mutation endpoints</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li><code>flaxon generate schema/service/middleware</code> produced syntactically
+  invalid Python (an unsubstituted template placeholder)</li>
+<li><code>flaxon shell</code> crashed immediately on invocation</li>
+<li><code>flaxon schedule</code>/<code>flaxon worker</code> did not actually block or run
+  correctly; <code>schedule --once</code> was accepted but silently ignored</li>
+<li><code>Cache.increment</code>/<code>Cache.decrement</code> were unreachable due to incorrect
+  indentation placing them outside the <code>Cache</code> class</li>
+<li><code>MigrationRunner.status()</code> could report a negative pending-migration
+  count in an edge case</li>
+<li>Path traversal in <code>FileStorage.save()</code> for Windows-style backslash
+  paths (e.g. <code>..\outside</code>), previously only caught on POSIX hosts</li>
+<li>Admin dashboard's own index page returned a 500 (template referenced
+  an undefined <code>url_prefix</code> variable)</li>
+<li>Admin Add/Edit forms silently discarded all submitted fields (<code>Request</code>
+  had no <code>.form()</code> method to parse form-encoded bodies)</li>
+<li>Static admin assets (CSS/JS) 404'd, since nothing served them</li>
+<li><code>flaxon_cli.py</code>-at-project-root CLI plugin discovery silently found
+  nothing when run via the installed <code>flaxon</code> console script, because the
+  current directory wasn't added to <code>sys.path</code></li>
+<li><code>doctor --fix</code> was a no-op; it now generates a real <code>SECRET_KEY</code> into
+  <code>.env</code> when that check fails</li>
+</ul>
+<h3 id="removed">Removed</h3>
+<ul>
+<li>Dead code with no callers anywhere in the codebase: a duplicate ASGI
+  protocol implementation (<code>flaxon/asgi/*</code>, superseded by the real
+  implementation in <code>Flaxon._handle_http</code>/<code>_handle_websocket</code>), a
+  duplicate template engine (<code>flaxon/jinax/{lexer,parser,compiler,...}.py</code>,
+  superseded by the real Jinja2-backed <code>Jinax</code> class), and unused
+  alternate route-matching implementations
+  (<code>flaxon/routing/{trie,resolver}.py</code>)</li>
+</ul>
+<h3 id="changed_2">Changed</h3>
+<ul>
+<li>CMS content update requests are now validated per-field against each
+  field's declared type before being persisted</li>
+</ul>
+<h2 id="010-2026-07-22">[0.1.0] - 2026-07-22</h2>
+<h3 id="added_2">Added</h3>
+<ul>
+<li>Initial alpha release</li>
+<li>Core framework prototype</li>
+<li>Example applications: hello_api, jinax_site, react_backend, android_backend</li>
+<li>Comprehensive documentation</li>
+</ul>
+<h3 id="known-limitations-as-of-010-superseded-see-below">Known Limitations (as of 0.1.0, superseded -- see below)</h3>
+<ul>
+<li>WebSocket manager is in-memory only (single-process)</li>
+<li>Rate limiter is in-memory only (single-process)</li>
+<li>No OpenAPI generation yet</li>
+<li>No official plugin system yet</li>
+<li>No authentication/authorization modules yet</li>
+</ul>
+<hr/>
+<h2 id="known-limitations-current-as-of-024">Known Limitations (current, as of 0.2.4)</h2>
+<ul>
+<li>CMS has no reusable media library -- uploads are per-field and are not
+  browsable or reusable across multiple content items</li>
+<li>CMS has no built-in public-facing theme/template rendering system; the
+  admin panel and JSON API are provided, but rendering a themed public
+  site from content is not built in</li>
+<li>CMS <code>richtext</code> fields render as a plain textarea in the admin UI --
+  there is no WYSIWYG editor, though the backend sanitizer supports safe
+  HTML if you author it by hand</li>
+<li>CMS <code>relationship</code> and <code>repeater</code> field types require hand-written JSON
+  in the admin UI -- there is no dedicated picker or list-editor UI yet</li>
+<li>No global, cross-content-type search (search is scoped to one content
+  type at a time)</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,279 +1,527 @@
-<!-- docs/core-concepts/routing.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Routing – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Routing — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Routing — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Routing</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/routing.md">Framework source</a> · <a href="../../content/framework/docs/guides/routing.md" download>Markdown</a></p><h1 id="routing">Routing</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides a fast, flexible, and familiar routing system for building web applications and APIs. Routes are registered using decorators on your application or on reusable routers.</p>
+<p><strong>Features</strong></p>
+<ul>
+<li>Decorator-based routing</li>
+<li>Async-first request handling</li>
+<li>Angle-bracket route parameters</li>
+<li>Nested routers</li>
+<li>Route groups</li>
+<li>Named routes</li>
+<li>URL generation</li>
+<li>Sub-application mounting</li>
+<li>Route inspection via CLI</li>
+</ul>
+<hr/>
+<h2 id="basic-routes">Basic Routes</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"my-app"</span><span class="p">)</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
 
-    <div id="header"></div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello, World!"</span><span class="p">}</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
 
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html" class="active">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"updated"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+    <span class="p">}</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                    </div>
-                </aside>
 
-                <!-- Main Content -->
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Routing</h1>
-                        <p>Define routes using decorators on your Flaxon application or routers.</p>
+<span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"deleted"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="supported-http-methods">Supported HTTP methods</h2>
+<p>Flaxon provides convenience decorators for <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, and
+<code>DELETE</code>. Register another method explicitly with <code>app.route()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_route</span><span class="p">():</span>
+    <span class="o">...</span>
 
-                        <h2>Basic Routes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
 
-app = Flaxon("my-app")
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">post_route</span><span class="p">():</span>
+    <span class="o">...</span>
 
-@app.get("/")
-async def home():
-    return {"message": "Welcome"}
 
-@app.post("/users")
-async def create_user():
-    return {"created": True}
+<span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">put_route</span><span class="p">():</span>
+    <span class="o">...</span>
 
-@app.put("/users/&lt;int:user_id&gt;")
-async def update_user(user_id: int):
-    return {"updated": True, "id": user_id}
 
-@app.delete("/users/&lt;int:user_id&gt;")
-async def delete_user(user_id: int):
-    return {"deleted": True, "id": user_id}</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">patch_route</span><span class="p">():</span>
+    <span class="o">...</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Supported Methods</strong>
-                            <p class="mb-0 mt-1"><code>@app.get()</code>, <code>@app.post()</code>, <code>@app.put()</code>, <code>@app.patch()</code>, and <code>@app.delete()</code>. For other methods, use <code>@app.route(..., methods={"HEAD", "OPTIONS"})</code>.</p>
-                        </div>
 
-                        <h2>Path Parameters</h2>
-                        <p>Flaxon supports both Flask-style and brace-style parameters.</p>
+<span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_route</span><span class="p">():</span>
+    <span class="o">...</span>
 
-                        <h3>Flask-Style</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    return {"id": user_id}
 
-@app.get("/posts/&lt;slug:post_slug&gt;")
-async def get_post(post_slug: str):
-    return {"slug": post_slug}
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">{</span><span class="s2">"HEAD"</span><span class="p">,</span> <span class="s2">"OPTIONS"</span><span class="p">})</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">metadata_route</span><span class="p">():</span>
+    <span class="o">...</span>
+</code></pre></div>
+<hr/>
+<h2 id="route-parameters">Route Parameters</h2>
+<h2 id="flask-style-parameters">Flask-Style Parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}</span>
 
-@app.get("/files/&lt;path:file_path&gt;")
-async def get_file(file_path: str):
-    return {"path": file_path}</code></pre>
-                        </div>
 
-                        <h3>Brace-Style</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/users/{user_id:int}")
-async def get_user(user_id: int):
-    return {"id": user_id}
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/posts/&lt;slug:slug&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_post</span><span class="p">(</span><span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"slug"</span><span class="p">:</span> <span class="n">slug</span><span class="p">}</span>
 
-@app.get("/posts/{post_slug:slug}")
-async def get_post(post_slug: str):
-    return {"slug": post_slug}</code></pre>
-                        </div>
 
-                        <h4>Supported Converters</h4>
-                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
-                            <thead>
-                                <tr class="bg-slate-100 dark:bg-slate-800">
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Converter</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Example</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>str</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">String (default)</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;name&gt;</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>int</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Integer</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;int:user_id&gt;</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>float</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Float</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;float:price&gt;</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>path</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Path with slashes</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;path:file_path&gt;</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>uuid</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">UUID</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;uuid:token&gt;</code></td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>slug</code></td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2">Slug (a-z, 0-9, -, _)</td>
-                                    <td class="border border-slate-200 dark:border-slate-700 px-4 py-2"><code>&lt;slug:post_slug&gt;</code></td>
-                                </tr>
-                            </tbody>
-                        </table>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/files/&lt;path:file_path&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="n">file_path</span><span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="supported-parameter-converters">Supported Parameter Converters</h2>
+<table>
+<thead>
+<tr>
+<th>Converter</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>str</code></td>
+<td>Default string</td>
+<td><code>&lt;name&gt;</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td>Integer</td>
+<td><code>&lt;int:user_id&gt;</code></td>
+</tr>
+<tr>
+<td><code>float</code></td>
+<td>Floating point</td>
+<td><code>&lt;float:price&gt;</code></td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>Path including <code>/</code></td>
+<td><code>&lt;path:file&gt;</code></td>
+</tr>
+<tr>
+<td><code>uuid</code></td>
+<td>UUID value</td>
+<td><code>&lt;uuid:token&gt;</code></td>
+</tr>
+<tr>
+<td><code>slug</code></td>
+<td>URL-safe slug string</td>
+<td><code>&lt;slug:article&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="typed-query-parameters">Typed Query Parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span>
 
-                        <h2>Route Groups (Routers)</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Router
 
-api = Router(prefix="/api/v1")
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/search"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"q"</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">),</span>
+    <span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"query"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
+</code></pre></div>
+<p><code>Query()</code> without a default is required. Values are coerced and invalid
+values return a <code>422</code> validation response. Query declarations are included in
+automatic OpenAPI documentation; see the <a href="../guides/openapi.html">OpenAPI guide</a>.</p>
+<hr/>
+<h2 id="route-prefixes">Route Prefixes</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 
-@api.get("/users")
-async def list_users():
-    return [{"id": 1, "name": "Alice"}]
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1"</span><span class="p">)</span>
 
-@api.post("/users")
-async def create_user():
-    return {"created": True}
 
-app.include_router(api)</code></pre>
-                        </div>
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
 
-                        <h2>Nested Routers</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">v1 = Router(prefix="/v1")
-v2 = Router(prefix="/v2")
 
-@v1.get("/users")
-async def users_v1():
-    return {"version": "v1"}
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/posts"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">posts</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
 
-@v2.get("/users")
-async def users_v2():
-    return {"version": "v2"}
 
-api = Router(prefix="/api")
-api.include_router(v1)
-api.include_router(v2)
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="specificity-and-safe-mounts">Specificity and safe mounts</h2>
+<p>Literal routes take precedence over parameter routes, regardless of registration
+order. Registration order is retained only when matching routes have equal
+specificity.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Router</span>
 
-app.include_router(api)</code></pre>
-                        </div>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"routing-example"</span><span class="p">)</span>
 
-                        <h2>Named Routes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;", name="users.detail")
-async def get_user(user_id: int):
-    return {"id": user_id}
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/&lt;model_name&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"model"</span><span class="p">:</span> <span class="n">model_name</span><span class="p">}</span>
 
-# Generate URL
-url = app.url_for("users.detail", user_id=42)
-# url == "/users/42"</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/cms"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cms</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"panel"</span><span class="p">:</span> <span class="s2">"cms"</span><span class="p">}</span>  <span class="c1"># wins over /admin/&lt;model_name&gt;</span>
 
-                        <h2>Route Matching Order</h2>
-                        <div class="note warning">
-                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Important</strong>
-                            <p class="mb-0 mt-1">Routes are matched in the order they are registered. More specific routes should be registered before more general routes.</p>
-                        </div>
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
 
-                        <div class="code-block">
-                            <pre><code class="language-python"># Specific route first
-@app.get("/users/me")
-async def get_current_user():
-    return {"user": "current"}
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/items/&lt;int:item_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">item</span><span class="p">(</span><span class="n">item_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">item_id</span><span class="p">}</span>
 
-# General route second
-@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    return {"id": user_id}</code></pre>
-                        </div>
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/v1"</span><span class="p">)</span>  <span class="c1"># GET /v1/items/7</span>
+</code></pre></div>
+<p><code>include_router(router, prefix=...)</code> strips the source router prefix before
+applying the mount prefix, so one router can be mounted at multiple locations.
+Overlapping patterns with the same HTTP method produce a registration warning.</p>
+<p>Endpoints:</p>
+<div class="highlight"><pre><span></span><code>GET /api/v1/users
+GET /api/v1/posts
+</code></pre></div>
+<hr/>
+<h2 id="routers">Routers</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 
-                        <h2>Error Handling</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import HTTPException
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
 
-@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    if user_id == 0:
-        raise HTTPException(400, "Invalid user ID", code="FX-INVALID-ID")
-    if user_id == 404:
-        raise HTTPException(404, "User not found", code="FX-USER-404")
-    return {"id": user_id, "name": f"User {user_id}"}</code></pre>
-                        </div>
 
-                        <div class="note">
-                            <strong><i class="fas fa-terminal mr-2"></i> CLI Command</strong>
-                            <p class="mb-0 mt-1">List all routes: <code>flaxon routes app:app</code></p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
 
-    <div id="footer"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+<span class="nd">@api</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-</body>
-</html>
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="route-groups">Route Groups</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RouteGroup</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">RouteGroup</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">)</span>
+
+
+<span class="nd">@admin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/dashboard"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dashboard</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"admin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="nd">@admin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">as_router</span><span class="p">())</span>
+</code></pre></div>
+<hr/>
+<h2 id="nested-routers">Nested Routers</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
+
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/v1"</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/v2"</span><span class="p">)</span>
+
+
+<span class="nd">@v1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users_v1</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"v1"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@v2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users_v2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"v2"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">api</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="n">api</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</code></pre></div>
+<p>Available routes</p>
+<div class="highlight"><pre><span></span><code>/api/v1/users
+/api/v2/users
+</code></pre></div>
+<hr/>
+<h2 id="named-routes">Named Routes</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"users.detail"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">user_detail</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Generate URLs:</p>
+<div class="highlight"><pre><span></span><code><span class="n">url</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">url_for</span><span class="p">(</span>
+    <span class="s2">"users.detail"</span><span class="p">,</span>
+    <span class="n">user_id</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="c1"># /users/42</span>
+</code></pre></div>
+<hr/>
+<h2 id="route-matching">Route Matching</h2>
+<p>Literal routes take precedence over dynamic routes regardless of registration
+order. Registration order is used only when matching routes have equal
+specificity.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/me"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">current_user</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"admin"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="multiple-decorators">Multiple Decorators</h2>
+<p>A single handler can respond to multiple routes.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/home"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome"</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="route-metadata">Route Metadata</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">"/products"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"products.list"</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"Products"</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">"List products"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div>
+<hr/>
+<h2 id="error-handling">Error Handling</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user_id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">400</span><span class="p">,</span>
+            <span class="s2">"Invalid user ID"</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">"FX-INVALID-ID"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user_id</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">404</span><span class="p">,</span>
+            <span class="s2">"User not found"</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">"FX-USER-404"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"User </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="mounting-applications">Mounting Applications</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mount</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"admin"</span><span class="p">)</span>
+
+
+<span class="nd">@admin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dashboard</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"admin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span>
+    <span class="n">Mount</span><span class="p">(</span><span class="s2">"/admin"</span><span class="p">,</span> <span class="n">admin</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Routes</p>
+<div class="highlight"><pre><span></span><code>/admin/
+</code></pre></div>
+<hr/>
+<h2 id="api-versioning">API Versioning</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1"</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v2"</span><span class="p">)</span>
+
+
+<span class="nd">@v1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users_v1</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@v2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users_v2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="route-inspection">Route Inspection</h2>
+<p>List every registered route.</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>routes<span class="w"> </span>app:app
+</code></pre></div>
+<p>Example output</p>
+<div class="highlight"><pre><span></span><code>Method   Path                      Name
+GET      /                         home
+POST     /users                    create_user
+PUT      /users/&lt;int:user_id&gt;      update_user
+DELETE   /users/&lt;int:user_id&gt;      delete_user
+GET      /api/v1/users             users
+GET      /about                    about
+</code></pre></div>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RouteGroup</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"routing-demo"</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome to Flaxon"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"User </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/v1"</span><span class="p">)</span>
+
+
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Laptop"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Keyboard"</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">RouteGroup</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">)</span>
+
+
+<span class="nd">@admin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/dashboard"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dashboard</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"users"</span><span class="p">:</span> <span class="mi">152</span><span class="p">,</span>
+        <span class="s2">"orders"</span><span class="p">:</span> <span class="mi">89</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">as_router</span><span class="p">())</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/about"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"about"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">about</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"framework"</span><span class="p">:</span> <span class="s2">"Flaxon"</span><span class="p">,</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.0.0"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">about_url</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">url_for</span><span class="p">(</span><span class="s2">"about"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">about_url</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Group related routes using <code>Router</code>.</li>
+<li>Use API versioning for public APIs.</li>
+<li>Register specific routes before dynamic routes.</li>
+<li>Use named routes for URL generation.</li>
+<li>Keep route handlers focused on request handling.</li>
+<li>Move business logic into services.</li>
+<li>Validate request data using schemas.</li>
+<li>Return consistent JSON responses.</li>
+<li>Organize large applications into multiple routers.</li>
+<li>Mount sub-applications when building modular systems.</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

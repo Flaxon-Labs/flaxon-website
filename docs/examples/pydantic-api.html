@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pydantic API Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Pydantic API Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Pydantic API Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/pydantic-api.md">Framework source</a> · <a href="../../content/framework/docs/examples/pydantic-api.md" download>Markdown</a></p><h1 id="pydantic-api-example">Pydantic API Example</h1>
+<p>This runnable example shows a feature module with a Pydantic request model.
+The root application only creates Flaxon and mounts the feature:</p>
+<div class="highlight"><pre><span></span><code>examples/pydantic_api/
+|-- app.py
+`-- modules/
+    `-- users.py
+</code></pre></div>
+<p>Install the optional integration and the email validator used by
+<code>EmailStr</code>:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[pydantic]"</span><span class="w"> </span>email-validator
+</code></pre></div>
+<p>Run it from the repository root:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>examples.pydantic_api.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Send a request to the mounted module:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:8000/api/users/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"content-type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"Ava","email":"ava@example.com","age":28}'</span>
+</code></pre></div>
+<p>Use <code>FlaxonModule</code> for the feature boundary, Pydantic for the request
+contract, and a service or repository for the database write. This keeps the
+same business operation reusable from HTTP, tasks, or other integrations.</p>
+<p>Source files: <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/tree/main/examples/pydantic_api">app.py</a></p></article>
+</main></div><div id="footer"></div></body></html>

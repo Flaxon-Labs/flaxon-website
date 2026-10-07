@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Security Policy — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Security Policy — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security Policy</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/SECURITY.md">Framework source</a> · <a href="../../content/framework/SECURITY.md" download>Markdown</a></p><h1 id="security-policy">Security Policy</h1>
+<h2 id="supported-versions">Supported Versions</h2>
+<p>Flaxon follows a security-focused maintenance policy. The current 2.x release
+series is the primary supported version.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.x</td>
+<td>✅ Fully supported</td>
+</tr>
+<tr>
+<td>1.x</td>
+<td>⚠️ Legacy / limited support</td>
+</tr>
+<tr>
+<td>0.x</td>
+<td>❌ Unsupported</td>
+</tr>
+</tbody>
+</table>
+<p>Security fixes will be prioritized for the actively supported release series.</p>
+<h2 id="reporting-a-vulnerability">Reporting a Vulnerability</h2>
+<p>We take security vulnerabilities seriously.</p>
+<p>If you discover a security vulnerability in Flaxon:</p>
+<ol>
+<li><strong>DO NOT</strong> open a public GitHub issue.</li>
+<li>Email the maintainer at <strong>aldanehutchinson5@gmail.com</strong>.</li>
+<li>Include as much of the following information as possible:</li>
+<li>Flaxon version</li>
+<li>Python version</li>
+<li>Operating system</li>
+<li>Step-by-step reproduction</li>
+<li>Expected behavior</li>
+<li>Actual behavior</li>
+<li>Potential security impact</li>
+<li>Suggested fix, if available</li>
+</ol>
+<p>We aim to acknowledge vulnerability reports within <strong>48 hours</strong> and will
+investigate and address confirmed vulnerabilities as quickly as practical.</p>
+<h2 id="security-best-practices">Security Best Practices</h2>
+<h3 id="production-deployment">Production Deployment</h3>
+<p>When deploying a Flaxon application to production:</p>
+<ul>
+<li><strong>Never</strong> enable <code>debug=True</code> in production.</li>
+<li>Use a strong <code>SECRET_KEY</code> generated from a secure random source.</li>
+<li>Configure <code>ALLOWED_HOSTS</code> for the application's expected domains.</li>
+<li>Terminate TLS using HTTPS at a trusted reverse proxy or load balancer.</li>
+<li>Store secrets in environment variables or an appropriate secrets manager.</li>
+<li>Keep Flaxon and its dependencies updated.</li>
+<li>Run production applications with the minimum required permissions.</li>
+</ul>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>Example production configuration:</p>
+<p>```env
+FLAXON_ENV=production
+FLAXON_DEBUG=false
+FLAXON_SECRET_KEY=<secure-random-secret>
+FLAXON_ALLOWED_HOSTS=api.example.com,example.com</secure-random-secret></p></article>
+</main></div><div id="footer"></div></body></html>

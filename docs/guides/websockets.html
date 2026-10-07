@@ -1,199 +1,444 @@
-<!-- docs/guides/websockets.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>WebSockets – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="WebSockets — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>WebSockets — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>WebSockets</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/websockets.md">Framework source</a> · <a href="../../content/framework/docs/guides/websockets.md" download>Markdown</a></p><h1 id="websockets">WebSockets</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides built-in WebSocket support with:</p>
+<ul>
+<li>Real-time communication</li>
+<li>Room-based broadcasting</li>
+<li>Authentication</li>
+<li>Heartbeat detection</li>
+<li>Event handling</li>
+<li>Connection management</li>
+</ul>
+<hr/>
+<h2 id="basic-websocket">Basic WebSocket</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">WebSocketDisconnect</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/echo"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">):</span>
 
-    <div id="header"></div>
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+    <span class="k">try</span><span class="p">:</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+                <span class="s2">"echo"</span><span class="p">:</span> <span class="n">message</span>
+            <span class="p">})</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html" class="active">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+    <span class="k">except</span> <span class="n">WebSocketDisconnect</span><span class="p">:</span>
+        <span class="k">pass</span>
+<span class="err">````</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>WebSockets</h1>
-                        <p>Flaxon provides built-in WebSocket support with room-based broadcasting, authentication, and heartbeat detection.</p>
+<span class="o">---</span>
 
-                        <h2>Basic WebSocket</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import WebSocket
+<span class="c1"># Room-Based Broadcasting</span>
 
-@app.websocket("/ws/echo")
-async def echo(socket: WebSocket):
-    await socket.accept()
+<span class="n">Clients</span> <span class="n">can</span> <span class="n">join</span> <span class="n">rooms</span> <span class="ow">and</span> <span class="n">broadcast</span> <span class="n">messages</span> <span class="n">to</span> <span class="n">other</span> <span class="n">connected</span> <span class="n">clients</span><span class="o">.</span>
 
-    try:
-        async for message in socket.iter_json():
-            await socket.send_json({"echo": message})
-    except WebSocketDisconnect:
-        pass</code></pre>
-                        </div>
+<span class="err">```</span><span class="n">python</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat/&lt;room_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span>
+    <span class="n">room_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">):</span>
 
-                        <h2>Room-Based Broadcasting</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.websocket("/ws/chat/&lt;room_id&gt;")
-async def chat(socket: WebSocket, room_id: str):
-    await socket.accept()
-    await socket.join(room_id)
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
 
-    try:
-        async for message in socket.iter_json():
-            await socket.broadcast_json(room_id, {
-                "room": room_id,
-                "message": message,
-                "sender": id(socket),
-            })
-    finally:
-        await socket.leave(room_id)</code></pre>
-                        </div>
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">room_id</span><span class="p">)</span>
 
-                        <h2>Authentication</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.websocket.authentication import WebSocketAuth
 
-auth = WebSocketAuth(secret_key="change-this-in-production")
-@app.websocket("/ws/auth")
-@auth.require_auth
-async def auth_websocket(socket: WebSocket):
-    user = socket.user
-    await socket.accept()
-    await socket.send_json({"user": user})</code></pre>
-                        </div>
+    <span class="k">try</span><span class="p">:</span>
 
-                        <h2>Heartbeat</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.websocket.heartbeat import Heartbeat
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
 
-heartbeat = Heartbeat(interval=30, timeout=60)
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                <span class="n">room_id</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">"room"</span><span class="p">:</span> <span class="n">room_id</span><span class="p">,</span>
+                    <span class="s2">"message"</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                    <span class="s2">"sender"</span><span class="p">:</span> <span class="nb">id</span><span class="p">(</span><span class="n">socket</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
 
-@app.websocket("/ws/heartbeat")
-async def heartbeat_ws(socket: WebSocket):
-    await socket.accept()
-    await heartbeat.start(socket)
+    <span class="k">finally</span><span class="p">:</span>
 
-    try:
-        async for message in socket.iter_json():
-            # Handle messages
-            pass
-    finally:
-        await heartbeat.stop(socket)</code></pre>
-                        </div>
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">leave</span><span class="p">(</span><span class="n">room_id</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="authentication">Authentication</h2>
+<p>WebSockets can use the same authentication system as HTTP routes.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">login_required</span><span class="p">,</span>
+    <span class="n">get_current_user</span><span class="p">,</span>
+<span class="p">)</span>
 
-                        <h2>Multiple Rooms</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.websocket("/ws/multi")
-async def multi_room(socket: WebSocket):
-    await socket.accept()
 
-    await socket.join("global")
-    await socket.join("user-" + str(id(socket)))
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/auth"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">auth_websocket</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
 
-    async for message in socket.iter_json():
-        room = message.get("room")
-        if room:
-            await socket.broadcast_json(room, message)</code></pre>
-                        </div>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">get_current_user</span><span class="p">(</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">scope</span>
+    <span class="p">)</span>
 
-                        <h2>WebSocket Events</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.websocket.events import WebSocketEvents
 
-@app.websocket("/ws/events")
-async def events(socket: WebSocket):
-    ws_events = WebSocketEvents(socket)
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
 
-    @ws_events.on_connect
-    async def on_connect():
-        print("Client connected")
 
-    @ws_events.on_message
-    async def on_message(data):
-        await socket.send_json({"echo": data})
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">})</span>
+</code></pre></div>
+<hr/>
+<h2 id="heartbeat">Heartbeat</h2>
+<p>Heartbeat detection automatically removes inactive connections.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.websocket</span><span class="w"> </span><span class="kn">import</span> <span class="n">Heartbeat</span>
 
-    await ws_events.run()</code></pre>
-                        </div>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">WebSocket connections are automatically cleaned up when clients disconnect.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+<span class="n">heartbeat</span> <span class="o">=</span> <span class="n">Heartbeat</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span>
+<span class="p">)</span>
 
-    <div id="footer"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/heartbeat"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">heartbeat_ws</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+
+    <span class="k">await</span> <span class="n">heartbeat</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+            <span class="c1"># Handle messages</span>
+
+            <span class="k">pass</span>
+
+
+    <span class="k">finally</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">heartbeat</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="multiple-rooms">Multiple Rooms</h2>
+<p>A single client can join multiple rooms.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/multi"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">multi_room</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">"global"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">"user-123"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+        <span class="n">room</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"room"</span>
+        <span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">room</span><span class="p">:</span>
+
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                <span class="n">room</span><span class="p">,</span>
+                <span class="n">message</span>
+            <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="websocket-events">WebSocket Events</h2>
+<p>Flaxon supports event-based WebSocket handlers.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.websocket</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketEvents</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/events"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
+
+    <span class="n">ws_events</span> <span class="o">=</span> <span class="n">WebSocketEvents</span><span class="p">(</span>
+        <span class="n">socket</span>
+    <span class="p">)</span>
+
+
+    <span class="nd">@ws_events</span><span class="o">.</span><span class="n">on_connect</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_connect</span><span class="p">():</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">"Client connected"</span>
+        <span class="p">)</span>
+
+
+    <span class="nd">@ws_events</span><span class="o">.</span><span class="n">on_message</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_message</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+            <span class="s2">"echo"</span><span class="p">:</span> <span class="n">data</span>
+        <span class="p">})</span>
+
+
+    <span class="nd">@ws_events</span><span class="o">.</span><span class="n">on_disconnect</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_disconnect</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Client disconnected: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">ws_events</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="broadcasting-to-all-clients">Broadcasting To All Clients</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/broadcast"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">"all"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+            <span class="s2">"all"</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">"sender"</span><span class="p">:</span> <span class="nb">id</span><span class="p">(</span><span class="n">socket</span><span class="p">),</span>
+                <span class="s2">"message"</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="error-handling">Error Handling</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/error"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">error_ws</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span>
+<span class="p">):</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+            <span class="k">try</span><span class="p">:</span>
+
+                <span class="c1"># Process message</span>
+
+                <span class="k">pass</span>
+
+
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+
+                <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span>
+                    <span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+                <span class="p">})</span>
+
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span>
+            <span class="n">code</span><span class="o">=</span><span class="mi">1011</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="s2">"Internal error"</span>
+        <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-chat-example">Complete Chat Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Flaxon</span><span class="p">,</span>
+    <span class="n">WebSocket</span><span class="p">,</span>
+    <span class="n">WebSocketDisconnect</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.websocket</span><span class="w"> </span><span class="kn">import</span> <span class="n">Heartbeat</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"chat-demo"</span>
+<span class="p">)</span>
+
+
+<span class="n">heartbeat</span> <span class="o">=</span> <span class="n">Heartbeat</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span>
+<span class="p">)</span>
+
+
+<span class="n">active_users</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/ws/chat/&lt;room_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span>
+    <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span>
+    <span class="n">room_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">):</span>
+
+    <span class="n">user_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+        <span class="nb">id</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">room_id</span>
+    <span class="p">)</span>
+
+
+    <span class="n">active_users</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"room"</span><span class="p">:</span> <span class="n">room_id</span><span class="p">,</span>
+        <span class="s2">"socket"</span><span class="p">:</span> <span class="n">socket</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+    <span class="k">await</span> <span class="n">heartbeat</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+        <span class="n">socket</span>
+    <span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+        <span class="n">room_id</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"user_joined"</span><span class="p">,</span>
+            <span class="s2">"user_id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">iter_json</span><span class="p">():</span>
+
+            <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+                <span class="n">room_id</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"message"</span><span class="p">,</span>
+                    <span class="s2">"user_id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+                    <span class="s2">"data"</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                    <span class="s2">"room"</span><span class="p">:</span> <span class="n">room_id</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+
+    <span class="k">except</span> <span class="n">WebSocketDisconnect</span><span class="p">:</span>
+
+        <span class="k">pass</span>
+
+
+    <span class="k">finally</span><span class="p">:</span>
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">leave</span><span class="p">(</span>
+            <span class="n">room_id</span>
+        <span class="p">)</span>
+
+
+        <span class="n">active_users</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="p">,</span>
+            <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+        <span class="k">await</span> <span class="n">heartbeat</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
+            <span class="n">socket</span>
+        <span class="p">)</span>
+
+
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">broadcast_json</span><span class="p">(</span>
+            <span class="n">room_id</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"user_left"</span><span class="p">,</span>
+                <span class="s2">"user_id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/ws/stats"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ws_stats</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"active_users"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">active_users</span>
+        <span class="p">),</span>
+
+        <span class="s2">"rooms"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">user</span><span class="p">[</span><span class="s2">"room"</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">active_users</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="websocket-best-practices">WebSocket Best Practices</h2>
+<ul>
+<li>Authenticate WebSocket connections.</li>
+<li>Use heartbeat monitoring.</li>
+<li>Handle disconnects gracefully.</li>
+<li>Validate incoming messages.</li>
+<li>Limit message size.</li>
+<li>Use rooms for large applications.</li>
+<li>Implement reconnection logic.</li>
+<li>Track active connections.</li>
+<li>Close unused connections.</li>
+<li>Use secure WebSockets (<code>wss://</code>) in production.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with:</p>
+<ul>
+<li>Push Notifications</li>
+<li>Background Tasks</li>
+<li>Mobile Backend</li>
+<li>Security</li>
+<li>Performance Optimization</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

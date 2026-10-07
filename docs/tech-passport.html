@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon Technical Passport — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon Technical Passport — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon Technical Passport</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/tech-passport.md">Framework source</a> · <a href="../content/framework/docs/tech-passport.md" download>Markdown</a></p><h1 id="flaxon-technical-passport">Flaxon Technical Passport</h1>
+<blockquote>
+<p><strong>Project Identity &amp; Technical Specification</strong></p>
+</blockquote>
+<p>This document provides a high-level overview of the Flaxon framework, including its architecture, supported platforms, compatibility, release policy, and technical specifications.</p>
+<hr/>
+<h2 id="project-information">Project Information</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project</td>
+<td>Flaxon</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>Python Web Framework</td>
+</tr>
+<tr>
+<td>License</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>Python 3</td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td>ASGI</td>
+</tr>
+<tr>
+<td>Repository</td>
+<td>https://github.com/aldanedev-create/Flaxon-Backend-Framework</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>https://flaxon-website.vercel.app/docs</td>
+</tr>
+<tr>
+<td>Website</td>
+<td>https://flaxon-website.vercel.app</td>
+</tr>
+<tr>
+<td>Package Manager</td>
+<td>pip</td>
+</tr>
+<tr>
+<td>Distribution</td>
+<td>PyPI</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="vision">Vision</h2>
+<p>Flaxon is an asynchronous-first Python web framework focused on developer productivity, high performance, clean architecture, and a first-class plugin ecosystem.</p>
+<p>Goals include:</p>
+<ul>
+<li>Modern API design</li>
+<li>Excellent developer experience</li>
+<li>Type-safe programming</li>
+<li>Production readiness</li>
+<li>Framework extensibility</li>
+<li>Batteries included</li>
+<li>Fast startup time</li>
+<li>Minimal boilerplate</li>
+</ul>
+<hr/>
+<h2 id="supported-python-versions">Supported Python Versions</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python 3.10</td>
+<td>✅ Supported</td>
+</tr>
+<tr>
+<td>Python 3.11</td>
+<td>✅ Supported</td>
+</tr>
+<tr>
+<td>Python 3.12</td>
+<td>✅ Supported</td>
+</tr>
+<tr>
+<td>Python 3.13</td>
+<td>✅ Supported</td>
+</tr>
+<tr>
+<td>Python 3.14+</td>
+<td>Experimental</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="supported-operating-systems">Supported Operating Systems</h2>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>WSL</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="application-interface">Application Interface</h2>
+<p>Flaxon supports:</p>
+<ul>
+<li>HTTP</li>
+<li>HTTPS</li>
+<li>WebSockets</li>
+<li>ASGI Lifespan</li>
+<li>Streaming Responses</li>
+<li>Background Tasks</li>
+<li>Static Files</li>
+<li>Template Rendering</li>
+<li>GraphQL</li>
+<li>Server-Sent Events (SSE)</li>
+</ul>
+<hr/>
+<h2 id="asgi-servers">ASGI Servers</h2>
+<p>Recommended servers:</p>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uvicorn</td>
+<td>✅ Recommended</td>
+</tr>
+<tr>
+<td>Hypercorn</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Daphne</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Granian</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Gunicorn + Uvicorn Workers</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="built-in-features">Built-in Features</h2>
+<ul>
+<li>Routing</li>
+<li>Middleware</li>
+<li>Dependency Injection</li>
+<li>Validation</li>
+<li>Authentication</li>
+<li>Sessions</li>
+<li>JWT</li>
+<li>Templates (Jinax)</li>
+<li>WebSockets</li>
+<li>Background Tasks</li>
+<li>Static Files</li>
+<li>Configuration System</li>
+<li>Plugin Manager</li>
+<li>Testing Utilities</li>
+<li>CLI</li>
+<li>Admin Dashboard</li>
+<li>GraphQL</li>
+<li>Security Utilities</li>
+</ul>
+<hr/>
+<h2 id="plugin-ecosystem">Plugin Ecosystem</h2>
+<p>Official plugins include:</p>
+<table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>flaxon-ai</td>
+<td>AI integrations</td>
+</tr>
+<tr>
+<td>flaxon-mobile</td>
+<td>Mobile backend</td>
+</tr>
+<tr>
+<td>flaxon-fyr</td>
+<td>Fyr frontend integration</td>
+</tr>
+<tr>
+<td>flaxon-oauth-google</td>
+<td>Google OAuth</td>
+</tr>
+<tr>
+<td>flaxon-inertia</td>
+<td>Inertia.js support</td>
+</tr>
+<tr>
+<td>flaxon-debug-toolbar</td>
+<td>Development tools</td>
+</tr>
+<tr>
+<td>flaxon-sentry</td>
+<td>Error monitoring</td>
+</tr>
+<tr>
+<td>flaxon-pytest</td>
+<td>Testing</td>
+</tr>
+<tr>
+<td>flaxon-spring-boot</td>
+<td>Spring-style architecture</td>
+</tr>
+<tr>
+<td>flaxon-ffd</td>
+<td>FastAPI/Flask/Django bridge</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="performance-goals">Performance Goals</h2>
+<p>Target characteristics:</p>
+<ul>
+<li>Fast routing</li>
+<li>Async-first architecture</li>
+<li>Low memory usage</li>
+<li>Startup optimized</li>
+<li>Zero unnecessary dependencies</li>
+<li>Efficient request handling</li>
+<li>High concurrency support</li>
+</ul>
+<hr/>
+<h2 id="security-features">Security Features</h2>
+<ul>
+<li>JWT Authentication</li>
+<li>Session Authentication</li>
+<li>CSRF Protection</li>
+<li>Password Hashing</li>
+<li>API Keys</li>
+<li>Rate Limiting</li>
+<li>Security Headers</li>
+<li>Input Validation</li>
+<li>Role Permissions</li>
+<li>Permission System</li>
+</ul>
+<hr/>
+<h2 id="template-engine">Template Engine</h2>
+<p>Default engine:</p>
+<p><strong>Jinax</strong></p>
+<p>Features:</p>
+<ul>
+<li>Async rendering</li>
+<li>Template inheritance</li>
+<li>Filters</li>
+<li>Custom functions</li>
+<li>Components</li>
+<li>Auto escaping</li>
+<li>Hot reload</li>
+<li>Global variables</li>
+</ul>
+<hr/>
+<h2 id="cli">CLI</h2>
+<p>Example commands:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>app
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app
+flaxon<span class="w"> </span>doctor<span class="w"> </span>app:app
+flaxon<span class="w"> </span>routes<span class="w"> </span>app:app
+flaxon<span class="w"> </span>generate<span class="w"> </span>route
+flaxon<span class="w"> </span>generate<span class="w"> </span>schema
+flaxon<span class="w"> </span>plugins<span class="w"> </span>list
+</code></pre></div>
+<hr/>
+<h2 id="dependency-policy">Dependency Policy</h2>
+<p>Core framework keeps dependencies minimal.</p>
+<p>Optional functionality is provided through plugins.</p>
+<div class="highlight"><pre><span></span><code>flaxon
+├── Core
+├── Routing
+├── HTTP
+├── Templates
+├── Validation
+├── CLI
+└── Plugins
+</code></pre></div>
+<hr/>
+<h2 id="code-style">Code Style</h2>
+<p>Recommended:</p>
+<ul>
+<li>Black</li>
+<li>Ruff</li>
+<li>isort</li>
+<li>mypy</li>
+</ul>
+<p>Formatting:</p>
+<ul>
+<li>4 spaces</li>
+<li>UTF-8</li>
+<li>Type hints encouraged</li>
+<li>Async where appropriate</li>
+</ul>
+<hr/>
+<h2 id="documentation-standards">Documentation Standards</h2>
+<p>Documentation includes:</p>
+<ul>
+<li>API Reference</li>
+<li>Examples</li>
+<li>Tutorials</li>
+<li>Migration Guides</li>
+<li>Plugin Guides</li>
+<li>Architecture Documentation</li>
+<li>Security Guides</li>
+<li>Deployment Guides</li>
+</ul>
+<hr/>
+<h2 id="testing">Testing</h2>
+<p>Supported:</p>
+<ul>
+<li>pytest</li>
+<li>unittest</li>
+<li>Async testing</li>
+<li>HTTP testing</li>
+<li>WebSocket testing</li>
+<li>Fixtures</li>
+<li>Factories</li>
+</ul>
+<hr/>
+<h2 id="deployment">Deployment</h2>
+<p>Recommended platforms:</p>
+<ul>
+<li>Docker</li>
+<li>Render</li>
+<li>Railway</li>
+<li>Fly.io</li>
+<li>DigitalOcean</li>
+<li>Azure</li>
+<li>AWS</li>
+<li>Google Cloud</li>
+<li>Kubernetes</li>
+</ul>
+<hr/>
+<h2 id="versioning">Versioning</h2>
+<p>Flaxon follows Semantic Versioning.</p>
+<div class="highlight"><pre><span></span><code>MAJOR.MINOR.PATCH
+
+Example:
+
+1.0.0
+1.1.0
+1.1.5
+2.0.0
+</code></pre></div>
+<hr/>
+<h2 id="compatibility-promise">Compatibility Promise</h2>
+<p>Minor releases:</p>
+<ul>
+<li>Backward compatible</li>
+</ul>
+<p>Patch releases:</p>
+<ul>
+<li>Bug fixes only</li>
+</ul>
+<p>Major releases:</p>
+<ul>
+<li>May introduce breaking changes</li>
+<li>Migration guide provided</li>
+</ul>
+<hr/>
+<h2 id="stability-levels">Stability Levels</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stable</td>
+<td>Production ready</td>
+</tr>
+<tr>
+<td>Beta</td>
+<td>Feature complete</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>Experimental</td>
+</tr>
+<tr>
+<td>Preview</td>
+<td>Early testing</td>
+</tr>
+<tr>
+<td>Deprecated</td>
+<td>Scheduled for removal</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="release-channels">Release Channels</h2>
+<ul>
+<li>Stable</li>
+<li>Beta</li>
+<li>Nightly</li>
+</ul>
+<hr/>
+<h2 id="long-term-support-lts">Long-Term Support (LTS)</h2>
+<p>LTS releases receive:</p>
+<ul>
+<li>Security updates</li>
+<li>Bug fixes</li>
+<li>Critical patches</li>
+</ul>
+<p>No new features.</p>
+<hr/>
+<h2 id="coding-principles">Coding Principles</h2>
+<p>Flaxon emphasizes:</p>
+<ul>
+<li>Explicit over implicit</li>
+<li>Async by default</li>
+<li>Small core</li>
+<li>Extensible architecture</li>
+<li>Clear APIs</li>
+<li>Strong typing</li>
+<li>Developer-first experience</li>
+</ul>
+<hr/>
+<h2 id="repository-layout">Repository Layout</h2>
+<div class="highlight"><pre><span></span><code>flaxon/
+├── flaxon/
+├── docs/
+├── examples/
+├── tests/
+├── benchmarks/
+├── scripts/
+├── plugins/
+├── website/
+└── pyproject.toml
+</code></pre></div>
+<hr/>
+<h2 id="maintenance-status">Maintenance Status</h2>
+<p>Current status:</p>
+<ul>
+<li>✅ Actively Developed</li>
+<li>✅ Community Supported</li>
+<li>✅ Open Source</li>
+<li>✅ Production Focused</li>
+</ul>
+<hr/>
+<h2 id="support">Support</h2>
+<p>Documentation:</p>
+<p>https://flaxon-website.vercel.app/docs</p>
+<p>Website:</p>
+<p>https://flaxon-website.vercel.app</p>
+<p>GitHub:</p>
+<p>https://github.com/aldanedev-create/Flaxon-Backend-Framework</p>
+<p>Issues:</p>
+<p>https://github.com/aldanedev-create/Flaxon-Backend-Framework/issues</p>
+<hr/>
+<h2 id="credits">Credits</h2>
+<p>Created and maintained by the Flaxon contributors.</p>
+<p>Thank you to everyone who helps improve the framework through code, documentation, bug reports, discussions, and community feedback.</p>
+<hr/>
+<p><strong>Simple Python. Serious Applications.</strong></p></article>
+</main></div><div id="footer"></div></body></html>

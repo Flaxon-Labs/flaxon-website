@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Use Flaxon as a backend — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Use Flaxon as a backend — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Use Flaxon as a backend</span></nav>
+<article class="doc-content"><h1 id="use-flaxon-as-a-backend">Use Flaxon as a backend</h1><p>Flaxon supports standalone JSON APIs and WebSocket services as well as full-stack applications. Keep your frontend in React, a mobile app, or another service, and use Flaxon for the HTTP boundary.</p><h2 id="install-and-run-a-json-api">Install and run a JSON API</h2><pre><code class="language-bash">pip install "flaxon[standard]"</code></pre><p>Create <code>app.py</code>:</p><pre><code class="language-python">from flaxon import Flaxon
+
+app = Flaxon("hello-api", debug=True)
+
+@app.get("/")
+async def home():
+    return {"message": "Hello from Flaxon"}
+
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {"id": user_id}
+</code></pre><pre><code class="language-bash">flaxon run app:app --reload</code></pre><p>Open <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>. These routes return JSON; you do not need to create Teloce components, templates, or an Admin dashboard.</p><h2 id="continue-with-your-client">Continue with your client</h2><ul><li><a href="../examples/basic-api.html">Basic API: routing and validation</a></li><li><a href="../examples/react-backend.html">React backend: connect a separate frontend</a></li><li><a href="../examples/android-backend.html">Android backend: mobile application services</a></li><li><a href="../examples/websocket-chat.html">WebSocket chat: real-time messaging</a></li><li><a href="../core-concepts/middleware.html">Middleware and CORS</a></li><li><a href="../security.html">Security configuration</a></li><li><a href="../deployment.html">Deployment</a></li></ul><p>Use explicit allowed origins for browser clients. For production, disable debug and reload, configure secrets and persistent/shared infrastructure, and follow the deployment guide.</p><h2 id="add-full-stack-features-when-you-need-them">Add full-stack features when you need them</h2><p>You can add <a href="jinax.html">Jinax server-rendered pages</a>, <a href="../fullstack/index.html">Teloce components</a>, and <a href="admin-cms.html">Admin and CMS</a> to an API application. The backend guides remain useful for either approach.</p></article>
+</main></div><div id="footer"></div></body></html>

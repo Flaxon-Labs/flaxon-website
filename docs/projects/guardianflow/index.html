@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GuardianFlow — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>GuardianFlow — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>GuardianFlow</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples/guardianflow/README.md">Framework source</a> · <a href="../../../content/framework/examples/guardianflow/README.md" download>Markdown</a></p><h1 id="guardianflow">GuardianFlow</h1>
+<p>GuardianFlow is a compact Flaxon hackathon demo that transforms camera events into activity stories. It is intentionally small: the judge can press three buttons and see delivery confirmation, package-removal review, and after-hours activity.</p>
+<h2 id="run-it">Run it</h2>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">pyyaml</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">flaxon</span> <span class="n">run</span> <span class="n">examples</span><span class="p">.</span><span class="n">guardianflow</span><span class="p">.</span><span class="n">app</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8014</span>
+</code></pre></div>
+<p>Open <code>http://127.0.0.1:8014/</code>. No Ring hardware, AWS account, or credentials are required for demo mode.</p>
+<h2 id="demo-flow">Demo flow</h2>
+<ol>
+<li>Press <strong>Simulate delivery</strong>: person detected, package detected, person leaves, delivery confirmed.</li>
+<li>Press <strong>Simulate removal</strong>: the existing delivery context plus person and package removal produces a review alert.</li>
+<li>Press <strong>Simulate after-hours</strong>: a person event at 23:15 produces a warning.</li>
+</ol>
+<p>The dashboard uses Jinjax templates and a Flaxon WebSocket for live event notifications. <code>RingClient</code> is the integration boundary and normalizes Ring-shaped payloads; <code>RingSimulator</code> is clearly separate and is what makes the demo deterministic.</p>
+<h2 id="flaxon-modules">Flaxon modules</h2>
+<p>The example mounts <code>guardian-pages</code>, <code>guardian-ring</code>, <code>guardian-vision</code>, <code>guardian-intelligence</code>, and <code>guardian-notifications</code> with <code>app.mount_module()</code>. Each module declares its state dependency with <code>requires()</code>, so this is a real reusable Flaxon composition rather than a collection of unrelated folders.</p>
+<p>The app uses in-memory state for a fast demo. Replace <code>GuardianState</code> with a repository-backed implementation when persistence is needed. The policy engine remains independent from the UI and reads the YAML files in <code>rules/</code>.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,11 +1,321 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flaxon Cheatsheet - Documentation</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/docs.css"><script defer src="/assets/js/site-shell.js"></script><script defer src="/assets/js/dark-mode.js"></script><script defer src="/assets/js/header-search.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script></head><body><div id="header"></div><section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16"><div class="container mx-auto px-4"><div class="grid lg:grid-cols-4 gap-8"><aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r=>r.text()).then(h=>document.getElementById('docs-sidebar').innerHTML=h)</script></aside><main class="lg:col-span-3"><article class="doc-content"><h1>Flaxon Cheatsheet</h1><h2>Application</h2><pre><code>from flaxon import Flaxon
-app = Flaxon("my-app", debug=True)
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon &amp; Plugins - Quick Reference Cheat Sheet — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon &amp; Plugins - Quick Reference Cheat Sheet — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon &amp; Plugins - Quick Reference Cheat Sheet</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/cheatsheet.md">Framework source</a> · <a href="../content/framework/docs/cheatsheet.md" download>Markdown</a></p><h1 id="flaxon-plugins-quick-reference-cheat-sheet">Flaxon &amp; Plugins - Quick Reference Cheat Sheet</h1>
+<p>A quick reference guide for the Flaxon Python full-stack framework and official plugins.</p>
+<hr/>
+<h2 id="installation">📦 Installation</h2>
+<h2 id="core-framework">Core Framework</h2>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+<span class="sb">````</span>
+
+<span class="c1">## Standard Features</span>
+
+<span class="sb">```</span>bash
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<h2 id="plugins">Plugins</h2>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon-ai<span class="o">[</span>all<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-mobile<span class="o">[</span>all<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-inertia
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-oauth-google
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-fyr
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-debug-toolbar
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-sentry
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-pytest
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-spring-boot
+pip<span class="w"> </span>install<span class="w"> </span>flaxon-ffd
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Core Commands Section
+
+```markdown
+# 🚀 Core Flaxon Commands
+
+```bash
+# Create project
+flaxon new my-app
+
+# Run application
+flaxon run app:app
+
+# Development mode
+flaxon run app:app --reload
+
+# Show routes
+flaxon routes app:app
+
+# Diagnose application
+flaxon doctor app:app
+
+# Generate route
+flaxon generate route /api/users --method GET
+
+# Generate schema
+flaxon generate schema CreateUser
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Basic Application
+
+Problems fixed:
+- Removed unnecessary uvicorn usage.
+- Added proper `request` typing consistency.
+- Fixed websocket example formatting.
+
+```markdown
+# 📝 Basic Application
+
+```python
+from flaxon import Flaxon
+
+
+app = Flaxon(
+    "my-app",
+    debug=True
+)
+
+
 @app.get("/")
-async def home(): return {"ok": True}
-flaxon run app:app --reload</code></pre><h2>Routing</h2><pre><code>@app.get("/users/&lt;int:user_id&gt;")
-async def user(user_id): return {"id": user_id}
-
-api = Router(prefix="/api")
-app.include_router(api, prefix="/v1")</code></pre><h2>Built-ins</h2><p>Use <code>Schema</code> and <code>fields</code> for validation; <code>request.session</code> for sessions; <code>app.add_middleware</code> for CORS, security headers, rate limits, and CSRF; <code>Jinax</code> for HTML; <code>Mailer</code> for email; <code>Cache</code> for caching; <code>TestClient</code> or <code>AsyncTestClient</code> for HTTP tests.</p><h2>Admin, CMS, and data</h2><p>Use <code>AdminDashboard</code> for authenticated model management and <code>CMS</code> for schema-driven content. Run <code>flaxon migrate --direction up</code> for migrations. Adapters include SQLite, PostgreSQL, MySQL, SQLAlchemy, MongoDB, Redis, and <code>CustomAdapter</code>; MongoDB and Redis use native APIs rather than SQL methods.</p><h2>Operations</h2><p><code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>, <code>/metrics</code>; <code>flaxon routes</code>, <code>doctor</code>, <code>docs</code>, <code>inspect</code>, <code>worker</code>, and <code>schedule</code>.</p><p>See the <a href="/docs/guides/admin-cms.html">Admin/CMS guide</a>, <a href="/docs/guides/mail.html">Email guide</a>, and <a href="/docs/teloce-py.html">Teloce-Py guide</a> for complete examples.</p></article></main></div></div></section><script src="/assets/js/docs.js"></script><script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script></body></html>
+async def home():
+    return {
+        "message": "Hello, World!"
+    }
 
 
+@app.get("/users/&lt;int:user_id&gt;")
+async def get_user(user_id: int):
+    return {
+        "id": user_id,
+        "name": f"User {user_id}"
+    }
+
+
+@app.post("/users")
+async def create_user(request):
+    data = await request.json()
+
+    return {
+        "success": True,
+        "data": data
+    }
+
+
+@app.websocket("/ws/echo")
+async def echo(socket):
+
+    await socket.accept()
+
+    async for message in socket.iter_json():
+        await socket.send_json({
+            "echo": message
+        })
+</code></pre></div>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Validation Section
+
+```markdown
+# 🔧 Validation Schemas
+
+```python
+from flaxon.validation import Schema, fields
+
+
+class CreateUser(Schema):
+
+    name = fields.StrField(
+        required=True,
+        min_length=2,
+        max_length=80
+    )
+
+    email = fields.EmailField(
+        required=True
+    )
+
+    age = fields.IntField(
+        required=False,
+        minimum=13,
+        maximum=120
+    )
+
+    status = fields.ChoiceField(
+        choices=[
+            "active",
+            "inactive",
+            "pending"
+        ]
+    )
+
+
+@app.post("/users")
+async def create_user(data: CreateUser):
+
+    return {
+        "success": True,
+        "user": data.to_dict()
+    }
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Middleware
+
+```markdown
+# 🛡️ Middleware
+
+```python
+from flaxon.middleware import CORSMiddleware
+from flaxon.security import RateLimitMiddleware
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allowed_origins=[
+        "https://example.com"
+    ],
+    allow_credentials=True,
+)
+
+
+app.add_middleware(
+    RateLimitMiddleware,
+    requests=120,
+    window_seconds=60,
+)
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed AI Plugin Example
+
+Changes:
+- Added missing `os`.
+- Made import style consistent.
+
+```markdown
+## 🤖 flaxon-ai
+
+```python
+import os
+
+from flaxon_ai import FlaxonAIPlugin
+
+
+await app.plugins.load_plugin(
+    FlaxonAIPlugin(
+        provider="gemini",
+        api_key=os.environ.get(
+            "GEMINI_API_KEY"
+        ),
+    )
+)
+
+
+response = await app.state.ai.generate(
+    "Write a poem about Python"
+)
+
+
+async for chunk in app.state.ai.stream(
+    "Tell a story"
+):
+    print(chunk)
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Quick Start Template
+
+```markdown
+# 🚀 Quick Start Template
+
+```python
+import os
+
+from flaxon import Flaxon
+from flaxon_ai import FlaxonAIPlugin
+from flaxon_debug_toolbar import DebugToolbarPlugin
+
+
+app = Flaxon(
+    "my-app",
+    debug=True
+)
+
+
+await app.plugins.load_plugin(
+    DebugToolbarPlugin()
+)
+
+
+await app.plugins.load_plugin(
+    FlaxonAIPlugin(
+        provider="gemini",
+        api_key=os.environ.get(
+            "GEMINI_API_KEY"
+        ),
+    )
+)
+
+
+@app.get("/")
+async def home():
+
+    return {
+        "message": "Hello, Flaxon!"
+    }
+
+
+@app.get("/ai")
+async def ai_generate():
+
+    result = await app.state.ai.generate(
+        "Say hello"
+    )
+
+    return {
+        "response": result
+    }
+</code></pre></div>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<hr/>
+<div class="highlight"><pre><span></span><code>---
+
+## Fixed Resources Section
+
+```markdown
+# 📚 Useful Resources
+
+| Resource | Link |
+|---|---|
+| Flaxon Website | https://flaxon-website.vercel.app |
+| Documentation | https://flaxon-website.vercel.app/docs |
+| GitHub | https://github.com/aldanedev-create/Flaxon-Backend-Framework |
+| PyPI | https://pypi.org/project/flaxon |
+| VS Code Extension | https://marketplace.visualstudio.com |
+
+---
+</code></pre></div></article>
+</main></div><div id="footer"></div></body></html>

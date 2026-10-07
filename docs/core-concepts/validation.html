@@ -1,271 +1,473 @@
-<!-- docs/core-concepts/validation.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Validation – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Validation — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Validation — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Validation</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/validation.md">Framework source</a> · <a href="../../content/framework/docs/guides/validation.md" download>Markdown</a></p><h1 id="validation">Validation</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides declarative validation schemas that automatically validate request data and inject validated objects into route handlers.</p>
+<p>Validation supports:</p>
+<ul>
+<li>Type checking</li>
+<li>Required fields</li>
+<li>Length validation</li>
+<li>Range validation</li>
+<li>Custom validators</li>
+<li>Nested schemas</li>
+<li>Serialization</li>
+<li>Automatic error responses</li>
+</ul>
+<hr/>
+<h2 id="basic-schema">Basic Schema</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-    <div id="header"></div>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span>
+    <span class="p">)</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span>
+    <span class="p">)</span>
+<span class="err">````</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html" class="active">Validation</a>
+<span class="o">---</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+<span class="c1"># Using Schemas in Routes</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                    </div>
-                </aside>
+<span class="err">```</span><span class="n">python</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
 
-                <!-- Main Content -->
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Validation</h1>
-                        <p>Flaxon provides declarative validation schemas that automatically validate request data.</p>
+    <span class="c1"># Data is automatically validated</span>
 
-                        <h2>Basic Schema</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation import Schema, fields
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Invalid data automatically returns:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FX-VAL-001"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Validation failed"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="field-types">Field Types</h2>
+<h2 id="string">String</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-class CreateUser(Schema):
-    name = fields.StrField(required=True, min_length=2, max_length=80)
-    email = fields.EmailField(required=True)
-    age = fields.IntField(required=False, minimum=13, maximum=120)</code></pre>
-                        </div>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+        <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">"^[a-zA-Z\s]+$"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="integer">Integer</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ProductSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h2>Using Schemas in Routes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/users")
-async def create_user(data: CreateUser):
-    # data is automatically validated
-    # Invalid data returns 422
-    return {"success": True, "user": data.to_dict()}</code></pre>
-                        </div>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">999999</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="float">Float</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PriceSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h2>Field Types</h2>
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mf">9999.99</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="boolean">Boolean</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SettingsSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>String</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class UserSchema(Schema):
-    name = fields.StrField(
-        required=True,
-        min_length=2,
-        max_length=80,
-        strip=True,
-        pattern=r"^[a-zA-Z\s]+$",
-    )</code></pre>
-                        </div>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BoolField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-                        <h3>Integer</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class ProductSchema(Schema):
-    price = fields.IntField(
-        required=True,
-        minimum=0,
-        maximum=999999,
-    )</code></pre>
-                        </div>
+    <span class="n">notifications</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BoolField</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="choice">Choice</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">StatusSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>Float</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class PriceSchema(Schema):
-    amount = fields.FloatField(
-        required=True,
-        minimum=0.0,
-        maximum=9999.99,
-    )</code></pre>
-                        </div>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">"pending"</span><span class="p">,</span>
+            <span class="s2">"active"</span><span class="p">,</span>
+            <span class="s2">"suspended"</span><span class="p">,</span>
+            <span class="s2">"deleted"</span>
+        <span class="p">],</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="email">Email</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ContactSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>Boolean</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class SettingsSchema(Schema):
-    active = fields.BoolField(required=True)
-    notifications = fields.BoolField(default=True)</code></pre>
-                        </div>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="date">Date</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">EventSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>Choice</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class StatusSchema(Schema):
-    status = fields.ChoiceField(
-        ["pending", "active", "suspended", "deleted"],
-        required=True,
-    )</code></pre>
-                        </div>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="datetime">DateTime</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScheduleSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>Email</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class ContactSchema(Schema):
-    email = fields.EmailField(required=True)</code></pre>
-                        </div>
+    <span class="n">datetime</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="uuid">UUID</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TokenSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>Date</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class EventSchema(Schema):
-    date = fields.DateField(required=True, format="%Y-%m-%d")</code></pre>
-                        </div>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="list-field">List Field</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BulkCreateSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>DateTime</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class ScheduleSchema(Schema):
-    datetime = fields.DateTimeField(required=True, format="%Y-%m-%dT%H:%M:%S")</code></pre>
-                        </div>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ListField</span><span class="p">(</span>
+        <span class="n">item_field</span><span class="o">=</span><span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">),</span>
+        <span class="n">min_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">max_items</span><span class="o">=</span><span class="mi">100</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="nested-schemas">Nested Schemas</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AddressSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-                        <h3>UUID</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class TokenSchema(Schema):
-    token = fields.UUIDField(required=True)</code></pre>
-                        </div>
+    <span class="n">street</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-                        <h3>List</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class BulkCreateSchema(Schema):
-    users = fields.ListField(
-        item_field=fields.StrField(min_length=2),
-        min_items=1,
-        max_items=100,
-    )</code></pre>
-                        </div>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-                        <h3>Nested</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">class AddressSchema(Schema):
-    street = fields.StrField(required=True)
-    city = fields.StrField(required=True)
-    zipcode = fields.StrField(required=True, pattern=r"^\d{5}$")
+    <span class="n">zipcode</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">"^\d</span><span class="si">{5}</span><span class="s2">$"</span>
+    <span class="p">)</span>
 
-class UserSchema(Schema):
-    name = fields.StrField(required=True)
-    address = fields.NestedField(AddressSchema)</code></pre>
-                        </div>
 
-                        <h2>Validation Errors</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/users")
-async def create_user(data: CreateUser):
-    # If validation fails, Flaxon automatically returns:
-    # {
-    #   "success": false,
-    #   "error": {
-    #     "code": "FX-VAL-001",
-    #     "message": "Request validation failed.",
-    #     "fields": {
-    #       "email": ["Enter a valid email address."],
-    #       "age": ["Must be at least 13."]
-    #     }
-    #   }
-    # }
-    return {"user": data.to_dict()}</code></pre>
-                        </div>
 
-                        <h2>Custom Validators</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation.validators import custom_validator
+<span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
 
-def validate_unique_email(value, field):
-    if email_exists(value):
-        raise ValueError("Email already registered")
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-class CreateUser(Schema):
-    email = fields.EmailField(
-        required=True,
-        validators=[custom_validator(validate_unique_email)],
-    )</code></pre>
-                        </div>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">NestedField</span><span class="p">(</span>
+        <span class="n">AddressSchema</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="validation-errors">Validation Errors</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
 
-                        <h2>Combining Validators</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation.validators import and_validators, or_validators, email_validator, pattern_validator, length_validator
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>If validation fails:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FX-VAL-001"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Request validation failed."</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="s2">"Enter a valid email address."</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="s2">"Must be at least 13."</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-validators">Custom Validators</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation.validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">custom_validator</span>
 
-class UserSchema(Schema):
-    # Must meet all conditions
-    username = fields.StrField(
-        validators=[and_validators(
-            length_validator(3, 20),
-            pattern_validator(r"^[a-zA-Z0-9_]+$"),
-        )],
-    )
 
-    # Must meet at least one condition
-    contact = fields.StrField(
-        validators=[or_validators(
-            email_validator(),
-            pattern_validator(r"^\+\d{10,15}$"),
-        )],
-    )</code></pre>
-                        </div>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_unique_email</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Schemas also have a <code>.validate()</code> method for manual validation and <code>.to_json()</code> for serialization.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+    <span class="k">if</span> <span class="n">email_exists</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 
-    <div id="footer"></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"Email already registered"</span>
+        <span class="p">)</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">custom_validator</span><span class="p">(</span>
+                <span class="n">validate_unique_email</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="combining-validators">Combining Validators</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation.validators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">and_validators</span><span class="p">,</span>
+    <span class="n">or_validators</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">and_validators</span><span class="p">(</span>
+                <span class="n">length_validator</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                <span class="n">pattern_validator</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">"^[a-zA-Z0-9_]+$"</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+    <span class="n">contact</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">or_validators</span><span class="p">(</span>
+                <span class="n">email_validator</span><span class="p">(),</span>
+                <span class="n">pattern_validator</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">"^\+\d{10,15}$"</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="serialization">Serialization</h2>
+<p>Objects returned from routes are automatically serialized.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
+        <span class="s2">"SELECT * FROM users WHERE id = $1"</span><span class="p">,</span>
+        <span class="n">user_id</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">user</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-serialization">Custom Serialization</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">UserSchema</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">()</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">"email"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="s2">"display_name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="full-example">Full Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Schema</span><span class="p">,</span>
+    <span class="n">fields</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation.validators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">custom_validator</span>
+<span class="p">)</span>
+
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"validation-demo"</span>
+<span class="p">)</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_unique_username</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">"admin"</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"Username already exists"</span>
+        <span class="p">)</span>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">"^[a-zA-Z0-9_]+$"</span><span class="p">,</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">custom_validator</span><span class="p">(</span>
+                <span class="n">validate_unique_username</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+
+    <span class="n">password</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span>
+    <span class="p">)</span>
+
+
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span>
+    <span class="p">)</span>
+
+
+    <span class="n">role</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">"user"</span><span class="p">,</span>
+            <span class="s2">"moderator"</span><span class="p">,</span>
+            <span class="s2">"admin"</span>
+        <span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"user"</span>
+    <span class="p">)</span>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UpdateUser</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">30</span>
+    <span class="p">)</span>
+
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+
+
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateUser</span><span class="p">):</span>
+
+    <span class="c1"># Hash password before saving</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_user</span><span class="p">(</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">UpdateUser</span>
+<span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"updated"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="validation-best-practices">Validation Best Practices</h2>
+<ul>
+<li>Validate all incoming data.</li>
+<li>Never trust client input.</li>
+<li>Use schemas for API requests.</li>
+<li>Keep validation separate from business logic.</li>
+<li>Create reusable validators.</li>
+<li>Return meaningful validation errors.</li>
+<li>Validate file uploads.</li>
+<li>Validate authentication payloads.</li>
+<li>Use nested schemas for complex objects.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with:</p>
+<ul>
+<li>Authentication</li>
+<li>Authorization</li>
+<li>Serialization</li>
+<li>Error Handling</li>
+<li>Database Integration</li>
+<li>API Development</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

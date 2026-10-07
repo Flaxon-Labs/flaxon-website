@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Contributing to Flaxon — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Contributing to Flaxon — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Contributing to Flaxon</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/CONTRIBUTING.md">Framework source</a> · <a href="../../content/framework/CONTRIBUTING.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
+<p>Thank you for your interest in contributing to Flaxon! 🎉</p>
+<h2 id="code-of-conduct">Code of Conduct</h2>
+<p>By participating in this project, you agree to abide by our <a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
+<h2 id="how-to-contribute">How to Contribute</h2>
+<h3 id="report-a-bug">Report a Bug</h3>
+<ol>
+<li>Check if the bug is already reported in <a href="https://github.com/aldanedev-create/Flaxon-Backend-Framework/issues">Issues</a></li>
+<li>If not, create a new issue with:</li>
+<li>Clear title and description</li>
+<li>Steps to reproduce</li>
+<li>Expected vs actual behavior</li>
+<li>Environment (OS, Python version, Flaxon version)</li>
+</ol>
+<h3 id="suggest-a-feature">Suggest a Feature</h3>
+<ol>
+<li>Check if the feature is already requested</li>
+<li>Create a feature request with:</li>
+<li>Clear description of the feature</li>
+<li>Why it's valuable</li>
+<li>Potential implementation approach</li>
+</ol>
+<h3 id="submit-code">Submit Code</h3>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch: <code>git checkout -b feature/your-feature</code></li>
+<li>Make your changes with tests</li>
+<li><strong>Run the full test suite</strong> (see below) and confirm it passes -- a partial
+   or single-file test run is not sufficient before opening a PR</li>
+<li>Run linting: <code>ruff check .</code></li>
+<li>Run type checking: <code>mypy .</code></li>
+<li>Commit with clear messages</li>
+<li>Push and open a Pull Request</li>
+</ol>
+<h2 id="development-setup">Development Setup</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clone the repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/aldanedev-create/Flaxon-Backend-Framework.git
+<span class="nb">cd</span><span class="w"> </span>Flaxon-Backend-Framework
+
+<span class="c1"># Create a virtual environment</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># On Windows: .venv\Scripts\activate</span>
+
+<span class="c1"># Install in development mode with all extras</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard,dev]"</span>
+
+<span class="c1"># Install browser test dependencies (see "Running the full test suite" below)</span>
+pip<span class="w"> </span>install<span class="w"> </span>playwright<span class="w"> </span>pytest-playwright
+python<span class="w"> </span>-m<span class="w"> </span>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+</code></pre></div>
+<h2 id="running-the-full-test-suite">Running the Full Test Suite</h2>
+<p>Before opening a pull request, contributors must run the <strong>full</strong> test suite,
+not just the tests touching their own change -- a change that looks isolated
+can still break something elsewhere (route matching, admin/CMS wiring, and
+the CLI have all had regressions from changes that looked unrelated).</p>
+<p>The project's <code>pytest.ini</code> already configures coverage reporting, strict
+markers, and test discovery across the whole <code>tests/</code> directory, so running
+the suite is just:</p>
+<div class="highlight"><pre><span></span><code>pytest
+</code></pre></div>
+<p>This includes <code>tests/browser/</code>, which drives a real Chromium browser via
+Playwright -- make sure you've run <code>python -m playwright install chromium</code>
+first (see Development Setup above), or those tests will fail rather than
+being skipped.</p>
+<p>Useful variations while iterating locally:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Fast pass while developing, without coverage overhead</span>
+pytest<span class="w"> </span>--no-cov
+
+<span class="c1"># A single test file or directory</span>
+pytest<span class="w"> </span>tests/integration/test_router_specificity.py<span class="w"> </span>-v<span class="w"> </span>--no-cov
+
+<span class="c1"># Skip browser tests if you don't have a display/Chromium available locally</span>
+pytest<span class="w"> </span>--ignore<span class="o">=</span>tests/browser
+</code></pre></div>
+<p>None of the shortcuts above are a substitute for a full <code>pytest</code> run before
+submitting a PR -- CI (and reviewers) will run the complete suite regardless.</p>
+<h2 id="code-style">Code Style</h2>
+<ul>
+<li>Follow PEP 8</li>
+<li>Use type hints for all function signatures</li>
+<li>Write docstrings for public APIs</li>
+<li>Keep functions focused and small</li>
+<li>Prefer async/await for I/O operations</li>
+</ul>
+<h2 id="linting-configuration">Linting Configuration</h2>
+<p>Flaxon uses <code>ruff</code> for linting and formatting. Configuration is in <code>ruff.toml</code>.</p>
+<h2 id="type-checking">Type Checking</h2>
+<p>Flaxon uses <code>mypy</code> for static type checking. Configuration is in <code>mypy.ini</code>.</p>
+<h2 id="test-organization">Test Organization</h2>
+<ul>
+<li>Unit tests in <code>tests/unit/</code> -- test individual components</li>
+<li>Integration tests in <code>tests/integration/</code> -- test component interactions</li>
+<li>Security tests in <code>tests/security/</code> -- test security properties</li>
+<li>Performance tests in <code>tests/performance/</code> -- benchmark performance</li>
+<li>Browser tests in <code>tests/browser/</code> -- real end-to-end tests via Playwright</li>
+</ul>
+<h2 id="writing-tests">Writing Tests</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># tests/unit/test_example.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncTestClient</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_route</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"test"</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"hello"</span><span class="p">}</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AsyncTestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">"GET"</span><span class="p">,</span> <span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+</code></pre></div>
+<h2 id="pull-request-process">Pull Request Process</h2>
+<ol>
+<li>Update <code>CHANGELOG.md</code> with your changes</li>
+<li>Update documentation if necessary</li>
+<li>Ensure the full test suite passes (<code>pytest</code>, not a partial run)</li>
+<li>Get at least one maintainer review</li>
+<li>Squash commits before merging</li>
+</ol>
+<h2 id="release-process">Release Process</h2>
+<ol>
+<li>Update version in <code>src/flaxon/version.py</code></li>
+<li>Update <code>CHANGELOG.md</code></li>
+<li>Tag the release: <code>git tag v0.2.4</code></li>
+<li>Push tags: <code>git push --tags</code></li>
+<li>GitHub Actions will build and publish to PyPI</li>
+</ol>
+<h2 id="maintainers">Maintainers</h2>
+<p>Aldane Hutchinson (@aldane)</p>
+<h2 id="questions">Questions?</h2>
+<ul>
+<li>Open an issue for bugs or feature requests</li>
+<li>Join our Discord for community support</li>
+<li>Email: maintainers@flaxon.dev</li>
+</ul>
+<p>Thank you for contributing to Flaxon! 🚀</p></article>
+</main></div><div id="footer"></div></body></html>

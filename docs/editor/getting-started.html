@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon VS Code Extension - Getting Started — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon VS Code Extension - Getting Started — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon VS Code Extension - Getting Started</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/vs%20Code%20%28Extension%29/getting-started.md">Framework source</a> · <a href="../../content/framework/docs/vs Code (Extension)/getting-started.md" download>Markdown</a></p><h1 id="flaxon-vs-code-extension-getting-started">Flaxon VS Code Extension - Getting Started</h1>
+<h2 id="overview">Overview</h2>
+<p>The <strong>Flaxon VS Code Extension</strong> provides full IDE support for <strong>Flaxon</strong>, the async-first Python full-stack framework. It brings intelligent code completion, route exploration, debugging, and project scaffolding directly into your editor.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Version</strong></td>
+<td>0.1.2</td>
+</tr>
+<tr>
+<td><strong>Publisher</strong></td>
+<td>Flaxon</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>MIT</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="installation">Installation</h2>
+<h2 id="from-the-vs-code-marketplace">From the VS Code Marketplace</h2>
+<ol>
+<li>
+<p>Open <strong>Visual Studio Code</strong>.
+
+<p align="center">
+<img alt="flaxon Logo" src="https://raw.githubusercontent.com/aldanedev-create/Flaxon-Backend-Framework/main/assets/vscode-1.png" width="400"/>
+</p>
+</p>
+</li>
+<li>
+<p>Open the <strong>Extensions</strong> view (<code>Ctrl+Shift+X</code> or <code>Cmd+Shift+X</code> on macOS).
+
+<p align="center">
+<img alt="flaxon Logo" src="https://raw.githubusercontent.com/aldanedev-create/Flaxon-Backend-Framework/main/assets/vscode-2.png" width="400"/>
+</p></p>
+</li>
+<li>
+<p>Search for <strong>Flaxon</strong>.</p>
+</li>
+<li>Click <strong>Install</strong>.</li>
+</ol>
+<p align="center">
+<img alt="flaxon Logo" src="https://raw.githubusercontent.com/aldanedev-create/Flaxon-Backend-Framework/main/assets/vscode-3.png" width="400"/>
+</p>
+<h2 id="from-the-command-line">From the Command Line</h2>
+<div class="highlight"><pre><span></span><code>code<span class="w"> </span>--install-extension<span class="w"> </span>flaxon.flaxon-vscode
+</code></pre></div>
+<h2 id="from-a-vsix-file">From a VSIX File</h2>
+<div class="highlight"><pre><span></span><code>code<span class="w"> </span>--install-extension<span class="w"> </span>flaxon-vscode-0.1.0.vsix
+</code></pre></div>
+<hr/>
+<h2 id="requirements">Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VS Code</td>
+<td>1.74.0 or later</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.11 or later</td>
+</tr>
+<tr>
+<td>Flaxon</td>
+<td>0.1.5 or later</td>
+</tr>
+<tr>
+<td>Python Extension</td>
+<td>Latest</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="quick-start">Quick Start</h2>
+<h2 id="1-create-a-flaxon-project">1. Create a Flaxon Project</h2>
+<p>Open the Command Palette (<code>Ctrl+Shift+P</code> or <code>Cmd+Shift+P</code> on macOS) and run:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Create Project
+</code></pre></div>
+<p>Follow the prompts to generate your new Flaxon project.</p>
+<hr/>
+<h2 id="2-open-your-project">2. Open Your Project</h2>
+<p>Open the generated project folder in Visual Studio Code.</p>
+<hr/>
+<h2 id="3-start-developing">3. Start Developing</h2>
+<p>The extension automatically activates when you open a supported Flaxon project.</p>
+<hr/>
+<h2 id="4-run-your-application">4. Run Your Application</h2>
+<p>Open the Command Palette and run:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Run App
+</code></pre></div>
+<hr/>
+<h2 id="5-view-your-routes">5. View Your Routes</h2>
+<p>Open the <strong>Route Explorer</strong> from the Activity Bar to browse all discovered routes.</p>
+<hr/>
+<h2 id="extension-activation">Extension Activation</h2>
+<p>The extension activates automatically when one of the following occurs:</p>
+<ul>
+<li>You open a Python (<code>.py</code>) file.</li>
+<li>A Flaxon project is detected (<code>app.py</code>, <code>main.py</code>, or <code>flaxon.py</code>).</li>
+<li>You execute a Flaxon command from the Command Palette.</li>
+</ul>
+<h2 id="status-bar">Status Bar</h2>
+<table>
+<thead>
+<tr>
+<th>Indicator</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flaxon ✓</td>
+<td>Extension is active</td>
+</tr>
+<tr>
+<td>Flaxon ✗</td>
+<td>Extension encountered an error</td>
+</tr>
+<tr>
+<td>Flaxon ⟳</td>
+<td>Language server is starting</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="first-project-checklist">First Project Checklist</h2>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> Install Flaxon</li>
+</ul>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<ul class="task-list">
+<li class="task-list-item"><input disabled="" type="checkbox"/> Create an <code>app.py</code> file.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Define a few routes.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Verify the Route Explorer detects them.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Try CodeLens on your routes.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Test IntelliSense and auto-completion.</li>
+<li class="task-list-item"><input disabled="" type="checkbox"/> Run your application using <strong>Flaxon: Run App</strong>.</li>
+</ul>
+<hr/>
+<h2 id="keyboard-shortcuts">Keyboard Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Shift+R</code> / <code>Cmd+Shift+R</code></td>
+<td>Show Routes</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+F5</code> / <code>Cmd+Shift+F5</code></td>
+<td>Run Application</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+P</code></td>
+<td>Open Command Palette</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h2 id="extension-not-activating">Extension Not Activating</h2>
+<ul>
+<li>Open a Python file containing Flaxon code.</li>
+<li>Open the <strong>Output</strong> panel (<code>Ctrl+Shift+U</code>) and select <strong>Flaxon</strong>.</li>
+<li>Restart Visual Studio Code.</li>
+</ul>
+<hr/>
+<h2 id="route-explorer-is-empty">Route Explorer Is Empty</h2>
+<ul>
+<li>Save your Python file (<code>Ctrl+S</code>).</li>
+<li>Ensure routes use decorators such as:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>Verify Flaxon is installed:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<hr/>
+<h2 id="codelens-not-appearing">CodeLens Not Appearing</h2>
+<ul>
+<li>Enable the setting:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>flaxon.enableCodeLens
+</code></pre></div>
+<ul>
+<li>Save the file.</li>
+<li>Restart the language server:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>Flaxon: Restart Language Server
+</code></pre></div>
+<hr/>
+<h2 id="auto-completion-not-working">Auto-Completion Not Working</h2>
+<ul>
+<li>Enable:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>flaxon.enableCompletions
+</code></pre></div>
+<ul>
+<li>Ensure the Python extension is installed.</li>
+<li>Restart Visual Studio Code.</li>
+</ul>
+<hr/>
+<h2 id="language-server-not-starting">Language Server Not Starting</h2>
+<p>Verify the following:</p>
+<ul>
+<li>Python is installed and available in your <code>PATH</code>.</li>
+<li>Flaxon is installed.</li>
+</ul>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon
+</code></pre></div>
+<p>Restart the language server:</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Restart Language Server
+</code></pre></div>
+<p>If problems persist, check the <strong>Output</strong> panel for diagnostic messages.</p>
+<hr/>
+<h2 id="getting-help">Getting Help</h2>
+<ul>
+<li>📚 Documentation</li>
+<li>🐛 Report Issues</li>
+<li>💬 Discussions</li>
+<li>🌐 Flaxon Website</li>
+</ul>
+<hr/>
+<p>Happy coding with <strong>Flaxon</strong>! 🚀</p></article>
+</main></div><div id="footer"></div></body></html>

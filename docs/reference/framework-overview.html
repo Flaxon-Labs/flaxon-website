@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Readme — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Readme — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Readme</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/README.md">Framework source</a> · <a href="../../content/framework/README.md" download>Markdown</a></p><div align="center">
+<a href="https://flaxon-website.vercel.app/">
+<img alt="Flaxon logo" src="https://raw.githubusercontent.com/aldanedev-create/flaxon/main/assets/flaxon.png" width="200"/>
+</a>
+<h1 id="flaxon">Flaxon</h1>
+<p><strong>The Python full-stack framework.</strong></p>
+<p>Simple Python. Serious Applications.</p>
+<a href="https://pypi.org/project/flaxon/"><img alt="PyPI version" src="https://img.shields.io/pypi/v/flaxon.svg?style=for-the-badge"/></a>
+<a href="https://github.com/aldanedev-create/flaxon/blob/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge"/></a>
+<a href="https://github.com/astral-sh/ruff"><img alt="Code style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000.svg?style=for-the-badge"/></a>
+</div>
+<h2 id="getting-started">Getting Started</h2>
+<p>Flaxon is an async-first Python full-stack framework with built-in Admin, CMS, authentication, database tools, WebSockets, and a modular application system. Build interactive applications with <strong>Teloce</strong>, complete server-rendered applications with <strong>Jinax</strong>, or combine both.</p>
+<p>Requires <strong>Python 3.11+</strong>. In an activated virtual environment:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>my-project<span class="w"> </span>--no-venv
+<span class="nb">cd</span><span class="w"> </span>my-project
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open <a href="http://127.0.0.1:8000/">localhost:8000</a> to see your application. The starter includes a welcome interface, feature modules, custom CLI commands, migrations, and a protected Admin dashboard.</p>
+<p>See the <a href="../getting-started/project-setup.html">getting started guide</a> for the complete setup.</p>
+<h2 id="documentation">Documentation</h2>
+<p>Visit the <a href="https://flaxon-website.vercel.app/docs.html">Flaxon documentation</a> or browse the <a href="../getting-started/index.html">repository guides</a>.</p>
+<ul>
+<li><a href="../api/teloce.html">Teloce full-stack applications</a></li>
+<li><a href="../guides/jinax.html">Jinax server-rendered applications</a></li>
+<li><a href="../guides/admin-cms.html">Admin and CMS</a></li>
+<li><a href="../guides/modules.html">Modules</a></li>
+<li><a href="../deployment.html">Deployment</a></li>
+</ul>
+<h2 id="examples">Examples</h2>
+<p>Explore the <a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/examples">example applications</a>, including a <a href="../projects/teloce-modules-shop/index.html">modular Teloce shop</a>, <a href="../projects/teloce-taskboard/index.html">taskboard</a>, and <a href="../projects/school-portal/index.html">school portal</a>.</p>
+<h2 id="community-and-contributing">Community and Contributing</h2>
+<p>Created and maintained by <strong>Aldane Hutchinson</strong>. Contributions, documentation improvements, and examples are welcome.</p>
+<p>Report bugs and suggest features through <a href="https://github.com/aldanedev-create/flaxon/issues">GitHub Issues</a>. Read the <a href="framework-contributing.html">contribution guidelines</a> and <a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/CODE_OF_CONDUCT.md">Code of Conduct</a> to get involved.</p>
+<h2 id="security">Security</h2>
+<p>Report vulnerabilities privately following <a href="security-policy.html">SECURITY.md</a>.</p>
+<h2 id="license">License</h2>
+<p><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/LICENSE">MIT</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

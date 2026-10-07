@@ -1,104 +1,250 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>OpenAPI, Swagger UI, and ReDoc - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>OpenAPI, Swagger UI, and ReDoc</h1>
-                        <p>Flaxon can generate an OpenAPI 3.1 document from the routes already registered on the application. The same schema powers an interactive Swagger UI and a ReDoc reference page.</p>
-                        <h2>Enable interactive documentation</h2>
-                        <pre><code class="language-python">from flaxon import Flaxon
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="OpenAPI, Swagger UI, and ReDoc — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>OpenAPI, Swagger UI, and ReDoc — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>OpenAPI, Swagger UI, and ReDoc</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/openapi.md">Framework source</a> · <a href="../../content/framework/docs/guides/openapi.md" download>Markdown</a></p><h1 id="openapi-swagger-ui-and-redoc">OpenAPI, Swagger UI, and ReDoc</h1>
+<p>Flaxon generates an OpenAPI 3.1 document from the routes already registered on
+your application. The generator reads path converters, endpoint annotations,
+native Flaxon schemas, optional Pydantic models, query declarations,
+docstrings, and route metadata. You do not maintain a second list of routes.</p>
+<h2 id="enable-automatic-documentation">Enable automatic documentation</h2>
+<p>Pass <code>openapi=True</code> when creating the application:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 
-app = Flaxon("catalog", openapi=True)
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"catalog"</span><span class="p">,</span> <span class="n">openapi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>This registers:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/openapi.json</code></td>
+<td>Generated OpenAPI 3.1 document</td>
+</tr>
+<tr>
+<td><code>/docs</code></td>
+<td>Interactive Swagger UI with Try it out</td>
+</tr>
+<tr>
+<td><code>/redoc</code></td>
+<td>ReDoc reference browser</td>
+</tr>
+</tbody>
+</table>
+<p>The feature is opt-in. An application that does not pass <code>openapi=True</code> does
+not expose documentation routes.</p>
+<p>Set application metadata directly in the constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"catalog"</span><span class="p">,</span>
+    <span class="n">openapi</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Catalog API"</span><span class="p">,</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"2026.1"</span><span class="p">,</span>
+        <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Inventory and ordering API."</span><span class="p">,</span>
+        <span class="s2">"docs_url"</span><span class="p">:</span> <span class="s2">"/api/docs"</span><span class="p">,</span>
+        <span class="s2">"redoc_url"</span><span class="p">:</span> <span class="s2">"/api/reference"</span><span class="p">,</span>
+        <span class="s2">"openapi_url"</span><span class="p">:</span> <span class="s2">"/api/openapi.json"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The equivalent explicit form is useful when configuration is loaded later:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"catalog"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">enable_openapi</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Catalog API"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"2026.1"</span><span class="p">,</span>
+    <span class="n">openapi_url</span><span class="o">=</span><span class="s2">"/api/openapi.json"</span><span class="p">,</span>
+    <span class="n">docs_url</span><span class="o">=</span><span class="s2">"/api/docs"</span><span class="p">,</span>
+    <span class="n">redoc_url</span><span class="o">=</span><span class="s2">"/api/reference"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="typed-routes-and-query-parameters">Typed routes and query parameters</h2>
+<p>Path converters and <code>Query</code> declarations become OpenAPI parameters and are
+also coerced and validated at runtime:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span>
 
-# Generated endpoints:
-# /openapi.json - OpenAPI 3.1 JSON
-# /docs         - Swagger UI with Try it out
-# /redoc        - ReDoc reference browser</code></pre>
-                        <p>OpenAPI is opt-in. An application that does not pass <code>openapi=True</code> does not mount these routes.</p>
-                        <h2>Configure URLs and metadata</h2>
-                        <pre><code class="language-python">app = Flaxon(
-    "catalog",
-    openapi={
-        "title": "Catalog API",
-        "version": "2026.1",
-        "description": "Inventory and ordering API.",
-        "docs_url": "/api/docs",
-        "redoc_url": "/api/reference",
-        "openapi_url": "/api/openapi.json",
-    },
-)</code></pre>
-                        <h2>Document typed endpoints</h2>
-                        <pre><code class="language-python">from flaxon import Query
 
-@app.get(
-    "/products/&lt;int:product_id&gt;",
-    summary="Get a product",
-    tags=["products"],
-    operation_id="get_product",
-)
-async def get_product(
-    product_id: int,
-    page: int = Query(1, ge=1),
-    search: str = Query("", max_length=120),
-):
-    return {"id": product_id, "page": page, "search": search}</code></pre>
-                        <p>Path converters and <code>Query</code> declarations become schema parameters and are validated at runtime. Invalid values use Flaxon's normal <code>422</code> validation response.</p>
-                        <h2>Use schemas and Pydantic</h2>
-                        <pre><code class="language-python">from flaxon.validation import IntField, Schema, StrField
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">"/products/&lt;int:product_id&gt;"</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">"Get a product"</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"products"</span><span class="p">],</span>
+    <span class="n">operation_id</span><span class="o">=</span><span class="s2">"get_product"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span>
+    <span class="n">product_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"One-based result page"</span><span class="p">),</span>
+    <span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Name search"</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">product_id</span><span class="p">,</span> <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span> <span class="s2">"search"</span><span class="p">:</span> <span class="n">search</span><span class="p">}</span>
+</code></pre></div>
+<p>Use <code>Query()</code> without a value for a required query parameter. Use <code>alias</code> when
+the public name differs from the Python argument:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_products</span><span class="p">(</span>
+    <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">"pageSize"</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"page_size"</span><span class="p">:</span> <span class="n">page_size</span><span class="p">}</span>
+</code></pre></div>
+<p>Invalid values return Flaxon's normal <code>422</code> validation response and the same
+constraints appear in the generated schema.</p>
+<h2 id="request-and-response-schemas">Request and response schemas</h2>
+<p>Native Flaxon schemas work without an extra dependency:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntField</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">StrField</span>
 
-class CreateProduct(Schema):
-    name = StrField(required=True, min_length=2, max_length=120)
-    stock = IntField(required=True, minimum=0)
 
-@app.post("/products", summary="Create a product", tags=["products"])
-async def create_product(product: CreateProduct) -> CreateProduct:
-    return product</code></pre>
-                        <p>Native Flaxon schemas work without extra dependencies. Install <code>flaxon[pydantic]</code> when you want Pydantic models; their <code>model_json_schema()</code> output is included in the OpenAPI components.</p>
-                        <h2>Modules and routers</h2>
-                        <p>Routes included with <code>include_router()</code> or mounted with <code>mount_module()</code> are discovered from the final application registry. Metadata stays with the feature that owns the route.</p>
-                        <h2>Protect documentation</h2>
-                        <pre><code class="language-python">from flaxon import HTTPException
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateProduct</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">stock</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-async def docs_guard(request):
-    if request.headers.get("x-docs-key") != "internal-preview":
-        raise HTTPException(403, "Documentation is restricted.")
-    return True
 
-app.enable_openapi(
-    title="Internal API",
-    docs_guard=docs_guard,
-    protect_docs=True,
-)</code></pre>
-                        <p>OpenAPI describes the contract; it does not authenticate requests. Keep the application's real authentication and authorization in place. For private deployments, serve Swagger and ReDoc assets from your own host.</p>
-                        <h2>Export and check the schema</h2>
-                        <pre><code class="language-bash">flaxon docs app:app --output openapi.json
-flaxon docs app:app --output openapi.json --check</code></pre>
-                        <p>The check compares parsed JSON and returns a non-zero exit code when the checked-in schema is missing, invalid, or out of date.</p>
-                        <p>WebSocket routes are not represented by OpenAPI; document their messages separately in the <a href="/docs/guides/websockets.html">WebSockets guide</a>.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">"/products"</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">"Create a product"</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"products"</span><span class="p">],</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span><span class="mi">201</span><span class="p">:</span> <span class="p">(</span><span class="n">CreateProduct</span><span class="p">,</span> <span class="s2">"Product created"</span><span class="p">)},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_product</span><span class="p">(</span><span class="n">product</span><span class="p">:</span> <span class="n">CreateProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CreateProduct</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">product</span>
+</code></pre></div>
+<p>The request body and <code>200</code> response reference a reusable component schema.
+The <code>responses</code> mapping accepts a description string, a schema class, a
+<code>(schema, description)</code> tuple, or a raw OpenAPI response object.</p>
+<p>Pydantic is optional. Install <code>flaxon[pydantic]</code> to use Pydantic request and
+response models; their <code>model_json_schema()</code> output is copied into the
+OpenAPI components section:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">price</span><span class="p">:</span> <span class="nb">float</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">product</span><span class="p">:</span> <span class="n">Product</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">product</span>
+</code></pre></div>
+<h2 id="docstrings-and-metadata">Docstrings and metadata</h2>
+<p>The first non-empty docstring line becomes the operation summary and remaining
+lines become its description. Explicit route metadata wins over the
+docstring:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/reports"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"reporting"</span><span class="p">],</span> <span class="n">deprecated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">reports</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""List reports.</span>
+
+<span class="sd">    Reports are filtered by the current user's organization.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div>
+<p>Every named route receives an <code>operationId</code>. Use <code>security</code> when the endpoint
+requires a security scheme that your application defines:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/account"</span><span class="p">,</span> <span class="n">security</span><span class="o">=</span><span class="p">[{</span><span class="s2">"bearerAuth"</span><span class="p">:</span> <span class="p">[]}])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">account</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"authenticated"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div>
+<p>OpenAPI describes the contract; it does not authenticate requests. Keep your
+real authentication middleware or endpoint dependency in place.</p>
+<h2 id="modules-and-routers">Modules and routers</h2>
+<p>Routes mounted with <code>include_router()</code> or <code>mount_module()</code> are discovered from
+the final application registry. Metadata survives the mount, so a feature can
+own its documentation next to its routes:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">Router</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/catalog"</span><span class="p">)</span>
+
+
+<span class="nd">@catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/products"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"catalog"</span><span class="p">],</span> <span class="n">summary</span><span class="o">=</span><span class="s2">"List products"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
+</code></pre></div>
+<p>The generated path is <code>/api/catalog/products</code>. WebSocket routes are not added
+to OpenAPI because OpenAPI describes HTTP operations; document WebSocket
+messages separately with the <a href="websockets.html">WebSocket guide</a>.</p>
+<h2 id="protect-documentation-in-production">Protect documentation in production</h2>
+<p>Documentation is public when enabled unless you provide a guard. The guard can
+be synchronous or asynchronous and may return a <code>Response</code> for a custom
+denial page:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">docs_guard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x-docs-key"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"internal-preview"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="s2">"Documentation is restricted."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">enable_openapi</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Internal API"</span><span class="p">,</span>
+    <span class="n">docs_guard</span><span class="o">=</span><span class="n">docs_guard</span><span class="p">,</span>
+    <span class="n">protect_docs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p><code>protect_docs=True</code> requires a guard so a deployment cannot accidentally claim
+that its documentation is protected. The default Swagger UI does not persist
+authorization tokens in browser storage. Set <code>persist_authorization=True</code> only
+when that tradeoff is intentional.</p>
+<p>For an offline or security-sensitive deployment, point <code>swagger_asset_url</code> and
+<code>redoc_asset_url</code> at assets served by your own application or reverse proxy.</p>
+<h2 id="generate-a-checked-in-specification">Generate a checked-in specification</h2>
+<p>The CLI can generate a file for clients, SDK tooling, or CI:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>docs<span class="w"> </span>app:app<span class="w"> </span>--output<span class="w"> </span>openapi.json
+</code></pre></div>
+<p>Use <code>--include-internal</code> only when you intentionally want framework routes
+such as <code>/health</code> and <code>/metrics</code> in the exported document. In CI, fail when a
+developer changed routes without updating the checked-in file:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>docs<span class="w"> </span>app:app<span class="w"> </span>--output<span class="w"> </span>openapi.json<span class="w"> </span>--check
+</code></pre></div>
+<p>The check compares parsed JSON, so whitespace and indentation do not create
+false failures. It reports a non-zero exit code when the file is missing,
+invalid, or out of date.</p>
+<h2 id="complete-copy-paste-application">Complete copy-paste application</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Query</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">StrField</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SearchResult</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"search-api"</span><span class="p">,</span>
+    <span class="n">openapi</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Search API"</span><span class="p">,</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.0.0"</span><span class="p">,</span>
+        <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"A small, documented Flaxon service."</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/search"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"search"</span><span class="p">])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">q</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[{</span><span class="s2">"title"</span><span class="p">:</span> <span class="n">q</span><span class="p">}]</span>
+</code></pre></div>
+<p>Run it with:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Then open <a href="http://127.0.0.1:8000/docs">http://127.0.0.1:8000/docs</a> or
+<a href="http://127.0.0.1:8000/redoc">http://127.0.0.1:8000/redoc</a>.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

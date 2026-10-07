@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 1: Understand the page lifecycle — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 1: Understand the page lifecycle — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 1: Understand the page lifecycle</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/01-first-app.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/01-first-app.md" download>Markdown</a></p><h1 id="lesson-1-understand-the-page-lifecycle">Lesson 1: Understand the page lifecycle</h1>
+<p>Create the quick-start files and run the development server. <code>app.use_teloce()</code>
+registers the UI tree and startup build. <code>request.compile()</code> returns an HTML
+shell referencing the built component and styles. The browser mounts the
+component, then its <code>mounted()</code> callback requests <code>/api/tasks</code>.</p>
+<p>The template source is not simply returned as an HTML page. The integration is
+client rendering: the initial body contains a mount point rather than rendered
+task rows. If a page needs server-rendered HTML, use Flaxon's Jinax integration
+and <code>request.render()</code>. Choose rendering according to the page's requirements.</p>
+<p>Keep browser-only UI behavior inside components and privileged business work
+inside Python endpoints. Context passed to <code>compile()</code> is serialized into the
+page: it is suitable for public display values, never credentials.</p>
+<p><strong>Checkpoint:</strong> inspect page source and Network tools. Find the mount point,
+compiled <code>.js</code>, stylesheet and API request. Disable JavaScript to understand
+which content depends on the browser runtime.</p>
+<h2 id="a-complete-app-you-can-run">A complete app you can run</h2>
+<p>Use <a href="../projects/teloce-taskboard/index.html">Taskboard</a> as the working baseline.
+The Python file below is complete. It contains a GET endpoint, validated POST
+endpoint and page route. Keep the interface in <code>ui/</code>; Python should not contain
+large HTML strings.</p>
+<h3 id="examplesteloce_taskboardapppy"><code>examples/teloce_taskboard/app.py</code></h3>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Taskboard teaching fixture: a Python API and a typed Teloce interface."""</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">fields</span>
+
+<span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"Taskboard"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span><span class="n">project_root</span><span class="o">=</span><span class="n">project_root</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Taskboard"</span><span class="p">)</span>
+
+<span class="c1"># This data resets when the process restarts. Lesson 8 explains persistence.</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Read the full-stack lessons"</span><span class="p">,</span> <span class="s2">"complete"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreateTask</span><span class="p">(</span><span class="n">Schema</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">StrField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_tasks</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"items"</span><span class="p">:</span> <span class="n">tasks</span><span class="p">}</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_task</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">CreateTask</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s2">"title"</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Enter a task title."</span><span class="p">},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">422</span><span class="p">)</span>
+
+    <span class="n">task</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s2">"complete"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">)</span>
+</code></pre></div>
+<p><code>CreateTask</code> is the request schema. Flaxon validates the JSON body before calling
+the handler. <code>JSONResponse</code> lets the handler choose a status code. The page route
+only selects a component; its browser-side API helper loads the tasks.</p>
+<p>Run the example with <code>flaxon run app:app --reload</code> from its folder. A restart
+resets this teaching fixture's in-memory tasks. Do not call it persistent storage.</p>
+<p><a href="index.html">Course contents</a> · <a href="02-components.html">Next lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>

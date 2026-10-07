@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mail Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Mail Example — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Mail Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/mail/readme.md">Framework source</a> · <a href="../../../content/framework/docs/examples/mail/readme.md" download>Markdown</a></p><h1 id="mail-example">Mail Example</h1>
+<p>This is a complete, same-origin contact form. The app serves the HTML page at
+<code>/</code> and posts validated data to <code>/api/contact</code>.</p>
+<h2 id="run-it">Run it</h2>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+flaxon<span class="w"> </span>run<span class="w"> </span>docs.examples.mail.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>. By default, <code>ConsoleAdapter</code> prints the email
+to the terminal and does not contact an SMTP server.</p>
+<h2 id="use-smtp">Use SMTP</h2>
+<p>Set these variables before starting the server. Credentials stay outside the
+source code:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">FLAXON_SMTP_HOST</span><span class="o">=</span>smtp.example.com
+<span class="nv">FLAXON_SMTP_PORT</span><span class="o">=</span><span class="m">587</span>
+<span class="nv">FLAXON_SMTP_USERNAME</span><span class="o">=</span>mailer@example.com
+<span class="nv">FLAXON_SMTP_PASSWORD</span><span class="o">=</span>replace-me
+<span class="nv">FLAXON_SMTP_TLS</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">FLAXON_MAIL_FROM</span><span class="o">=</span>noreply@example.com
+<span class="nv">FLAXON_MAIL_TO</span><span class="o">=</span>support@example.com
+</code></pre></div>
+<p>The app switches to <code>SMTPAdapter</code> when <code>FLAXON_SMTP_HOST</code> is present. Use
+<code>FLAXON_SMTP_SSL=true</code> for implicit TLS, normally on port 465, and do not use
+implicit SSL and STARTTLS for the same connection.</p>
+<p>The example uses <code>EmailField</code> and length limits before sending. For production,
+add authentication or abuse protection to public contact forms and use a task
+queue for slow or high-volume delivery. See the full <a href="../../guides/mail.html">Mail guide</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

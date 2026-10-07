@@ -113,6 +113,7 @@
     // ============================================================
     ready(function() {
         document.querySelectorAll('.code-block').forEach(function(block) {
+            if (block.closest('.doc-content') || block.querySelector('.copy-btn')) return;
             const copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
             copyBtn.innerHTML = '<i class="fas fa-copy"></i>';

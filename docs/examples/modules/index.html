@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Modules Example: Catalog and Orders — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Modules Example: Catalog and Orders — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Modules Example: Catalog and Orders</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/Modules/readme.md">Framework source</a> · <a href="../../../content/framework/docs/examples/Modules/readme.md" download>Markdown</a></p><h1 id="modules-example-catalog-and-orders">Modules Example: Catalog and Orders</h1>
+<p>This is a small production-style application composed from independent
+<code>FlaxonModule</code> features. It demonstrates the boundary that scales to a larger
+application without putting every route in <code>app.py</code>:</p>
+<div class="highlight"><pre><span></span><code>docs/examples/Modules/
+|-- app.py
+|-- modules/
+|   |-- catalog.py
+|   |-- orders.py
+|   `-- store.py
+`-- templates/store.html
+</code></pre></div>
+<h2 id="run-it">Run it</h2>
+<p>Install the framework and Jinax, then run from the repository root:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[templates]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>docs.examples.Modules.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open <a href="http://127.0.0.1:8000/store/">http://127.0.0.1:8000/store/</a> to view the catalog. The API endpoints
+are:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/store/</code></td>
+<td>Jinax storefront owned by the catalog module</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/store/api/products</code></td>
+<td>Catalog JSON</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/store/api/products/1</code></td>
+<td>One product</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/orders/</code></td>
+<td>Orders JSON</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/orders/</code></td>
+<td>Validate and create an order</td>
+</tr>
+</tbody>
+</table>
+<p>Create an order:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:8000/api/orders/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"product_id":1,"quantity":2,"customer_email":"ada@example.com"}'</span>
+</code></pre></div>
+<h2 id="what-the-example-demonstrates">What the example demonstrates</h2>
+<ul>
+<li><code>catalog.py</code> owns storefront and product routes.</li>
+<li><code>orders.py</code> owns order validation and order routes.</li>
+<li><code>store.py</code> is a shared service boundary. It is in-memory only so the demo
+  needs no database; replace it with a repository for production persistence.</li>
+<li><code>app.py</code> registers the service and decides the public URL prefixes with
+  <code>app.mount_module(...)</code>.</li>
+<li><code>requires("store")</code> makes a missing service fail during startup instead of
+  failing on the first request.</li>
+<li>The same module pattern works for authentication, billing, admin pages,
+  WebSockets, background tasks, and optional Pydantic or FastMCP integrations.</li>
+</ul>
+<p>The module does not start its own server. The application factory owns
+composition and the normal Flaxon CLI owns the server lifecycle.</p></article>
+</main></div><div id="footer"></div></body></html>

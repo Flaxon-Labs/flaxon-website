@@ -1,120 +1,173 @@
-<!-- docs/getting-started/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Getting Started – Flaxon</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
-
-    <div id="header"></div>
-
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html" class="active">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-                        <div class="section-title">More</div>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Getting Started with Flaxon</h1>
-                        <p>Welcome to Flaxon! This guide will help you get started with building applications using the framework.</p>
-
-                        <div class="note success">
-                            <strong><i class="fas fa-rocket mr-2"></i> What You'll Learn</strong>
-                            <ul class="mb-0 mt-1">
-                                <li>How to install Flaxon</li>
-                                <li>How to create your first application</li>
-                                <li>Core concepts and structure</li>
-                            </ul>
-                        </div>
-
-                        <h2>Prerequisites</h2>
-                        <ul>
-                            <li>Python 3.11 or higher</li>
-                            <li>pip (Python package manager)</li>
-                            <li>Basic knowledge of Python and async/await</li>
-                        </ul>
-
-                        <h2>Installation</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">pip install flaxon</code></pre>
-                        </div>
-
-                        <h2>Your First Application</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
-
-app = Flaxon("hello-world", debug=True)
-
-@app.get("/")
-async def home():
-    return {"message": "Hello, World!"}</code></pre>
-                        </div>
-
-                        <h2>Run It</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">flaxon run app:app --reload</code></pre>
-                        </div>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Next Steps</strong>
-                            <p class="mb-0 mt-1">Check out the <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-                        <div class="section-title">More</div>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a> guide for a more detailed walkthrough.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon documentation — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon documentation — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon documentation</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/index.md">Framework source</a> · <a href="../../content/framework/docs/index.md" download>Markdown</a></p><h1 id="flaxon-documentation">Flaxon documentation</h1>
+<p>Flaxon brings Python APIs, Teloce interfaces, TypeScript, modules, persistence, and administration into one full-stack application. Teloce compiles your HTML components and browser scripts; Flaxon serves the application and runs its Python features.</p>
+<h2 id="start-here">Start here</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>my-project
+<span class="nb">cd</span><span class="w"> </span>my-project
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+flaxon<span class="w"> </span>run
+</code></pre></div>
+<p>The default starter welcomes you at <code>/</code>, demonstrates a module-owned Python API from TypeScript, and includes a protected <code>/admin</code>. Try <code>/server-page</code> for the complete Jinax example, and run <code>flaxon welcome</code> or <code>flaxon welcome-status</code> for module-owned custom commands. Choose Flaxon + Jinax for server-rendered applications, Flaxon + Teloce for interactive interfaces, or combine them. There is no default administrator password. Read <a href="project-setup.html">getting started</a> for virtual environments, project files, command details, and deployment boundaries.</p>
+<h2 id="a-complete-learning-path">A complete learning path</h2>
+<ol>
+<li><strong>Build the server:</strong> <a href="../core-concepts/routing.html">routing</a>, <a href="../core-concepts/requests.html">requests</a>, <a href="../core-concepts/validation.html">validation</a>, <a href="../guides/databases.html">databases</a>, and <a href="../guides/authentication.html">authentication</a>.</li>
+<li><strong>Build the interface:</strong> <a href="../guides/teloce-spa.html">Teloce SPA</a>, <a href="../fullstack/02-components.html">HTML components</a>, <a href="../fullstack/03-typed-api.html">typed APIs</a>, and <a href="../fullstack/04-typescript.html">TypeScript</a>.</li>
+<li><strong>Organize features:</strong> <a href="../guides/modules.html">modules</a>, <a href="../fullstack/06-routing.html">navigation</a>, and <a href="../guides/admin-cms.html">admin/CMS</a>.</li>
+<li><strong>Ship responsibly:</strong> <a href="../guides/testing.html">testing</a>, <a href="../security.html">security</a>, <a href="../fullstack/10-production.html">production</a>, and <a href="../deployment.html">deployment</a>.</li>
+</ol>
+<h2 id="ten-full-stack-lessons">Ten full-stack lessons</h2>
+<p>Work through <a href="../fullstack/index.html">the course overview</a>, then follow these lessons:</p>
+<ul>
+<li><a href="../fullstack/01-first-app.html">Lesson 1: Understand the page lifecycle</a></li>
+<li><a href="../fullstack/02-components.html">Lesson 2: Build useful components and scoped styles</a></li>
+<li><a href="../fullstack/03-typed-api.html">Lesson 3: Connect writes to validated Python endpoints</a></li>
+<li><a href="../fullstack/04-typescript.html">Lesson 4: Use TypeScript without sending types to browsers</a></li>
+<li><a href="../fullstack/05-head-and-cdn.html">Lesson 5: Configure the document head and CDN resources</a></li>
+<li><a href="../fullstack/06-routing.html">Lesson 6: Add pages and direct-link navigation</a></li>
+<li><a href="../fullstack/07-modules.html">Lesson 7: Organize full-stack features with modules</a></li>
+<li><a href="../fullstack/08-data-and-security.html">Lesson 8: Persist data and authorize every operation</a></li>
+<li><a href="../fullstack/09-live-updates.html">Lesson 9: Add live updates and test the full boundary</a></li>
+<li><a href="../fullstack/10-production.html">Lesson 10: Build, deploy and maintain the complete application</a></li>
+</ul>
+<h2 id="complete-documentation-directory">Complete documentation directory</h2>
+<p>Use the guides for explanations, the API pages for reference, and the examples for working patterns. The directory below lists every Markdown document in this documentation tree, including older lessons and editor guides.</p>
+<h3 id="foundations-and-operations">Foundations and operations</h3>
+<ul>
+<li><a href="../admin-guide.html">Flaxon Admin Dashboard Guide</a></li>
+<li><a href="../architecture.html">Architecture</a></li>
+<li><a href="../cheatsheet.html">Flaxon &amp; Plugins - Quick Reference Cheat Sheet</a></li>
+<li><a href="../cms.html">Flaxon CMS</a></li>
+<li><a href="../configuration.html">Configuration</a></li>
+<li><a href="../contributing.html">Contributing to Flaxon</a></li>
+<li><a href="../deployment.html">Deployment</a></li>
+<li><a href="../guides/ecosystem.html">Flaxon ecosystem</a></li>
+<li><a href="../getting-starting.html">Getting started</a></li>
+<li><a href="project-setup.html">Getting started with Flaxon</a></li>
+<li><a href="../graphql.html">GraphQL API Example</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="../guides/mail.html">Email</a></li>
+<li><a href="../maintenance.html">Maintenance Guide</a></li>
+<li><a href="../migration-guide.html">Migration Guide</a></li>
+<li><a href="../performance.html">Performance</a></li>
+<li><a href="../philosophy.html">Philosophy</a></li>
+<li><a href="quickstart.html">Full-stack quick start</a></li>
+<li><a href="../security.html">Security</a></li>
+<li><a href="../tech-passport.html">Flaxon Technical Passport</a></li>
+<li><a href="../updates.html">Flaxon Update Policy</a></li>
+</ul>
+<h3 id="feature-guides">Feature guides</h3>
+<ul>
+<li><a href="../guides/admin-cms.html">Admin and CMS Production Guide</a></li>
+<li><a href="../guides/admin-production.html">Flaxon Admin in Production</a></li>
+<li><a href="../guides/authentication.html">Authentication</a></li>
+<li><a href="../guides/authorization.html">Authorization</a></li>
+<li><a href="../guides/databases.html">Databases</a></li>
+<li><a href="../guides/debugging.html">Debugging</a></li>
+<li><a href="../guides/fastmcp.html">FastMCP Integration</a></li>
+<li><a href="../guides/graphql.html">GraphQL API Example</a></li>
+<li><a href="../guides/jinax.html">Jinax Templates</a></li>
+<li><a href="../guides/microservices.html">Admin and CMS with microservices</a></li>
+<li><a href="../core-concepts/middleware.html">Middleware</a></li>
+<li><a href="../guides/mobile-backends.html">Mobile Development</a></li>
+<li><a href="../guides/modules.html">Modules Guide</a></li>
+<li><a href="../guides/openapi.html">OpenAPI, Swagger UI, and ReDoc</a></li>
+<li><a href="../guides/plugins.html">Plugins</a></li>
+<li><a href="../guides/pydantic.html">Pydantic Integration</a></li>
+<li><a href="../core-concepts/requests.html">Requests</a></li>
+<li><a href="../core-concepts/responses.html">Responses</a></li>
+<li><a href="../core-concepts/routing.html">Routing</a></li>
+<li><a href="../guides/scaling.html">Growing a Flaxon application</a></li>
+<li><a href="../guides/tasks.html">Tasks</a></li>
+<li><a href="../guides/teloce-spa.html">Teloce Spa</a></li>
+<li><a href="../guides/testing.html">Testing</a></li>
+<li><a href="../core-concepts/validation.html">Validation</a></li>
+<li><a href="../guides/websockets.html">WebSockets</a></li>
+</ul>
+<h3 id="api-reference">API reference</h3>
+<ul>
+<li><a href="../api/admin-cms.html">Admin and CMS API Reference</a></li>
+<li><a href="../api/admin.html">Admin API Reference</a></li>
+<li><a href="../api/application.html">Application API</a></li>
+<li><a href="../api/graphql.html">GraphQL API Reference</a></li>
+<li><a href="../api/http.html">HTTP API</a></li>
+<li><a href="../api/jinax.html">Jinax API</a></li>
+<li><a href="../api/routing.html">Routing API</a></li>
+<li><a href="../api/security.html">Security API</a></li>
+<li><a href="../api/tasks.html">Tasks API</a></li>
+<li><a href="../api/teloce.html">Teloce full-stack integration: API reference</a></li>
+<li><a href="../api/testing.html">Testing API</a></li>
+<li><a href="../api/validation.html">Validation API</a></li>
+<li><a href="../api/websocket.html">WebSocket API</a></li>
+</ul>
+<h3 id="full-stack-course">Full-stack course</h3>
+<ul>
+<li><a href="../fullstack/01-first-app.html">Lesson 1: Understand the page lifecycle</a></li>
+<li><a href="../fullstack/02-components.html">Lesson 2: Build useful components and scoped styles</a></li>
+<li><a href="../fullstack/03-typed-api.html">Lesson 3: Connect writes to validated Python endpoints</a></li>
+<li><a href="../fullstack/04-typescript.html">Lesson 4: Use TypeScript without sending types to browsers</a></li>
+<li><a href="../fullstack/05-head-and-cdn.html">Lesson 5: Configure the document head and CDN resources</a></li>
+<li><a href="../fullstack/06-routing.html">Lesson 6: Add pages and direct-link navigation</a></li>
+<li><a href="../fullstack/07-modules.html">Lesson 7: Organize full-stack features with modules</a></li>
+<li><a href="../fullstack/08-data-and-security.html">Lesson 8: Persist data and authorize every operation</a></li>
+<li><a href="../fullstack/09-live-updates.html">Lesson 9: Add live updates and test the full boundary</a></li>
+<li><a href="../fullstack/10-production.html">Lesson 10: Build, deploy and maintain the complete application</a></li>
+<li><a href="../fullstack/index.html">Learn full-stack Flaxon in ten lessons</a></li>
+</ul>
+<h3 id="worked-examples">Worked examples</h3>
+<ul>
+<li><a href="../examples/android-backend.html">Android Backend Example</a></li>
+<li><a href="../examples/basic-api.html">Basic API Example</a></li>
+<li><a href="../examples/cms/admin-cms/example-cms.html">CMS Example</a></li>
+<li><a href="../examples/cms/full-admin-cms/index.html">Full Admin and CMS Example</a></li>
+<li><a href="../examples/fastmcp-app.html">FastMCP Example</a></li>
+<li><a href="../examples/frontend-integration.html">Frontend Integration Examples</a></li>
+<li><a href="../examples/grahql/index.html">GraphQL Example</a></li>
+<li><a href="../examples/jinax-website.html">Jinax Website Example</a></li>
+<li><a href="../examples/large-application.html">Large Application Example</a></li>
+<li><a href="../examples/mail/index.html">Mail Example</a></li>
+<li><a href="../examples/modules/index.html">Modules Example: Catalog and Orders</a></li>
+<li><a href="../examples/openapi.html">OpenAPI API Example</a></li>
+<li><a href="../examples/pydantic-api.html">Pydantic API Example</a></li>
+<li><a href="../examples/react-backend.html">React frontend and API</a></li>
+<li><a href="../examples/react-backend/index.html">Flaxon + React example</a></li>
+<li><a href="../examples/school-portal.html">School portal: Admin plus Flaxon modules</a></li>
+<li><a href="../examples/websocket-chat.html">WebSocket Chat Example</a></li>
+<li><a href="../examples/whatsapp-chat/index.html">Flaxon WhatsApp-style Chat</a></li>
+</ul>
+<h3 id="additional-lessons-and-cheat-sheets">Additional lessons and cheat sheets</h3>
+<ul>
+<li><a href="../lessons/admin-cheatsheet.html">Admin and CMS Cheat Sheet</a></li>
+<li><a href="../lessons/building-flaxon-plugins.html">Building Flaxon Plugins</a></li>
+<li><a href="../lessons/cli.html">CLI Reference</a></li>
+<li><a href="../lessons/features.html">Flaxon Features</a></li>
+<li><a href="../lessons/flaxon-cheat-sheet.html">Flaxon Cheat Sheet</a></li>
+<li><a href="../lessons/industrial-admin-customization.html">Industrial Admin Customization</a></li>
+<li><a href="../lessons/platform-deployment.html">Deploying Flaxon Apps</a></li>
+<li><a href="../lessons/production-app-guide.html">Building a Production App with Modules</a></li>
+<li><a href="../api/teloce.html">Teloce Integration Reference</a></li>
+<li><a href="../lessons/vscode-cheatsheet.html">Flaxon VS Code Extension Cheat Sheet</a></li>
+</ul>
+<h3 id="vs-code-extension">VS Code extension</h3>
+<ul>
+<li><a href="../editor/advanced.html">Flaxon VS Code Extension - Advanced Guide</a></li>
+<li><a href="../editor/features.html">Flaxon VS Code Extension - Features Guide</a></li>
+<li><a href="../editor/getting-started.html">Flaxon VS Code Extension - Getting Started</a></li>
+<li><a href="../editor/quick-cheat-sheet.html">Flaxon VS Code Extension - Quick Cheat Sheet</a></li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

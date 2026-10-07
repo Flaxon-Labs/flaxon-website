@@ -1,230 +1,113 @@
-// assets/js/docs.js
-/**
- * Flaxon Website - Documentation JavaScript
- * Interactive features for the documentation pages
- */
-
-(function() {
+/** Documentation reading tools and one native sidebar on every page. */
+(function () {
     'use strict';
-
-    // ============================================================
-    // Table of Contents Generation
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        const content = document.querySelector('.doc-content');
-        const tocContainer = document.querySelector('.doc-toc');
-
-        if (content && tocContainer) {
-            const headings = content.querySelectorAll('h2, h3');
-            if (headings.length > 0) {
-                const tocList = document.createElement('ul');
-                let currentH2 = null;
-                let currentList = tocList;
-
-                headings.forEach(function(heading) {
-                    const level = heading.tagName.toLowerCase();
-                    const id = heading.id || heading.textContent.toLowerCase().replace(/\s+/g, '-');
-
-                    if (!heading.id) {
-                        heading.id = id;
-                    }
-
-                    const link = document.createElement('a');
-                    link.href = '#' + id;
-                    link.textContent = heading.textContent;
-
-                    const item = document.createElement('li');
-                    item.appendChild(link);
-
-                    if (level === 'h2') {
-                        currentList = tocList;
-                        currentList.appendChild(item);
-                        currentH2 = item;
-                    } else if (level === 'h3' && currentH2) {
-                        let subList = currentH2.querySelector('ul');
-                        if (!subList) {
-                            subList = document.createElement('ul');
-                            currentH2.appendChild(subList);
-                        }
-                        const subItem = document.createElement('li');
-                        subItem.appendChild(link);
-                        subList.appendChild(subItem);
-                    } else {
-                        currentList.appendChild(item);
-                    }
-                });
-
-                tocContainer.appendChild(tocList);
-            }
-        }
-    });
-
-    // ============================================================
-    // Sidebar Active State Based on Scroll
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebarLinks = document.querySelectorAll('.doc-sidebar a');
-        const sections = document.querySelectorAll('.doc-content h1, .doc-content h2');
-
-        if (sidebarLinks.length > 0 && sections.length > 0) {
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.id;
-                        sidebarLinks.forEach(function(link) {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === '#' + id) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            }, {
-                threshold: 0.3,
-            });
-
-            sections.forEach(function(section) {
-                observer.observe(section);
-            });
-        }
-    });
-
-    // ============================================================
-    // Search Functionality (Simple Client-Side)
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('docs-search');
-        const searchResults = document.getElementById('search-results');
-
-        if (searchInput && searchResults) {
-            const searchData = [];
-
-            // Collect all content sections
-            document.querySelectorAll('.doc-content h1, .doc-content h2, .doc-content p').forEach(function(el) {
-                const text = el.textContent.trim();
-                if (text && text.length > 10) {
-                    searchData.push({
-                        text: text,
-                        type: el.tagName.toLowerCase(),
-                        section: el.closest('h1, h2, h3')?.textContent || 'Documentation',
-                    });
-                }
-            });
-
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                searchResults.innerHTML = '';
-
-                if (query.length < 2) {
-                    searchResults.style.display = 'none';
-                    return;
-                }
-
-                const results = searchData.filter(function(item) {
-                    return item.text.toLowerCase().includes(query);
-                });
-
-                if (results.length > 0) {
-                    searchResults.style.display = 'block';
-                    results.slice(0, 10).forEach(function(item) {
-                        const div = document.createElement('div');
-                        div.className = 'search-result-item';
-                        div.style.cssText = `
-                            padding: 8px 12px;
-                            border-bottom: 1px solid #e2e8f0;
-                            cursor: pointer;
-                            font-size: 0.9rem;
-                            transition: background 0.2s;
-                        `;
-                        div.innerHTML = `
-                            <span style="color: #64748b; font-size: 0.75rem;">${item.type}</span>
-                            <span style="margin-left: 8px;">${item.text.substring(0, 60)}${item.text.length > 60 ? '...' : ''}</span>
-                        `;
-                        div.addEventListener('mouseenter', function() {
-                            this.style.background = '#f1f5f9';
-                        });
-                        div.addEventListener('mouseleave', function() {
-                            this.style.background = 'transparent';
-                        });
-                        searchResults.appendChild(div);
-                    });
-                } else {
-                    searchResults.style.display = 'block';
-                    const div = document.createElement('div');
-                    div.style.cssText = 'padding: 12px; color: #94a3b8; font-size: 0.9rem;';
-                    div.textContent = 'No results found';
-                    searchResults.appendChild(div);
-                }
-            });
-
-            // Close results on click outside
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.style.display = 'none';
-                }
-            });
-        }
-    });
-
-    // ============================================================
-    // Code Block Language Detection
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.code-block pre code').forEach(function(code) {
-            const className = code.className;
-            const lang = className.replace('language-', '');
-            if (lang && lang !== 'plaintext') {
-                const parent = code.closest('.code-block');
-                if (parent) {
-                    const label = document.createElement('span');
-                    label.className = 'code-language';
-                    label.textContent = lang.toUpperCase();
-                    label.style.cssText = `
-                        position: absolute;
-                        top: 8px;
-                        left: 12px;
-                        font-size: 0.6rem;
-                        color: #475569;
-                        background: rgba(255,255,255,0.06);
-                        padding: 2px 8px;
-                        border-radius: 4px;
-                        font-weight: 600;
-                        letter-spacing: 0.05em;
-                    `;
-                    parent.style.position = 'relative';
-                    parent.appendChild(label);
-                }
+    function ready(callback) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback, {once: true});
+        else callback();
+    }
+    function bindNavigation() {
+        const sidebar = document.querySelector('#docs-sidebar .doc-sidebar');
+        if (!sidebar || sidebar.dataset.bound) return;
+        sidebar.dataset.bound = 'true';
+        const toggle = sidebar.querySelector('#docs-menu-toggle');
+        const filter = sidebar.querySelector('#docs-nav-filter');
+        const groups = Array.from(sidebar.querySelectorAll('.docs-nav-group'));
+        let activeGroup = null;
+        sidebar.querySelectorAll('a').forEach(function (link) {
+            const current = window.location.pathname.replace(/\/index\.html$/, '/');
+            const destination = new URL(link.href).pathname.replace(/\/index\.html$/, '/');
+            if (current === destination) {
+                link.classList.add('active');
+                link.setAttribute('aria-current', 'page');
+                activeGroup = link.closest('details');
+                if (activeGroup) activeGroup.open = true;
             }
         });
-    });
-
-    // ============================================================
-    // Breadcrumb Navigation Update
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        const breadcrumb = document.getElementById('breadcrumb');
-        if (breadcrumb) {
-            const pathParts = window.location.pathname.split('/').filter(Boolean);
-            let html = '<a href="/">Home</a>';
-
-            if (pathParts.length > 0) {
-                let currentPath = '';
-                pathParts.forEach(function(part, index) {
-                    currentPath += '/' + part;
-                    const isLast = index === pathParts.length - 1;
-                    const label = part.replace(/-/g, ' ').replace(/.html$/, '').replace(/.md$/, '');
-                    if (isLast) {
-                        html += ` / <span class="text-slate-500">${label}</span>`;
-                    } else {
-                        html += ` / <a href="${currentPath}">${label}</a>`;
-                    }
-                });
-            }
-
-            breadcrumb.innerHTML = html;
+        if (!activeGroup && groups[0]) groups[0].open = true;
+        function close() {
+            sidebar.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
         }
+        toggle.addEventListener('click', function () {
+            const open = sidebar.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', String(open));
+        });
+        sidebar.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') { close(); toggle.focus(); }
+        });
+        filter.addEventListener('input', function () {
+            const query = filter.value.toLocaleLowerCase().trim();
+            let matches = 0;
+            groups.forEach(function (group) {
+                let count = 0;
+                group.querySelectorAll('li').forEach(function (item) {
+                    item.hidden = !item.textContent.toLocaleLowerCase().includes(query);
+                    if (!item.hidden) count++;
+                });
+                group.hidden = count === 0;
+                group.open = query ? count > 0 : group === activeGroup || (!activeGroup && group === groups[0]);
+                matches += count;
+            });
+            sidebar.querySelector('#docs-nav-empty').hidden = matches > 0;
+        });
+    }
+    ready(function () {
+        const content = document.querySelector('.doc-content');
+        if (!content) return;
+        const headings = content.querySelectorAll('h2, h3');
+        const ids = new Set(Array.from(document.querySelectorAll('[id]'), node => node.id));
+        const toc = document.createElement('details');
+        toc.className = 'doc-toc';
+        const summary = document.createElement('summary'); summary.textContent = 'On this page'; toc.append(summary);
+        const list = document.createElement('ul');
+        headings.forEach(function (heading) {
+            if (!heading.id) {
+                const base = heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'section';
+                let id = base, count = 2;
+                while (ids.has(id)) id = base + '-' + count++;
+                heading.id = id; ids.add(id);
+            }
+            const item = document.createElement('li');
+            if (heading.tagName === 'H3') item.className = 'toc-subheading';
+            const link = document.createElement('a'); link.href = '#' + heading.id; link.textContent = heading.textContent;
+            item.append(link); list.append(item);
+        });
+        if (headings.length) {
+            toc.append(list);
+            const h1 = content.querySelector('h1');
+            if (h1) h1.insertAdjacentElement('afterend', toc);
+        }
+        content.querySelectorAll('pre').forEach(function (pre) {
+            if (pre.closest('.doc-code')) return;
+            const code = pre.querySelector('code') || pre;
+            const wrapper = document.createElement('div'); wrapper.className = 'doc-code';
+            const toolbar = document.createElement('div'); toolbar.className = 'doc-code-toolbar';
+            const label = document.createElement('span');
+            const language = (code.className.match(/language-([\w-]+)/) || [])[1];
+            label.textContent = language || 'Code';
+            const button = document.createElement('button'); button.type = 'button'; button.className = 'copy-btn';
+            button.textContent = 'Copy'; button.setAttribute('aria-label', 'Copy code');
+            button.setAttribute('aria-live', 'polite');
+            toolbar.append(label, button); pre.before(wrapper); wrapper.append(toolbar, pre);
+            button.addEventListener('click', async function () {
+                try {
+                    await navigator.clipboard.writeText(code.textContent);
+                    button.textContent = 'Copied';
+                } catch (_) {
+                    button.textContent = 'Select code';
+                    const selection = window.getSelection(); const range = document.createRange();
+                    range.selectNodeContents(code); selection.removeAllRanges(); selection.addRange(range);
+                }
+                setTimeout(() => {button.textContent = 'Copy';}, 2000);
+            });
+        });
+        // Tables scroll within their own boundary, including at desktop widths.
+        content.querySelectorAll('table').forEach(function (table) {
+            const wrapper = document.createElement('div'); wrapper.className = 'doc-table';
+            wrapper.tabIndex = 0; wrapper.setAttribute('role', 'region'); wrapper.setAttribute('aria-label', 'Scrollable table');
+            table.before(wrapper); wrapper.append(table);
+        });
+        bindNavigation();
     });
-
-    console.log('Flaxon documentation features initialized! 📚');
-
-})();
+    document.addEventListener('flaxon:shell-ready', bindNavigation);
+}());

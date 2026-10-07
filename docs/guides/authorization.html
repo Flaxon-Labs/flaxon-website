@@ -1,230 +1,398 @@
-<!-- docs/guides/authorization.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Authorization – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Authorization — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Authorization — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Authorization</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/authorization.md">Framework source</a> · <a href="../../content/framework/docs/guides/authorization.md" download>Markdown</a></p><h1 id="authorization">Authorization</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides flexible authorization through roles, permissions, decorators, and utility classes. Authorization is separate from authentication, allowing you to choose the strategy that best fits your application.</p>
+<p>Authentication answers <strong>who the user is</strong>.</p>
+<p>Authorization answers <strong>what the user is allowed to do</strong>.</p>
+<hr/>
+<h2 id="role-based-authorization">Role-Based Authorization</h2>
+<p>Roles group related permissions together.</p>
+<h2 id="registering-roles">Registering Roles</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_role</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read"</span><span class="p">,</span>
+        <span class="s2">"write"</span><span class="p">,</span>
+        <span class="s2">"delete"</span><span class="p">,</span>
+        <span class="s2">"manage_users"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Administrator"</span><span class="p">,</span>
+<span class="p">)</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"moderator"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read"</span><span class="p">,</span>
+        <span class="s2">"write"</span><span class="p">,</span>
+        <span class="s2">"delete"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-    <div id="header"></div>
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="role-inheritance">Role Inheritance</h2>
+<p>Roles may inherit permissions from another role.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_role</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="n">user</span> <span class="o">=</span> <span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span><span class="s2">"read"</span><span class="p">],</span>
+<span class="p">)</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="n">moderator</span> <span class="o">=</span> <span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"moderator"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"write"</span><span class="p">,</span>
+        <span class="s2">"delete"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">parent</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+<span class="p">)</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="n">admin</span> <span class="o">=</span> <span class="n">register_role</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"manage_users"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">parent</span><span class="o">=</span><span class="n">moderator</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The resulting permissions become:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Permissions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User</td>
+<td>read</td>
+</tr>
+<tr>
+<td>Moderator</td>
+<td>read, write, delete</td>
+</tr>
+<tr>
+<td>Admin</td>
+<td>read, write, delete, manage_users</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="permission-based-authorization">Permission-Based Authorization</h2>
+<p>Permissions can also be assigned directly.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">register_permission</span><span class="p">,</span>
+    <span class="n">permission_required</span><span class="p">,</span>
+<span class="p">)</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html" class="active">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"read"</span><span class="p">,</span>
+    <span class="s2">"Read data"</span><span class="p">,</span>
+<span class="p">)</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Authorization</h1>
-                        <p>Flaxon provides role-based and permission-based authorization through decorators and utility functions.</p>
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"write"</span><span class="p">,</span>
+    <span class="s2">"Write data"</span><span class="p">,</span>
+<span class="p">)</span>
 
-                        <h2>Defining Roles</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import Role, register_role
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"delete"</span><span class="p">,</span>
+    <span class="s2">"Delete data"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Protect routes with decorators.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="nd">@permission_required</span><span class="p">(</span><span class="s2">"read"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="nd">@permission_required</span><span class="p">(</span><span class="s2">"write"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="nd">@permission_required</span><span class="p">(</span><span class="s2">"delete"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"deleted"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="role-decorator">Role Decorator</h2>
+<p>Require a specific role.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">role_required</span>
 
-admin_role = register_role(
-    name="admin",
-    permissions=["read", "write", "delete", "manage_users"],
-    description="Administrator with full access",
-)
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin"</span><span class="p">)</span>
+<span class="nd">@role_required</span><span class="p">(</span><span class="s2">"admin"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">admin</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome administrator."</span>
+    <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/moderator"</span><span class="p">)</span>
+<span class="nd">@role_required</span><span class="p">(</span><span class="s2">"moderator"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">moderator</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Moderator panel"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="combining-roles-and-permissions">Combining Roles and Permissions</h2>
+<p>Sometimes both conditions should be met.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">authorize</span>
 
-moderator_role = register_role(
-    name="moderator",
-    permissions=["read", "write", "delete"],
-    description="Moderator with limited access",
-)
+<span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="nd">@authorize</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span>
+    <span class="n">permission</span><span class="o">=</span><span class="s2">"delete"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"deleted"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="authorization-checker">Authorization Checker</h2>
+<p>Permissions can also be checked manually.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthorizationChecker</span>
 
-user_role = register_role(
-    name="user",
-    permissions=["read"],
-    description="Regular user with read-only access",
-)</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/reports"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">reports</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-                        <h2>Role Hierarchy</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">moderator = register_role(
-    name="moderator",
-    permissions=["write", "delete"],
-    parent=user_role,  # Inherits all user permissions
-)
+    <span class="n">checker</span> <span class="o">=</span> <span class="n">AuthorizationChecker</span><span class="p">(</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">)</span>
+    <span class="p">)</span>
 
-admin = register_role(
-    name="admin",
-    permissions=["manage_users"],
-    parent=moderator,  # Inherits all moderator permissions
-)</code></pre>
-                        </div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">checker</span><span class="o">.</span><span class="n">has_permission</span><span class="p">(</span><span class="s2">"read"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">403</span><span class="p">,</span>
+            <span class="s2">"Permission denied."</span><span class="p">,</span>
+        <span class="p">)</span>
 
-                        <h2>Permission-Based Authorization</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import permission_required, Permission
+    <span class="k">return</span> <span class="k">await</span> <span class="n">report_service</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+</code></pre></div>
+<hr/>
+<h2 id="requiring-multiple-permissions">Requiring Multiple Permissions</h2>
+<p>Require one permission.</p>
+<div class="highlight"><pre><span></span><code><span class="n">checker</span><span class="o">.</span><span class="n">require_any_permission</span><span class="p">(</span>
+    <span class="s2">"write"</span><span class="p">,</span>
+    <span class="s2">"delete"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Require every permission.</p>
+<div class="highlight"><pre><span></span><code><span class="n">checker</span><span class="o">.</span><span class="n">require_all_permissions</span><span class="p">(</span>
+    <span class="s2">"read"</span><span class="p">,</span>
+    <span class="s2">"write"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="resource-authorization">Resource Authorization</h2>
+<p>Applications often need ownership checks.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-register_permission("read", "Read data")
-register_permission("write", "Write data")
-register_permission("delete", "Delete data")
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">,</span>
+    <span class="p">)</span>
 
-@app.get("/api/users")
-@permission_required("read")
-async def list_users():
-    return [{"id": 1, "name": "Alice"}]
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">user_id</span>
+        <span class="ow">and</span> <span class="s2">"admin"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">roles</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">403</span><span class="p">,</span>
+            <span class="s2">"Access denied."</span><span class="p">,</span>
+        <span class="p">)</span>
 
-@app.post("/api/users")
-@permission_required("write")
-async def create_user():
-    return {"created": True}
+    <span class="k">return</span> <span class="k">await</span> <span class="n">user_service</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="organization-authorization">Organization Authorization</h2>
+<p>Projects with teams or organizations can perform custom checks.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/organizations/&lt;int:org_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_org</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-@app.delete("/api/users/&lt;int:user_id&gt;")
-@permission_required("delete")
-async def delete_user(user_id: int):
-    return {"deleted": True}</code></pre>
-                        </div>
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">)</span>
 
-                        <h2>Role-Based Authorization</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import role_required
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">organization_service</span><span class="o">.</span><span class="n">can_edit</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">org_id</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">403</span><span class="p">,</span>
+            <span class="s2">"Not allowed."</span><span class="p">,</span>
+        <span class="p">)</span>
 
-@app.get("/admin/dashboard")
-@role_required("admin")
-async def admin_dashboard():
-    return {"admin": True}
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"updated"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-authorization-decorators">Custom Authorization Decorators</h2>
+<p>You can create your own decorators.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">authorization</span>
 
-@app.get("/moderator/reports")
-@role_required("moderator")
-async def moderator_reports():
-    return {"reports": []}</code></pre>
-                        </div>
+<span class="nd">@authorization</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">premium_required</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
 
-                        <h2>Combining Roles and Permissions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import authorize
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">subscription</span> <span class="o">==</span> <span class="s2">"premium"</span>
 
-@app.delete("/api/users/&lt;int:user_id&gt;")
-@authorize(permission="delete", role="admin")
-async def delete_user(user_id: int):
-    return {"deleted": True}</code></pre>
-                        </div>
 
-                        <h2>Permission Checking in Functions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import AuthorizationChecker
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/premium"</span><span class="p">)</span>
+<span class="nd">@premium_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">premium</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"premium"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Flaxon</span><span class="p">,</span>
+    <span class="n">HTTPException</span><span class="p">,</span>
+<span class="p">)</span>
 
-async def get_user_data(request):
-    checker = AuthorizationChecker(getattr(request, "user", None))
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">login_required</span><span class="p">,</span>
+    <span class="n">permission_required</span><span class="p">,</span>
+    <span class="n">role_required</span><span class="p">,</span>
+    <span class="n">authorize</span><span class="p">,</span>
+    <span class="n">register_permission</span><span class="p">,</span>
+    <span class="n">register_role</span><span class="p">,</span>
+<span class="p">)</span>
 
-    if checker.has_permission("read"):
-        return await db.fetch_all("SELECT * FROM users")
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"authorization-demo"</span><span class="p">)</span>
 
-    raise HTTPException(403, "Insufficient permissions")</code></pre>
-                        </div>
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"read_users"</span><span class="p">,</span>
+    <span class="s2">"Read users"</span><span class="p">,</span>
+<span class="p">)</span>
 
-                        <h2>Multiple Permissions</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.post("/api/bulk")
-@login_required
-async def bulk_operation(request):
-    user = getattr(request, "user")
-    checker = AuthorizationChecker(user)
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"write_users"</span><span class="p">,</span>
+    <span class="s2">"Write users"</span><span class="p">,</span>
+<span class="p">)</span>
 
-    # Require any of the specified permissions
-    checker.require_any_permission("write", "admin")
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"delete_users"</span><span class="p">,</span>
+    <span class="s2">"Delete users"</span><span class="p">,</span>
+<span class="p">)</span>
 
-    # Or require all permissions
-    checker.require_all_permissions("write", "read")
+<span class="n">register_permission</span><span class="p">(</span>
+    <span class="s2">"manage_roles"</span><span class="p">,</span>
+    <span class="s2">"Manage roles"</span><span class="p">,</span>
+<span class="p">)</span>
 
-    return {"success": True}</code></pre>
-                        </div>
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="s2">"viewer"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read_users"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-                        <h2>Resource-Level Authorization</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(request, user_id: int):
-    user = getattr(request, "user")
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="s2">"editor"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read_users"</span><span class="p">,</span>
+        <span class="s2">"write_users"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-    # Check if user owns the resource or is admin
-    if user.id != user_id and "admin" not in user.roles:
-        raise HTTPException(403, "Cannot access this user")
+<span class="n">register_role</span><span class="p">(</span>
+    <span class="s2">"admin"</span><span class="p">,</span>
+    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"read_users"</span><span class="p">,</span>
+        <span class="s2">"write_users"</span><span class="p">,</span>
+        <span class="s2">"delete_users"</span><span class="p">,</span>
+        <span class="s2">"manage_roles"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-    return await db.fetch_one("SELECT * FROM users WHERE id = $1", user_id)</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="nd">@permission_required</span><span class="p">(</span><span class="s2">"read_users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[]</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Use <code>AuthorizationChecker</code> for complex permission logic inside functions.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="nd">@permission_required</span><span class="p">(</span><span class="s2">"write_users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
 
-    <div id="footer"></div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="nd">@authorize</span><span class="p">(</span>
+    <span class="n">role</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span>
+    <span class="n">permission</span><span class="o">=</span><span class="s2">"write_users"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"updated"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/users/&lt;int:user_id&gt;"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="nd">@role_required</span><span class="p">(</span><span class="s2">"admin"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"deleted"</span><span class="p">:</span> <span class="n">user_id</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Keep authentication and authorization separate.</li>
+<li>Prefer permissions over hard-coded role checks.</li>
+<li>Use role inheritance to reduce duplication.</li>
+<li>Apply the principle of least privilege.</li>
+<li>Protect every sensitive endpoint.</li>
+<li>Log authorization failures for auditing.</li>
+<li>Never trust client-provided roles or permissions.</li>
+<li>Validate authorization on every request.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with:</p>
+<ul>
+<li>Authentication</li>
+<li>Security</li>
+<li>Middleware</li>
+<li>GraphQL</li>
+<li>Admin Dashboard</li>
+<li>Databases</li>
+<li>Testing</li>
+<li>Deployment</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

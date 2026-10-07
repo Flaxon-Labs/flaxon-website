@@ -1,197 +1,577 @@
-<!-- docs/guides/tasks.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Tasks – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tasks — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Tasks — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Tasks</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/tasks.md">Framework source</a> · <a href="../../content/framework/docs/guides/tasks.md" download>Markdown</a></p><h1 id="tasks">Tasks</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon includes a background task system for running long-running jobs outside the normal request lifecycle.</p>
+<p>Tasks support:</p>
+<ul>
+<li>Background execution</li>
+<li>Async and sync functions</li>
+<li>Task queues</li>
+<li>Workers</li>
+<li>Scheduling</li>
+<li>Retries</li>
+<li>Timeouts</li>
+<li>Priorities</li>
+<li>Result storage</li>
+<li>Task monitoring</li>
+<li>Custom backends</li>
+</ul>
+<p>Common use cases:</p>
+<ul>
+<li>Sending emails</li>
+<li>Processing images/videos</li>
+<li>Generating reports</li>
+<li>Data processing</li>
+<li>Notifications</li>
+<li>Scheduled maintenance jobs</li>
+</ul>
+<hr/>
+<h2 id="defining-tasks">Defining Tasks</h2>
+<p>Tasks are created using the <code>@task</code> decorator.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">task</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="nd">@task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"send_email"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_email</span><span class="p">(</span>
+    <span class="n">to</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># Send email logic</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"sent"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"to"</span><span class="p">:</span> <span class="n">to</span><span class="p">,</span>
+    <span class="p">}</span>
 
-    <div id="header"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="nd">@task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"process_image"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_image</span><span class="p">(</span><span class="n">image_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+    <span class="c1"># CPU intensive processing</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"processed"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"file"</span><span class="p">:</span> <span class="n">image_path</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="err">````</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="o">---</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html" class="active">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="c1"># Registering Tasks</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Tasks</h1>
-                        <p>Flaxon provides a task queue system for background job processing with retries, scheduling, and result storage.</p>
+<span class="n">Tasks</span> <span class="n">must</span> <span class="n">be</span> <span class="n">registered</span> <span class="n">before</span> <span class="n">they</span> <span class="n">can</span> <span class="n">run</span><span class="o">.</span>
 
-                        <h2>Defining Tasks</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import Task
+<span class="err">```</span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TaskRegistry</span><span class="p">,</span>
+    <span class="n">TaskQueue</span><span class="p">,</span>
+<span class="p">)</span>
 
-async def send_email(to: str, subject: str, body: str):
-    # Send email
-    return {"sent": True, "to": to}
+<span class="n">registry</span> <span class="o">=</span> <span class="n">TaskRegistry</span><span class="p">()</span>
+<span class="n">queue</span> <span class="o">=</span> <span class="n">TaskQueue</span><span class="p">()</span>
 
-def process_image(image_path: str):
-    # CPU-intensive processing
-    return {"processed": True}</code></pre>
-                        </div>
 
-                        <h2>Running Tasks</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import Task, TaskQueue, TaskRegistry
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">send_email</span><span class="p">,</span>
+<span class="p">)</span>
 
-registry = TaskRegistry()
-queue = TaskQueue()
 
-registry.register("send_email", send_email)
-registry.register("process_image", process_image)
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="s2">"process_image"</span><span class="p">,</span>
+    <span class="n">process_image</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="creating-tasks">Creating Tasks</h2>
+<p>Create a task instance and push it to the queue.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span>
 
-email_task = Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome"))
-await queue.push(email_task)</code></pre>
-                        </div>
 
-                        <h2>Starting Workers</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash"># Start a worker
-flaxon worker app:app --concurrency 4
+<span class="n">email_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">send_email</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"user@example.com"</span><span class="p">,</span>
+        <span class="s2">"Welcome"</span><span class="p">,</span>
+        <span class="s2">"Hello World"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-# With specific queue
-flaxon worker app:app --queue email --concurrency 2</code></pre>
-                        </div>
 
-                        <h2>Scheduling Tasks</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import Scheduler, Task
+<span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">email_task</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="creating-tasks-from-registry">Creating Tasks From Registry</h2>
+<div class="highlight"><pre><span></span><code><span class="n">task</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"user@example.com"</span><span class="p">,</span>
+        <span class="s2">"Hello"</span><span class="p">,</span>
+        <span class="s2">"Welcome"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-scheduler = Scheduler(queue)
 
-# Schedule a one-time task
-scheduler.schedule(
-    task=Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome")),
-    delay=60,  # 60 seconds from now
-)
+<span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="running-workers">Running Workers</h2>
+<p>Workers execute queued tasks.</p>
+<p>Start a worker:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>worker<span class="w"> </span>app:app
+</code></pre></div>
+<p>Multiple workers:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>worker<span class="w"> </span>app:app<span class="w"> </span>--concurrency<span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<p>Specific queue:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>worker<span class="w"> </span>app:app<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--queue<span class="w"> </span>email<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--concurrency<span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<hr/>
+<h2 id="task-queues">Task Queues</h2>
+<p>Multiple queues can separate workloads.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">email_queue</span> <span class="o">=</span> <span class="n">TaskQueue</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"email"</span>
+<span class="p">)</span>
 
-# Schedule recurring task
-scheduler.schedule(
-    task=Task("process_image", process_image, args=("/tmp/image.jpg",)),
-    interval=300,  # Every 5 minutes
-)
 
-# Recurring work is scheduled by Scheduler; defining a function alone does not enqueue it.
-async def cleanup_tokens():
-    await db.execute("DELETE FROM expired_tokens")
+<span class="n">image_queue</span> <span class="o">=</span> <span class="n">TaskQueue</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"images"</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Push tasks:</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">email_queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span>
+    <span class="n">email_task</span>
+<span class="p">)</span>
 
-scheduler.schedule(task=Task("cleanup_tokens", cleanup_tokens), interval=60)</code></pre>
-                        </div>
 
-                        <h2>Task Results</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">email_task = Task("send_email", send_email, args=("user@example.com", "Hello", "Welcome"))
-await queue.push(email_task)
-# A worker must execute the task before its result is available.
-queued_task = await queue.get(email_task.id)
-result = queued_task.to_result() if queued_task else None
-print(result.result if result else None)</code></pre>
-                        </div>
+<span class="k">await</span> <span class="n">image_queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span>
+    <span class="n">image_task</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="scheduling-tasks">Scheduling Tasks</h2>
+<p>Flaxon supports delayed and recurring tasks.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scheduler</span>
 
-                        <h2>Retry Policies</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.tasks import RetryPolicy
 
-retry_policy = RetryPolicy(
-    max_retries=5,
-    delay=1.0,
-    backoff=2.0,
-    max_delay=60.0,
-    random_jitter=0.1,
-)
+<span class="n">scheduler</span> <span class="o">=</span> <span class="n">Scheduler</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="delayed-task">Delayed Task</h2>
+<p>Run after a delay.</p>
+<div class="highlight"><pre><span></span><code><span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">email_task</span><span class="p">,</span>
+    <span class="n">delay</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The task runs after:</p>
+<div class="highlight"><pre><span></span><code>60 seconds
+</code></pre></div>
+<hr/>
+<h2 id="recurring-tasks">Recurring Tasks</h2>
+<p>Run repeatedly.</p>
+<div class="highlight"><pre><span></span><code><span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">image_task</span><span class="p">,</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Runs every:</p>
+<div class="highlight"><pre><span></span><code>5 minutes
+</code></pre></div>
+<hr/>
+<h2 id="scheduled-decorator">Scheduled Decorator</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">scheduled_task</span>
 
-@task(name="retry_task", retry_policy=retry_policy)
-async def retry_task():
-    # Will retry up to 5 times with exponential backoff
-    return {"success": True}</code></pre>
-                        </div>
 
-                        <h2>Task Timeouts</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@task(name="timeout_task", timeout=30)
-async def long_running_task():
-    # Will be cancelled after 30 seconds
-    return {"done": True}</code></pre>
-                        </div>
+<span class="nd">@scheduled_task</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">60</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_tokens</span><span class="p">():</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">Tasks support priority queues. Higher priority tasks are processed first.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">"DELETE FROM expired_tokens"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Runs every minute.</p>
+<hr/>
+<h2 id="task-results">Task Results</h2>
+<p>Tasks can store execution results.</p>
+<div class="highlight"><pre><span></span><code><span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">send_email</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"user@example.com"</span><span class="p">,</span>
+        <span class="s2">"Hello"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
-    <div id="footer"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+<span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+</code></pre></div>
+<p>Check result:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-</body>
-</html>
+
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
+        <span class="k">break</span>
+
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"sent"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@example.com"</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="retry-policies">Retry Policies</h2>
+<p>Tasks can automatically retry after failures.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetryPolicy</span>
+
+
+<span class="n">policy</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">delay</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">max_delay</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">random_jitter</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Use policy:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"payment"</span><span class="p">,</span>
+    <span class="n">retry_policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_payment</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Retry behavior:</p>
+<div class="highlight"><pre><span></span><code>Attempt 1
+↓
+Wait 1 second
+
+Attempt 2
+↓
+Wait 2 seconds
+
+Attempt 3
+↓
+Wait 4 seconds
+</code></pre></div>
+<hr/>
+<h2 id="task-timeouts">Task Timeouts</h2>
+<p>Prevent tasks from running forever.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"long_task"</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">long_task</span><span class="p">():</span>
+
+    <span class="k">await</span> <span class="n">process_data</span><span class="p">()</span>
+</code></pre></div>
+<p>The task is cancelled after:</p>
+<div class="highlight"><pre><span></span><code>30 seconds
+</code></pre></div>
+<hr/>
+<h2 id="task-priorities">Task Priorities</h2>
+<p>Higher priority tasks execute first.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"urgent"</span><span class="p">,</span>
+    <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">urgent_task</span><span class="p">():</span>
+    <span class="k">pass</span>
+
+
+
+<span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"normal"</span><span class="p">,</span>
+    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">normal_task</span><span class="p">():</span>
+    <span class="k">pass</span>
+</code></pre></div>
+<p>Priority:</p>
+<div class="highlight"><pre><span></span><code>10 → High
+1  → Normal
+0  → Low
+</code></pre></div>
+<hr/>
+<h2 id="task-signals">Task Signals</h2>
+<p>Listen for task events.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Signal</span><span class="p">,</span>
+    <span class="n">connect_signal</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">success</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> completed"</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">failure</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> failed"</span>
+    <span class="p">)</span>
+
+
+<span class="n">connect_signal</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">Signal</span><span class="o">.</span><span class="n">ON_SUCCESS</span><span class="p">,</span>
+    <span class="n">success</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">connect_signal</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">Signal</span><span class="o">.</span><span class="n">ON_FAILURE</span><span class="p">,</span>
+    <span class="n">failure</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-storage-backend">Custom Storage Backend</h2>
+<p>Task results can be stored using custom backends.</p>
+<p>Example Redis backend:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RedisBackend</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">redis</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">redis</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">store_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"task:</span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"task:</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Task</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="p">)</span>
+</code></pre></div>
+<p>Enable backend:</p>
+<div class="highlight"><pre><span></span><code><span class="n">queue</span> <span class="o">=</span> <span class="n">TaskQueue</span><span class="p">(</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">RedisBackend</span><span class="p">(</span><span class="n">redis</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="task-monitoring">Task Monitoring</h2>
+<p>Check queue status.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks/status"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">task_status</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"pending"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">pending_count</span><span class="p">(),</span>
+
+        <span class="s2">"running"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">running_count</span><span class="p">(),</span>
+
+        <span class="s2">"completed"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">completed_count</span><span class="p">(),</span>
+
+        <span class="s2">"failed"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">failed_count</span><span class="p">(),</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Task</span><span class="p">,</span>
+    <span class="n">TaskQueue</span><span class="p">,</span>
+    <span class="n">TaskRegistry</span><span class="p">,</span>
+    <span class="n">RetryPolicy</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"tasks-demo"</span>
+<span class="p">)</span>
+
+
+<span class="n">queue</span> <span class="o">=</span> <span class="n">TaskQueue</span><span class="p">()</span>
+
+<span class="n">registry</span> <span class="o">=</span> <span class="n">TaskRegistry</span><span class="p">()</span>
+
+
+
+<span class="nd">@task</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">retry_policy</span><span class="o">=</span><span class="n">RetryPolicy</span><span class="p">(</span>
+        <span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_email</span><span class="p">(</span>
+    <span class="n">to</span><span class="p">,</span>
+    <span class="n">subject</span><span class="p">,</span>
+    <span class="n">body</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"sent"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"to"</span><span class="p">:</span> <span class="n">to</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="s2">"send_email"</span><span class="p">,</span>
+    <span class="n">send_email</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/email"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">email</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
+        <span class="s2">"send_email"</span><span class="p">,</span>
+        <span class="n">send_email</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"to"</span><span class="p">],</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"subject"</span><span class="p">],</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"body"</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+
+    <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"task_id"</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+
+        <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"queued"</span><span class="p">,</span>
+
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks/&lt;task_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span>
+        <span class="n">task_id</span>
+    <span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"not_found"</span>
+        <span class="p">}</span>
+
+
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"pending"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">pending_count</span><span class="p">(),</span>
+
+        <span class="s2">"running"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">running_count</span><span class="p">(),</span>
+
+        <span class="s2">"completed"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">completed_count</span><span class="p">(),</span>
+
+        <span class="s2">"failed"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">failed_count</span><span class="p">(),</span>
+
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Keep tasks small and focused.</li>
+<li>Use retries for unreliable operations.</li>
+<li>Set timeouts for external services.</li>
+<li>Use queues to separate workloads.</li>
+<li>Store large results externally.</li>
+<li>Monitor failed tasks.</li>
+<li>Use idempotent tasks.</li>
+<li>Avoid blocking async workers.</li>
+<li>Use scheduled tasks for maintenance.</li>
+<li>Use dedicated workers for heavy processing.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Continue with:</p>
+<ul>
+<li>WebSockets</li>
+<li>Events</li>
+<li>Background Workers</li>
+<li>Caching</li>
+<li>Database Integration</li>
+<li>Performance Optimization</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

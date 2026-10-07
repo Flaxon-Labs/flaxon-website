@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 7: Organize full-stack features with modules — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 7: Organize full-stack features with modules — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 7: Organize full-stack features with modules</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/07-modules.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/07-modules.md" download>Markdown</a></p><h1 id="lesson-7-organize-full-stack-features-with-modules">Lesson 7: Organize full-stack features with modules</h1>
+<p>Group tasks with their endpoints and UI rather than splitting the entire
+project into unrelated frontend/backend repositories:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">tasks</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"tasks"</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">"modules/tasks/ui"</span><span class="p">)</span>
+
+<span class="nd">@tasks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_tasks</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"items"</span><span class="p">:</span> <span class="p">[]}</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
+</code></pre></div>
+<p>Mounting registers backend routes and the module's UI source. Directories must
+remain inside the configured project root. Module names and UI roots must be
+unique. A backend prefix does not automatically change browser page routes;
+use <code>ui_routes</code> when a client route requires an explicit mapping.</p>
+<p>Keep repository/data services separate from request handlers so a module can
+be tested with a fixture service. Share a small design-system component library
+instead of copying markup into every feature. Register sources before serving
+traffic; concurrent runtime builds are not a deployment lifecycle.</p>
+<p><strong>Checkpoint:</strong> add a second module and verify both backend endpoints and browser
+pages work. Deliberately introduce a duplicate client route and confirm the
+build rejects it. See the <a href="../projects/teloce-modules-shop/index.html">modules shop</a>.</p>
+<h2 id="a-module-can-own-typed-browser-code">A module can own typed browser code</h2>
+<p>A useful feature layout is:</p>
+<ul>
+<li><code>modules/tasks/routes.py</code>: HTTP boundary and module declaration.</li>
+<li><code>modules/tasks/service.py</code>: business rules shared by endpoints and workers.</li>
+<li><code>modules/tasks/ui/pages/Tasks.html</code>: feature page with <code>lang="ts"</code>.</li>
+<li><code>modules/tasks/ui/api.ts</code>: typed browser request helpers.</li>
+<li><code>modules/tasks/ui/types.ts</code>: browser-visible payload contracts.</li>
+<li><code>modules/tasks/ui/components/TaskRow.html</code>: reusable feature component.</li>
+</ul>
+<p>The browser API URL must match the Python mount prefix. A <code>/api/tasks</code> backend
+prefix and <code>/tasks</code> browser page can coexist, but one does not automatically
+configure the other. Keep page-to-service communication through endpoints.</p>
+<p>Use <code>Router</code>/<code>include_router()</code> for API route composition without UI sources;
+use <code>FlaxonModule</code> when a feature also contributes interface files and installers.
+ASGI mounting is another boundary: it embeds a separate ASGI app, rather than
+registering that app's UI files as Teloce sources. See the module and application
+references for lifecycle and prefix behavior.</p>
+<p><a href="index.html">Course contents</a> · <a href="06-routing.html">Previous lesson</a> · <a href="08-data-and-security.html">Next lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>

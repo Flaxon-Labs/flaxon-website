@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon VS Code Extension - Quick Cheat Sheet — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon VS Code Extension - Quick Cheat Sheet — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon VS Code Extension - Quick Cheat Sheet</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/vs%20Code%20%28Extension%29/Quick%20Cheat%20Sheet.md">Framework source</a> · <a href="../../content/framework/docs/vs Code (Extension)/Quick Cheat Sheet.md" download>Markdown</a></p><h1 id="flaxon-vs-code-extension-quick-cheat-sheet">Flaxon VS Code Extension - Quick Cheat Sheet</h1>
+<blockquote>
+<p>A 2-minute overview of everything the Flaxon VS Code Extension provides.</p>
+</blockquote>
+<hr/>
+<h2 id="main-features">🚀 Main Features</h2>
+<p>✅ Route Explorer</p>
+<p>View every route in your project from the sidebar.</p>
+<hr/>
+<p>✅ CodeLens</p>
+<p>Run or debug routes directly above your functions.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="c1"># ▶ Run    🐛 Debug</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">():</span>
+    <span class="o">...</span>
+</code></pre></div>
+<hr/>
+<p>✅ IntelliSense</p>
+<p>Smart auto-completion for:</p>
+<ul>
+<li>Routes</li>
+<li>Schemas</li>
+<li>Validation</li>
+<li>Exceptions</li>
+<li>Requests</li>
+<li>WebSockets</li>
+</ul>
+<hr/>
+<p>✅ Snippets</p>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Creates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>froute</code></td>
+<td>GET Route</td>
+</tr>
+<tr>
+<td><code>fpost</code></td>
+<td>POST Route</td>
+</tr>
+<tr>
+<td><code>fws</code></td>
+<td>WebSocket</td>
+</tr>
+<tr>
+<td><code>fschema</code></td>
+<td>Schema</td>
+</tr>
+<tr>
+<td><code>fplugin</code></td>
+<td>Plugin</td>
+</tr>
+<tr>
+<td><code>ftest</code></td>
+<td>Test</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<p>✅ Hover Documentation</p>
+<p>Hover over Flaxon APIs to see documentation without leaving the editor.</p>
+<hr/>
+<p>✅ Diagnostics</p>
+<p>Detects:</p>
+<ul>
+<li>Missing imports</li>
+<li>Invalid routes</li>
+<li>Non-async handlers</li>
+<li>Missing returns</li>
+<li>Schema issues</li>
+<li>WebSocket mistakes</li>
+</ul>
+<hr/>
+<p>✅ One-Click Run</p>
+<p>Run your app directly from VS Code.</p>
+<div class="highlight"><pre><span></span><code>Flaxon: Run App
+</code></pre></div>
+<hr/>
+<p>✅ Integrated Debugging</p>
+<p>Supports:</p>
+<ul>
+<li>Breakpoints</li>
+<li>Variables</li>
+<li>Call Stack</li>
+<li>Exceptions</li>
+</ul>
+<hr/>
+<p>✅ Project Generator</p>
+<p>Generate:</p>
+<ul>
+<li>Projects</li>
+<li>Routes</li>
+<li>Schemas</li>
+<li>Plugins</li>
+</ul>
+<hr/>
+<h2 id="useful-commands">⌨️ Useful Commands</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create Project</td>
+<td>Generate a new Flaxon project</td>
+</tr>
+<tr>
+<td>Run App</td>
+<td>Start the application</td>
+</tr>
+<tr>
+<td>Debug App</td>
+<td>Launch debugger</td>
+</tr>
+<tr>
+<td>Show Routes</td>
+<td>Open Route Explorer</td>
+</tr>
+<tr>
+<td>Generate Route</td>
+<td>Create route</td>
+</tr>
+<tr>
+<td>Generate Schema</td>
+<td>Create schema</td>
+</tr>
+<tr>
+<td>Generate Plugin</td>
+<td>Create plugin</td>
+</tr>
+<tr>
+<td>Restart Language Server</td>
+<td>Restart IntelliSense</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="shortcuts">⌨️ Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Shift+P</code></td>
+<td>Command Palette</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+R</code></td>
+<td>Route Explorer</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+F5</code></td>
+<td>Run App</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+U</code></td>
+<td>Output Panel</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="project-detection">📂 Project Detection</h2>
+<p>The extension automatically activates when it finds:</p>
+<div class="highlight"><pre><span></span><code>app.py
+main.py
+run.py
+flaxon.py
+</code></pre></div>
+<hr/>
+<h2 id="recommended-settings">⚙️ Recommended Settings</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">"flaxon.entryPoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app:app"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableRouteExplorer"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableCodeLens"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableDiagnostics"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"flaxon.enableCompletions"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="typical-workflow">💡 Typical Workflow</h2>
+<div class="highlight"><pre><span></span><code>Create Project
+      ↓
+Write Routes
+      ↓
+Use Snippets
+      ↓
+Route Explorer
+      ↓
+Run App
+      ↓
+Debug
+      ↓
+Test
+</code></pre></div>
+<hr/>
+<h2 id="common-fixes">🛠 Common Fixes</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No routes</td>
+<td>Save the file</td>
+</tr>
+<tr>
+<td>No IntelliSense</td>
+<td>Restart Language Server</td>
+</tr>
+<tr>
+<td>No CodeLens</td>
+<td>Enable CodeLens</td>
+</tr>
+<tr>
+<td>Extension inactive</td>
+<td>Open a Python file</td>
+</tr>
+<tr>
+<td>Debug issues</td>
+<td>Install Python extension</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="best-experience">📦 Best Experience</h2>
+<p>Recommended VS Code extensions:</p>
+<ul>
+<li>Python</li>
+<li>Pylance</li>
+<li>Error Lens</li>
+<li>GitHub Pull Requests</li>
+</ul>
+<hr/>
+<h2 id="what-you-get">🎯 What You Get</h2>
+<ul>
+<li>⚡ Fast project scaffolding</li>
+<li>🧠 Intelligent auto-completion</li>
+<li>📍 Route Explorer</li>
+<li>▶ One-click run</li>
+<li>🐛 Integrated debugging</li>
+<li>🔎 Hover documentation</li>
+<li>📝 Code snippets</li>
+<li>📊 Live diagnostics</li>
+<li>🔌 Language Server support</li>
+</ul>
+<hr/>
+<p><strong>In short:</strong> The Flaxon VS Code Extension brings an IDE-like development experience to Flaxon, making it easier to build, navigate, debug, and maintain Python web applications without leaving Visual Studio Code.</p></article>
+</main></div><div id="footer"></div></body></html>

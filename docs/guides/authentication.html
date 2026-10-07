@@ -1,210 +1,517 @@
-<!-- docs/guides/authentication.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Authentication – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Authentication — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Authentication — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Authentication</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/authentication.md">Framework source</a> · <a href="../../content/framework/docs/guides/authentication.md" download>Markdown</a></p><h1 id="authentication">Authentication</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon provides flexible authentication support through pluggable authentication backends.</p>
+<p>Supported approaches include:</p>
+<ul>
+<li>JWT authentication</li>
+<li>Session-based authentication</li>
+<li>API key authentication</li>
+<li>OAuth2 providers</li>
+<li>Custom authentication implementations</li>
+</ul>
+<p>Flaxon does not force a single authentication strategy. Developers can choose the approach that best fits their application.</p>
+<hr/>
+<h2 id="jwt-authentication">JWT Authentication</h2>
+<p>JWT (JSON Web Token) authentication is commonly used for APIs, mobile applications, and distributed systems.</p>
+<hr/>
+<h2 id="setup">Setup</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JWTBackend</span><span class="p">,</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">login_required</span>
+<span class="p">)</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"auth-app"</span>
+<span class="p">)</span>
 
-    <div id="header"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret-key"</span>
+<span class="p">)</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span>
+<span class="p">)</span>
+<span class="err">````</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html" class="active">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-                    </div>
-                </aside>
+<span class="o">---</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Authentication</h1>
-                        <p>Flaxon provides flexible authentication through JWT, sessions, and custom backends.</p>
+<span class="c1"># Login</span>
 
-                        <h2>JWT Authentication</h2>
+<span class="n">Create</span> <span class="n">a</span> <span class="n">login</span> <span class="n">endpoint</span> <span class="n">that</span> <span class="n">validates</span> <span class="n">credentials</span> <span class="ow">and</span> <span class="n">returns</span> <span class="n">a</span> <span class="n">token</span><span class="o">.</span>
 
-                        <h3>Setup</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
-from flaxon.security import JWTBackend, AuthenticationMiddleware
+<span class="err">```</span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
 
-app = Flaxon("auth-app")
-backend = JWTBackend(secret_key="your-secret-key")
 
-app.add_middleware(AuthenticationMiddleware, backend=backend)</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-                        <h3>Login</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import User
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-@app.post("/login")
-async def login(request):
-    data = await request.json()
-    user = await authenticate_user(data["username"], data["password"])
 
-    if not user:
-        raise HTTPException(401, "Invalid credentials")
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">authenticate_user</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"password"</span><span class="p">]</span>
+    <span class="p">)</span>
 
-    token = await backend.create_token(user)
-    return {"token": token, "user": user.to_dict()}</code></pre>
-                        </div>
 
-                        <h3>Protecting Routes</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import login_required
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">401</span><span class="p">,</span>
+            <span class="s2">"Invalid credentials"</span>
+        <span class="p">)</span>
 
-@app.get("/profile")
-@login_required
-async def profile(request):
-    user = getattr(request, "user")
-    return {"user": user.to_dict()}</code></pre>
-                        </div>
 
-                        <h2>Session Authentication</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import JSONResponse
-from flaxon.security import SessionBackend, AuthenticationMiddleware
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span>
+        <span class="n">user</span>
+    <span class="p">)</span>
 
-backend = SessionBackend()
-app.add_middleware(AuthenticationMiddleware, backend=backend)
 
-@app.post("/login")
-async def login(request):
-    data = await request.json()
-    user = await authenticate_user(data)
-    session_id = await backend.create_token(user)
-    response = JSONResponse({"success": True})
-    response.headers["set-cookie"] = f"session_id={session_id}; HttpOnly; Path=/"
-    return response</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"token"</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="protecting-routes">Protecting Routes</h2>
+<p>Use <code>login_required</code> to protect authenticated endpoints.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/profile"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
-                        <h2>API Key Authentication</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import APIKeyManager, api_key_required
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span>
+    <span class="p">)</span>
 
-manager = APIKeyManager()
-key, hashed = manager.generate_key()
-manager.register(key)
 
-app.state.api_key_manager = manager
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-user-model">Custom User Model</h2>
+<p>Applications can extend the default user model with custom fields and permissions.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
 
-@app.get("/protected")
-@api_key_required
-async def protected(request):
-    return {"data": "secret"}</code></pre>
-                        </div>
 
-                        <h2>OAuth2</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import OAuth2Provider, OAuth2Backend
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomUser</span><span class="p">(</span><span class="n">User</span><span class="p">):</span>
 
-provider = OAuth2Provider(
-    client_id="your-client-id",
-    client_secret="your-client-secret",
-    authorization_endpoint="https://auth.example.com/authorize",
-    token_endpoint="https://auth.example.com/token",
-    redirect_uri="https://your-app.com/callback",
-)
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">,</span>
+        <span class="n">roles</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
 
-backend = OAuth2Backend()
-backend.register_provider("example", provider)
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="nb">id</span><span class="p">,</span>
+            <span class="n">username</span><span class="p">,</span>
+            <span class="n">email</span><span class="p">,</span>
+            <span class="n">roles</span>
+        <span class="p">)</span>
 
-@app.get("/auth/login")
-async def auth_login():
-    url = backend.get_authorization_url("example")
-    return RedirectResponse(url)</code></pre>
-                        </div>
 
-                        <h2>Password Hashing</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.security import hash_password, verify_password
+        <span class="bp">self</span><span class="o">.</span><span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"read"</span><span class="p">,</span>
+            <span class="s2">"write"</span>
+        <span class="p">]</span>
 
-# Hash a password
-hashed = hash_password("my-password")
 
-# Verify a password
-is_valid = verify_password("my-password", hashed)
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_access_admin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-# Check if rehash is needed
-if needs_rehash(hashed):
-    hashed = hash_password("my-password")</code></pre>
-                        </div>
+        <span class="k">return</span> <span class="s2">"admin"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roles</span>
+</code></pre></div>
+<hr/>
+<h2 id="session-authentication">Session Authentication</h2>
+<p>Session authentication is useful for traditional web applications.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SessionBackend</span><span class="p">,</span>
+    <span class="n">AuthenticationMiddleware</span>
+<span class="p">)</span>
 
-                        <div class="note warning">
-                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Security Reminder</strong>
-                            <p class="mb-0 mt-1">Always store secret keys in environment variables, not in code. Use <code>FLAXON_SECRET_KEY</code> in production.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
 
-    <div id="footer"></div>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">SessionBackend</span><span class="p">()</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">authenticate_user</span><span class="p">(</span>
+        <span class="n">data</span>
+    <span class="p">)</span>
+
+
+    <span class="n">session_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span>
+        <span class="n">user</span>
+    <span class="p">)</span>
+
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">"set-cookie"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"session_id=</span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">; "</span>
+        <span class="s2">"HttpOnly; Path=/"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">response</span>
+</code></pre></div>
+<hr/>
+<h2 id="api-key-authentication">API Key Authentication</h2>
+<p>API keys are useful for service-to-service communication and external integrations.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">APIKeyManager</span><span class="p">,</span>
+    <span class="n">api_key_required</span>
+<span class="p">)</span>
+
+
+<span class="n">manager</span> <span class="o">=</span> <span class="n">APIKeyManager</span><span class="p">()</span>
+
+
+<span class="n">key</span><span class="p">,</span> <span class="n">hashed</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">generate_key</span><span class="p">()</span>
+
+
+<span class="n">manager</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="n">key</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">api_key_manager</span> <span class="o">=</span> <span class="n">manager</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/protected"</span><span class="p">)</span>
+<span class="nd">@api_key_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">protected</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="s2">"secret"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="oauth2-protocol-helpers">OAuth2 protocol helpers</h2>
+<p>Flaxon provides configurable OAuth2 protocol helpers for authorization URL
+creation and authorization-code/token refresh requests. They do not create
+login routes, validate callback state, provision users, or establish an
+application session automatically. Your application must implement those
+steps, or use a dedicated identity provider integration.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OAuth2Provider</span><span class="p">,</span>
+    <span class="n">OAuth2Backend</span>
+<span class="p">)</span>
+
+
+<span class="n">provider</span> <span class="o">=</span> <span class="n">OAuth2Provider</span><span class="p">(</span>
+
+    <span class="n">client_id</span><span class="o">=</span><span class="s2">"your-client-id"</span><span class="p">,</span>
+
+    <span class="n">client_secret</span><span class="o">=</span><span class="s2">"your-client-secret"</span><span class="p">,</span>
+
+    <span class="n">authorization_endpoint</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"https://auth.example.com/authorize"</span>
+    <span class="p">),</span>
+
+    <span class="n">token_endpoint</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"https://auth.example.com/token"</span>
+    <span class="p">),</span>
+
+    <span class="n">redirect_uri</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"https://your-app.com/callback"</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">OAuth2Backend</span><span class="p">()</span>
+
+
+<span class="n">backend</span><span class="o">.</span><span class="n">register_provider</span><span class="p">(</span>
+    <span class="s2">"example"</span><span class="p">,</span>
+    <span class="n">provider</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/auth/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">auth_login</span><span class="p">():</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_authorization_url</span><span class="p">(</span>
+        <span class="s2">"example"</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/auth/callback"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">auth_callback</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"code"</span>
+    <span class="p">)</span>
+
+
+    <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+        <span class="s2">"example"</span><span class="p">,</span>
+        <span class="n">code</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user_data</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="password-hashing">Password Hashing</h2>
+<p>Passwords should never be stored as plain text.</p>
+<p>Flaxon provides password hashing utilities.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">hash_password</span><span class="p">,</span>
+    <span class="n">verify_password</span>
+<span class="p">)</span>
+
+
+<span class="n">hashed</span> <span class="o">=</span> <span class="n">hash_password</span><span class="p">(</span>
+    <span class="s2">"my-password"</span>
+<span class="p">)</span>
+
+
+<span class="n">is_valid</span> <span class="o">=</span> <span class="n">verify_password</span><span class="p">(</span>
+    <span class="s2">"my-password"</span><span class="p">,</span>
+    <span class="n">hashed</span>
+<span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">needs_rehash</span><span class="p">(</span><span class="n">hashed</span><span class="p">):</span>
+
+    <span class="n">hashed</span> <span class="o">=</span> <span class="n">hash_password</span><span class="p">(</span>
+        <span class="s2">"my-password"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-authentication-example">Complete Authentication Example</h2>
+<p>Example API with registration, login, and protected routes.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Flaxon</span><span class="p">,</span>
+    <span class="n">HTTPException</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JWTBackend</span><span class="p">,</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">login_required</span><span class="p">,</span>
+    <span class="n">User</span><span class="p">,</span>
+    <span class="n">hash_password</span><span class="p">,</span>
+    <span class="n">verify_password</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"auth-demo"</span>
+<span class="p">)</span>
+
+
+<span class="n">backend</span> <span class="o">=</span> <span class="n">JWTBackend</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">"your-secret-key"</span>
+<span class="p">)</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">AuthenticationMiddleware</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Example storage</span>
+<span class="c1"># Use a database in production</span>
+
+<span class="n">users</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/register"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">400</span><span class="p">,</span>
+            <span class="s2">"Username already exists"</span>
+        <span class="p">)</span>
+
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+
+        <span class="nb">id</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+
+        <span class="n">username</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">],</span>
+
+        <span class="n">email</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">"email"</span><span class="p">],</span>
+
+        <span class="n">roles</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">"user"</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+    <span class="n">users</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+
+        <span class="s2">"password"</span><span class="p">:</span> <span class="n">hash_password</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"password"</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+
+        <span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+    <span class="n">stored</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stored</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">401</span><span class="p">,</span>
+            <span class="s2">"Invalid credentials"</span>
+        <span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_password</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"password"</span><span class="p">],</span>
+        <span class="n">stored</span><span class="p">[</span><span class="s2">"password"</span><span class="p">]</span>
+    <span class="p">):</span>
+
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">401</span><span class="p">,</span>
+            <span class="s2">"Invalid credentials"</span>
+        <span class="p">)</span>
+
+
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">create_token</span><span class="p">(</span>
+        <span class="n">stored</span><span class="p">[</span><span class="s2">"user"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"token"</span><span class="p">:</span> <span class="n">token</span>
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/profile"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">}</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin"</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">admin</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">"user"</span>
+    <span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="s2">"admin"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="mi">403</span><span class="p">,</span>
+            <span class="s2">"Admin access required"</span>
+        <span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"admin"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+</code></pre></div>
+<hr/>
+<h2 id="security-recommendations">Security Recommendations</h2>
+<p>For production applications:</p>
+<ul>
+<li>Store users in a database.</li>
+<li>Use strong secret keys.</li>
+<li>Enable HTTPS.</li>
+<li>Rotate tokens when appropriate.</li>
+<li>Use short-lived access tokens.</li>
+<li>Protect sensitive routes with authorization checks.</li>
+<li>Never store plain-text passwords.</li>
+<li>Apply rate limiting to login endpoints.</li>
+</ul>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<p>Related documentation:</p>
+<ul>
+<li>Security Guide</li>
+<li>Middleware</li>
+<li>Authorization</li>
+<li>API Development</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

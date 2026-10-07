@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Deploying Flaxon Apps — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Deploying Flaxon Apps — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Deploying Flaxon Apps</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Platform-Deployment.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Platform-Deployment.md" download>Markdown</a></p><h1 id="deploying-flaxon-apps">Deploying Flaxon Apps</h1>
+<p>A note on how this doc is sourced, since deployment platforms change
+their behavior over time: claims about Flaxon itself (ASGI compliance,
+the module system, the serverless-detection pattern) were built and
+tested in this environment, including a simulated real Lambda event
+handled end to end. Claims specific to Vercel's and AWS's current
+platform behavior (entrypoint detection, timeouts, framework detection)
+are sourced from each platform's own current documentation, not
+memorized -- check the linked pages if something has changed since.</p>
+<h2 id="why-this-works-at-all-flaxon-apps-are-plain-asgi-apps">Why this works at all: Flaxon apps are plain ASGI apps</h2>
+<p><code>Flaxon</code> implements the ASGI protocol directly --
+<code>async def __call__(self, scope, receive, send)</code> -- with no framework-
+specific glue in between. That means any host that can run a standard
+ASGI application can run a Flaxon app, without Flaxon needing its own
+special integration for each one. This is verified, not assumed: a
+bare <code>Flaxon</code> app was wrapped with <code>Mangum</code> (the standard AWS Lambda
+ASGI adapter) and handled a simulated real Lambda/API Gateway event
+correctly, with zero Flaxon-side changes.</p>
+<hr/>
+<h2 id="vercel">Vercel</h2>
+<p>Per Vercel's current docs, the Python runtime auto-detects a supported
+framework from <code>requirements.txt</code>/<code>pyproject.toml</code>/<code>Pipfile</code>, and looks
+for an ASGI or WSGI application object named <code>app</code> in one of these
+entrypoint files: <code>app.py</code>, <code>index.py</code>, <code>server.py</code>, <code>main.py</code>,
+<code>wsgi.py</code>, or <code>asgi.py</code> (or a custom path via <code>tool.vercel.entrypoint</code>
+in <code>pyproject.toml</code>). ASGI apps are supported natively -- Vercel's own
+docs describe the Python runtime as running "ASGI and WSGI applications
+including FastAPI, Flask, Django, and other Python web frameworks."</p>
+<p>Conveniently, Flaxon's own <code>flaxon new</code> scaffold already generates
+<code>app.py</code> with a top-level <code>app = Flaxon(...)</code> -- one of Vercel's
+default entrypoints, no restructuring needed for the basic case.</p>
+<h2 id="minimal-setup">Minimal setup</h2>
+<div class="highlight"><pre><span></span><code>myapp/
+├── app.py              # exposes `app` -- Vercel finds this automatically
+├── requirements.txt
+└── vercel.json
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># app.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"myapp"</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello from Flaxon on Vercel"</span><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code># requirements.txt
+flaxon
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1">// vercel.json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"rewrites"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"source"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/(.*)"</span><span class="p">,</span><span class="w"> </span><span class="nt">"destination"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/app.py"</span><span class="w"> </span><span class="p">}]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Deploy with <code>vercel deploy</code> or by connecting the repo through the
+Vercel dashboard/CLI.</p>
+<h2 id="what-actually-needs-adapting-for-vercel-specifically">What actually needs adapting for Vercel specifically</h2>
+<p>Nothing Flaxon-side needs a code adapter to <em>run</em> on Vercel -- the app
+object works as-is. What genuinely needs attention is Vercel's
+<em>execution model</em>, which is meaningfully different from a long-running
+server. This is the part worth being careful about:</p>
+<h3 id="1-websocket-dependent-modules-should-not-be-mounted-on-vercel">1. WebSocket-dependent modules should not be mounted on Vercel</h3>
+<p>Per Vercel's own current documentation, standard Vercel Functions are
+short-lived and stateless, and WebSockets are explicitly called out as
+unreliable in that model. If you've built anything with Flaxon's
+WebSocket support (live-updating admin panels, the CMS live feed from
+earlier in this project, chat features), don't mount those routes when
+deploying to Vercel -- detect the environment and skip them:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">IS_SERVERLESS</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VERCEL"</span><span class="p">))</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"myapp"</span><span class="p">)</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"api"</span><span class="p">)</span>
+
+<span class="nd">@api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/ping"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"pong"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">IS_SERVERLESS</span><span class="p">:</span>
+    <span class="n">live</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"live"</span><span class="p">)</span>
+
+    <span class="nd">@live</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">"/updates"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">updates</span><span class="p">(</span><span class="n">socket</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="c1"># ... live updates ...</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">live</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/live"</span><span class="p">)</span>
+</code></pre></div>
+<p>Verified: the same app object built with <code>VERCEL</code> set vs. unset
+correctly includes or excludes the WebSocket route, while the HTTP
+routes work identically either way. Vercel sets <code>VERCEL=1</code> in its
+Function environment automatically -- no manual configuration needed
+to detect it.</p>
+<h3 id="2-dont-rely-solely-on-on_startup-for-critical-initialization">2. Don't rely solely on <code>on_startup</code> for critical initialization</h3>
+<p>Flaxon's <code>@app.on_startup</code> hooks fire on the ASGI lifespan protocol.
+Whether a given serverless host reliably drives that protocol the same
+way a long-running server does is host-specific and not something to
+assume — as a defensive measure for any serverless target, do critical
+setup (e.g. opening a DB connection) at module level too, so it runs
+on every cold start regardless of whether lifespan events fire the way
+they would locally under <code>flaxon run</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.database.adapters.postgresql</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostgreSQLAdapter</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseManager</span><span class="p">(</span><span class="n">PostgreSQLAdapter</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="s2">"db"</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+
+<span class="c1"># Also keep the normal hook for local dev / hosts that do drive lifespan:</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_startup</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="3-real-limits-to-plan-around-from-vercels-current-docs">3. Real limits to plan around (from Vercel's current docs)</h3>
+<ul>
+<li>Execution timeout: 10 seconds on the free plan, 60 seconds on Pro
+  (longer with Fluid Compute, which has its own pricing model -- check
+  current Vercel docs before relying on it)</li>
+<li>No persistent background processes or workers in the standard model
+  -- Flaxon's <code>flaxon worker</code>/<code>flaxon schedule</code> CLI commands assume a
+  long-running process and don't fit this model at all; run those on a
+  different host (see below) if you need them</li>
+<li>Bundle size: 500MB standard, up to 5GB on the "Large Functions"
+  beta -- relevant if your <code>requirements.txt</code> pulls in heavy DB
+  drivers</li>
+</ul>
+<hr/>
+<h2 id="aws-lambda-via-mangum">AWS Lambda (via Mangum)</h2>
+<p>Unlike Vercel, AWS Lambda doesn't natively speak ASGI -- it needs an
+adapter to translate Lambda/API Gateway events into ASGI scope/receive/
+send calls. <a href="https://mangum.fastapiexpert.com/">Mangum</a> is the
+standard tool for this, framework-agnostic, and was verified here to
+correctly wrap a real Flaxon app and handle a simulated API Gateway
+event end to end.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># lambda_handler.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mangum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mangum</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"myapp"</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/hello"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"from flaxon on lambda"</span><span class="p">}</span>
+
+<span class="n">handler</span> <span class="o">=</span> <span class="n">Mangum</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">lifespan</span><span class="o">=</span><span class="s2">"off"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pip install mangum
+</code></pre></div>
+<p>Set the Lambda function's handler to <code>lambda_handler.handler</code>. Point
+API Gateway (HTTP API, for simplicity) at the function.</p>
+<p><code>lifespan="off"</code> is the safer default here for the same reason as the
+Vercel note above -- do critical initialization at module level, not
+solely inside <code>@app.on_startup</code>, since Lambda's relationship to the
+lifespan protocol is adapter-mediated rather than native. Same
+serverless caveats apply as Vercel: no long-running <code>flaxon worker</code>/
+<code>flaxon schedule</code>, WebSockets need API Gateway's separate WebSocket API
+(more setup than the REST/HTTP API path, not covered here).</p>
+<p>If you'd rather avoid Lambda's event-translation model entirely, AWS
+App Runner or ECS Fargate run a normal container with a normal
+long-running ASGI server -- see "Container-based hosting" below; no
+Mangum needed, same as any other container host.</p>
+<hr/>
+<h2 id="platforms-with-normal-long-running-processes">Platforms with normal, long-running processes</h2>
+<p>These are the simplest deployment targets for Flaxon, since nothing
+needs adapting at all -- Flaxon apps run exactly the way they do
+locally, WebSockets and background workers included.</p>
+<h2 id="flyio-railway-render-recommended-if-you-use-websockets">Fly.io / Railway / Render (recommended if you use WebSockets)</h2>
+<p>All three run your app as a normal long-running process from a
+Dockerfile or buildpack. This is the right choice for anything using
+Flaxon's WebSocket features, <code>flaxon worker</code>, or <code>flaxon schedule</code>,
+none of which fit a serverless execution model.</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Dockerfile</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">python:3.12-slim</span>
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>uvicorn<span class="o">[</span>standard<span class="o">]</span>
+
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8000</span>
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"flaxon"</span><span class="p">,</span><span class="w"> </span><span class="s2">"run"</span><span class="p">,</span><span class="w"> </span><span class="s2">"app:app"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--host"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0.0.0.0"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--port"</span><span class="p">,</span><span class="w"> </span><span class="s2">"8000"</span><span class="p">]</span>
+</code></pre></div>
+<p>Fly.io: <code>fly launch</code> detects the Dockerfile and deploys it.
+Railway/Render: connect the repo, both auto-detect a Dockerfile.</p>
+<h2 id="any-vps-bare-server">Any VPS / bare server</h2>
+<p>Same Dockerfile works standalone (<code>docker run -p 8000:8000 myapp</code>), or
+skip Docker entirely and run <code>flaxon run app:app --host 0.0.0.0 --port 8000</code>
+behind a reverse proxy (nginx/Caddy) for TLS termination. For
+production, prefer running under a process manager (systemd, or
+multiple Uvicorn workers via <code>--workers</code> if <code>flaxon run</code> exposes it,
+otherwise invoke <code>uvicorn app:app</code> directly with <code>--workers N</code>) rather
+than a single foreground process.</p>
+<hr/>
+<h2 id="choosing-a-platform">Choosing a platform</h2>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Best fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simple API, no WebSockets, want zero-config</td>
+<td>Vercel</td>
+</tr>
+<tr>
+<td>Existing AWS infrastructure, comfortable with Lambda</td>
+<td>AWS Lambda + Mangum</td>
+</tr>
+<tr>
+<td>WebSocket features (CMS live updates, chat, etc.)</td>
+<td>Fly.io / Railway / Render / any container host -- not Vercel or Lambda's REST path</td>
+</tr>
+<tr>
+<td><code>flaxon worker</code> / <code>flaxon schedule</code> background processes</td>
+<td>Any long-running host -- not serverless</td>
+</tr>
+<tr>
+<td>Full control, existing ops setup</td>
+<td>Docker on a VPS</td>
+</tr>
+</tbody>
+</table>
+<p>If you're not sure yet, start with Fly.io/Railway/Render: nothing
+about your Flaxon app needs to change later if you decide to add
+WebSocket features, since you're not fighting a serverless execution
+model to begin with.</p></article>
+</main></div><div id="footer"></div></body></html>

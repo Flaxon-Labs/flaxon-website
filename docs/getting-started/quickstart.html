@@ -1,144 +1,79 @@
-<!-- docs/getting-started/quickstart.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Quick Start – Flaxon</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Full-stack quick start — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Full-stack quick start — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Full-stack quick start</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/quickstart.md">Framework source</a> · <a href="../../content/framework/docs/quickstart.md" download>Markdown</a></p><h1 id="full-stack-quick-start">Full-stack quick start</h1>
+<p>Build a Python API and a Teloce interface in the same project. Python 3.11+ is
+required. Create a virtual environment and install compatible Flaxon/Teloce releases:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="c1"># Linux/macOS: source .venv/bin/activate</span>
+<span class="c1"># PowerShell: .\.venv\Scripts\Activate.ps1</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<p>For unreleased repository features, install your local Flaxon and teloce-py
+checkouts with <code>pip install -e /path/to/teloce-py -e '/path/to/flaxon[standard]'</code>.</p>
+<p>Create <code>app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"Taskboard"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span><span class="n">project_root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Taskboard"</span><span class="p">)</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/tasks"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tasks</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"items"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Try Flaxon"</span><span class="p">}]}</span>
 
-    <div id="header"></div>
-
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html" class="active">Quick Start</a>
-                        <div class="section-title">More</div>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Quick Start</h1>
-                        <p>Build your first Flaxon application in minutes.</p>
-
-                        <h2>Create a Project</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">mkdir my-flaxon-app
-cd my-flaxon-app
-python -m venv .venv
-source .venv/bin/activate
-pip install "flaxon[standard]"</code></pre>
-                        </div>
-
-                        <h2>Create app.py</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Flaxon
-
-app = Flaxon("hello-world", debug=True)
-
-@app.get("/")
-async def home():
-    return {"message": "Hello, World!"}
-
-@app.get("/health")
-async def health():
-    return {"status": "healthy", "service": "hello-world"}</code></pre>
-                        </div>
-
-                        <h2>Run It</h2>
-                        <div class="code-block">
-                            <pre><code class="language-bash">flaxon run app:app --reload</code></pre>
-                        </div>
-                        <p>Visit <code>http://localhost:8000</code> to see your API.</p>
-
-                        <h2>Add a Route with Parameters</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/users/&lt;int:user_id&gt;")
-async def get_user(user_id: int):
-    return {"id": user_id, "name": f"User {user_id}"}</code></pre>
-                        </div>
-                        <p>Visit <code>http://localhost:8000/users/42</code></p>
-
-                        <h2>Add Validation</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.validation import Schema, fields
-
-class CreateUser(Schema):
-    name = fields.StrField(required=True, min_length=2, max_length=80)
-    email = fields.EmailField(required=True)
-    age = fields.IntField(required=False, minimum=13, maximum=120)
-
-@app.post("/users")
-async def create_user(data: CreateUser):
-    return {"success": True, "user": data.to_dict()}</code></pre>
-                        </div>
-
-                        <h2>Add a WebSocket</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import WebSocket
-
-@app.websocket("/ws/echo")
-async def echo(socket):
-    await socket.accept()
-    async for message in socket.iter_json():
-        await socket.send_json({"echo": message})</code></pre>
-                        </div>
-
-                        <div class="note success">
-                            <strong><i class="fas fa-check-circle mr-2"></i> Done!</strong>
-                            <p class="mb-0 mt-1">You've built your first Flaxon application. Check the <a href="/docs.html">documentation</a> for more.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">)</span>
+</code></pre></div>
+<p>Create <code>ui/app.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Taskboard<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>{{ status }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">v-for</span><span class="o">=</span><span class="s">"task in tasks"</span> <span class="na">:key</span><span class="o">=</span><span class="s">"task.id"</span><span class="p">&gt;</span>{{ task.title }}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">tasks</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s2">"Loading…"</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">mounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"/api/tasks"</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s2">"Could not load tasks"</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">items</span><span class="p">;</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Ready"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Could not load tasks. Refresh to retry."</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span><span class="nt">main</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span><span class="w"> </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">system-ui</span><span class="p">;</span><span class="w"> </span><span class="p">}&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Run <code>flaxon run app:app --reload</code> and open http://127.0.0.1:8000.
+The startup build turns the component into JavaScript. The returned HTML shell
+mounts it, then the browser fetches the Python API. Changes trigger a server
+restart; refresh the browser afterward. This is not browser HMR.</p>
+<p>The fixture has no persistence or accounts. Continue with the
+<a href="../fullstack/index.html">10 full-stack lessons</a> to add data, validation, modules,
+authorization, testing and deployment. See the runnable
+<a href="../projects/teloce-head-ts/index.html">TypeScript/CDN converter</a> for <code>.vel</code> and <code>.ts</code>.</p></article>
+</main></div><div id="footer"></div></body></html>

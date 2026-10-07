@@ -1,123 +1,406 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Admin in Production - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>Admin in production</h1>
-                        <p>Flaxon Admin is a server-rendered management surface for application models and operations. It is not a replacement for your identity provider, mail service, object storage, job worker, or monitoring platform. Configure those boundaries explicitly before deployment.</p>
-                        <h2>What the Admin provides</h2>
-                        <ul>
-                            <li>Cookie-backed login/logout, password policy validation, reset and verification tokens, and TOTP MFA with recovery codes.</li>
-                            <li>User editing, deactivation, deletion, roles, permissions, protected system roles, and permission-aware CRUD.</li>
-                            <li>Model list/detail/create/edit/delete, global search, filters, sorting, pagination, and CSRF-protected bulk actions.</li>
-                            <li>Media upload, folders, metadata, hashing, validation, signed URLs, resumable uploads, and thumbnail job integration.</li>
-                            <li>Activity, hash-chained audit verification, notifications, operations, settings, CSV/JSON import and export, and CMS workspaces.</li>
-                        </ul>
-                        <h2>Production bootstrap</h2>
-                        <pre><code class="language-python">import os
-from flaxon import Flaxon
-from flaxon.admin import AdminConfig, AdminDashboard
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flaxon Admin in Production — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Flaxon Admin in Production — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Flaxon Admin in Production</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/admin-production.md">Framework source</a> · <a href="../../content/framework/docs/guides/admin-production.md" download>Markdown</a></p><h1 id="flaxon-admin-in-production">Flaxon Admin in Production</h1>
+<p>This guide explains how to deploy, configure, extend, and operate the Flaxon
+Admin dashboard. The Admin is a server-rendered management surface for
+application models and administrative operations. It is not a replacement for
+your application database, identity provider, mail service, object storage,
+job worker, or monitoring platform.</p>
+<p>For the CMS SPA and publishing features, see <a href="admin-cms.html">Admin and CMS Production
+Guide</a>. For endpoint details, see the <a href="../api/admin.html">Admin API
+reference</a>.</p>
+<h2 id="what-the-admin-provides">What the Admin Provides</h2>
+<p>The built-in dashboard includes:</p>
+<ul>
+<li>Cookie-backed login and logout</li>
+<li>Password policy validation, password reset tokens, and optional email verification</li>
+<li>TOTP authenticator-app MFA with recovery codes</li>
+<li>User creation, editing, deactivation, deletion, and role assignment</li>
+<li>Role and permission editing with protected system roles</li>
+<li>Registered-model list, detail, create, edit, delete, search, filters, sorting, and pagination</li>
+<li>Permission-aware model actions and bulk actions</li>
+<li>Global model search</li>
+<li>Media upload, metadata, folders, validation, hashing, thumbnails, and custom storage adapters</li>
+<li>Settings persistence</li>
+<li>Activity history, hash-chained audit verification, notifications, and operations views</li>
+<li>CSV/JSON model export and import endpoints</li>
+<li>CSRF-protected browser forms and SPA mutations</li>
+<li>Optional Redis sessions, distributed rate limits, Redis WebSocket broadcasting, and publishing locks</li>
+</ul>
+<p>Several production capabilities are extension points rather than bundled
+services. Email delivery, WebAuthn verification, antivirus scanning, durable
+workers, scheduler execution, object storage credentials, and alert delivery
+must be configured by the application.</p>
+<h2 id="installation-and-bootstrap">Installation and Bootstrap</h2>
+<p>Install the framework with the dependencies required by the deployment:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard]"</span>
+</code></pre></div>
+<p>Create the application and an Admin instance. Use a strong password from an
+environment variable or a secret manager; the literal value below is only a
+local example.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-app = Flaxon("backoffice", debug=False)
-admin = AdminDashboard(
-    app,
-    url_prefix="/admin",
-    config=AdminConfig(site_title="Operations", timezone="UTC"),
-    storage_path="var/admin.sqlite3",
-    redis_url=os.environ.get("REDIS_URL"),
-    users=[{
-        "username": "owner",
-        "password": os.environ["FLAXON_ADMIN_PASSWORD"],
-        "roles": ["administrator"],
-    }],
-)</code></pre>
-                        <p>Use a database-backed Admin store for PostgreSQL/Neon deployments. Apply migrations before starting web processes and workers. A process-local session backend is for development only.</p>
-                        <h2>Redis and multiple workers</h2>
-                        <pre><code class="language-python">admin = AdminDashboard(
-    app,
-    storage_path="var/admin.sqlite3",
-    redis_url=os.environ["REDIS_URL"],
-    redis_protocol=2,
-    redis_max_connections=100,
-    session_idle_timeout=1800,
-)</code></pre>
-                        <p>Redis-backed configuration coordinates sessions, Admin request limits, publishing locks, and optional WebSocket fan-out. Configure TLS, authentication, pooling, and a protocol version tested with the deployed Redis client.</p>
-                        <h2>Passwords, reset mail, and MFA</h2>
-                        <pre><code class="language-python">async def send_reset(identifier: str, token: str) -> None:
-    await mail.send(
-        to=identifier,
-        subject="Reset your Admin password",
-        body=f"https://admin.example.com/admin/password-reset?token={token}",
-    )
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
 
-admin = AdminDashboard(
-    app,
-    password_reset_sender=send_reset,
-    require_email_verification=True,
-)</code></pre>
-                        <p>Queue delivery instead of blocking a request on a mail provider. Enable distributed rate limits for reset and MFA endpoints when multiple workers are used. Never log passwords, MFA secrets, or recovery codes.</p>
-                        <h2>Model lists and custom models</h2>
-                        <pre><code class="language-python">from flaxon.admin import admin_model
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"backoffice"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-@admin_model(
-    list_display=["id", "name", "price", "active"],
-    search_fields=["name", "sku"],
-    list_filter=["active", "category"],
-    ordering=["name"],
-)
-class Flower:
-    ...
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span>
+        <span class="n">site_title</span><span class="o">=</span><span class="s2">"Acme Operations"</span><span class="p">,</span>
+        <span class="n">site_header</span><span class="o">=</span><span class="s2">"Acme Operations"</span><span class="p">,</span>
+        <span class="n">index_title</span><span class="o">=</span><span class="s2">"Operations dashboard"</span><span class="p">,</span>
+        <span class="n">timezone</span><span class="o">=</span><span class="s2">"UTC"</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"var/admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"owner"</span><span class="p">,</span>
+        <span class="s2">"password"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_ADMIN_PASSWORD"</span><span class="p">],</span>
+        <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"owner@example.com"</span><span class="p">,</span>
+        <span class="s2">"roles"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"administrator"</span><span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Run locally:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+</code></pre></div>
+<p>Open <code>/admin/login</code>. The dashboard is mounted at <code>/admin/</code> and the model
+interface uses <code>/admin/&lt;model-name&gt;</code>.</p>
+<h2 id="persistence-and-migrations">Persistence and Migrations</h2>
+<p><code>storage_path</code> enables the built-in SQLite AdminStore. For PostgreSQL or Neon,
+use <code>PostgreSQLAdminStore(database_url)</code> and pass it as <code>store</code>; it persists
+the same auxiliary Admin state without a local filesystem dependency. Both
+stores persist Admin users,
+roles, settings, sessions, reset/verification tokens, activities, media
+metadata, notifications, operations, jobs, audit entries, uploads, and CMS
+namespaces. Create the parent directory before startup.</p>
+<p>For an application-owned database, generate the migration files and apply them
+with the Flaxon CLI:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_admin_migration</span>
 
-# Example URLs:
-# /admin/flower?q=rose
-# /admin/flower?filter_category=Bouquets&order_by=-price&page=2</code></pre>
-                        <p>Server-side permissions remain authoritative. Custom clients must handle <code>401</code>, <code>403</code>, validation errors, loading states, and retry states; hidden buttons are not security.</p>
-                        <h2>Media and operations</h2>
-                        <p>Use S3-compatible storage for private or large files, signed URLs for controlled access, antivirus scanning, EXIF policy, content hashing, upload limits, and durable background thumbnail workers. Use the operations page for visibility, but send serious errors to an external logging and alerting platform.</p>
-                        <h2>CSRF and custom pages</h2>
-                        <pre><code class="language-html">&lt;input type="hidden" name="_csrf" value="{{ dashboard.csrf_token() }}"&gt;</code></pre>
-                        <pre><code class="language-python">@app.get("/admin/reports")
-async def reports(request):
-    user = await admin.auth.current_user(request)
-    admin.auth.authorize(user, "admin:read")
-    return await admin.jinax.render_response(
-        "admin/reports.html",
-        {"dashboard": admin, "models": admin.registry.get_all()},
-    )</code></pre>
-                        <p>For reusable custom areas with their own routes, templates, static files, hooks, and CLI commands, use <code>FlaxonModule</code> and <code>admin.mount_module()</code>. See the <a href="/docs/guides/modules.html">Modules guide</a>.</p>
-                        <h2>Deployment checklist</h2>
-                        <ul>
-                            <li>Run Admin migrations and use durable database or Redis sessions.</li>
-                            <li>Use secret-managed passwords, MFA, secure cookies, TLS, and a trusted public origin.</li>
-                            <li>Configure object storage, signed URLs, antivirus, upload limits, and thumbnail workers.</li>
-                            <li>Define audit retention, external log export, health checks, metrics, and alerts.</li>
-                            <li>Test denied permissions, CSRF rejection, invalid imports, browser workflows, and multi-worker behavior.</li>
-                        </ul>
-                        <p>For endpoint details, see the <a href="/docs/api/admin.html">Admin API</a>. For service-owned databases and the control plane, see <a href="/docs/guides/microservices.html">Microservices</a>.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
-</body>
-</html>
+<span class="n">write_admin_migration</span><span class="p">(</span><span class="s2">"migrations"</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>migrate<span class="w"> </span>--database<span class="w"> </span>sqlite://./var/app.sqlite3<span class="w"> </span>--migrations-dir<span class="w"> </span>migrations
+</code></pre></div>
+<p>Pass the configured <code>DatabaseManager</code> as <code>database=</code> to the Admin and CMS.
+Run migrations before starting web processes and workers. For multiple
+workers, use a database-backed session backend or configure Redis sessions;
+the default in-memory session backend is process-local.</p>
+<h2 id="sessions-and-redis">Sessions and Redis</h2>
+<p>Redis is recommended when more than one web process handles Admin requests:</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">storage_path</span><span class="o">=</span><span class="s2">"var/admin.sqlite3"</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"REDIS_URL"</span><span class="p">],</span>
+    <span class="n">redis_protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">redis_max_connections</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">session_idle_timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Redis settings apply to Admin sessions, Admin request rate limits, publishing
+locks, and optional WebSocket broadcasting. Configure Redis with authentication
+and TLS in production. Use <code>redis_protocol=3</code> only when the installed Redis
+client and server are tested together; RESP2 is the conservative default.</p>
+<h2 id="authentication-passwords-and-mfa">Authentication, Passwords, and MFA</h2>
+<p>The login form requires username and password. The authenticator field is an
+additional six-digit TOTP factor when <code>mfa_secret</code> is enabled for the account.
+Users enroll from <code>/admin/profile</code>; the setup flow displays a QR code, requires
+confirmation with a current code, and generates one-time recovery codes.</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"owner"</span><span class="p">,</span>
+        <span class="s2">"password"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_ADMIN_PASSWORD"</span><span class="p">],</span>
+        <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"owner@example.com"</span><span class="p">,</span>
+        <span class="s2">"roles"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"administrator"</span><span class="p">],</span>
+        <span class="c1"># Use a secret provisioned by a secret manager for pre-enrolled MFA.</span>
+        <span class="s2">"mfa_secret"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLAXON_ADMIN_MFA_SECRET"</span><span class="p">),</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Do not log MFA secrets or recovery codes. Password creation and change flows
+use <code>PasswordValidator</code>; reset passwords are also validated. Reset and email
+verification tokens are single-use and expire, but delivery still requires an
+application callback:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_reset</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">mail</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+        <span class="n">to</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">"Reset your Admin password"</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="sa">f</span><span class="s2">"https://admin.example.com/admin/password-reset?token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_verification</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">mail</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+        <span class="n">to</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="n">subject</span><span class="o">=</span><span class="s2">"Verify your Admin email"</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="sa">f</span><span class="s2">"https://admin.example.com/admin/verify-email?token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">password_reset_sender</span><span class="o">=</span><span class="n">send_reset</span><span class="p">,</span>
+    <span class="n">email_verification_sender</span><span class="o">=</span><span class="n">send_verification</span><span class="p">,</span>
+    <span class="n">require_email_verification</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The callbacks should enqueue mail rather than block a request on a remote mail
+provider. Configure distributed rate limiting with Redis for password reset and
+MFA endpoints when multiple workers are used.</p>
+<h2 id="users-roles-and-permissions">Users, Roles, and Permissions</h2>
+<p>The Admin UI exposes user and role management to users with <code>admin:users</code>.
+Use least privilege and keep the protected <code>staff</code> and <code>administrator</code> roles.
+Model permissions follow <code>&lt;model&gt;:&lt;action&gt;</code>:</p>
+<div class="highlight"><pre><span></span><code>admin:read          dashboard and read-only access
+admin:write         general writes and fallback model writes
+admin:users         users and roles
+admin:media         media operations
+admin:settings      settings writes
+admin:superuser     full access
+flower:read         read Flower records
+flower:create       create Flower records
+flower:update       update Flower records
+flower:delete       delete Flower records
+</code></pre></div>
+<p>The server enforces permissions at route boundaries. UI controls are a
+convenience only; custom clients must handle <code>401</code> and <code>403</code> responses and must
+not rely on hidden buttons as authorization.</p>
+<h2 id="registering-models">Registering Models</h2>
+<p>The model must expose asynchronous or synchronous <code>get_instances</code>,
+<code>get_instance</code>, <code>create_instance</code>, <code>update_instance</code>, and
+<code>delete_instance</code> methods. Register list behavior with <code>admin_model</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin_model</span>
+
+
+<span class="nd">@admin_model</span><span class="p">(</span>
+    <span class="n">list_display</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">],</span>
+    <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">],</span>
+    <span class="n">list_filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"active"</span><span class="p">,</span> <span class="s2">"category"</span><span class="p">],</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">,</span> <span class="s2">"category"</span><span class="p">],</span>
+    <span class="n">readonly_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+    <span class="n">ordering</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Flower</span><span class="p">:</span>
+    <span class="n">_items</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_next_id</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instances</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">object_id</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">object_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_next_id</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">[</span><span class="n">object_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">object_id</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="p">[</span><span class="n">object_id</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">object_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">object_id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Alternatively register explicitly with <code>admin.register(Model, ...)</code>. The
+decorator uses the default registry, so register models before constructing
+the dashboard or pass the model to the dashboard registry as appropriate for
+the application.</p>
+<h2 id="lists-search-filters-sorting-and-bulk-actions">Lists, Search, Filters, Sorting, and Bulk Actions</h2>
+<p>The model list supports:</p>
+<ul>
+<li><code>q</code> search across <code>search_fields</code> (or configured fields)</li>
+<li><code>filter_&lt;field&gt;</code> exact-value filters for <code>list_filter</code></li>
+<li><code>order_by=&lt;field&gt;</code> and <code>order_by=-&lt;field&gt;</code> sorting</li>
+<li><code>page</code> and <code>per_page</code> pagination, capped at 200 per page</li>
+<li>Checkbox selection and registered bulk actions</li>
+</ul>
+<p>Example URLs:</p>
+<div class="highlight"><pre><span></span><code>/admin/flower?q=rose
+/admin/flower?filter_category=Bouquets&amp;order_by=-price
+/admin/flower?q=rose&amp;filter_active=True&amp;page=2&amp;per_page=50
+</code></pre></div>
+<p>For models backed by <code>get_instances</code>, Flaxon performs these controls in the
+Admin view. For models that expose a custom <code>query()</code> method, pass filtering,
+ordering, and pagination through that method in the model implementation.</p>
+<p>Register a bulk action:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">restock</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">object_id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">flower</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Flower</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">object_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flower</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">Flower</span><span class="o">.</span><span class="n">update_instance</span><span class="p">(</span><span class="n">object_id</span><span class="p">,</span> <span class="p">{</span>
+                <span class="s2">"stock"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">flower</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stock"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="p">})</span>
+
+
+<span class="n">admin</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"flower"</span><span class="p">)</span><span class="o">.</span><span class="n">add_action</span><span class="p">(</span><span class="s2">"restock"</span><span class="p">,</span> <span class="n">restock</span><span class="p">)</span>
+</code></pre></div>
+<p>Bulk forms include CSRF tokens and the action route enforces model/action
+permissions. Keep actions idempotent where possible and wrap multi-record
+database writes in one transaction in your repository.</p>
+<h2 id="custom-columns-and-display-logic">Custom Columns and Display Logic</h2>
+<p>Keep list fields cheap and deterministic. For expensive derived values, add a
+stored field or a query annotation rather than doing network requests during
+template rendering. Custom display decorators are available for project
+specific display methods; ensure the method is safe for untrusted values.</p>
+<h2 id="media">Media</h2>
+<p>The Admin media page supports upload, folders, metadata, content hashing,
+allowed MIME types, maximum size checks, image validation, dimensions, and
+thumbnail scheduling. Configure a storage adapter for object storage:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.files.adapters.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3StorageAdapter</span>
+
+<span class="n">media</span> <span class="o">=</span> <span class="n">S3StorageAdapter</span><span class="p">(</span>
+    <span class="n">bucket</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"MEDIA_BUCKET"</span><span class="p">],</span>
+    <span class="n">region</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AWS_REGION"</span><span class="p">,</span> <span class="s2">"us-east-1"</span><span class="p">),</span>
+    <span class="n">endpoint_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"S3_ENDPOINT_URL"</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">media_storage</span><span class="o">=</span><span class="n">media</span><span class="p">,</span>
+    <span class="n">allowed_upload_types</span><span class="o">=</span><span class="p">{</span><span class="s2">"image/jpeg"</span><span class="p">,</span> <span class="s2">"image/png"</span><span class="p">,</span> <span class="s2">"image/webp"</span><span class="p">,</span> <span class="s2">"application/pdf"</span><span class="p">},</span>
+    <span class="n">max_upload_size</span><span class="o">=</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>
+    <span class="n">media_scanner</span><span class="o">=</span><span class="n">scan_with_antivirus</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>For production uploads, provide an antivirus scanner, strip EXIF data where
+required, use signed URLs for private objects, and run thumbnail work through a
+durable worker. Do not make private media publicly readable merely to simplify
+the Admin preview.</p>
+<h2 id="settings-activity-audit-and-operations">Settings, Activity, Audit, and Operations</h2>
+<p>The settings page persists <code>AdminConfig</code> values and application settings. Give
+<code>admin:settings</code> only to operators who need it. Activity records are useful for
+the UI; the hash-chained audit service provides tamper-evident verification at
+<code>GET /admin/audit/verify</code>. Store audit data in a database with restricted write
+access and define a retention policy before deployment.</p>
+<p>The operations page exposes health checks, task records, and recent failures.
+Register application-specific health checks and send serious failures to the
+normal observability stack; the Admin page is not an alerting system.</p>
+<p>Notifications are persisted and can be marked read. Delivery to email, SMS,
+push, or an external event bus is application-specific. Configure notification
+preferences and use Redis/WebSockets when cross-worker real-time fanout is
+required.</p>
+<h2 id="csrf-requirements">CSRF Requirements</h2>
+<p>All browser forms must include:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"hidden"</span> <span class="na">name</span><span class="o">=</span><span class="s">"_csrf"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ dashboard.csrf_token() }}"</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>All JSON mutations must send:</p>
+<div class="highlight"><pre><span></span><code><span class="err">X-CSRF-Token: &lt;token rendered by the Admin page&gt;</span>
+</code></pre></div>
+<p>The Admin list bulk action, delete forms, settings, profile, users, roles,
+media, notifications, and CMS SPA mutations follow this rule. Never disable
+CSRF validation to make a custom form work; inspect the rendered token and
+request headers instead.</p>
+<h2 id="adding-a-custom-admin-page">Adding a Custom Admin Page</h2>
+<p>Custom pages can be mounted on the same application router. Authenticate and
+authorize inside the handler, then use the Admin Jinax instance to render a
+template:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/reports"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"admin_reports"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">reports</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HTMLResponse</span><span class="p">:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">current_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">"admin:read"</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">build_report</span><span class="p">()</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">admin</span><span class="o">.</span><span class="n">jinax</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span>
+        <span class="s2">"admin/reports.html"</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"dashboard"</span><span class="p">:</span> <span class="n">admin</span><span class="p">,</span>
+            <span class="s2">"models"</span><span class="p">:</span> <span class="n">admin</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_all</span><span class="p">(),</span>
+            <span class="s2">"report"</span><span class="p">:</span> <span class="n">report</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Place <code>reports.html</code> in the configured template directory. For a page that
+should use the Admin shell, extend <code>admin/base.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">"admin/base.html"</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span><span class="x">Reports</span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+<span class="x">&lt;h1 class="text-2xl font-bold"&gt;Reports&lt;/h1&gt;</span>
+<span class="x">&lt;pre&gt;</span><span class="cp">{{</span> <span class="nv">report</span> <span class="cp">}}</span><span class="x">&lt;/pre&gt;</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</code></pre></div>
+<p>For a JSON page, return <code>JSONResponse</code> and use the same permission checks. Add
+CSRF validation to every non-read-only endpoint. Keep custom route paths
+specific enough to avoid collisions with <code>/admin/&lt;model_name&gt;</code>.</p>
+<h2 id="custom-actions-and-widgets">Custom Actions and Widgets</h2>
+<p>Register dashboard widgets for summary values that are safe to calculate on a
+request. Keep slow work out of the request path by supplying a cached value:</p>
+<div class="highlight"><pre><span></span><code><span class="n">open_deliveries_count</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># Refresh this from a scheduled metrics task.</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">register_widget</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Open deliveries"</span><span class="p">,</span>
+    <span class="s2">"value"</span><span class="p">:</span> <span class="n">open_deliveries_count</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Prefer cached metrics for dashboard traffic. Add custom actions to the
+registered <code>AdminModel</code> and enforce the corresponding permission on the server.</p>
+<h2 id="custom-templates-css-and-javascript">Custom Templates, CSS, and JavaScript</h2>
+<p>Use <code>template_dir</code> or a project-level Jinax loader to override templates. Keep
+the required context variables used by the base shell and preserve the CSRF
+fields. Add project assets under your own static prefix so they do not collide
+with <code>/static/admin</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">template_dir</span><span class="o">=</span><span class="s2">"templates/admin-overrides"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Use CSS variables or scoped classes instead of changing global framework
+styles. Custom JavaScript should handle loading, empty, error, and retry
+states; do not treat a visual state as proof that a mutation succeeded.</p>
+<h2 id="custom-identity-backends">Custom Identity Backends</h2>
+<p>If your application already owns identity, inject a session backend or adapt
+your identity layer to the Admin authentication contract. The backend must
+support token creation, lookup, and revocation. Keep Admin authorization checks
+in place even when login is delegated.</p>
+<h2 id="deployment-checklist">Deployment Checklist</h2>
+<p>Before production:</p>
+<ul>
+<li>Run Admin migrations against the production database.</li>
+<li>Use persistent database or Redis sessions; never rely on process memory with multiple workers.</li>
+<li>Set strong, secret-managed passwords and enroll MFA for every administrator.</li>
+<li>Configure password reset and verification mail delivery through a queue.</li>
+<li>Set a trusted public origin and secure cookie/TLS policy at the reverse proxy.</li>
+<li>Configure Redis pooling and protocol compatibility when using multiple workers.</li>
+<li>Configure object storage, signed URLs, upload limits, antivirus, and thumbnail workers.</li>
+<li>Define audit retention, restricted access, and external log export.</li>
+<li>Add health checks, metrics, error tracking, and alerts outside the Admin UI.</li>
+<li>Test model permissions with both allowed and denied users.</li>
+<li>Test CSRF rejection and successful form/API mutations.</li>
+<li>Test import/export with invalid rows, large files, and rollback behavior.</li>
+<li>Run browser tests for login, MFA, list search/filtering, bulk actions, media, and settings.</li>
+</ul>
+<p>The Admin is production-capable when these dependencies and operational
+controls are configured. A default in-memory development setup should not be
+described as a production deployment.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,272 +1,562 @@
-<!-- docs/examples/jinax-website.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Jinax Website Example – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Jinax Website Example — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Jinax Website Example — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Jinax Website Example</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/jinax-website.md">Framework source</a> · <a href="../../content/framework/docs/examples/jinax-website.md" download>Markdown</a></p><h1 id="jinax-website-example">Jinax Website Example</h1>
+<p>This example demonstrates a server-rendered website using <strong>Jinax templates</strong> with Flaxon.</p>
+<p>Features demonstrated:</p>
+<ul>
+<li>Template inheritance</li>
+<li>Custom filters</li>
+<li>Global template functions</li>
+<li>Dynamic routes</li>
+<li>Server-side rendering</li>
+<li>Static HTML pages</li>
+</ul>
+<hr/>
+<h2 id="running-the-example">Running the Example</h2>
+<p>Create a new Flaxon project:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>website-example
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="nb">cd</span><span class="w"> </span>website-example
+</code></pre></div>
+<p>Install dependencies:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>standard,templates<span class="o">]</span>
+</code></pre></div>
+<p>Create the application files below.</p>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000
+</code></pre></div>
+<hr/>
+<h2 id="application-code">Application Code</h2>
+<h2 id="apppy">app.py</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.jinax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinax</span>
 
-    <div id="header"></div>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span>
+    <span class="s2">"website"</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="c1"># Configure Jinax templates</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+<span class="n">app</span><span class="o">.</span><span class="n">use_templates</span><span class="p">(</span>
+    <span class="n">Jinax</span><span class="p">(</span>
+        <span class="s2">"templates"</span><span class="p">,</span>
+        <span class="n">auto_reload</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
 
-                        <div class="section-title">Examples</div>
-                        <a href="/docs/examples/basic-api.html">Basic API</a>
-                        <a href="/docs/examples/react-backend.html">React Backend</a>
-                        <a href="/docs/examples/android-backend.html">Android Backend</a>
-                        <a href="/docs/examples/websocket-chat.html">WebSocket Chat</a>
-                        <a href="/docs/examples/jinax-website.html" class="active">Jinax Website</a>
-                        <a href="/docs/examples/large-application.html">Large Application</a>
-                    </div>
-                </aside>
+<span class="n">jinax</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">jinax</span>
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Jinax Website Example</h1>
-                        <p>A server-rendered website using Jinax templates with custom filters, global functions, and template inheritance.</p>
 
-                        <h2>Application Code</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python"># app.py
-from datetime import datetime
-from flaxon import Flaxon
-from flaxon.jinax import Jinax
+<span class="c1"># ---------------------</span>
+<span class="c1"># Custom Filter</span>
+<span class="c1"># ---------------------</span>
 
-app = Flaxon("website", debug=True)
+<span class="k">def</span><span class="w"> </span><span class="nf">currency_filter</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">symbol</span><span class="o">=</span><span class="s2">"$"</span>
+<span class="p">):</span>
 
-# Configure Jinax templates
-app.use_templates(Jinax("templates", auto_reload=True))
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-# Custom filter
-jinax = app.jinax
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">symbol</span><span class="si">}{</span><span class="n">amount</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
 
-def currency_filter(value, symbol="$"):
-    try:
-        amount = float(value)
-        return f"{symbol}{amount:,.2f}"
-    except (TypeError, ValueError):
-        return value
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
 
-jinax.add_filter("currency", currency_filter)
+        <span class="k">return</span> <span class="n">value</span>
 
-# Custom function
-def get_year():
-    return datetime.now().year
 
-jinax.add_global("current_year", get_year)
 
-# Routes
-@app.get("/")
-async def home(request):
-    products = [
-        {"id": 1, "name": "Flaxon T-Shirt", "price": 29.99, "in_stock": True},
-        {"id": 2, "name": "Flaxon Mug", "price": 14.99, "in_stock": True},
-        {"id": 3, "name": "Flaxon Sticker Pack", "price": 9.99, "in_stock": False},
-        {"id": 4, "name": "Flaxon Developer Guide", "price": 49.99, "in_stock": True},
-    ]
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span>
+    <span class="s2">"currency"</span><span class="p">,</span>
+    <span class="n">currency_filter</span>
+<span class="p">)</span>
 
-    return await request.render("home.html", {
-        "title": "Flaxon Store",
-        "products": products,
-    })
 
-@app.get("/about")
-async def about(request):
-    return await request.render("about.html", {
-        "title": "About Us",
-        "description": "Flaxon is a technology-neutral, async-first Python backend framework.",
-        "features": [
-            "Async-first ASGI architecture",
-            "Flask-style route decorators",
-            "Optional modular structure",
-            "Request validation",
-            "WebSocket support",
-            "Middleware stack",
-            "Readable debugger",
-        ],
-    })
 
-@app.get("/product/&lt;int:product_id&gt;")
-async def product_detail(request, product_id: int):
-    products = [
-        {"id": 1, "name": "Flaxon T-Shirt", "price": 29.99, "in_stock": True, "description": "Premium cotton t-shirt with Flaxon logo."},
-        {"id": 2, "name": "Flaxon Mug", "price": 14.99, "in_stock": True, "description": "Ceramic mug with Flaxon branding."},
-        {"id": 3, "name": "Flaxon Sticker Pack", "price": 9.99, "in_stock": False, "description": "Pack of 5 Flaxon stickers."},
-        {"id": 4, "name": "Flaxon Developer Guide", "price": 49.99, "in_stock": True, "description": "Complete guide to building with Flaxon."},
-    ]
+<span class="c1"># ---------------------</span>
+<span class="c1"># Global Function</span>
+<span class="c1"># ---------------------</span>
 
-    product = next((p for p in products if p["id"] == product_id), None)
+<span class="k">def</span><span class="w"> </span><span class="nf">current_year</span><span class="p">():</span>
 
-    if not product:
-        return await request.render("404.html", {"title": "Product Not Found"}), 404
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
 
-    return await request.render("product.html", {
-        "title": product["name"],
-        "product": product,
-    })</code></pre>
-                        </div>
 
-                        <h2>Template Files</h2>
 
-                        <h3>templates/base.html</h3>
-                        <div class="code-block">
-                            <pre><code class="language-html">&lt;!doctype html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-    &lt;meta charset="utf-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-    &lt;title&gt;{% block title %}Flaxon{% endblock %}&lt;/title&gt;
-    &lt;style&gt;
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
-        nav { background: #0f172a; color: #e2e8f0; padding: 1rem 2rem; display: flex; gap: 2rem; align-items: center; }
-        nav a { color: #e2e8f0; text-decoration: none; }
-        nav a:hover { color: #7dd3fc; }
-        nav .brand { font-weight: bold; font-size: 1.2rem; }
-        main { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        footer { text-align: center; padding: 2rem; color: #94a3b8; border-top: 1px solid #e2e8f0; margin-top: 2rem; }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;nav&gt;
-        &lt;span class="brand"&gt;Flaxon&lt;/span&gt;
-        &lt;a href="/"&gt;Home&lt;/a&gt;
-        &lt;a href="/about"&gt;About&lt;/a&gt;
-    &lt;/nav&gt;
+<span class="n">jinax</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span>
+    <span class="s2">"current_year"</span><span class="p">,</span>
+    <span class="n">current_year</span>
+<span class="p">)</span>
 
-    &lt;main&gt;
-        {% block content %}{% endblock %}
-    &lt;/main&gt;
 
-    &lt;footer&gt;
-        &lt;p&gt;&copy; {{ current_year() }} Flaxon. All rights reserved.&lt;/p&gt;
-    &lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                        </div>
 
-                        <h3>templates/home.html</h3>
-                        <div class="code-block">
-                            <pre><code class="language-html">{% extends "base.html" %}
+<span class="c1"># ---------------------</span>
+<span class="c1"># Routes</span>
+<span class="c1"># ---------------------</span>
 
-{% block title %}{{ title }}{% endblock %}
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">products</span> <span class="o">=</span> <span class="p">[</span>
+
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span><span class="s2">"Flaxon T-Shirt"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span><span class="mf">29.99</span><span class="p">,</span>
+            <span class="s2">"in_stock"</span><span class="p">:</span><span class="kc">True</span>
+        <span class="p">},</span>
+
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span><span class="s2">"Flaxon Mug"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span><span class="mf">14.99</span><span class="p">,</span>
+            <span class="s2">"in_stock"</span><span class="p">:</span><span class="kc">True</span>
+        <span class="p">},</span>
+
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span><span class="s2">"Sticker Pack"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span><span class="mf">9.99</span><span class="p">,</span>
+            <span class="s2">"in_stock"</span><span class="p">:</span><span class="kc">False</span>
+        <span class="p">}</span>
+
+    <span class="p">]</span>
+
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="s2">"home.html"</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"title"</span><span class="p">:</span><span class="s2">"Flaxon Store"</span><span class="p">,</span>
+            <span class="s2">"products"</span><span class="p">:</span><span class="n">products</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/about"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">about</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="s2">"about.html"</span><span class="p">,</span>
+        <span class="p">{</span>
+
+            <span class="s2">"title"</span><span class="p">:</span>
+            <span class="s2">"About Flaxon"</span><span class="p">,</span>
+
+            <span class="s2">"description"</span><span class="p">:</span>
+            <span class="s2">"Technology-neutral async-first Python full-stack framework."</span><span class="p">,</span>
+
+
+            <span class="s2">"features"</span><span class="p">:[</span>
+
+                <span class="s2">"Async-first architecture"</span><span class="p">,</span>
+                <span class="s2">"Route decorators"</span><span class="p">,</span>
+                <span class="s2">"Validation"</span><span class="p">,</span>
+                <span class="s2">"WebSockets"</span><span class="p">,</span>
+                <span class="s2">"Middleware"</span><span class="p">,</span>
+                <span class="s2">"Debugger"</span>
+
+            <span class="p">]</span>
+
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/product/&lt;int:product_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">product_detail</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">,</span>
+    <span class="n">product_id</span><span class="p">:</span><span class="nb">int</span>
+<span class="p">):</span>
+
+    <span class="n">products</span> <span class="o">=</span> <span class="p">[</span>
+
+        <span class="p">{</span>
+            <span class="s2">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span><span class="s2">"Flaxon T-Shirt"</span><span class="p">,</span>
+            <span class="s2">"price"</span><span class="p">:</span><span class="mf">29.99</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span>
+            <span class="s2">"Premium Flaxon shirt"</span><span class="p">,</span>
+            <span class="s2">"in_stock"</span><span class="p">:</span><span class="kc">True</span>
+        <span class="p">}</span>
+
+    <span class="p">]</span>
+
+
+    <span class="n">product</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span>
+            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">product_id</span>
+        <span class="p">),</span>
+        <span class="kc">None</span>
+    <span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">product</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="s2">"404.html"</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">"title"</span><span class="p">:</span>
+                <span class="s2">"Product Not Found"</span>
+            <span class="p">}</span>
+        <span class="p">),</span><span class="mi">404</span>
+
+
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="s2">"product.html"</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"title"</span><span class="p">:</span>
+            <span class="n">product</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+
+            <span class="s2">"product"</span><span class="p">:</span>
+            <span class="n">product</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Run the example with <code>flaxon run app:app --reload</code>.</p>
+<hr/>
+<h2 id="template-files">Template Files</h2>
+<p>Project structure:</p>
+<div class="highlight"><pre><span></span><code>website-example/
+
+├── app.py
+│
+└── templates/
+    ├── base.html
+    ├── home.html
+    ├── about.html
+    └── product.html
+</code></pre></div>
+<hr/>
+<h2 id="templatesbasehtml">templates/base.html</h2>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>
+{% block title %}
+Flaxon
+{% endblock %}
+<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+
+<span class="nt">body</span><span class="w"> </span><span class="p">{</span>
+
+<span class="k">font-family</span><span class="p">:</span>
+<span class="n">system-ui</span><span class="p">;</span>
+
+<span class="k">background</span><span class="p">:</span>
+<span class="mh">#f8fafc</span><span class="p">;</span>
+
+<span class="k">color</span><span class="p">:</span>
+<span class="mh">#0f172a</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="nt">nav</span><span class="w"> </span><span class="p">{</span>
+
+<span class="k">background</span><span class="p">:</span>
+<span class="mh">#0f172a</span><span class="p">;</span>
+
+<span class="k">padding</span><span class="p">:</span>
+<span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="nt">nav</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+
+<span class="k">color</span><span class="p">:</span><span class="kc">white</span><span class="p">;</span>
+
+<span class="k">margin-right</span><span class="p">:</span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="p">.</span><span class="nc">card</span><span class="w"> </span><span class="p">{</span>
+
+<span class="k">background</span><span class="p">:</span><span class="kc">white</span><span class="p">;</span>
+
+<span class="k">padding</span><span class="p">:</span><span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
+
+<span class="k">border-radius</span><span class="p">:</span><span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+
+<span class="k">margin</span><span class="p">:</span><span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="p">.</span><span class="nc">price</span><span class="w"> </span><span class="p">{</span>
+
+<span class="k">color</span><span class="p">:</span><span class="mh">#0284c7</span><span class="p">;</span>
+
+<span class="k">font-weight</span><span class="p">:</span><span class="kc">bold</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>
+Flaxon
+<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/"</span><span class="p">&gt;</span>
+Home
+<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/about"</span><span class="p">&gt;</span>
+About
+<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+
+
+
+<span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
 
 {% block content %}
-    &lt;h1&gt;Welcome to the Flaxon Store&lt;/h1&gt;
-    &lt;p&gt;Explore our collection of Flaxon merchandise and resources.&lt;/p&gt;
 
-    &lt;div class="grid"&gt;
-        {% for product in products %}
-            &lt;div class="card"&gt;
-                &lt;h3&gt;{{ product.name }}&lt;/h3&gt;
-                &lt;p class="price"&gt;{{ product.price|currency("USD") }}&lt;/p&gt;
-                {% if product.in_stock %}
-                    &lt;span class="in-stock"&gt;✓ In Stock&lt;/span&gt;
-                {% else %}
-                    &lt;span class="out-of-stock"&gt;✗ Out of Stock&lt;/span&gt;
-                {% endif %}
-                &lt;br&gt;
-                &lt;a href="/product/{{ product.id }}" class="btn"&gt;View Details&lt;/a&gt;
-            &lt;/div&gt;
-        {% endfor %}
-    &lt;/div&gt;
-{% endblock %}</code></pre>
-                        </div>
+{% endblock %}
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Key Concepts</strong>
-                            <ul class="mb-0 mt-1">
-                                <li><strong>Template Inheritance:</strong> Base template with blocks</li>
-                                <li><strong>Custom Filters:</strong> Currency formatting</li>
-                                <li><strong>Global Functions:</strong> Current year</li>
-                                <li><strong>Async Rendering:</strong> Request.render()</li>
-                            </ul>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
 
-    <div id="footer"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
 
-</body>
-</html>
+<span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+© {{ current_year() }}
+Flaxon
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<hr/>
+<h2 id="templateshomehtml">templates/home.html</h2>
+<div class="highlight"><pre><span></span><code>{% extends "base.html" %}
+
+
+{% block title %}
+
+{{title}}
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+Welcome to Flaxon Store
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+
+{% for product in products %}
+
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"card"</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>
+
+{{product.name}}
+
+<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"price"</span><span class="p">&gt;</span>
+
+{{product.price|currency("USD")}}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+
+
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/product/{{product.id}}"</span><span class="p">&gt;</span>
+
+View Product
+
+<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+
+{% endfor %}
+
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+
+{% endblock %}
+</code></pre></div>
+<hr/>
+<h2 id="templatesabouthtml">templates/about.html</h2>
+<div class="highlight"><pre><span></span><code>{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+{{title}}
+
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+{{description}}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+
+
+<span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>
+Features
+<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+{% for feature in features %}
+
+<span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>
+
+{{feature}}
+
+<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+
+{% endfor %}
+
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+
+{% endblock %}
+</code></pre></div>
+<hr/>
+<h2 id="templatesproducthtml">templates/product.html</h2>
+<div class="highlight"><pre><span></span><code>{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+{{product.name}}
+
+<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"price"</span><span class="p">&gt;</span>
+
+{{product.price|currency("USD")}}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+
+{{product.description}}
+
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+
+
+{% if product.in_stock %}
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+✓ Available
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+{% else %}
+
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+Out of stock
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+{% endif %}
+
+
+
+<span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>
+
+Add To Cart
+
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+
+{% endblock %}
+</code></pre></div>
+<hr/>
+<h2 id="development">Development</h2>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>flaxon<span class="o">[</span>standard,templates<span class="o">]</span>
+
+flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Visit:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8000
+</code></pre></div>
+<p>You should see the Jinax server-rendered website.</p>
+<hr/>
+<h2 id="features-demonstrated">Features Demonstrated</h2>
+<p>✅ Template inheritance<br/>
+✅ Custom template filters<br/>
+✅ Global functions<br/>
+✅ Dynamic routes<br/>
+✅ HTML rendering<br/>
+✅ Server-side applications with Flaxon + Jinax</p></article>
+</main></div><div id="footer"></div></body></html>

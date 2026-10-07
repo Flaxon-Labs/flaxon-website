@@ -1,240 +1,437 @@
-<!-- docs/core-concepts/responses.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Responses – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Responses — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Responses — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Responses</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/responses.md">Framework source</a> · <a href="../../content/framework/docs/guides/responses.md" download>Markdown</a></p><h1 id="responses">Responses</h1>
+<h2 id="overview">Overview</h2>
+<p>Flaxon automatically converts Python return values into HTTP responses. In most cases you can simply return a dictionary, list, string, or bytes, and Flaxon will generate the appropriate response.</p>
+<p>Supported response types include:</p>
+<ul>
+<li>JSON</li>
+<li>HTML</li>
+<li>Plain text</li>
+<li>Files</li>
+<li>Redirects</li>
+<li>Streams</li>
+<li>Custom response classes</li>
+</ul>
+<hr/>
+<h2 id="automatic-response-conversion">Automatic Response Conversion</h2>
+<p>Flaxon automatically converts common Python types into HTTP responses.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+    <span class="c1"># Dictionary → JSON</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello, Flaxon!"</span>
+    <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">():</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+    <span class="c1"># List → JSON</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Alice"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Bob"</span><span class="p">},</span>
+    <span class="p">]</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/text"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">():</span>
 
-    <div id="header"></div>
+    <span class="c1"># String → text/plain</span>
+    <span class="k">return</span> <span class="s2">"Hello World"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/bytes"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">bytes_response</span><span class="p">():</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+    <span class="c1"># Bytes → application/octet-stream</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="s2">"Binary Data"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/empty"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">empty</span><span class="p">():</span>
 
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+    <span class="c1"># None → HTTP 204</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
+<hr/>
+<h2 id="response-classes">Response Classes</h2>
+<p>Flaxon provides specialized response classes when additional control is needed.</p>
+<p>Available responses:</p>
+<ul>
+<li>Response</li>
+<li>JSONResponse</li>
+<li>HTMLResponse</li>
+<li>TextResponse</li>
+<li>FileResponse</li>
+<li>RedirectResponse</li>
+<li>StreamingResponse</li>
+</ul>
+<hr/>
+<h2 id="jsonresponse">JSONResponse</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html" class="active">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/json"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">():</span>
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/ecosystem.html">Ecosystem</a>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"success"</span><span class="p">,</span>
+            <span class="s2">"items"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="htmlresponse">HTMLResponse</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                    </div>
-                </aside>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/page"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">page</span><span class="p">():</span>
 
-                <!-- Main Content -->
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Responses</h1>
-                        <p>Flaxon automatically converts return values to appropriate HTTP responses.</p>
+    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        &lt;h1&gt;Welcome&lt;/h1&gt;</span>
+<span class="sd">        &lt;p&gt;Hello from Flaxon!&lt;/p&gt;</span>
+<span class="sd">        """</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="textresponse">TextResponse</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextResponse</span>
 
-                        <h2>Automatic Conversion</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/")
-async def home():
-    # Dictionary → JSON
-    return {"message": "Hello"}
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/robots.txt"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">robots</span><span class="p">():</span>
 
-@app.get("/users")
-async def list_users():
-    # List → JSON
-    return [{"id": 1, "name": "Alice"}]
+    <span class="k">return</span> <span class="n">TextResponse</span><span class="p">(</span>
+        <span class="s2">"User-agent: *</span><span class="se">\n</span><span class="s2">Disallow:"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="fileresponse">FileResponse</h2>
+<p>Serve existing files.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileResponse</span>
 
-@app.get("/text")
-async def text():
-    # String → Text
-    return "Hello, World!"
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/download"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">():</span>
 
-@app.get("/empty")
-async def empty():
-    # None → 204 No Content
-    return None
+    <span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+        <span class="s2">"downloads/manual.pdf"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Specify a download filename.</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+    <span class="s2">"downloads/report.pdf"</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">"report.pdf"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="redirectresponse">RedirectResponse</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedirectResponse</span>
 
-@app.get("/file")
-async def file():
-    # Bytes → Octet-Stream
-    return b"file content"</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/old"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">old</span><span class="p">():</span>
 
-                        <h2>Response Classes</h2>
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span>
+        <span class="s2">"/new"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Permanent redirect:</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span>
+    <span class="s2">"/new"</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="mi">301</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="redirect-helpers">Redirect Helpers</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http.redirects</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redirect</span>
 
-                        <h3>JSONResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import JSONResponse
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">():</span>
 
-@app.get("/json")
-async def json_response():
-    return JSONResponse(
-        {"status": "ok", "data": [1, 2, 3]},
-        status_code=201,
-        headers={"X-Custom": "value"},
-    )</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="n">Redirect</span><span class="o">.</span><span class="n">temporary</span><span class="p">(</span>
+        <span class="s2">"/dashboard"</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Permanent redirect:</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">Redirect</span><span class="o">.</span><span class="n">permanent</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="streamingresponse">StreamingResponse</h2>
+<p>Useful for large downloads and generated content.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingResponse</span>
 
-                        <h3>HTMLResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import HTMLResponse
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">():</span>
 
-@app.get("/html")
-async def html_response():
-    return HTMLResponse("&lt;h1&gt;Hello&lt;/h1&gt;", status_code=200)</code></pre>
-                        </div>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="sa">f</span><span class="s2">"Line </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
 
-                        <h3>TextResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import TextResponse
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/stream"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">():</span>
 
-@app.get("/text")
-async def text_response():
-    return TextResponse("Plain text", status_code=200)</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">generator</span><span class="p">(),</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="s2">"text/plain"</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="returning-status-codes">Returning Status Codes</h2>
+<p>Return a tuple.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">CREATED</span>
 
-                        <h3>RedirectResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import RedirectResponse
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">():</span>
 
-@app.get("/old")
-async def redirect():
-    return RedirectResponse("/new", status_code=301)
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">},</span> <span class="n">CREATED</span>
+</code></pre></div>
+<p>Or use a response object.</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">"created"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="mi">201</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="http-status-constants">HTTP Status Constants</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http.status</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OK</span><span class="p">,</span>
+    <span class="n">CREATED</span><span class="p">,</span>
+    <span class="n">ACCEPTED</span><span class="p">,</span>
+    <span class="n">NO_CONTENT</span><span class="p">,</span>
+    <span class="n">BAD_REQUEST</span><span class="p">,</span>
+    <span class="n">UNAUTHORIZED</span><span class="p">,</span>
+    <span class="n">FORBIDDEN</span><span class="p">,</span>
+    <span class="n">NOT_FOUND</span><span class="p">,</span>
+    <span class="n">INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="p">{</span>
+    <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Not Found"</span>
+<span class="p">},</span> <span class="n">NOT_FOUND</span>
+</code></pre></div>
+<hr/>
+<h2 id="custom-headers">Custom Headers</h2>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span>
+    <span class="p">},</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"X-Request-ID"</span><span class="p">:</span> <span class="s2">"12345"</span><span class="p">,</span>
+        <span class="s2">"X-Version"</span><span class="p">:</span> <span class="s2">"1.0"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="cookies">Cookies</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">():</span>
 
-# Or use the Redirect helper
-from flaxon.http.redirects import Redirect
+    <span class="n">response</span> <span class="o">=</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">"success"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">)</span>
 
-@app.get("/temp")
-async def temp_redirect():
-    return Redirect.temporary("/new")</code></pre>
-                        </div>
+    <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span>
+        <span class="s2">"session"</span><span class="p">,</span>
+        <span class="s2">"abc123"</span><span class="p">,</span>
+        <span class="n">httponly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
 
-                        <h3>StreamingResponse</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import StreamingResponse
+    <span class="k">return</span> <span class="n">response</span>
+</code></pre></div>
+<p>Delete a cookie.</p>
+<div class="highlight"><pre><span></span><code><span class="n">response</span><span class="o">.</span><span class="n">delete_cookie</span><span class="p">(</span><span class="s2">"session"</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="content-types">Content Types</h2>
+<p>Specify the media type.</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+    <span class="s2">"&lt;xml&gt;&lt;/xml&gt;"</span><span class="p">,</span>
+    <span class="n">media_type</span><span class="o">=</span><span class="s2">"application/xml"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="file-downloads">File Downloads</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileResponse</span>
 
-async def generate_data():
-    for i in range(10):
-        yield f"Data {i}\n".encode()
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/report"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">():</span>
 
-@app.get("/stream")
-async def stream():
-    return StreamingResponse(
-        generate_data(),
-        media_type="text/plain",
-    )</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+        <span class="s2">"reports/annual.pdf"</span><span class="p">,</span>
+        <span class="n">filename</span><span class="o">=</span><span class="s2">"annual-report.pdf"</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="streaming-large-files">Streaming Large Files</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">aiofiles</span>
 
-                        <h2>Status Codes</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon.http.status import OK, CREATED, NO_CONTENT, BAD_REQUEST, NOT_FOUND
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">file_stream</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 
-@app.get("/ok")
-async def ok_response():
-    return {"status": "ok"}, OK
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
 
-@app.post("/users")
-async def create_user():
-    return {"created": True}, CREATED
+        <span class="k">while</span> <span class="n">chunk</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8192</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">chunk</span>
 
-@app.delete("/users/&lt;int:user_id&gt;")
-async def delete_user(user_id: int):
-    return None, NO_CONTENT</code></pre>
-                        </div>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/video"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">video</span><span class="p">():</span>
 
-                        <h2>Custom Headers</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">@app.get("/headers")
-async def custom_headers():
-    return JSONResponse(
-        {"data": "value"},
-        headers={
-            "X-Custom-Header": "custom-value",
-            "X-Rate-Limit": "100",
-        },
-    )</code></pre>
-                        </div>
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">file_stream</span><span class="p">(</span><span class="s2">"movie.mp4"</span><span class="p">),</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="s2">"video/mp4"</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Streaming avoids loading the entire file into memory.</p>
+<hr/>
+<h2 id="custom-response-classes">Custom Response Classes</h2>
+<p>Create reusable response types.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
 
-                        <h2>Custom Response Class</h2>
-                        <div class="code-block">
-                            <pre><code class="language-python">from flaxon import Response
+<span class="k">class</span><span class="w"> </span><span class="nc">CSVResponse</span><span class="p">(</span><span class="n">Response</span><span class="p">):</span>
 
-class CSVResponse(Response):
-    media_type = "text/csv; charset=utf-8"
+    <span class="n">media_type</span> <span class="o">=</span> <span class="s2">"text/csv"</span>
 
-    def __init__(self, data: list[list[str]], **kwargs):
-        content = "\n".join(",".join(row) for row in data)
-        super().__init__(content, **kwargs)
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rows</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 
-@app.get("/export")
-async def export():
-    data = [["Name", "Email"], ["Alice", "alice@example.com"]]
-    return CSVResponse(data, status_code=200)</code></pre>
-                        </div>
+        <span class="n">content</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span>
+        <span class="p">)</span>
 
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Tip</strong>
-                            <p class="mb-0 mt-1">You can return tuples like <code>(data, status_code)</code> or <code>(data, headers)</code> for quick responses.</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">content</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div>
+<p>Usage:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/export"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">export</span><span class="p">():</span>
 
-    <div id="footer"></div>
+    <span class="k">return</span> <span class="n">CSVResponse</span><span class="p">([</span>
+        <span class="p">[</span><span class="s2">"Name"</span><span class="p">,</span> <span class="s2">"Email"</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"alice@example.com"</span><span class="p">],</span>
+    <span class="p">])</span>
+</code></pre></div>
+<hr/>
+<h2 id="response-compression">Response Compression</h2>
+<p>When <code>CompressionMiddleware</code> is enabled, responses are automatically compressed.</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CompressionMiddleware</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Supported algorithms:</p>
+<ul>
+<li>gzip</li>
+<li>deflate</li>
+<li>brotli</li>
+</ul>
+<hr/>
+<h2 id="response-caching">Response Caching</h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"Cache-Control"</span><span class="p">:</span> <span class="s2">"public, max-age=300"</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="complete-example">Complete Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Flaxon</span><span class="p">,</span>
+    <span class="n">JSONResponse</span><span class="p">,</span>
+    <span class="n">HTMLResponse</span><span class="p">,</span>
+    <span class="n">RedirectResponse</span><span class="p">,</span>
+    <span class="n">StreamingResponse</span><span class="p">,</span>
+    <span class="n">FileResponse</span><span class="p">,</span>
+<span class="p">)</span>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"responses-demo"</span><span class="p">)</span>
 
-</body>
-</html>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Welcome to Flaxon"</span>
+    <span class="p">}</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/html"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">html</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span>
+        <span class="s2">"&lt;h1&gt;Hello&lt;/h1&gt;"</span>
+    <span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/download"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">FileResponse</span><span class="p">(</span>
+        <span class="s2">"downloads/manual.pdf"</span>
+    <span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/redirect"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">redirect</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/stream"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">():</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">():</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">generator</span><span class="p">(),</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="s2">"text/plain"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/custom"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">custom</span><span class="p">():</span>
+
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"accepted"</span>
+        <span class="p">},</span>
+        <span class="n">status_code</span><span class="o">=</span><span class="mi">202</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"X-Powered-By"</span><span class="p">:</span> <span class="s2">"Flaxon"</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="best-practices">Best Practices</h2>
+<ul>
+<li>Return dictionaries for JSON APIs.</li>
+<li>Use response classes only when additional control is needed.</li>
+<li>Stream large files instead of loading them into memory.</li>
+<li>Prefer <code>FileResponse</code> for downloads.</li>
+<li>Use proper HTTP status codes.</li>
+<li>Set cache headers when appropriate.</li>
+<li>Compress large responses.</li>
+<li>Use redirects instead of duplicate routes.</li>
+<li>Set secure cookies for authentication.</li>
+<li>Create custom response classes for reusable formats such as CSV, XML, or PDF.</li>
+</ul>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

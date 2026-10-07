@@ -1,224 +1,420 @@
-<!-- docs/api/tasks.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Tasks API – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tasks API — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Tasks API — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Tasks API</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/tasks.md">Framework source</a> · <a href="../../content/framework/docs/api/tasks.md" download>Markdown</a></p><h1 id="tasks-api">Tasks API</h1>
+<h2 id="task">Task</h2>
+<p>Task definition.</p>
+<h2 id="constructor">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Task</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">retry_policy</span><span class="p">:</span> <span class="n">RetryPolicy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">queue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span>
+<span class="err">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="c1">## Methods</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="c1">### run</span>
 
-    <div id="header"></div>
+<span class="err">```</span><span class="n">python</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Run the task.</p>
+<hr/>
+<h3 id="cancel">cancel</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Cancel the task.</p>
+<hr/>
+<h3 id="to_result">to_result</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_result</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TaskResult</span>
+</code></pre></div>
+<p>Convert the task into a <code>TaskResult</code>.</p>
+<hr/>
+<h2 id="properties">Properties</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>str</td>
+<td>Task ID</td>
+</tr>
+<tr>
+<td>name</td>
+<td>str</td>
+<td>Task name</td>
+</tr>
+<tr>
+<td>status</td>
+<td>TaskStatus</td>
+<td>Task status</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>datetime</td>
+<td>Created timestamp</td>
+</tr>
+<tr>
+<td>started_at</td>
+<td>datetime</td>
+<td>Started timestamp</td>
+</tr>
+<tr>
+<td>completed_at</td>
+<td>datetime</td>
+<td>Completed timestamp</td>
+</tr>
+<tr>
+<td>retry_count</td>
+<td>int</td>
+<td>Retry count</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="taskstatus">TaskStatus</h2>
+<p>Task status enum.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PENDING</td>
+<td>Task is pending</td>
+</tr>
+<tr>
+<td>RUNNING</td>
+<td>Task is running</td>
+</tr>
+<tr>
+<td>COMPLETED</td>
+<td>Task completed</td>
+</tr>
+<tr>
+<td>FAILED</td>
+<td>Task failed</td>
+</tr>
+<tr>
+<td>RETRY</td>
+<td>Task will retry</td>
+</tr>
+<tr>
+<td>CANCELLED</td>
+<td>Task cancelled</td>
+</tr>
+<tr>
+<td>TIMEOUT</td>
+<td>Task timed out</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="taskqueue">TaskQueue</h2>
+<p>Task queue.</p>
+<h2 id="constructor_1">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">TaskQueue</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods">Methods</h2>
+<h3 id="push">push</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">push</span><span class="p">(</span>
+    <span class="n">task</span><span class="p">:</span> <span class="n">Task</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Push a task to the queue.</p>
+<hr/>
+<h3 id="pop">pop</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pop</span><span class="p">(</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Pop a task from the queue.</p>
+<hr/>
+<h3 id="get">get</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get a task by ID.</p>
+<hr/>
+<h3 id="remove">remove</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span>
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Remove a task.</p>
+<hr/>
+<h3 id="cancel_1">cancel</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span>
+    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Cancel a task.</p>
+<hr/>
+<h3 id="clear">clear</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Clear the queue.</p>
+<hr/>
+<h3 id="size">size</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get queue size.</p>
+<hr/>
+<h3 id="pending_count">pending_count</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pending_count</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get pending task count.</p>
+<hr/>
+<h3 id="running_count">running_count</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">running_count</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get running task count.</p>
+<hr/>
+<h3 id="completed_count">completed_count</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">completed_count</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get completed task count.</p>
+<hr/>
+<h3 id="failed_count">failed_count</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">failed_count</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get failed task count.</p>
+<hr/>
+<h2 id="worker">Worker</h2>
+<p>Task worker.</p>
+<h2 id="constructor_2">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Worker</span><span class="p">(</span>
+    <span class="n">registry</span><span class="p">:</span> <span class="n">TaskRegistry</span><span class="p">,</span>
+    <span class="n">queue</span><span class="p">:</span> <span class="n">TaskQueue</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">queue_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"default"</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_1">Methods</h2>
+<h3 id="start">start</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Start the worker.</p>
+<hr/>
+<h3 id="stop">stop</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Stop the worker.</p>
+<hr/>
+<h3 id="shutdown">shutdown</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Shutdown the worker.</p>
+<hr/>
+<h3 id="is_running">is_running</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check whether the worker is running.</p>
+<hr/>
+<h2 id="scheduler">Scheduler</h2>
+<p>Task scheduler.</p>
+<h2 id="constructor_3">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">Scheduler</span><span class="p">(</span>
+    <span class="n">queue</span><span class="p">:</span> <span class="n">TaskQueue</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_2">Methods</h2>
+<h3 id="schedule">schedule</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">schedule</span><span class="p">(</span>
+    <span class="n">task</span><span class="p">:</span> <span class="n">Task</span><span class="p">,</span>
+    <span class="n">delay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Schedule a task.</p>
+<hr/>
+<h3 id="start_1">start</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Start the scheduler.</p>
+<hr/>
+<h3 id="stop_1">stop</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Stop the scheduler.</p>
+<hr/>
+<h2 id="retrypolicy">RetryPolicy</h2>
+<p>Task retry configuration.</p>
+<h2 id="constructor_4">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">max_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+    <span class="n">random_jitter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">retry_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="methods_3">Methods</h2>
+<h3 id="should_retry">should_retry</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">should_retry</span><span class="p">(</span>
+    <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if retry should be attempted.</p>
+<hr/>
+<h3 id="get_delay">get_delay</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_delay</span><span class="p">(</span>
+    <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>
+</code></pre></div>
+<p>Get retry delay.</p>
+<hr/>
+<h2 id="taskresult">TaskResult</h2>
+<p>Task execution result.</p>
+<h2 id="attributes">Attributes</h2>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>str</td>
+<td>Task ID</td>
+</tr>
+<tr>
+<td>name</td>
+<td>str</td>
+<td>Task name</td>
+</tr>
+<tr>
+<td>status</td>
+<td>TaskStatus</td>
+<td>Task status</td>
+</tr>
+<tr>
+<td>result</td>
+<td>Any</td>
+<td>Task result</td>
+</tr>
+<tr>
+<td>error</td>
+<td>str</td>
+<td>None</td>
+</tr>
+<tr>
+<td>retry_count</td>
+<td>int</td>
+<td>Retry count</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="methods_4">Methods</h2>
+<h3 id="is_pending">is_pending</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_pending</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if pending.</p>
+<hr/>
+<h3 id="is_running_1">is_running</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if running.</p>
+<hr/>
+<h3 id="is_completed">is_completed</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_completed</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if completed.</p>
+<hr/>
+<h3 id="is_failed">is_failed</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_failed</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if failed.</p>
+<hr/>
+<h3 id="is_retry">is_retry</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_retry</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if retrying.</p>
+<hr/>
+<h3 id="is_cancelled">is_cancelled</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_cancelled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if cancelled.</p>
+<hr/>
+<h3 id="is_timeout">is_timeout</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_timeout</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if timed out.</p>
+<hr/>
+<h3 id="is_done">is_done</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_done</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+<p>Check if task is finished.</p>
+<hr/>
+<h3 id="get_duration">get_duration</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_duration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Get task execution duration.</p>
+<hr/>
+<h3 id="to_dict">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert result to dictionary.</p>
+<hr/>
+<h2 id="admin-durable-jobs">Admin Durable Jobs</h2>
+<p>The Admin production layer exposes a small persistent job contract for work
+such as thumbnail generation. It uses the configured AdminStore and records
+retry state, errors, and completion:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">DurableJobStore</span><span class="p">,</span> <span class="n">DurableJobWorker</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
-
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
-
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
-
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html" class="active">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-                    </div>
-                </aside>
-
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>Tasks API</h1>
-
-                        <h2>Task</h2>
-                        <p>Task definition.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Task(name: str, func: Callable, *, retry_policy: RetryPolicy | None = None, timeout: int | None = None, queue: str = "default", priority: int = 0)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async run(*args, **kwargs) -> Any</code> — Run the task</li>
-                            <li><code>cancel() -> None</code> — Cancel the task</li>
-                            <li><code>to_result() -> TaskResult</code> — Convert to TaskResult</li>
-                        </ul>
-
-                        <h3>Properties</h3>
-                        <ul>
-                            <li><code>id</code> — Task ID</li>
-                            <li><code>name</code> — Task name</li>
-                            <li><code>status</code> — Task status</li>
-                            <li><code>created_at</code> — Created timestamp</li>
-                            <li><code>started_at</code> — Started timestamp</li>
-                            <li><code>completed_at</code> — Completed timestamp</li>
-                            <li><code>retry_count</code> — Retry count</li>
-                        </ul>
-
-                        <h2>TaskStatus</h2>
-                        <p>Task status enum.</p>
-
-                        <table class="w-full text-sm border-collapse border border-slate-200 dark:border-slate-700 my-4">
-                            <thead>
-                                <tr class="bg-slate-100 dark:bg-slate-800">
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Value</th>
-                                    <th class="border border-slate-200 dark:border-slate-700 px-4 py-2 text-left">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="border px-4 py-2"><code>PENDING</code></td><td class="border px-4 py-2">Task is pending</td></tr>
-                                <tr><td class="border px-4 py-2"><code>RUNNING</code></td><td class="border px-4 py-2">Task is running</td></tr>
-                                <tr><td class="border px-4 py-2"><code>COMPLETED</code></td><td class="border px-4 py-2">Task completed</td></tr>
-                                <tr><td class="border px-4 py-2"><code>FAILED</code></td><td class="border px-4 py-2">Task failed</td></tr>
-                                <tr><td class="border px-4 py-2"><code>RETRY</code></td><td class="border px-4 py-2">Task will retry</td></tr>
-                                <tr><td class="border px-4 py-2"><code>CANCELLED</code></td><td class="border px-4 py-2">Task cancelled</td></tr>
-                                <tr><td class="border px-4 py-2"><code>TIMEOUT</code></td><td class="border px-4 py-2">Task timed out</td></tr>
-                            </tbody>
-                        </table>
-
-                        <h2>TaskQueue</h2>
-                        <p>Task queue.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">TaskQueue(name: str = "default", max_size: int = 1000)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async push(task)</code> — Push a task to the queue</li>
-                            <li><code>async pop(timeout)</code> — Pop a task from the queue</li>
-                            <li><code>async get(task_id)</code> — Get a task by ID</li>
-                            <li><code>async remove(task_id)</code> — Remove a task</li>
-                            <li><code>async cancel(task_id)</code> — Cancel a task</li>
-                            <li><code>async clear()</code> — Clear the queue</li>
-                            <li><code>async size()</code> — Get the queue size</li>
-                            <li><code>async pending_count()</code> — Get pending count</li>
-                            <li><code>async running_count()</code> — Get running count</li>
-                            <li><code>async completed_count()</code> — Get completed count</li>
-                            <li><code>async failed_count()</code> — Get failed count</li>
-                        </ul>
-
-                        <h2>Worker</h2>
-                        <p>Task worker.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Worker(registry: TaskRegistry, queue: TaskQueue | None = None, concurrency: int = 10, queue_name: str = "default")</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async start()</code> — Start the worker</li>
-                            <li><code>stop()</code> — Stop the worker</li>
-                            <li><code>is_running()</code> — Check if running</li>
-                        </ul>
-
-                        <h2>Scheduler</h2>
-                        <p>Task scheduler.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">Scheduler(queue: TaskQueue)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>schedule(task, delay=None, at=None, interval=None)</code> — Schedule a task</li>
-                            <li><code>async start()</code> — Start the scheduler</li>
-                            <li><code>async stop()</code> — Stop the scheduler</li>
-                        </ul>
-
-                        <h2>RetryPolicy</h2>
-                        <p>Retry policy.</p>
-
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">RetryPolicy(max_retries: int = 3, delay: float = 1.0, backoff: float = 2.0, max_delay: float = 60.0, random_jitter: float = 0.1, retry_on: list[type[Exception]] | None = None)</code></pre>
-                        </div>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>should_retry(retry_count, error)</code> — Check if retry should be attempted</li>
-                            <li><code>get_delay(retry_count)</code> — Get the delay before retry</li>
-                        </ul>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> CLI Command</strong>
-                            <p class="mb-0 mt-1">Start a worker: <code>flaxon worker app:app --concurrency 4</code></p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+<span class="n">jobs</span> <span class="o">=</span> <span class="n">DurableJobStore</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">store</span><span class="p">)</span>
+<span class="n">worker</span> <span class="o">=</span> <span class="n">DurableJobWorker</span><span class="p">(</span><span class="n">jobs</span><span class="p">)</span>
+<span class="n">worker</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"media.thumbnail"</span><span class="p">,</span> <span class="n">make_thumbnail</span><span class="p">)</span>
+<span class="n">job</span> <span class="o">=</span> <span class="n">jobs</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="s2">"media.thumbnail"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"relative"</span><span class="p">:</span> <span class="s2">"images/photo.jpg"</span><span class="p">},</span> <span class="n">max_attempts</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">worker</span><span class="o">.</span><span class="n">run_once</span><span class="p">()</span>
+</code></pre></div>
+<p>Handlers are registered by name so the worker can be started separately from
+the web process. For multiple workers, use a shared persistent store and add a
+distributed claim/lease implementation appropriate to the database or Redis
+deployment.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

@@ -1,73 +1,145 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>FastMCP Integration - Flaxon Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-</head>
-<body>
-    <div id="header"></div>
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
-                <aside><div id="docs-sidebar"></div><script>fetch('/components/sidebar.html').then(r => r.text()).then(h => document.getElementById('docs-sidebar').innerHTML = h)</script></aside>
-                <main class="lg:col-span-3">
-                    <article class="doc-content">
-                        <h1>FastMCP integration</h1>
-                        <p>FastMCP is an optional integration for exposing Flaxon operations as Model Context Protocol tools, resources, and prompts. It can live beside normal HTTP, GraphQL, WebSocket, Admin, and CMS routes.</p>
-                        <h2>Install and mount</h2>
-                        <pre><code class="language-bash">python -m pip install "flaxon[mcp]"</code></pre>
-                        <pre><code class="language-python">from fastmcp import FastMCP
-from flaxon import Flaxon
-from flaxon.integrations.fastmcp import mount_fastmcp
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="FastMCP Integration — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>FastMCP Integration — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>FastMCP Integration</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/guides/fastmcp.md">Framework source</a> · <a href="../../content/framework/docs/guides/fastmcp.md" download>Markdown</a></p><h1 id="fastmcp-integration">FastMCP Integration</h1>
+<p>FastMCP is an optional integration for exposing Flaxon application operations
+as Model Context Protocol tools, resources, and prompts. It is useful when the
+same application also provides normal HTTP, GraphQL, WebSocket, admin, or CMS
+features.</p>
+<h2 id="install">Install</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[mcp]"</span>
+</code></pre></div>
+<p>FastMCP and Starlette are not required by Flaxon core.</p>
+<h2 id="mount-an-mcp-server">Mount an MCP server</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
 
-app = Flaxon("store", debug=True)
-mcp = FastMCP("Store Tools")
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.integrations.fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">mount_fastmcp</span>
 
-@mcp.tool
-async def find_product(name: str) -> dict[str, str | bool]:
-    """Find a product in the store catalog."""
-    return {"name": name, "available": True}
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"store"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">"Store Tools"</span><span class="p">)</span>
 
-mount_fastmcp(app, mcp, path="/mcp", require_auth=False)</code></pre>
-                        <p>The mounted endpoint is <code>/mcp</code>. Flaxon owns the ASGI lifecycle; do not call <code>mcp.run()</code> inside an endpoint or startup callback.</p>
-                        <h2>Production authentication</h2>
-                        <pre><code class="language-python">mount_fastmcp(
-    app,
-    mcp,
-    path="/mcp",
-    auth=auth_provider,
-    require_auth=True,
-    host_origin_protection=True,
-    allowed_hosts=["api.example.com"],
-    allowed_origins=["https://console.example.com"],
-)</code></pre>
-                        <p>Do not expose remote tools without authentication. Apply authorization, rate limits, input validation, audit logging, and business rules before allowing side effects.</p>
-                        <h2>Multiple workers</h2>
-                        <pre><code class="language-python">mount_fastmcp(app, mcp, path="/mcp", stateless_http=True)</code></pre>
-                        <p>FastMCP's default Streamable HTTP sessions are process-local. Use stateless mode for multiple workers and put application state and event storage in shared Redis or database infrastructure.</p>
-                        <h2>Keep protocol boundaries clear</h2>
-                        <ul>
-                            <li>Use Flaxon routes for normal HTTP APIs.</li>
-                            <li>Use GraphQL for typed graph queries.</li>
-                            <li>Use WebSockets for application real-time features.</li>
-                            <li>Use FastMCP for tools and resources consumed by MCP clients.</li>
-                        </ul>
-                        <p>FastMCP remains the source of truth for MCP protocol behavior; Flaxon's adapter provides mounting and lifecycle composition.</p>
-                    </article>
-                </main>
-            </div>
-        </div>
-    </section>
-    <script src="/assets/js/docs.js"></script>
-    <script>document.addEventListener("DOMContentLoaded", function () { if (window.hljs) window.hljs.highlightAll(); });</script>
-</body>
-</html>
+
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Find a product in the store catalog."""</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"available"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="n">mount_fastmcp</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">mcp</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span> <span class="n">require_auth</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p>The MCP endpoint is available at <code>/mcp</code>; the rest of the Flaxon routes remain
+unchanged. <code>require_auth=False</code> is explicit here because this is a local
+development example. Remote deployments should provide an auth provider.</p>
+<h2 id="authentication-and-production-configuration">Authentication and production configuration</h2>
+<p>Pass FastMCP HTTP options through the adapter:</p>
+<div class="highlight"><pre><span></span><code><span class="n">mount_fastmcp</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">,</span>
+    <span class="n">mcp</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">auth_provider</span><span class="p">,</span>
+    <span class="n">require_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">host_origin_protection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="s2">"api.example.com"</span><span class="p">],</span>
+    <span class="n">allowed_origins</span><span class="o">=</span><span class="p">[</span><span class="s2">"https://console.example.com"</span><span class="p">],</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Do not expose remote MCP tools without authentication. Treat tool calls as
+application operations: apply authorization, rate limits, input validation,
+audit logging, and business rules before allowing side effects.</p>
+<h2 id="multiple-workers">Multiple workers</h2>
+<p>FastMCP's default Streamable HTTP sessions are process-local. For multiple
+workers or multiple instances, enable stateless mode and put application data
+and event storage in shared infrastructure:</p>
+<div class="highlight"><pre><span></span><code><span class="n">mount_fastmcp</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">mcp</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span> <span class="n">stateless_http</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>Configure shared Redis or database storage for any application state that must
+survive worker changes.</p>
+<h2 id="lifecycle-behavior">Lifecycle behavior</h2>
+<p><code>mount_fastmcp()</code> registers the FastMCP HTTP app's lifespan with Flaxon. The
+MCP session manager is initialized during Flaxon startup and closed during
+Flaxon shutdown. Do not call <code>mcp.run()</code> inside a Flaxon endpoint or startup
+handler; the mounted ASGI application owns the protocol lifecycle.</p>
+<h2 id="keep-api-boundaries-clear">Keep API boundaries clear</h2>
+<ul>
+<li>Use Flaxon routes for normal HTTP APIs.</li>
+<li>Use GraphQL for typed graph queries.</li>
+<li>Use WebSockets for application real-time features.</li>
+<li>Use FastMCP for tools and resources consumed by MCP clients.</li>
+</ul>
+<p>FastMCP remains the source of truth for MCP protocol behavior; this integration
+only provides mounting and lifecycle composition.</p>
+<h2 id="use-fastmcp-from-a-large-application-module">Use FastMCP from a large application module</h2>
+<p>Keep MCP tools with the feature they operate on. A module should export an
+installer function; the application factory supplies authentication and mounts
+the feature. This avoids starting a second server and makes the same business
+service reusable from HTTP and MCP.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/modules/ai_tools/module.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.integrations.fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">mount_fastmcp</span>
+
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">"Store Tools"</span><span class="p">)</span>
+
+
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">find_product</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"available"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">install_ai_tools</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">auth_provider</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">mount_fastmcp</span><span class="p">(</span>
+        <span class="n">app</span><span class="p">,</span>
+        <span class="n">mcp</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="s2">"/mcp"</span><span class="p">,</span>
+        <span class="n">auth</span><span class="o">=</span><span class="n">auth_provider</span><span class="p">,</span>
+        <span class="n">require_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stateless_http</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Compose it with the other modules:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># app/main.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth_provider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.ai_tools.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_ai_tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.modules.catalog.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">install_catalog</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flaxon</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"store"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">install_catalog</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">install_ai_tools</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth_provider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<p><code>auth_provider</code> above is your application's configured FastMCP-compatible
+provider. Keep <code>require_auth=True</code> outside local development. <code>stateless_http</code>
+is useful for multiple workers, but shared application data and event storage
+still belong in a database or Redis. Never call <code>mcp.run()</code> in this layout.</p>
+<p>The complete local example is <code>examples/fastmcp_app/</code>. Install and run it with:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[mcp]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>examples.fastmcp_app.app:app<span class="w"> </span>--reload
+</code></pre></div>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

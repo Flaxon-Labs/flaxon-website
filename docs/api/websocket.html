@@ -1,233 +1,493 @@
-<!-- docs/api/websocket.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>WebSocket API – Flaxon Documentation</title>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="WebSocket API — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>WebSocket API — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>WebSocket API</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/api/websocket.md">Framework source</a> · <a href="../../content/framework/docs/api/websocket.md" download>Markdown</a></p><h1 id="websocket-api">WebSocket API</h1>
+<h2 id="websocket">WebSocket</h2>
+<p>WebSocket connection handler.</p>
+<h3 id="constructor">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">WebSocket</span><span class="p">(</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">receive</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">send</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+<span class="err">````</span>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/docs.css">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
+<span class="c1">### Properties</span>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        flaxon: { blue: '#3776AB', electric: '#00D4FF', dark: '#0F172A', light: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo/flaxon-logo.svg">
-    <link rel="apple-touch-icon" href="/assets/images/logo/flaxon.png">
-    <script defer src="/assets/js/site-shell.js"></script>
-    <script defer src="/assets/js/dark-mode.js"></script>
-    <script defer src="/assets/js/header-search.js"></script>
-    <script defer src="/assets/js/main.js"></script></head>
-<body>
+<span class="o">|</span> <span class="n">Property</span>      <span class="o">|</span> <span class="n">Type</span>             <span class="o">|</span> <span class="n">Description</span>                              <span class="o">|</span>
+<span class="o">|</span> <span class="o">-------------</span> <span class="o">|</span> <span class="o">----------------</span> <span class="o">|</span> <span class="o">----------------------------------------</span> <span class="o">|</span>
+<span class="o">|</span> <span class="err">`</span><span class="n">path_params</span><span class="err">`</span> <span class="o">|</span> <span class="err">`</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="err">`</span> <span class="o">|</span> <span class="n">Path</span> <span class="n">parameters</span>                          <span class="o">|</span>
+<span class="o">|</span> <span class="err">`</span><span class="n">state</span><span class="err">`</span>       <span class="o">|</span> <span class="err">`</span><span class="n">WebSocketState</span><span class="err">`</span> <span class="o">|</span> <span class="n">Connection</span> <span class="n">state</span>                         <span class="o">|</span>
+<span class="o">|</span> <span class="err">`</span><span class="n">accepted</span><span class="err">`</span>    <span class="o">|</span> <span class="err">`</span><span class="nb">bool</span><span class="err">`</span>           <span class="o">|</span> <span class="n">Whether</span> <span class="n">the</span> <span class="n">connection</span> <span class="n">has</span> <span class="n">been</span> <span class="n">accepted</span> <span class="o">|</span>
+<span class="o">|</span> <span class="err">`</span><span class="n">closed</span><span class="err">`</span>      <span class="o">|</span> <span class="err">`</span><span class="nb">bool</span><span class="err">`</span>           <span class="o">|</span> <span class="n">Whether</span> <span class="n">the</span> <span class="n">connection</span> <span class="n">has</span> <span class="n">been</span> <span class="n">closed</span>   <span class="o">|</span>
 
-    <div id="header"></div>
+<span class="o">---</span>
 
-    <section class="bg-slate-50 dark:bg-slate-950 pt-8 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-4 gap-8">
+<span class="c1">## Methods</span>
 
-                <aside class="lg:col-span-1">
-                    <div class="doc-sidebar">
-                        <div class="section-title">Getting Started</div>
-                        <a href="/docs/getting-started/index.html">Overview</a>
-                        <a href="/docs/getting-started/installation.html">Installation</a>
-                        <a href="/docs/getting-started/quickstart.html">Quick Start</a>
+<span class="c1">### accept</span>
 
-                        <div class="section-title">Core Concepts</div>
-                        <a href="/docs/core-concepts/routing.html">Routing</a>
-                        <a href="/docs/core-concepts/requests.html">Requests</a>
-                        <a href="/docs/core-concepts/responses.html">Responses</a>
-                        <a href="/docs/core-concepts/middleware.html">Middleware</a>
-                        <a href="/docs/core-concepts/validation.html">Validation</a>
+<span class="err">```</span><span class="n">python</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">accept</span><span class="p">(</span>
+    <span class="n">subprotocol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Accept the WebSocket connection.</p>
+<hr/>
+<h3 id="receive">receive</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Receive a WebSocket message.</p>
+<hr/>
+<h3 id="receive_text">receive_text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive_text</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<p>Receive a text message.</p>
+<hr/>
+<h3 id="receive_bytes">receive_bytes</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive_bytes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bytes</span>
+</code></pre></div>
+<p>Receive a binary message.</p>
+<hr/>
+<h3 id="receive_json">receive_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive_json</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Receive a JSON message.</p>
+<hr/>
+<h3 id="send_text">send_text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_text</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Send a text message.</p>
+<hr/>
+<h3 id="send_bytes">send_bytes</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_bytes</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Send a binary message.</p>
+<hr/>
+<h3 id="send_json">send_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_json</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Send a JSON message.</p>
+<hr/>
+<h3 id="close">close</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Close the WebSocket connection.</p>
+<hr/>
+<h3 id="join">join</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">join</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Join a room.</p>
+<hr/>
+<h3 id="leave">leave</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">leave</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Leave a room.</p>
+<hr/>
+<h3 id="broadcast_json">broadcast_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_json</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Broadcast JSON data to all connections in a room.</p>
+<hr/>
+<h3 id="broadcast_text">broadcast_text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_text</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Broadcast text data to all connections in a room.</p>
+<hr/>
+<h3 id="iter_json">iter_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iter_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Iterate over incoming JSON messages.</p>
+<hr/>
+<h3 id="iter_text">iter_text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iter_text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Iterate over incoming text messages.</p>
+<hr/>
+<h2 id="websocketmanager">WebSocketManager</h2>
+<p>WebSocket connection manager for handling rooms and connected clients.</p>
+<h2 id="methods">Methods</h2>
+<h3 id="join_1">join</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">join</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Add a connection to a room.</p>
+<hr/>
+<h3 id="leave_1">leave</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">leave</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Remove a connection from a room.</p>
+<hr/>
+<h3 id="leave_all">leave_all</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">leave_all</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Remove a connection from all rooms.</p>
+<hr/>
+<h3 id="broadcast_text_1">broadcast_text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_text</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Broadcast a text message.</p>
+<hr/>
+<h3 id="broadcast_json_1">broadcast_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_json</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Broadcast JSON data.</p>
+<hr/>
+<h3 id="broadcast_bytes">broadcast_bytes</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_bytes</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Broadcast binary data.</p>
+<hr/>
+<h3 id="get_room_size">get_room_size</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_room_size</span><span class="p">(</span><span class="n">room</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</code></pre></div>
+<p>Get the number of connections in a room.</p>
+<hr/>
+<h3 id="get_rooms">get_rooms</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_rooms</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Get all room names.</p>
+<hr/>
+<h3 id="get_connection_rooms">get_connection_rooms</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_connection_rooms</span><span class="p">(</span><span class="n">socket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+<p>Get all rooms a connection belongs to.</p>
+<hr/>
+<h3 id="clear">clear</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Clear all rooms and connections.</p>
+<hr/>
+<h2 id="websocketdisconnect">WebSocketDisconnect</h2>
+<p>WebSocket disconnect exception.</p>
+<h2 id="constructor_1">Constructor</h2>
+<div class="highlight"><pre><span></span><code><span class="n">WebSocketDisconnect</span><span class="p">(</span>
+    <span class="n">code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="attributes">Attributes</h2>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td><code>int</code></td>
+<td>Close code</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td><code>str</code></td>
+<td>Close reason</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="websocketstate">WebSocketState</h2>
+<p>WebSocket connection states.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONNECTING</code></td>
+<td>Connecting</td>
+</tr>
+<tr>
+<td><code>CONNECTED</code></td>
+<td>Connected</td>
+</tr>
+<tr>
+<td><code>CLOSING</code></td>
+<td>Closing</td>
+</tr>
+<tr>
+<td><code>CLOSED</code></td>
+<td>Closed</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>---
 
-                        <div class="section-title">Guides</div>
-                        <a href="/docs/guides/databases.html">Databases</a>
-                        <a href="/docs/guides/authentication.html">Authentication</a>
-                        <a href="/docs/guides/authorization.html">Authorization</a>
-                        <a href="/docs/guides/websockets.html">WebSockets</a>
-                        <a href="/docs/guides/tasks.html">Tasks</a>
-                        <a href="/docs/guides/jinax.html">Jinax Templates</a>
-                        <a href="/docs/guides/testing.html">Testing</a>
-                        <a href="/docs/guides/debugging.html">Debugging</a>
-                        <a href="/docs/guides/plugins.html">Plugins</a>
-                            <a href="/docs/guides/ecosystem.html">Ecosystem</a>
-                        <a href="/docs/guides/mobile-backends.html">Mobile Backends</a>
+# Validation API
 
-                        <div class="section-title">API Reference</div>
-                        <a href="/docs/api/application.html">Application</a>
-                        <a href="/docs/api/routing.html">Routing</a>
-                        <a href="/docs/api/http.html">HTTP</a>
-                        <a href="/docs/api/websocket.html" class="active">WebSocket</a>
-                        <a href="/docs/api/validation.html">Validation</a>
-                        <a href="/docs/api/security.html">Security</a>
-                        <a href="/docs/api/jinax.html">Jinax</a>
-                        <a href="/docs/api/tasks.html">Tasks</a>
-                        <a href="/docs/api/testing.html">Testing</a>
-                    </div>
-                </aside>
+## Schema
 
-                <main class="lg:col-span-3">
-                    <div class="doc-content">
-                        <h1>WebSocket API</h1>
+Base schema class for data validation.
 
-                        <h2>WebSocket</h2>
-                        <p>WebSocket connection.</p>
+## Class Methods
 
-                        <h3>Constructor</h3>
-                        <div class="code-block">
-                            <pre><code class="language-python">WebSocket(scope: dict[str, Any], receive: Any, send: Any, manager: Any = None)</code></pre>
-                        </div>
+### load
 
-                        <h3>Properties</h3>
-                        <ul>
-                            <li><code>path_params</code> — Path parameters</li>
-                            <li><code>state</code> — Connection state (<code>CONNECTING</code>, <code>CONNECTED</code>, <code>CLOSING</code>, <code>CLOSED</code>)</li>
-                            <li><code>accepted</code> — Whether accepted</li>
-                            <li><code>closed</code> — Whether closed</li>
-                        </ul>
-
-                        <h3>Methods</h3>
-
-                        <h4>accept</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def accept(subprotocol: str | None = None, headers: list[tuple[bytes, bytes]] | None = None) -> None</code></pre>
-                        </div>
-
-                        <h4>receive</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def receive() -> dict[str, Any]</code></pre>
-                        </div>
-
-                        <h4>receive_text</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def receive_text() -> str</code></pre>
-                        </div>
-
-                        <h4>receive_bytes</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def receive_bytes() -> bytes</code></pre>
-                        </div>
-
-                        <h4>receive_json</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def receive_json() -> Any</code></pre>
-                        </div>
-
-                        <h4>send_text</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def send_text(value: str) -> None</code></pre>
-                        </div>
-
-                        <h4>send_bytes</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def send_bytes(value: bytes) -> None</code></pre>
-                        </div>
-
-                        <h4>send_json</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def send_json(value: Any) -> None</code></pre>
-                        </div>
-
-                        <h4>close</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def close(code: int = 1000, reason: str = "") -> None</code></pre>
-                        </div>
-
-                        <h4>join</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def join(room: str) -> None</code></pre>
-                        </div>
-
-                        <h4>leave</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def leave(room: str) -> None</code></pre>
-                        </div>
-
-                        <h4>broadcast_json</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def broadcast_json(room: str, value: Any) -> None</code></pre>
-                        </div>
-
-                        <h4>broadcast_text</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">async def broadcast_text(room: str, value: str) -> None</code></pre>
-                        </div>
-
-                        <h4>iter_json</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">def iter_json(self) -> AsyncIterator[Any]</code></pre>
-                        </div>
-
-                        <h4>iter_text</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">def iter_text(self) -> AsyncIterator[str]</code></pre>
-                        </div>
-
-                        <h2>WebSocketManager</h2>
-                        <p>WebSocket connection manager.</p>
-
-                        <h3>Methods</h3>
-                        <ul>
-                            <li><code>async join(room, socket)</code> — Add connection to room</li>
-                            <li><code>async leave(room, socket)</code> — Remove connection from room</li>
-                            <li><code>async leave_all(socket)</code> — Remove from all rooms</li>
-                            <li><code>async broadcast_text(room, message)</code> — Broadcast text</li>
-                            <li><code>async broadcast_json(room, data)</code> — Broadcast JSON</li>
-                            <li><code>async broadcast_bytes(room, data)</code> — Broadcast bytes</li>
-                            <li><code>get_room_size(room)</code> — Get number of connections</li>
-                            <li><code>get_rooms()</code> — Get all room names</li>
-                            <li><code>get_connection_rooms(socket)</code> — Get rooms a connection is in</li>
-                            <li><code>clear()</code> — Clear all rooms and connections</li>
-                        </ul>
-
-                        <h2>WebSocketDisconnect</h2>
-                        <p>WebSocket disconnect exception.</p>
-
-                        <div class="code-block">
-                            <pre><code class="language-python">WebSocketDisconnect(code: int = 1000, reason: str = "")</code></pre>
-                        </div>
-
-                        <h3>Attributes</h3>
-                        <ul>
-                            <li><code>code</code> — Close code</li>
-                            <li><code>reason</code> — Close reason</li>
-                        </ul>
-
-                        <div class="note">
-                            <strong><i class="fas fa-lightbulb mr-2"></i> Close Codes</strong>
-                            <p class="mb-0 mt-1"><code>1000</code> Normal, <code>1001</code> Going away, <code>1011</code> Internal error</p>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </section>
-
-    <div id="footer"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() { hljs.highlightAll(); });
-        if (localStorage.getItem('dark-mode') === 'true') { document.documentElement.classList.add('dark'); }
-    </script>
-
-</body>
-</html>
+```python
+@classmethod
+def load(cls, data: Any) -&gt; Schema
+</code></pre></div>
+<p>Load and validate data.</p>
+<hr/>
+<h2 id="methods_1">Methods</h2>
+<h3 id="to_dict">to_dict</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert schema data into a dictionary.</p>
+<hr/>
+<h3 id="to_json">to_json</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Convert schema data into a JSON-serializable dictionary.</p>
+<hr/>
+<h3 id="validate">validate</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Validate schema data.</p>
+<hr/>
+<h2 id="fields">Fields</h2>
+<h2 id="strfield">StrField</h2>
+<p>String validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">StrField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">strip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="intfield">IntField</h2>
+<p>Integer validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">IntField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="floatfield">FloatField</h2>
+<p>Float validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">FloatField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="boolfield">BoolField</h2>
+<p>Boolean validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">BoolField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="choicefield">ChoiceField</h2>
+<p>Choice validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ChoiceField</span><span class="p">(</span>
+    <span class="n">choices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="emailfield">EmailField</h2>
+<p>Email validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">EmailField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="datefield">DateField</h2>
+<p>Date validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DateField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="datetimefield">DateTimeField</h2>
+<p>DateTime validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DateTimeField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S"</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="decimalfield">DecimalField</h2>
+<p>Decimal validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">DecimalField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="n">Decimal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="n">Decimal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="uuidfield">UUIDField</h2>
+<p>UUID validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">UUIDField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="listfield">ListField</h2>
+<p>List validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ListField</span><span class="p">(</span>
+    <span class="n">item_field</span><span class="p">:</span> <span class="n">Field</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="nestedfield">NestedField</h2>
+<p>Nested schema validation field.</p>
+<div class="highlight"><pre><span></span><code><span class="n">NestedField</span><span class="p">(</span>
+    <span class="n">schema_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Schema</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="anyfield">AnyField</h2>
+<p>Accepts any value.</p>
+<div class="highlight"><pre><span></span><code><span class="n">AnyField</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nullable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="validators">Validators</h2>
+<h2 id="required_validator">required_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">required_validator</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">field</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<hr/>
+<h2 id="length_validator">length_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">length_validator</span><span class="p">(</span>
+    <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="min_validator">min_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">min_validator</span><span class="p">(</span><span class="n">min_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="max_validator">max_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">max_validator</span><span class="p">(</span><span class="n">max_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="range_validator">range_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">range_validator</span><span class="p">(</span>
+    <span class="n">min_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="email_validator">email_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">email_validator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="url_validator">url_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">url_validator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="pattern_validator">pattern_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">pattern_validator</span><span class="p">(</span><span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<hr/>
+<h2 id="and_validators">and_validators</h2>
+<div class="highlight"><pre><span></span><code><span class="n">and_validators</span><span class="p">(</span><span class="o">*</span><span class="n">validators</span><span class="p">:</span> <span class="n">Validator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<p>Combine validators using AND logic.</p>
+<hr/>
+<h2 id="or_validators">or_validators</h2>
+<div class="highlight"><pre><span></span><code><span class="n">or_validators</span><span class="p">(</span><span class="o">*</span><span class="n">validators</span><span class="p">:</span> <span class="n">Validator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<p>Combine validators using OR logic.</p>
+<hr/>
+<h2 id="custom_validator">custom_validator</h2>
+<div class="highlight"><pre><span></span><code><span class="n">custom_validator</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validator</span>
+</code></pre></div>
+<p>Create a custom validator.</p>
+<hr/>
+<h2 id="exceptions">Exceptions</h2>
+<h2 id="validationerror">ValidationError</h2>
+<div class="highlight"><pre><span></span><code><span class="n">ValidationError</span><span class="p">(</span><span class="n">fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span>
+</code></pre></div>
+<p>Raised when validation fails.</p>
+<hr/>
+<h2 id="fielderror">FieldError</h2>
+<div class="highlight"><pre><span></span><code><span class="n">FieldError</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+<p>Raised when a field validation fails.</p>
+<h2 id="use-this-capability-in-a-full-stack-app">Use this capability in a full-stack app</h2>
+<p>Flaxon serves Python APIs and Teloce interfaces in one project. Keep validation,
+authorization and privileged operations on the server; components call those
+endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
+and <a href="teloce.html">Teloce integration reference</a> to connect this capability
+to pages, components and application modules.</p></article>
+</main></div><div id="footer"></div></body></html>

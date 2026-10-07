@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="School portal: Admin plus Flaxon modules — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>School portal: Admin plus Flaxon modules — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>School portal: Admin plus Flaxon modules</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/examples/school-portal.md">Framework source</a> · <a href="../../content/framework/docs/examples/school-portal.md" download>Markdown</a></p><h1 id="school-portal-admin-plus-flaxon-modules">School portal: Admin plus Flaxon modules</h1>
+<p>The runnable <a href="../projects/school-portal/index.html"><code>examples/school_portal/</code></a> project
+is a small Northstar Academy website. It demonstrates the application shape
+to copy when building a larger product:</p>
+<div class="highlight"><pre><span></span><code>school_portal/
+|-- app.py
+|-- modules/
+|   |-- repository.py
+|   |-- website.py
+|   |-- academics.py
+|   `-- community.py
+|-- templates/
+`-- static/school.css
+</code></pre></div>
+<h2 id="run-the-example">Run the example</h2>
+<p>From the Flaxon repository root:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard]"</span>
+flaxon<span class="w"> </span>run<span class="w"> </span>examples.school_portal.app:app<span class="w"> </span>--reload<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+</code></pre></div>
+<p>Open the public site at <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>. The Admin login is at
+<a href="http://127.0.0.1:8000/admin/login">http://127.0.0.1:8000/admin/login</a> with the development credentials
+<code>admin</code> / <code>School123!</code>. Set <code>FLAXON_SCHOOL_ADMIN_PASSWORD</code> before using the
+example outside local development.</p>
+<p>The example includes:</p>
+<ul>
+<li>Admin-managed Students, Courses, and Staff models with search, filters,
+  sorting, pagination, CRUD, and persistent JSON demo records.</li>
+<li>CMS-managed News and Events content types. Publish an item in
+  <code>/admin/cms/</code> and it appears in the public bulletin or school calendar.</li>
+<li>A custom Admin page at <code>/admin/school-overview</code>.</li>
+<li>Public module-owned pages at <code>/</code>, <code>/about</code>, <code>/academics</code>,
+  <code>/academics/courses</code>, <code>/students</code>, <code>/admissions</code>, <code>/contact</code>, <code>/calendar</code>,
+  and <code>/news</code>, plus JSON APIs at <code>/api/courses</code> and <code>/api/news</code>.</li>
+</ul>
+<p>The public site includes a responsive institutional navigation, a campus hero
+image, a featured news layout, an events calendar, admissions calls to action,
+and a staff directory. The visual pages are ordinary Jinax templates, so a
+developer can replace the content or connect the same routes to a database
+without changing the Admin/CMS setup.</p>
+<h2 id="copy-the-module-pattern">Copy the module pattern</h2>
+<p>Each feature declares only the dependencies it needs and owns its routes:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">academics</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span><span class="s2">"academics"</span><span class="p">)</span>
+<span class="n">academics</span><span class="o">.</span><span class="n">requires</span><span class="p">(</span><span class="s2">"school"</span><span class="p">)</span>
+
+
+<span class="nd">@academics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/courses"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">courses</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">school</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+        <span class="s2">"courses.html"</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Courses"</span><span class="p">,</span> <span class="s2">"courses"</span><span class="p">:</span> <span class="k">await</span> <span class="n">school</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">"courses"</span><span class="p">)},</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>The application factory provides services and chooses URL prefixes:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"school"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="s2">"school"</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">academics</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/academics"</span><span class="p">)</span>
+</code></pre></div>
+<p>The module is reusable because it does not start a server and does not bake a
+prefix into its routes. Mount the same feature under <code>/academics</code>, <code>/api/v1</code>,
+or an authenticated Admin extension when the application needs it. Use the
+<a href="../guides/modules.html">Modules guide</a> for hooks, nested modules, templates,
+static files, CLI commands, and module tests.</p>
+<p>The example's JSON repository is intentionally easy to replace. In production,
+use a database repository, persistent Admin storage, Redis for shared workers,
+secret-managed credentials, and object storage for media.</p></article>
+</main></div><div id="footer"></div></body></html>

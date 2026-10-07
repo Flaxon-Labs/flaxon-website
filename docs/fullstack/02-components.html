@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Lesson 2: Build useful components and scoped styles — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Lesson 2: Build useful components and scoped styles — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 2: Build useful components and scoped styles</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/fullstack/02-components.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/02-components.md" download>Markdown</a></p><h1 id="lesson-2-build-useful-components-and-scoped-styles">Lesson 2: Build useful components and scoped styles</h1>
+<p>Start with loading, success, empty and failure states. The quick-start component
+already handles a failed API request; add a retry button that invokes a shared
+<code>loadTasks</code> method rather than duplicating fetch logic. Preserve current rows
+when refreshing so a temporary failure does not erase the user's context.</p>
+<p>Extract a row into <code>ui/components/TaskRow.html</code> when it has a distinct job:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;&lt;</span><span class="nt">article</span><span class="p">&gt;&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ status }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">article</span><span class="p">&gt;&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">props</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"title"</span><span class="p">,</span><span class="w"> </span><span class="s2">"status"</span><span class="p">]</span><span class="w"> </span><span class="p">};&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span><span class="nt">article</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#bbb</span><span class="p">;</span><span class="w"> </span><span class="p">}&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Import it from the parent component and register it through Teloce's component
+API; see the existing <a href="../projects/teloce-siteledger/index.html">SiteLedger components</a>.
+Scoped CSS limits component styling, while shared typography belongs in the
+application shell. Use real labels, buttons, visible focus and status regions.
+Do not make a clickable <code>div</code> the only way to perform an action.</p>
+<p><strong>Checkpoint:</strong> show zero tasks, a failed request and a populated list. Navigate
+with the keyboard. Confirm a row's styles do not unexpectedly affect another
+page. Component extraction should clarify responsibilities rather than create
+one file for every line of markup.</p>
+<h2 id="readable-child-component">Readable child component</h2>
+<p>This <code>.html</code> file is a component, not a whole browser document. The parent owns
+the task object; the child displays it and derives a label with a typed helper.</p>
+<h3 id="examplesteloce_taskboarduicomponentstaskrowhtml"><code>examples/teloce_taskboard/ui/components/TaskRow.html</code></h3>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ task.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ status }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">taskStatus</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../format.ts"</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">props</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"task"</span><span class="p">],</span>
+<span class="w">  </span><span class="nx">computed</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">status</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="nx">taskStatus</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">task</span><span class="p">);</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="nt">article</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#b9c7d5</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h2</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">1.1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<h2 id="events-slots-and-directives">Events, slots and directives</h2>
+<p>For an editable row, emit an intent instead of mutating a parent-owned prop:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">article</span> <span class="na">:class</span><span class="o">=</span><span class="s">"{ complete: task.complete }"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span> <span class="na">v-text</span><span class="o">=</span><span class="s">"task.title"</span><span class="p">&gt;&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="err">@</span><span class="na">click</span><span class="o">=</span><span class="s">"$emit('select', task.id)"</span><span class="p">&gt;</span>Open task<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">slot</span><span class="p">&gt;&lt;/</span><span class="nt">slot</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">props</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"task"</span><span class="p">],</span>
+<span class="w">  </span><span class="nx">emits</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"select"</span><span class="p">],</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>A parent handles <code>@select="openTask"</code> and supplies slot content. <code>:class</code> binds
+presentation, <code>v-text</code> renders escaped text, <code>v-if</code> creates/removes content,
+<code>v-show</code> controls visibility, and <code>v-for</code> repeats keyed rows. <code>v-model</code> connects
+input state; event modifiers such as <code>@submit.prevent</code> prevent default behavior.
+The original <code>&lt;if&gt;</code>, <code>&lt;for&gt;</code> and <code>:model</code> forms remain available too.</p>
+<p>Use <code>computed</code> for derived values, <code>watch</code> for side effects and <code>methods</code> for
+user actions. Keep expensive work and third-party widget creation out of computed
+values. Initialize widgets in <code>mounted()</code> and destroy them in <code>beforeUnmount()</code>.
+Never feed untrusted user HTML to <code>v-html</code> without appropriate sanitization.</p>
+<p><a href="index.html">Course contents</a> · <a href="01-first-app.html">Previous lesson</a> · <a href="03-typed-api.html">Next lesson</a></p></article>
+</main></div><div id="footer"></div></body></html>
