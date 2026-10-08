@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Getting started with Flaxon</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/getting-started.md">Framework source</a> · <a href="../../content/framework/docs/getting-started.md" download>Markdown</a></p><h1 id="getting-started-with-flaxon">Getting started with Flaxon</h1>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/getting-started.md">Framework source</a> · <a href="../../content/framework/docs/getting-started.md" download>Markdown</a></p><h1 id="getting-started-with-flaxon">Getting started with Flaxon</h1>
 <p>Build a complete application with Python APIs, Teloce HTML components, TypeScript, scoped styles, and a protected admin in one project.</p>
 <h2 id="create-your-first-application">Create your first application</h2>
 <p>Use Python 3.11 or newer. Install Flaxon in a virtual environment, then generate the starter:</p>
@@ -24,9 +24,11 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 flaxon<span class="w"> </span>new<span class="w"> </span>my-project
 <span class="nb">cd</span><span class="w"> </span>my-project
 python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>check
+python<span class="w"> </span>management.py<span class="w"> </span>makemigrations
 python<span class="w"> </span>management.py<span class="w"> </span>migrate
 python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
-flaxon<span class="w"> </span>run
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
 </code></pre></div>
 <p>Open <strong>http://127.0.0.1:8000/</strong>. The welcome page's <strong>Try your Python API</strong> button calls <code>/api/welcome/status</code> through a TypeScript helper. Open <code>/admin/login</code> to sign in with the account you created.</p>
 <p>There is no preset administrator or password. Use a password of at least eight characters with upper- and lowercase letters, a number, and a special character. Password entry is hidden; passwords are hashed before storage. Create accounts before starting the server, or restart it after adding an account from the command line.</p>
@@ -57,7 +59,7 @@ flaxon<span class="w"> </span>run
 </tr>
 <tr>
 <td><code>settings.py</code></td>
-<td>Project paths, SQLite location, and development mode.</td>
+<td>Shared database URL, security, paths, and enabled features.</td>
 </tr>
 <tr>
 <td><code>modules/welcome/module.py</code></td>
@@ -84,8 +86,12 @@ flaxon<span class="w"> </span>run
 <td>Project-local migrations and administrator creation.</td>
 </tr>
 <tr>
-<td><code>migrations/0001_project_notes.json</code></td>
-<td>Example migration creating a project notes table.</td>
+<td><code>models.py</code> / <code>admin.py</code></td>
+<td>ORM schema and explicit Admin registration.</td>
+</tr>
+<tr>
+<td><code>migrations/</code></td>
+<td>Generated Python migrations from model changes.</td>
 </tr>
 <tr>
 <td><code>data/</code></td>
@@ -107,7 +113,7 @@ flaxon<span class="w"> </span>welcome-status
 <li>Update <code>api.ts</code> to call that endpoint and describe its response with a TypeScript interface.</li>
 <li>Update <code>Welcome.html</code> to show the result. Its scoped styles belong to the component.</li>
 <li>Add a module for each feature and mount it in <code>app.py</code>. Keep its UI beside its Python routes.</li>
-<li>Add migrations for database schema changes, then run <code>python management.py migrate</code>.</li>
+<li>Edit models, run <code>python management.py makemigrations</code>, review the generated Python migration, then run <code>python management.py migrate</code>.</li>
 </ol>
 <p>Check migration status with <code>python management.py migrate --status</code>. <code>python management.py createsuperuser</code> is an alias for <code>setup-admin</code>; existing usernames are never overwritten. Run <code>python management.py --help</code> for command help.</p>
 <h2 id="learn-the-rest-of-flaxon">Learn the rest of Flaxon</h2>
@@ -158,5 +164,6 @@ flaxon<span class="w"> </span>welcome-status
 </tr>
 </tbody>
 </table>
-<p>Before deployment, set <code>FLAXON_DEBUG=0</code>, use HTTPS, review permissions, back up <code>data/</code>, and follow the deployment and production-admin guides. The starter uses local SQLite and local uploads for a single application instance. Deploy the project sources or an editable installation; packaging your own application as a wheel requires including its UI and public files.</p></article>
+<p>Before deployment, set <code>FLAXON_DEBUG=0</code>, use HTTPS, review permissions, back up <code>data/</code>, and follow the deployment and production-admin guides. The starter uses local SQLite and local uploads for a single application instance. Deploy the project sources or an editable installation; packaging your own application as a wheel requires including its UI and public files.</p>
+<p>See <a href="../guides/orm.html">ORM and settings</a> for the complete management workflow and legacy migration transition.</p></article>
 </main></div><div id="footer"></div></body></html>

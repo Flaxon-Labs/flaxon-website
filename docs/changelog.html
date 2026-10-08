@@ -12,8 +12,35 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
 <h2 id="unreleased">Unreleased</h2>
+<ul>
+<li>Project CLI: discover commands once, avoid importing project commands for new/version, flush setup messages, show environment progress and stop after a 120-second timeout with recovery instructions.</li>
+<li>Admin/CMS: distinguish the ORM lifecycle object from legacy SQL adapters so generated ORM applications use their metadata store without page errors.</li>
+<li>Documentation: shared settings/management/ORM workflow and a verified 15-chapter, complete-code project-manager ebook covering Teloce HTML, scoped CSS, signals, SPA routing, staff Admin/CMS and Render.</li>
+</ul>
+<h2 id="027-unreleased">[0.2.7] — Unreleased</h2>
+<ul>
+<li>Bundle Alpine.js for essential Admin/CMS interactions.</li>
+<li>Add permission-filtered relationship selectors, many-to-many forms, optional
+  child inlines, query scoping, field groups and custom widget templates.</li>
+<li>Make ORM imports transactional, show field validation errors, reject stale ORM
+  edits, preview dependent deletion and enforce cascade delete permissions.</li>
+<li>
+<p>Add opt-in ORM Admin/CMS metadata storage with Python migrations and a
+  transactional legacy SQLite store copy command.</p>
+</li>
+<li>
+<p>Integrate pinned Tortoise ORM through flaxon.db and shared typed settings.</p>
+</li>
+<li>Add model-driven Python migrations and project management commands; preserve legacy adapters/JSON runners.</li>
+<li>Discover model/Admin metadata from explicitly mounted modules without frontend compilation in management mode.</li>
+<li>Add ORM Admin CRUD, typed fields, bounded relationships, validation and project registry isolation.</li>
+<li>Repair disabled-feature navigation and expired/shared-worker CSRF handling in new starters.</li>
+<li>Enforce model/object permissions in global search, exports and bulk actions; redact credentials in snapshots.</li>
+<li>Require CMS authentication by default and publishing rights across writes/imports/restores; support async authorization.</li>
+</ul>
+<h2 id="26">2.6</h2>
 <ul>
 <li>Add synchronous and asynchronous module-owned starter commands, exposed through project CLI discovery.</li>
 <li>
@@ -25,14 +52,14 @@
 <li>Package the starter assets in Flaxon distributions and correct the generated Flaxon dependency name.</li>
 <li>Add a canonical getting-started guide and a complete documentation directory.</li>
 </ul>
-<h2 id="unreleased-readable-full-stack-course">Unreleased — Readable full-stack course</h2>
+<h2 id="26-readable-full-stack-course">2.6 — Readable full-stack course</h2>
 <ul>
 <li>Shorten the README around Python server and Teloce browser development, keeping the logo.</li>
 <li>Split the full-stack course into ten numbered lesson files with navigation and API coverage maps.</li>
 <li>Add a runnable typed Taskboard using HTML components, TypeScript helpers, validation and reusable components.</li>
 <li>Add compilation/API and browser tests for the Taskboard.</li>
 </ul>
-<h2 id="unreleased-full-stack-page-configuration">Unreleased — Full-stack page configuration</h2>
+<h2 id="26-full-stack-page-configuration">2.6 — Full-stack page configuration</h2>
 <ul>
 <li>Add optional favicon, description, language, theme color, stylesheet and script settings to Teloce page shells.</li>
 <li>Escape head values and validate resource schemes and supported attributes.</li>
@@ -42,7 +69,7 @@
 <p>All notable changes to Flaxon will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased_1">[Unreleased]</h2>
+<h2 id="26_1">[2.6]</h2>
 <h3 id="teloce-integration">Teloce integration</h3>
 <ul>
 <li>Generated assets revalidate instead of caching stable router/aliases as immutable.</li>

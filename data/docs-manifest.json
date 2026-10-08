@@ -1,6 +1,6 @@
 {
-  "repository": "https://github.com/Flaxon-Labs/flaxon",
-  "commit": "0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34",
+  "repository": "https://github.com/aldanedev-create/flaxon",
+  "commit": "70fe276efcb75a3729535c65abd9e75e0bde57b3",
   "pages": [
     {
       "source": "CHANGELOG.md",
@@ -357,6 +357,102 @@
       "section": "Full-stack course"
     },
     {
+      "source": "docs/fullstack/project-manager/01.md",
+      "url": "docs/fullstack/project-manager/01.html",
+      "title": "01 | Preview and CLI setup",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/02.md",
+      "url": "docs/fullstack/project-manager/02.html",
+      "title": "02 | Settings, management and application composition",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/03.md",
+      "url": "docs/fullstack/project-manager/03.html",
+      "title": "03 | Models and Python migrations",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/04.md",
+      "url": "docs/fullstack/project-manager/04.html",
+      "title": "04 | Customer authentication and sessions",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/05.md",
+      "url": "docs/fullstack/project-manager/05.html",
+      "title": "05 | Owned project APIs",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/06.md",
+      "url": "docs/fullstack/project-manager/06.html",
+      "title": "06 | Task workflow",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/07.md",
+      "url": "docs/fullstack/project-manager/07.html",
+      "title": "07 | Backend tests",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/08.md",
+      "url": "docs/fullstack/project-manager/08.html",
+      "title": "08 | Teloce HTML shell and scoped CSS",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/09.md",
+      "url": "docs/fullstack/project-manager/09.html",
+      "title": "09 | Login and project screens",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/10.md",
+      "url": "docs/fullstack/project-manager/10.html",
+      "title": "10 | Task components, signals and progress",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/11.md",
+      "url": "docs/fullstack/project-manager/11.html",
+      "title": "11 | SPA routing and direct refresh",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/12.md",
+      "url": "docs/fullstack/project-manager/12.html",
+      "title": "12 | Staff Admin",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/13.md",
+      "url": "docs/fullstack/project-manager/13.html",
+      "title": "13 | CMS help and sample data",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/14.md",
+      "url": "docs/fullstack/project-manager/14.html",
+      "title": "14 | Full-stack verification",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/15.md",
+      "url": "docs/fullstack/project-manager/15.html",
+      "title": "15 | Production build and Render",
+      "section": "Full-stack course"
+    },
+    {
+      "source": "docs/fullstack/project-manager/index.md",
+      "url": "docs/fullstack/project-manager/index.html",
+      "title": "Project Manager: complete full-stack ebook",
+      "section": "Full-stack course"
+    },
+    {
       "source": "docs/getting Starting.md",
       "url": "docs/getting-starting.html",
       "title": "Getting started",
@@ -462,6 +558,12 @@
       "source": "docs/guides/openapi.md",
       "url": "docs/guides/openapi.html",
       "title": "OpenAPI, Swagger UI, and ReDoc",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/orm.md",
+      "url": "docs/guides/orm.html",
+      "title": "Models, settings, and management commands",
       "section": "Feature guides"
     },
     {
@@ -739,6 +841,12 @@
       "url": "docs/projects/teloce-taskboard/index.html",
       "title": "Taskboard course example",
       "section": "Runnable projects"
+    },
+    {
+      "source": "src/flaxon/admin/static/admin/js/ALPINE-LICENSE.md",
+      "url": "src/flaxon/admin/static/admin/js/alpine-license.html",
+      "title": "MIT License",
+      "section": "Admin and CMS"
     },
     {
       "source": "tests/expanded/README.md",

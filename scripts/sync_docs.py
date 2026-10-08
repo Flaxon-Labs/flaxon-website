@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content/framework"
-REPO = "https://github.com/Flaxon-Labs/flaxon"
+REPO = "https://github.com/aldanedev-create/flaxon"
 ALIASES = {
     "docs/index.md": "docs/getting-started/index.html",
     "docs/installation.md": "docs/getting-started/installation.html",
@@ -267,11 +267,12 @@ def api_fragment(checkout, symbol, commit):
     return block + "</div>"
 
 
-def sync(checkout):
+def sync(checkout, revision=None):
     checkout = checkout.resolve()
     commit = subprocess.check_output(
         ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
     ).strip()
+    commit = revision or commit
     # Every tracked Markdown document belongs in the published inventory.
     tracked = subprocess.check_output(
         ["git", "-C", str(checkout), "ls-files", "-z", "*.md"], text=True
@@ -488,7 +489,7 @@ def build():
             heading.name = "h2"
         output = ROOT / entry["url"]
         output.parent.mkdir(parents=True, exist_ok=True)
-        if entry["url"].startswith("docs/fullstack/") and (entry["url"].endswith("index.html") or "/10" in entry["url"]):
+        if entry["url"] in {"docs/fullstack/index.html", "docs/fullstack/10-production.html"}:
             usage_note = soup.new_tag("p")
             usage_note.string = "Flaxon full-stack examples use .html Teloce single-file components. app.use_teloce() compiles them; request.compile() serves their browser application shell. See lesson 13 for the complete data-teloce-link routing workflow."
             soup.append(usage_note)
@@ -585,7 +586,8 @@ def build():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path)
+    parser.add_argument("--revision", help="Published commit matching the source checkout")
     args = parser.parse_args()
     if args.source:
-        sync(args.source)
+        sync(args.source, revision=args.revision)
     build()

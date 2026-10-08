@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="11 | SPA routing and direct refresh — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>11 | SPA routing and direct refresh — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>11 | SPA routing and direct refresh</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/11.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/11.md" download>Markdown</a></p><h1 id="11-spa-routing-and-direct-refresh">11 | SPA routing and direct refresh</h1>
+<h2 id="goal">Goal</h2>
+<p>Support internal clicks, Back/Forward and direct nested URLs.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>There are two routers. Teloce's ui_routes maps /projects/:id to the detail component and passes id as a prop. data-teloce-link lets an ordinary anchor navigate without replacing the document; data-teloce-router-view provides the mount point. Flaxon's explicit /projects/<int:project_id> shell route handles direct visits and refreshes. The browser then fetches protected JSON. Keep Admin links as ordinary full-page navigation. Do not use a catch-all shell route that turns an unknown API path into HTML.</int:project_id></p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-edit-replace-the-entire-file-apppy">Step 1: EDIT - replace the entire file - app.py</h2>
+<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argon2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.projects.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">projects</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.tasks.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+    <span class="n">DATA_DIR</span><span class="p">,</span>
+    <span class="n">DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">DEBUG</span><span class="p">,</span>
+    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="s2">"/api/projects"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="s2">"/api/tasks"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
+        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"minifier"</span><span class="p">:</span> <span class="s2">"minifyjs"</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
+
+    <span class="c1"># Explicit shell routes preserve real 404 responses for unknown API paths.</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/projects"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/projects/&lt;int:project_id&gt;"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">spa</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
+<span class="c1"># Refresh a nested /projects/ID URL, then use Back and Forward.</span>
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>Click into a project, use Back and Forward and refresh /projects/ID. The same screen loads. /api/does-not-exist remains a JSON 404.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>A successful click with a failed refresh means the server shell route is missing. A document reload on an internal link means its data-teloce-link marker is missing. Use /projects/:id in browser routes and <int:project_id> in Python routes.</int:project_id></p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Put a temporary window marker in the browser console and prove an internal link preserves it.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Support internal clicks, Back/Forward and direct nested URLs. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 11: SPA routing and direct refresh"</span>
+</code></pre></div>
+<p><a href="10.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="12.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

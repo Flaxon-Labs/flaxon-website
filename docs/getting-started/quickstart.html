@@ -12,7 +12,29 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Full-stack quick start</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/quickstart.md">Framework source</a> · <a href="../../content/framework/docs/quickstart.md" download>Markdown</a></p><h1 id="full-stack-quick-start">Full-stack quick start</h1>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/quickstart.md">Framework source</a> · <a href="../../content/framework/docs/quickstart.md" download>Markdown</a></p><h1 id="full-stack-quick-start">Full-stack quick start</h1>
+<p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
+explicit mounts in <code>app.py</code>, and <code>management.py</code> workflow. See <a href="../guides/orm.html">ORM and project management</a>
+for Python migrations, model registration, permission hooks, relationship editing,
+and Admin/CMS metadata storage. Backend-only and legacy adapter examples remain supported.</p>
+<h2 id="start-from-the-project-cli">Start from the project CLI</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard,admin]"</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>project_manager
+<span class="nb">cd</span><span class="w"> </span>project_manager
+<span class="c1"># Activate the generated .venv, then:</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>check
+python<span class="w"> </span>management.py<span class="w"> </span>makemigrations
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<p>For unreleased ORM features, install the repository revision or the pinned course
+wheel rather than assuming those features are in the latest PyPI release.
+Follow <a href="project-setup.html">getting started</a> for activation commands and the
+<a href="../fullstack/project-manager/index.html">complete project-manager ebook</a> to build a
+real app, one complete file at a time.</p>
+<h2 id="a-minimal-hand-written-full-stack-example">A minimal hand-written full-stack example</h2>
 <p>Build a Python API and a Teloce interface in the same project. Python 3.11+ is
 required. Create a virtual environment and install compatible Flaxon/Teloce releases:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="01 | Preview and CLI setup — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>01 | Preview and CLI setup — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>01 | Preview and CLI setup</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/01.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/01.md" download>Markdown</a></p><h1 id="01-preview-and-cli-setup">01 | Preview and CLI setup</h1>
+<h2 id="goal">Goal</h2>
+<p>Generate your own project and run its welcome screen.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>You will build a project manager with customer accounts, private projects, tasks, progress, a staff Admin and published help. Flaxon runs Python on the server. Teloce compiles HTML components and TypeScript into a browser SPA. MinifyJS optimizes the production JavaScript. We build the APIs first so every screen connects to a working backend.</p>
+<h2 id="start-here-create-the-project-with-the-cli">Start here: create the project with the CLI</h2>
+<p>Use Python 3.12. Run the first commands in a new parent directory, not inside the
+finished course repository. The reference checkout supplies the pinned course
+wheels; you will write application code yourself in the generated project.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/aldanedev-create/FreecodeCamp-flaxon-project-manager-course.git<span class="w"> </span>course_reference
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>course_env
+</code></pre></div>
+<p>Activate the bootstrap environment on Windows PowerShell:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\</span><span class="n">course_env</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p>Or activate it on macOS/Linux:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>course_env/bin/activate
+</code></pre></div>
+<p>Install while inside the reference folder so the relative wheel paths resolve:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>course_reference
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+<span class="nb">cd</span><span class="w"> </span>..
+flaxon<span class="w"> </span>new<span class="w"> </span>project_manager
+<span class="nb">cd</span><span class="w"> </span>project_manager
+</code></pre></div>
+<p>The CLI creates the project and its own <code>.venv</code>. Activate that project environment
+now (rather than keeping the parent environment for the rest of the course).</p>
+<p>Windows PowerShell:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p>macOS/Linux:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</code></pre></div>
+<h2 id="create-prepare_coursepy">CREATE: prepare_course.py</h2>
+<p>Create this file in the generated project. It copies dependency files only; it
+does not copy the completed application's Python or UI code.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+<span class="n">reference</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"../course_reference"</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">reference</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s2">"Keep course_reference beside project_manager."</span><span class="p">)</span>
+
+<span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">reference</span> <span class="o">/</span> <span class="s2">"vendor"</span><span class="p">,</span> <span class="s2">"vendor"</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"requirements.txt"</span><span class="p">,</span> <span class="s2">"requirements-dev.txt"</span><span class="p">,</span> <span class="s2">"requirements.lock.txt"</span><span class="p">):</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">reference</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="n">Path</span><span class="p">(</span><span class="s2">"scripts"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">reference</span> <span class="o">/</span> <span class="s2">"scripts/verify_vendor.py"</span><span class="p">,</span> <span class="s2">"scripts/verify_vendor.py"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Pinned course dependencies are ready; application code is still the starter."</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="run-these-commands-now">Run these commands now</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>prepare_course.py
+python<span class="w"> </span>scripts/verify_vendor.py
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>welcome
+python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>welcome-status
+python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
+</code></pre></div>
+<p>Open http://127.0.0.1:8000/. Show the welcome screen and click its Python API button.
+Do not set up staff or run the generated migration yet. Chapter 3 supplies the
+ORM models and generates its first Python migration.</p>
+<h2 id="what-to-say-and-show-at-this-point">What to say and show at this point</h2>
+<p>Say: "We generated the starter ourselves. The dependency helper copied wheels
+and version pins, not the finished task manager. Next we will build the backend
+one module at a time. The customer SPA returns in chapter 8."</p>
+<p>Show: the welcome module, <code>flaxon_cli.py</code>, <code>management.py</code>, and <code>ui/app.html</code>.
+Explain that the generated starter has its own CSS file; chapter 8 replaces the
+shell and removes that file in favour of scoped component CSS.</p>
+<p>Stop the server with Ctrl+C before chapter 2. Initialize your own checkpoints with <code>git init</code> and <code>git add .</code>, then <code>git commit -m "Chapter 01 setup"</code>. Do not create a nested
+project_manager directory by running the generation command again inside it.</p>
+<h2 id="expected-result">Expected result</h2>
+<p>The welcome page loads. Click its API button and see the Python response. The welcome command prints the project name.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>If flaxon is missing, activate the environment or use python -m flaxon. Environment creation does not install application dependencies; run the separate installation commands. Keep course_reference beside project_manager. Do not generate inside the completed repository.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Find the welcome module's route and the HTML component that calls it.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Generate your own project and run its welcome screen. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 01: Preview and CLI setup"</span>
+</code></pre></div>
+<p><a href="index.html">Course contents</a> | <a href="02.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

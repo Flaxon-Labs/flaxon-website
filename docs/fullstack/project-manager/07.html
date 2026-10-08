@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="07 | Backend tests — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>07 | Backend tests — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>07 | Backend tests</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/07.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/07.md" download>Markdown</a></p><h1 id="07-backend-tests">07 | Backend tests</h1>
+<h2 id="goal">Goal</h2>
+<p>Run realistic HTTP requests against disposable ORM databases before writing the UI.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>conftest.py creates a test app and owns its event loop and ORM lifecycle. generate_schemas is used ONLY to prepare disposable test databases; production and development use migrations. TestClient exercises the ASGI app with HTTPX. Account carries its cookie and rotated CSRF token. Tests cover valid workflows, rejected input, expired sessions and cross-user access. Read an ownership test aloud: arrange two accounts, create a project, attempt another user's request and assert it is denied.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-testsconftestpy">Step 1: CREATE - make parent folders, then create this file - tests/conftest.py</h2>
+<p>Own the test database lifecycle and event loop. Never use development files in this fixture.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_app</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestClient</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="s2">"test_loop"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">():</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span>
+                    <span class="n">transport</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">ASGITransport</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">),</span>
+                    <span class="n">base_url</span><span class="o">=</span><span class="s2">"http://testserver"</span><span class="p">,</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                        <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">path</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">json_data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">send</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span>
+                <span class="k">else</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">send</span><span class="p">())</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">request</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">ROOT</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">application</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"app.sqlite3"</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"admin.sqlite3"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">test_loop</span> <span class="o">=</span> <span class="n">loop</span>
+    <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">initialize</span><span class="p">())</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">bind</span><span class="p">():</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">generate_schemas</span><span class="p">())</span>
+    <span class="k">yield</span> <span class="n">app</span>
+    <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">())</span>
+    <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="n">application</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Account</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s2">"learner@example.test"</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/auth/session"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accept_session</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/auth/register"</span><span class="p">,</span>
+            <span class="s2">"post"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Learner"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"LearningPython123!"</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accept_session</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">accept_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="n">value</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span><span class="s2">"set-cookie"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"project_session="</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">";"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csrf</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"csrf"</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"cookie"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">,</span>
+            <span class="s2">"x-csrf-token"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">csrf</span><span class="p">,</span>
+            <span class="s2">"content-type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"get"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"headers"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">headers</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s2">"json_data"</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">account</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Account</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">orm</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Run a direct ORM assertion in the same database context as this test app."""</span>
+    <span class="k">with</span> <span class="n">application</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">bind</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">application</span><span class="o">.</span><span class="n">test_loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">query</span><span class="p">())</span>
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-teststest_apipy">Step 2: CREATE - make parent folders, then create this file - tests/test_api.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">conftest</span><span class="w"> </span><span class="kn">import</span> <span class="n">Account</span><span class="p">,</span> <span class="n">orm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">Session</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">project</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="s2">"/api/projects/"</span><span class="p">,</span>
+        <span class="s2">"post"</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Course project"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Build the app"</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_registration_rotates_session_and_never_returns_password_hash</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/auth/session"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"user"</span><span class="p">][</span><span class="s2">"email"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"learner@example.test"</span>
+    <span class="k">assert</span> <span class="s2">"password"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="s2">"httponly"</span> <span class="ow">in</span> <span class="n">account</span><span class="o">.</span><span class="n">cookie_header</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="s2">"samesite=lax"</span> <span class="ow">in</span> <span class="n">account</span><span class="o">.</span><span class="n">cookie_header</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_login_logout_and_old_session_revocation</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+    <span class="n">old_headers</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">headers</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/auth/logout"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">account</span><span class="o">.</span><span class="n">accept_session</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">old_headers</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="s2">"/api/auth/login"</span><span class="p">,</span>
+        <span class="s2">"post"</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"email"</span><span class="p">:</span> <span class="s2">"learner@example.test"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"LearningPython123!"</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">account</span><span class="o">.</span><span class="n">accept_session</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
+    <span class="s2">"payload"</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="p">[],</span>
+        <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"bad"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"short"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"a@test.test"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"short"</span><span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_invalid_registration</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/auth/register"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_wrong_password_and_duplicate_registration</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/auth/login"</span><span class="p">,</span>
+            <span class="s2">"post"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"email"</span><span class="p">:</span> <span class="s2">"learner@example.test"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"IncorrectPassword123!"</span><span class="p">},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">401</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/auth/register"</span><span class="p">,</span>
+            <span class="s2">"post"</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Other"</span><span class="p">,</span>
+                <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"LEARNER@example.test"</span><span class="p">,</span>
+                <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"LearningPython123!"</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">409</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_authentication_and_csrf_boundaries</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/projects/"</span><span class="p">,</span>
+            <span class="s2">"post"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Blocked"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"cookie"</span><span class="p">:</span> <span class="n">account</span><span class="o">.</span><span class="n">cookie</span><span class="p">},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">"other@example.test"</span><span class="p">)</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">account</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s2">"x-csrf-token"</span><span class="p">:</span> <span class="n">other</span><span class="o">.</span><span class="n">csrf</span><span class="p">}</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Blocked"</span><span class="p">},</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">account</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s2">"origin"</span><span class="p">:</span> <span class="s2">"https://evil.example"</span><span class="p">}</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Blocked"</span><span class="p">},</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_project_crud_and_ownership</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">account</span><span class="p">)</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">"other@example.test"</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/api/projects/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"put"</span><span class="p">,</span> <span class="s2">"delete"</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Stolen"</span><span class="p">}</span> <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">"get"</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+            <span class="o">==</span> <span class="mi">404</span>
+        <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"put"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Renamed"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Updated"</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span>
+            <span class="s2">"data"</span>
+        <span class="p">][</span><span class="s2">"name"</span><span class="p">]</span>
+        <span class="o">==</span> <span class="s2">"Renamed"</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"delete"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_task_workflow_filter_and_cascade</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">account</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/api/tasks/project/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Record lesson"</span><span class="p">,</span> <span class="s2">"due_date"</span><span class="p">:</span> <span class="s2">"2026-12-01"</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+    <span class="n">task_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"id"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/tasks/</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"patch"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"done"</span><span class="p">})</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">200</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">"?status=done"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">"?status=todo"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">"?status=unknown"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span>
+    <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/projects/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"delete"</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">assert</span> <span class="n">orm</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">Task</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">())</span> <span class="ow">is</span> <span class="kc">None</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
+    <span class="s2">"data"</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">""</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Task"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"invalid"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Task"</span><span class="p">,</span> <span class="s2">"due_date"</span><span class="p">:</span> <span class="s2">"2026-02-30"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="mi">123</span><span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_task_validation</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">account</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/tasks/project/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">400</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_task_ownership_and_deletion</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">account</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/api/tasks/project/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Private task"</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">"other@example.test"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+    <span class="k">assert</span> <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Wrong owner"</span><span class="p">})</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/tasks/</span><span class="si">{</span><span class="n">task</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"patch"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"done"</span><span class="p">})</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">404</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">other</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/tasks/</span><span class="si">{</span><span class="n">task</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"delete"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/tasks/</span><span class="si">{</span><span class="n">task</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"delete"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_expired_session_is_rejected</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
+    <span class="n">orm</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">Session</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">expires_at</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_sql_values_are_not_executed</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Robert'); DROP TABLE users;--"</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/auth/session"</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"user"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_auth_rate_limit</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+    <span class="n">codes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">"/api/auth/login"</span><span class="p">,</span>
+            <span class="s2">"post"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"email"</span><span class="p">:</span> <span class="s2">"learner@example.test"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"WrongPassword123!"</span><span class="p">},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">assert</span> <span class="mi">429</span> <span class="ow">in</span> <span class="n">codes</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_unknown_api_is_404</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/not-a-route"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_request_body_limit</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/auth/register"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"x"</span> <span class="o">*</span> <span class="p">(</span><span class="mi">300</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)})</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">413</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_production_requires_secret</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_app</span>
+
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">):</span>
+        <span class="n">create_app</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"app.sqlite3"</span><span class="p">,</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"admin.sqlite3"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>tests/test_api.py
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>tests/test_api.py passes. Each test uses temporary files and does not modify your learner database.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Do not run later Admin tests yet. Keep the ORM context and event loop alive for the whole fixture. Sharing one account's cookie with another makes an ownership test invalid.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Add a regression test that sends an extra owner_id in project JSON and proves it cannot choose a different owner.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Run realistic HTTP requests against disposable ORM databases before writing the UI. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 07: Backend tests"</span>
+</code></pre></div>
+<p><a href="06.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="08.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

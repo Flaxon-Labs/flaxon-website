@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="04 | Customer authentication and sessions — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>04 | Customer authentication and sessions — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>04 | Customer authentication and sessions</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/04.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/04.md" download>Markdown</a></p><h1 id="04-customer-authentication-and-sessions">04 | Customer authentication and sessions</h1>
+<h2 id="goal">Goal</h2>
+<p>Register, sign in, sign out and reject requests without valid sessions.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>validation.py checks JSON and field types before handlers write anything. security.py reads hashed session tokens, compares CSRF tokens, checks browser origins and rotates sessions after authentication changes. Password hashing runs in a worker thread because Argon2 is CPU intensive. The login handler verifies a dummy hash for unknown emails. The durable limiter counts attempts inside a transaction. Customer accounts are separate from staff Admin accounts. Start by requesting /api/auth/session; this issues an anonymous cookie and CSRF token. Registration and login replace both, so use the new values for the next request.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-validationpy">Step 1: CREATE - make parent folders, then create this file - validation.py</h2>
+<p>Validate JSON before passing values to ORM calls. Reuse these checks in all mutations.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Validate every write on the server, even when the browser already validated it."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">BadRequest</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">json_object</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Send a valid JSON object."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Send a JSON object."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be text."</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">required</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maximum</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must contain 1 to </span><span class="si">{</span><span class="n">maximum</span><span class="si">}</span><span class="s2"> characters."</span>
+            <span class="k">if</span> <span class="n">required</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must contain at most </span><span class="si">{</span><span class="n">maximum</span><span class="si">}</span><span class="s2"> characters."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">credentials</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">,</span> <span class="mi">254</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\s@]+@[^\s@]+\.[^\s@]+"</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Enter a valid email address."</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"password"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">password</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">12</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Use a password with 12 to 128 characters."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">email</span><span class="p">,</span> <span class="n">password</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">task_fields</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">partial</span> <span class="ow">or</span> <span class="s2">"title"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="mi">160</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">partial</span> <span class="ow">or</span> <span class="s2">"status"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">"todo"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"todo"</span><span class="p">,</span> <span class="s2">"doing"</span><span class="p">,</span> <span class="s2">"done"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Status must be todo, doing, or done."</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">partial</span> <span class="ow">or</span> <span class="s2">"due_date"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">due</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"due_date"</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">due</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">due</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">due</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Use YYYY-MM-DD for a due date."</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">"due_date"</span><span class="p">]</span> <span class="o">=</span> <span class="n">due</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">(</span><span class="s2">"Supply at least one editable field."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-securitypy">Step 2: CREATE - make parent folders, then create this file - security.py</h2>
+<p>Read each helper in order: identify a session, require its user, check CSRF, rotate credentials, then limit attempts.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Opaque cookie sessions and session-bound CSRF; account ownership stays on the server."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Session</span><span class="p">,</span> <span class="n">AuthAttempt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tortoise.expressions</span><span class="w"> </span><span class="kn">import</span> <span class="n">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_transaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Forbidden</span><span class="p">,</span> <span class="n">Unauthorized</span><span class="p">,</span> <span class="n">TooManyRequests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http.cookies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cookie</span>
+
+<span class="n">COOKIE_NAME</span> <span class="o">=</span> <span class="s2">"project_session"</span>
+<span class="n">SESSION_SECONDS</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">digest</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_session</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">COOKIE_NAME</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="k">await</span> <span class="n">Session</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">token_hash</span><span class="o">=</span><span class="n">digest</span><span class="p">(</span><span class="n">token</span><span class="p">),</span> <span class="n">expires_at__gt</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+        <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">require_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">read_session</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span> <span class="ow">or</span> <span class="n">session</span><span class="p">[</span><span class="s2">"user_id"</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Please sign in."</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">session</span><span class="p">[</span><span class="s2">"user_id"</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Please sign in."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"origin"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">and</span> <span class="n">origin</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">public_origin</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Forbidden</span><span class="p">(</span><span class="s2">"This request came from an untrusted origin."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">"application/json"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"content-type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">Forbidden</span><span class="p">(</span><span class="s2">"Send JSON with a CSRF token."</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">read_session</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">supplied</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"x-csrf-token"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="ow">not</span> <span class="n">session</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="n">supplied</span>
+        <span class="ow">or</span> <span class="ow">not</span> <span class="n">hmac</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s2">"csrf"</span><span class="p">],</span> <span class="n">supplied</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="n">Forbidden</span><span class="p">(</span><span class="s2">"Your session expired. Reload the page and try again."</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">session_response</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">COOKIE_NAME</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="n">token</span><span class="p">,</span> <span class="n">csrf</span> <span class="o">=</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">in_transaction</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">old</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">Session</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">token_hash</span><span class="o">=</span><span class="n">digest</span><span class="p">(</span><span class="n">old</span><span class="p">))</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">Session</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">expires_at__lte</span><span class="o">=</span><span class="n">now</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">Session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">token_hash</span><span class="o">=</span><span class="n">digest</span><span class="p">(</span><span class="n">token</span><span class="p">),</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="k">if</span> <span class="n">user</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">csrf</span><span class="o">=</span><span class="n">csrf</span><span class="p">,</span>
+            <span class="n">expires_at</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="n">SESSION_SECONDS</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="p">(</span>
+        <span class="n">COOKIE_NAME</span><span class="p">,</span>
+        <span class="n">token</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="s2">"/"</span><span class="p">,</span>
+        <span class="n">httponly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">samesite</span><span class="o">=</span><span class="s2">"Lax"</span><span class="p">,</span>
+        <span class="n">secure</span><span class="o">=</span><span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+        <span class="n">max_age</span><span class="o">=</span><span class="n">SESSION_SECONDS</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span> <span class="s2">"csrf"</span><span class="p">:</span> <span class="n">csrf</span><span class="p">}},</span>
+        <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"cache-control"</span><span class="p">:</span> <span class="s2">"no-store"</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"set-cookie"</span><span class="p">,</span> <span class="n">cookie</span><span class="o">.</span><span class="n">to_header</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">limit_auth_attempts</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A durable, single-instance limiter; production proxies also limit the auth routes."""</span>
+    <span class="n">peer</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"client"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">"unknown"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">digest</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">peer</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="n">email</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">with</span> <span class="n">in_transaction</span><span class="p">():</span>
+        <span class="k">await</span> <span class="n">AuthAttempt</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">started_at__lt</span><span class="o">=</span><span class="n">now</span> <span class="o">-</span> <span class="mi">900</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">AuthAttempt</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">"started_at"</span><span class="p">:</span> <span class="n">now</span><span class="p">})</span>
+        <span class="k">await</span> <span class="n">AuthAttempt</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s2">"attempts"</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AuthAttempt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">attempts</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">attempts</span>
+    <span class="k">if</span> <span class="n">attempts</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">TooManyRequests</span><span class="p">(</span><span class="s2">"Too many attempts. Try again in 15 minutes."</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-modulesauthinitpy">Step 3: CREATE - make parent folders, then create this file - modules/auth/<strong>init</strong>.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Module-owned APIs and interface files."""</span>
+</code></pre></div>
+<h2 id="step-4-create-make-parent-folders-then-create-this-file-modulesauthmodulepy">Step 4: CREATE - make parent folders, then create this file - modules/auth/module.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Registration and cookie authentication, separate from staff Admin accounts."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tortoise.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntegrityError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argon2.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerifyMismatchError</span><span class="p">,</span> <span class="n">VerificationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Conflict</span><span class="p">,</span> <span class="n">Unauthorized</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">security</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_csrf</span><span class="p">,</span>
+    <span class="n">read_session</span><span class="p">,</span>
+    <span class="n">require_user</span><span class="p">,</span>
+    <span class="n">session_response</span><span class="p">,</span>
+    <span class="n">limit_auth_attempts</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">json_object</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">credentials</span>
+
+<span class="n">auth</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span>
+    <span class="s2">"auth"</span><span class="p">,</span> <span class="n">ui_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"ui"</span><span class="p">,</span> <span class="n">ui_routes</span><span class="o">=</span><span class="p">{</span><span class="s2">"Login.js"</span><span class="p">:</span> <span class="s2">"/login"</span><span class="p">}</span>
+<span class="p">)</span>
+
+
+<span class="nd">@auth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/session"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="k">await</span> <span class="n">read_session</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">current</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">require_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="k">if</span> <span class="n">current</span><span class="p">[</span><span class="s2">"user_id"</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span> <span class="s2">"csrf"</span><span class="p">:</span> <span class="n">current</span><span class="p">[</span><span class="s2">"csrf"</span><span class="p">]}},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"cache-control"</span><span class="p">:</span> <span class="s2">"no-store"</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">session_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+
+<span class="nd">@auth</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/register"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">json_object</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">credentials</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">limit_auth_attempts</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="n">password_hash</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span> <span class="n">password_hash</span><span class="o">=</span><span class="n">password_hash</span><span class="p">)</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Conflict</span><span class="p">(</span><span class="s2">"Unable to create this account. Try signing in."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">session_response</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="n">email</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">201</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@auth</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">credentials</span><span class="p">(</span><span class="k">await</span> <span class="n">json_object</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="k">await</span> <span class="n">limit_auth_attempts</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">password_hash</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s2">"password_hash"</span><span class="p">]</span> <span class="k">if</span> <span class="n">user</span> <span class="k">else</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">verify</span><span class="p">,</span> <span class="n">password_hash</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">VerifyMismatchError</span><span class="p">,</span> <span class="n">VerificationError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Email or password is incorrect."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Unauthorized</span><span class="p">(</span><span class="s2">"Email or password is incorrect."</span><span class="p">)</span>
+    <span class="n">public_user</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">session_response</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">public_user</span><span class="p">)</span>
+
+
+<span class="nd">@auth</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/logout"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logout</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">session_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-5-edit-replace-the-entire-file-apppy">Step 5: EDIT - replace the entire file - app.py</h2>
+<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argon2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+    <span class="n">DATA_DIR</span><span class="p">,</span>
+    <span class="n">DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">DEBUG</span><span class="p">,</span>
+    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Backend lesson ready. The SPA starts in chapter 8."</span><span class="p">}}</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
+<span class="c1"># In a second terminal:</span>
+curl<span class="w"> </span>-c<span class="w"> </span>cookies.txt<span class="w"> </span>http://127.0.0.1:8000/api/auth/session
+</code></pre></div>
+<h2 id="make-the-first-authenticated-request">Make the first authenticated request</h2>
+<p>Keep the server running. In a second terminal use an HTTP client to GET /api/auth/session and save its Set-Cookie value and data.csrf. Then POST /api/auth/register with that cookie, Content-Type: application/json and X-CSRF-Token set to data.csrf. The complete Python demo in chapter 5 automates this exchange. For curl on macOS/Linux:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-c<span class="w"> </span>cookies.txt<span class="w"> </span>http://127.0.0.1:8000/api/auth/session
+<span class="c1"># Replace TOKEN with data.csrf from the response above:</span>
+curl<span class="w"> </span>-b<span class="w"> </span>cookies.txt<span class="w"> </span>-c<span class="w"> </span>cookies.txt<span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'X-CSRF-Token: TOKEN'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"name":"Learner","email":"learner@example.test","password":"LearningPython123!"}'</span><span class="w"> </span>http://127.0.0.1:8000/api/auth/register
+</code></pre></div>
+<p>Save the NEW token returned by registration. Do not commit cookies.txt.</p>
+<h2 id="expected-result">Expected result</h2>
+<p>GET /api/auth/session returns data.user = null and a CSRF token. POST /api/auth/register with the cookie and token creates a customer. GET /api/projects is introduced next; the auth module itself now supports login and logout.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Use PUBLIC_ORIGIN exactly, including scheme, hostname and port. A 403 can mean a missing or rotated CSRF token, wrong Origin or non-JSON body. Passwords must have 12-128 characters. Never put the HttpOnly cookie in localStorage.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Use curl or a small HTTP client to register, then log out and show that the previous cookie cannot authenticate.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Register, sign in, sign out and reject requests without valid sessions. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 04: Customer authentication and sessions"</span>
+</code></pre></div>
+<p><a href="03.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="05.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

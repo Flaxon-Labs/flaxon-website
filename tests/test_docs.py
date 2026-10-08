@@ -65,7 +65,9 @@ class DocumentationTests(unittest.TestCase):
             for e in self.manifest["pages"]
             if e["section"] == "Full-stack course"
         ]
-        self.assertEqual(len(paths), 14)
+        self.assertEqual(len(paths), 30)
+        for number in range(1, 16):
+            self.assertIn(f"docs/fullstack/project-manager/{number:02d}.html", paths)
         self.assertIn("docs/fullstack/11-guessing-game.html", paths)
         for number in range(1, 11):
             self.assertTrue(any(f"/fullstack/{number:02d}-" in p for p in paths))
