@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="03 | Models and Python migrations — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>03 | Models and Python migrations — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>03 | Models and Python migrations</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/03.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/03.md" download>Markdown</a></p><h1 id="03-models-and-python-migrations">03 | Models and Python migrations</h1>
+<h2 id="goal">Goal</h2>
+<p>Define all five application tables and apply the first Python migration.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>User owns projects; Project owns tasks. The ForeignKeyField names use the root ORM label models. Cascading a project deletion removes its tasks. Session stores a digest of an opaque cookie and an expiry; AuthAttempt persists login attempt counts. Define the schema once in models.py. makemigrations compares models with migration history and generates Python code; migrate applies that code. Commit the generated file. No JSON migration is needed. We define the complete schema now so later API chapters focus on behavior rather than repeated table changes.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-modelspy">Step 1: CREATE - make parent folders, then create this file - models.py</h2>
+<p>These five models are the complete schema. Relationships define ownership and deletion behavior; handlers add authorization.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Application tables. Generate Python migrations whenever these models change."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">fields</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">254</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">password_hash</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="s2">"users"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Project</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ForeignKeyField</span><span class="p">(</span>
+        <span class="s2">"models.User"</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">"projects"</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">fields</span><span class="o">.</span><span class="n">CASCADE</span>
+    <span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DatetimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="s2">"projects"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Task</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ForeignKeyField</span><span class="p">(</span>
+        <span class="s2">"models.Project"</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">"tasks"</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">fields</span><span class="o">.</span><span class="n">CASCADE</span>
+    <span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"todo"</span><span class="p">)</span>
+    <span class="n">due_date</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DatetimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="s2">"tasks"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">token_hash</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ForeignKeyField</span><span class="p">(</span><span class="s2">"models.User"</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">fields</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">csrf</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+    <span class="n">expires_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BigIntField</span><span class="p">(</span><span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="s2">"sessions"</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthAttempt</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">attempts</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">started_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BigIntField</span><span class="p">(</span><span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="s2">"auth_attempts"</span>
+</code></pre></div>
+<h2 id="step-2-edit-replace-the-entire-file-adminpy">Step 2: EDIT - replace the entire file - admin.py</h2>
+<p>Keep explicit registration in this file. At chapter 3 it is empty; chapter 12 adds the domain models.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Staff model registration is added in chapter 12."""</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">admin</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-migrationsinitpy">Step 3: CREATE - make parent folders, then create this file - migrations/<strong>init</strong>.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+<h2 id="step-4-edit-replace-the-entire-file-apppy">Step 4: EDIT - replace the entire file - app.py</h2>
+<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+    <span class="n">DATA_DIR</span><span class="p">,</span>
+    <span class="n">DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">DEBUG</span><span class="p">,</span>
+    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Backend lesson ready. The SPA starts in chapter 8."</span><span class="p">}}</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>check
+python<span class="w"> </span>management.py<span class="w"> </span>makemigrations<span class="w"> </span>--name<span class="w"> </span>initial
+python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--plan
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--status
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>check reports valid settings and registrations. makemigrations creates migrations/0001_initial.py. migrate applies it; status lists it as applied. A second migrate performs no new schema changes.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Use a fresh learner project. Do not apply the starter ProjectNote migration before replacing models.py. If you already migrated the starter, select a NEW DATA_DIR in .env and start the course migration history in a separate project. Do not delete or reset a database containing data you need. No such table means the selected database has not been migrated.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Add a priority field to Task in a disposable copy. Generate and inspect a second migration without applying it to your course database.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Define all five application tables and apply the first Python migration. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 03: Models and Python migrations"</span>
+</code></pre></div>
+<p><a href="02.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="04.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

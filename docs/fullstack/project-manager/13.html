@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="13 | CMS help and sample data — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>13 | CMS help and sample data — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>13 | CMS help and sample data</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/13.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/13.md" download>Markdown</a></p><h1 id="13-cms-help-and-sample-data">13 | CMS help and sample data</h1>
+<h2 id="goal">Goal</h2>
+<p>Publish sanitized help articles and show them through read-only public endpoints.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>CMS uses staff authentication. Help articles have title, summary, body and draft/published status. Public endpoints whitelist fields and expose only published items. Rich text is sanitized before the article component displays it with v-html; ordinary customer text remains escaped. seed is a project custom command exposed by flaxon_cli.py. It creates a sample project for the first registered customer and a published help article. Stop the server before seeding, then restart it so in-process CMS state reloads. Publishing permission remains distinct from drafting permission.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-flaxon_clipy">Step 1: CREATE - make parent folders, then create this file - flaxon_cli.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Expose commands owned by feature modules to the Flaxon CLI.</span>
+
+<span class="sd">Run these commands from the project directory. Add another module's</span>
+<span class="sd">install_cli_commands(globals()) call here when you add its commands.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+
+<span class="n">welcome</span><span class="o">.</span><span class="n">install_cli_commands</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.cli.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Command</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">seed_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">console</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seed</span><span class="w"> </span><span class="kn">import</span> <span class="n">seed</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">seed</span><span class="p">())</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+
+<span class="n">seed</span> <span class="o">=</span> <span class="n">Command</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="n">seed_command</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">"Create sample projects and published help content"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-modulescontentinitpy">Step 2: CREATE - make parent folders, then create this file - modules/content/<strong>init</strong>.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Module-owned APIs and interface files."""</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-modulescontentmodulepy">Step 3: CREATE - make parent folders, then create this file - modules/content/module.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Public read-only content endpoints; never expose the authenticated CMS API to readers."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFound</span>
+
+<span class="n">content</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span>
+    <span class="s2">"content"</span><span class="p">,</span>
+    <span class="n">ui_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"ui"</span><span class="p">,</span>
+    <span class="n">ui_routes</span><span class="o">=</span><span class="p">{</span><span class="s2">"Help.js"</span><span class="p">:</span> <span class="s2">"/help"</span><span class="p">,</span> <span class="s2">"Article/[slug].js"</span><span class="p">:</span> <span class="s2">"/help/:slug"</span><span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">published_articles</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">cms</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">cms</span>
+    <span class="k">await</span> <span class="n">cms</span><span class="o">.</span><span class="n">_load_database</span><span class="p">()</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">cms</span><span class="o">.</span><span class="n">content_types</span><span class="p">[</span><span class="s2">"help_article"</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">articles</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"published"</span>
+    <span class="p">]</span>
+
+
+<span class="nd">@content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/articles"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_articles</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="k">await</span> <span class="n">published_articles</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">"slug"</span><span class="p">,</span> <span class="s2">"summary"</span><span class="p">)}</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">articles</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/articles/&lt;slug&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="k">await</span> <span class="n">published_articles</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">article</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span> <span class="o">==</span> <span class="n">slug</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="n">key</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">"slug"</span><span class="p">,</span> <span class="s2">"summary"</span><span class="p">,</span> <span class="s2">"body"</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+    <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span><span class="s2">"Article not found."</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-4-create-make-parent-folders-then-create-this-file-modulescontentuipageshelphtml">Step 4: CREATE - make parent folders, then create this file - modules/content/ui/pages/Help.html</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Help centre<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"loading"</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>Loading articles…<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"message"</span> <span class="na">role</span><span class="o">=</span><span class="s">"alert"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"!loading &amp;&amp; articles.length === 0"</span><span class="p">&gt;</span>No published articles yet.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"cards"</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">a</span>
+        <span class="na">v-for</span><span class="o">=</span><span class="s">"article in articles"</span>
+        <span class="na">:key</span><span class="o">=</span><span class="s">"article.id"</span>
+        <span class="na">:href</span><span class="o">=</span><span class="s">"'/help/' + article.slug"</span>
+        <span class="na">data-teloce-link</span>
+        <span class="na">class</span><span class="o">=</span><span class="s">"card"</span>
+        <span class="p">&gt;&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ article.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ article.summary }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">a</span>
+      <span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../../../../ui/api.ts"</span><span class="p">;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">articles</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nx">loading</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">mounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">articles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">(</span><span class="s2">"/api/content/articles"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">loading</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="o">*</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">box-sizing</span><span class="p">:</span><span class="w"> </span><span class="kc">border-box</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#1d4ed8</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">h1</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="nf">clamp</span><span class="p">(</span><span class="mf">1.8</span><span class="kt">rem</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="kt">vw</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="kt">rem</span><span class="p">);</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.15</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">h2</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">1.2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.6</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">"alert"</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#a21c2b</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.8</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-left</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">:</span><span class="nd">focus-visible</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">outline</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#f59e0b</span><span class="p">;</span>
+<span class="w">  </span><span class="k">outline-offset</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">card</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">block</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#d8e0ed</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">1.2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">inherit</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">cards</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="k">grid</span><span class="p">;</span>
+<span class="w">  </span><span class="k">grid-template-columns</span><span class="p">:</span><span class="w"> </span><span class="nf">repeat</span><span class="p">(</span><span class="kc">auto</span><span class="nv">-fit</span><span class="p">,</span><span class="w"> </span><span class="nf">minmax</span><span class="p">(</span><span class="nf">min</span><span class="p">(</span><span class="mi">100</span><span class="kt">%</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="kt">px</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="n">fr</span><span class="p">));</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<h2 id="step-5-create-make-parent-folders-then-create-this-file-modulescontentuipagesarticleslughtml">Step 5: CREATE - make parent folders, then create this file - modules/content/ui/pages/Article/[slug].html</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/help"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>← Help centre<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"loading"</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>Loading article…<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"message"</span> <span class="na">role</span><span class="o">=</span><span class="s">"alert"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"article"</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ article.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ article.summary }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"article-body"</span> <span class="na">v-html</span><span class="o">=</span><span class="s">"article.body"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"../../../../../ui/api.ts"</span><span class="p">;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">props</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"slug"</span><span class="p">],</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">article</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">loading</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">mounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">article</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">(</span>
+<span class="w">        </span><span class="s2">"/api/content/articles/"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">encodeURIComponent</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">slug</span><span class="p">),</span>
+<span class="w">      </span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">loading</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="o">*</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">box-sizing</span><span class="p">:</span><span class="w"> </span><span class="kc">border-box</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#1d4ed8</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">h1</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="nf">clamp</span><span class="p">(</span><span class="mf">1.8</span><span class="kt">rem</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="kt">vw</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="kt">rem</span><span class="p">);</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.15</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">h2</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">1.2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.6</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">"alert"</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#a21c2b</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.8</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-left</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">:</span><span class="nd">focus-visible</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">outline</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#f59e0b</span><span class="p">;</span>
+<span class="w">  </span><span class="k">outline-offset</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">article-body</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.6</span><span class="p">;</span>
+<span class="w">  </span><span class="k">overflow-wrap</span><span class="p">:</span><span class="w"> </span><span class="n">anywhere</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<h2 id="step-6-create-make-parent-folders-then-create-this-file-seedpy">Step 6: CREATE - make parent folders, then create this file - seed.py</h2>
+<p>Populate sample data explicitly after a customer exists; do not seed on every server start.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Idempotent sample content. Register your own user before running this command."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Project</span><span class="p">,</span> <span class="n">Task</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">seed</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Register an account before seeding sample projects."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">"Launch my portfolio"</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">"A small project to practise planning."</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">"Choose a design"</span><span class="p">,</span> <span class="s2">"done"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"Build the homepage"</span><span class="p">,</span> <span class="s2">"doing"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"Deploy the website"</span><span class="p">,</span> <span class="s2">"todo"</span><span class="p">),</span>
+            <span class="p">]:</span>
+                <span class="k">await</span> <span class="n">Task</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">content_types</span><span class="p">[</span><span class="s2">"help_article"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">articles</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+        <span class="n">articles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Getting started"</span><span class="p">,</span>
+                <span class="s2">"summary"</span><span class="p">:</span> <span class="s2">"Create a project, add tasks, and track progress."</span><span class="p">,</span>
+                <span class="s2">"body"</span><span class="p">:</span> <span class="s2">"&lt;p&gt;Open Projects, create a project, and add your first task. Move tasks from To do to Doing to Done.&lt;/p&gt;"</span><span class="p">,</span>
+                <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Sample projects, tasks, and help content are ready."</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-7-edit-replace-the-entire-file-uiapphtml">Step 7: EDIT - replace the entire file - ui/app.html</h2>
+<p>This is the SPA shell. Its internal anchors and router view cooperate with each module's page mappings.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"app-shell"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/"</span> <span class="na">data-teloce-link</span> <span class="na">class</span><span class="o">=</span><span class="s">"brand"</span><span class="p">&gt;</span>Project Manager<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">nav</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">"Main navigation"</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/projects"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Projects<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/help"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Help<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/login"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Account<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">main</span> <span class="na">id</span><span class="o">=</span><span class="s">"router-view"</span> <span class="na">data-teloce-router-view</span><span class="p">&gt;&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>Built with Flaxon and Teloce. <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/admin/"</span><span class="p">&gt;</span>Staff Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="c">/* Only the document reset is global: body is outside this component. */</span>
+<span class="p">:</span><span class="nd">global</span><span class="o">(</span><span class="nt">body</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">app-shell</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">min-height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">vh</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">system-ui</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#17243a</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#f3f6fc</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">header</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">justify-content</span><span class="p">:</span><span class="w"> </span><span class="kc">space-between</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">align-items</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">1.2</span><span class="kt">rem</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="kt">rem</span><span class="p">,</span><span class="w"> </span><span class="nb">calc</span><span class="p">(</span><span class="err">(</span><span class="mi">100</span><span class="kt">vw</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1080</span><span class="kt">px</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#17243a</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">header</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">brand</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">800</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">1.3</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">nav</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">flex-wrap</span><span class="p">:</span><span class="w"> </span><span class="kc">wrap</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">main</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">1080</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
+<span class="w">  </span><span class="k">min-height</span><span class="p">:</span><span class="w"> </span><span class="mi">75</span><span class="kt">vh</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="kt">rem</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">footer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#526079</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">footer</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#1d4ed8</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">:</span><span class="nd">focus-visible</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">outline</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#f59e0b</span><span class="p">;</span>
+<span class="w">  </span><span class="k">outline-offset</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">@</span><span class="k">media</span><span class="w"> </span><span class="o">(</span><span class="nt">max-width</span><span class="o">:</span><span class="w"> </span><span class="nt">520px</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">header</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">flex-direction</span><span class="p">:</span><span class="w"> </span><span class="kc">column</span><span class="p">;</span>
+<span class="w">    </span><span class="k">align-items</span><span class="p">:</span><span class="w"> </span><span class="kc">flex-start</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="nt">main</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<h2 id="step-8-edit-replace-the-entire-file-apppy">Step 8: EDIT - replace the entire file - app.py</h2>
+<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argon2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">backoffice</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_backoffice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.projects.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">projects</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.tasks.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.content.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">content</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+    <span class="n">DATA_DIR</span><span class="p">,</span>
+    <span class="n">DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">DEBUG</span><span class="p">,</span>
+    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="s2">"/api/projects"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="s2">"/api/tasks"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="s2">"/api/content"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+
+    <span class="n">configure_backoffice</span><span class="p">(</span>
+        <span class="n">app</span><span class="p">,</span>
+        <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
+        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"minifier"</span><span class="p">:</span> <span class="s2">"minifyjs"</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
+
+    <span class="c1"># Explicit shell routes preserve real 404 responses for unknown API paths.</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/login"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/projects"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/projects/&lt;int:project_id&gt;"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/help"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/help/&lt;slug&gt;"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">spa</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">"app.html"</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>seed
+<span class="c1"># Stop/restart the running server after seeding:</span>
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+<span class="c1"># Open /help and /admin/cms/.</span>
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>Run seed after registering a customer. /help lists the sample published article and the article page survives a refresh. Drafts remain absent from public responses.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Do not call authenticated CMS editing endpoints from public reader pages. Do not display arbitrary HTML using v-html. A draft editor also needs publishing permission to modify live content.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Create a draft in staff CMS, confirm it is hidden publicly, then publish it with a permitted staff account.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Publish sanitized help articles and show them through read-only public endpoints. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 13: CMS help and sample data"</span>
+</code></pre></div>
+<p><a href="12.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="14.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

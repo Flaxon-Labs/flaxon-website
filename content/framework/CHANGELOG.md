@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+- Project CLI: discover commands once, avoid importing project commands for new/version, flush setup messages, show environment progress and stop after a 120-second timeout with recovery instructions.
+- Admin/CMS: distinguish the ORM lifecycle object from legacy SQL adapters so generated ORM applications use their metadata store without page errors.
+- Documentation: shared settings/management/ORM workflow and a verified 15-chapter, complete-code project-manager ebook covering Teloce HTML, scoped CSS, signals, SPA routing, staff Admin/CMS and Render.
+
+
+## [0.2.7] — Unreleased
+
+- Bundle Alpine.js for essential Admin/CMS interactions.
+- Add permission-filtered relationship selectors, many-to-many forms, optional
+  child inlines, query scoping, field groups and custom widget templates.
+- Make ORM imports transactional, show field validation errors, reject stale ORM
+  edits, preview dependent deletion and enforce cascade delete permissions.
+- Add opt-in ORM Admin/CMS metadata storage with Python migrations and a
+  transactional legacy SQLite store copy command.
+
+- Integrate pinned Tortoise ORM through flaxon.db and shared typed settings.
+- Add model-driven Python migrations and project management commands; preserve legacy adapters/JSON runners.
+- Discover model/Admin metadata from explicitly mounted modules without frontend compilation in management mode.
+- Add ORM Admin CRUD, typed fields, bounded relationships, validation and project registry isolation.
+- Repair disabled-feature navigation and expired/shared-worker CSRF handling in new starters.
+- Enforce model/object permissions in global search, exports and bulk actions; redact credentials in snapshots.
+- Require CMS authentication by default and publishing rights across writes/imports/restores; support async authorization.
+
+
+## 2.6
+
 - Add synchronous and asynchronous module-owned starter commands, exposed through project CLI discovery.
 - Refresh the welcome page with an installation-success design, hosted Flaxon logo and website links, and a working Jinax page alongside Teloce. Explain both complete-app options in the generated README and getting-started guide.
 
@@ -9,7 +35,7 @@
 - Package the starter assets in Flaxon distributions and correct the generated Flaxon dependency name.
 - Add a canonical getting-started guide and a complete documentation directory.
 
-## Unreleased — Readable full-stack course
+## 2.6 — Readable full-stack course
 
 - Shorten the README around Python server and Teloce browser development, keeping the logo.
 - Split the full-stack course into ten numbered lesson files with navigation and API coverage maps.
@@ -17,7 +43,7 @@
 - Add compilation/API and browser tests for the Taskboard.
 
 
-## Unreleased — Full-stack page configuration
+## 2.6 — Full-stack page configuration
 
 - Add optional favicon, description, language, theme color, stylesheet and script settings to Teloce page shells.
 - Escape head values and validate resource schemes and supported attributes.
@@ -30,7 +56,7 @@ All notable changes to Flaxon will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.6]
 
 ### Teloce integration
 

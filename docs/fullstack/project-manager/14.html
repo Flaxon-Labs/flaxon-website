@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="14 | Full-stack verification — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>14 | Full-stack verification — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>14 | Full-stack verification</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/14.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/14.md" download>Markdown</a></p><h1 id="14-full-stack-verification">14 | Full-stack verification</h1>
+<h2 id="goal">Goal</h2>
+<p>Exercise customer, staff and CMS workflows in a real browser.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>API tests cannot prove form listeners, history navigation or mobile layout. The browser script starts a disposable server, seeds a temporary staff account and tests desktop and 390-pixel workflows. It checks registration, login, projects, tasks, progress, help, navigation, refresh and logout. Run it in development and production mode to test MinifyJS output. Use labels, status messages and alerts; also rehearse with the keyboard.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-teststest_backofficepy">Step 1: CREATE - make parent folders, then create this file - tests/test_backoffice.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span><span class="p">,</span> <span class="n">CMSField</span><span class="p">,</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">staff</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">permissions</span><span class="p">):</span>
+    <span class="n">admin</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">backoffice</span>
+    <span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">add_user</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"editor"</span><span class="p">,</span>
+            <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"EditorLearning123!"</span><span class="p">,</span>
+            <span class="s2">"roles"</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">"permissions"</span><span class="p">:</span> <span class="n">permissions</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">"editor"</span><span class="p">,</span> <span class="s2">"EditorLearning123!"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"cookie"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"session_id=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"x-csrf-token"</span><span class="p">:</span> <span class="n">admin</span><span class="o">.</span><span class="n">csrf_token</span><span class="p">()}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_public_content_hides_drafts_and_private_fields</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">content_types</span><span class="p">[</span><span class="s2">"help_article"</span><span class="p">]</span>
+    <span class="n">articles</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Hidden draft"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"draft"</span><span class="p">})</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">articles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Published guide"</span><span class="p">,</span>
+            <span class="s2">"body"</span><span class="p">:</span> <span class="s2">"&lt;p&gt;Safe&lt;/p&gt;&lt;script&gt;bad()&lt;/script&gt;"</span><span class="p">,</span>
+            <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/content/articles"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"Published guide"</span><span class="p">]</span>
+    <span class="n">detail</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/content/articles/"</span> <span class="o">+</span> <span class="n">item</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">])</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">"&lt;script&gt;"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">detail</span><span class="p">[</span><span class="s2">"body"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">"created_at"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">detail</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/content/articles/hidden-draft"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_application_accounts_do_not_have_staff_access</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/admin/cms/api/help_article/items"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_editor_can_write_drafts_but_cannot_publish</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">staff</span><span class="p">(</span>
+        <span class="n">application</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="s2">"help_article.view_help_article"</span><span class="p">,</span>
+            <span class="s2">"help_article.add_help_article"</span><span class="p">,</span>
+            <span class="s2">"help_article.change_help_article"</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"/admin/cms/api/help_article/items"</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Draft"</span><span class="p">},</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">201</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Forbidden"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/import/help_article"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">[{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Forbidden"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">}],</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_publisher_requires_csrf</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">staff</span><span class="p">(</span>
+        <span class="n">application</span><span class="p">,</span> <span class="p">[</span><span class="s2">"help_article.add_help_article"</span><span class="p">,</span> <span class="s2">"cms.publish_content"</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"/admin/cms/api/help_article/items"</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Published"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">201</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Missing token"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"cookie"</span><span class="p">:</span> <span class="n">headers</span><span class="p">[</span><span class="s2">"cookie"</span><span class="p">]},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">400</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_standalone_cms_is_closed_by_default</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"cms-test"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)]))</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Forbidden"</span><span class="p">})</span>
+        <span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_database_and_cms_survive_new_application_instance</span><span class="p">(</span>
+    <span class="n">application</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">tmp_path</span>
+<span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_app</span>
+
+    <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Persistent"</span><span class="p">})</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">content_types</span><span class="p">[</span><span class="s2">"help_article"</span><span class="p">]</span>
+    <span class="n">articles</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Persistent article"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">})</span>
+    <span class="n">application</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+    <span class="n">new_app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span>
+        <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"app.sqlite3"</span><span class="p">,</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"admin.sqlite3"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_project</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">new_app</span><span class="o">.</span><span class="n">db</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">())</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">assert</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">read_project</span><span class="p">())</span> <span class="o">==</span> <span class="s2">"Persistent"</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_app</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">content_types</span><span class="p">[</span><span class="s2">"help_article"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_staff_model_adapter_reads_domain_records_and_denies_ungranted_changes</span><span class="p">(</span>
+    <span class="n">application</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">account</span>
+<span class="p">):</span>
+    <span class="n">account</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Domain record"</span><span class="p">})</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">staff</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="p">[</span><span class="s2">"admin.view_dashboard"</span><span class="p">,</span> <span class="s2">"project.view_project"</span><span class="p">])</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/project"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="s2">"Domain record"</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/project/1/edit"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/admin/project/1/delete"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-teststest_cms_securitypy">Step 2: CREATE - make parent folders, then create this file - tests/test_cms_security.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminDashboard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span><span class="p">,</span> <span class="n">CMSField</span><span class="p">,</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_editor</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"cms-security"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
+        <span class="n">app</span><span class="p">,</span>
+        <span class="n">strict_permissions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">users</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"editor"</span><span class="p">,</span>
+                <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"Editor123!"</span><span class="p">,</span>
+                <span class="s2">"roles"</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">"permissions"</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">"article.view_article"</span><span class="p">,</span>
+                    <span class="s2">"article.add_article"</span><span class="p">,</span>
+                    <span class="s2">"article.change_article"</span><span class="p">,</span>
+                    <span class="s2">"cms.restore_revision"</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+        <span class="n">ContentType</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+    <span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">"editor"</span><span class="p">,</span> <span class="s2">"Editor123!"</span><span class="p">))</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"cookie"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"session_id=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"x-csrf-token"</span><span class="p">:</span> <span class="n">admin</span><span class="o">.</span><span class="n">csrf_token</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">),</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_standalone_cms_denies_anonymous_requests_by_default</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"closed-cms"</span><span class="p">)</span>
+    <span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">cms</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ContentType</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">CMSField</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)]))</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/admin/cms/api/article/items"</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Anonymous"</span><span class="p">}</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"approved"</span><span class="p">,</span> <span class="s2">"scheduled"</span><span class="p">,</span> <span class="s2">"published"</span><span class="p">])</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"method"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"create"</span><span class="p">,</span> <span class="s2">"update"</span><span class="p">,</span> <span class="s2">"import"</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_editor_cannot_publish_through_generic_write_paths</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">setup_editor</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Blocked"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"create"</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"update"</span><span class="p">:</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Draft"</span><span class="p">})</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"/admin/cms/api/article/items/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">item</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"draft"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/import/article"</span><span class="p">,</span> <span class="n">json_data</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+        <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">==</span> <span class="n">status</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_editor_cannot_restore_published_revision_or_edit_published_content</span><span class="p">():</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">setup_editor</span><span class="p">()</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Published"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">})</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"/admin/cms/api/article/items/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Changed"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+    <span class="n">content</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"draft"</span><span class="p">})</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"/admin/cms/api/article/items/</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">/restore/0"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">403</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">item</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"draft"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_draft_editing_and_publisher_creation_work_with_csrf</span><span class="p">():</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">setup_editor</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Draft"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">201</span>
+    <span class="p">)</span>
+    <span class="n">cms</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="s2">"editor"</span><span class="p">][</span><span class="s2">"permissions"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"cms.publish_content"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Published"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">201</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/admin/cms/api/article/items"</span><span class="p">,</span>
+            <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"No CSRF"</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"cookie"</span><span class="p">:</span> <span class="n">headers</span><span class="p">[</span><span class="s2">"cookie"</span><span class="p">]},</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="o">==</span> <span class="mi">400</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_import_authorization_is_checked_before_any_row_is_created</span><span class="p">():</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">setup_editor</span><span class="p">()</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="s2">"/admin/cms/api/import/article"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Draft"</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Forbidden"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"published"</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+    <span class="k">assert</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span> <span class="o">==</span> <span class="p">{}</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"action"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"publish"</span><span class="p">,</span> <span class="s2">"unpublish"</span><span class="p">,</span> <span class="s2">"custom"</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_actions_require_publisher_permission</span><span class="p">(</span><span class="n">action</span><span class="p">):</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">cms</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">setup_editor</span><span class="p">()</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Draft"</span><span class="p">})</span>
+    <span class="n">content</span><span class="o">.</span><span class="n">register_action</span><span class="p">(</span><span class="s2">"custom"</span><span class="p">,</span> <span class="s2">"Custom"</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"/admin/cms/api/article/actions/</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">json_data</span><span class="o">=</span><span class="p">{</span><span class="s2">"ids"</span><span class="p">:</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]},</span>
+        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-scriptsbrowser_smokepy">Step 3: CREATE - make parent folders, then create this file - scripts/browser_smoke.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Run desktop/mobile workflows against a fresh temporary database. No real user data."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.sync_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">sync_playwright</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">BASE</span> <span class="o">=</span> <span class="s2">"http://127.0.0.1:8123"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="n">production</span> <span class="o">=</span> <span class="s2">"--production"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
+            <span class="s2">"DATA_DIR"</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span>
+            <span class="s2">"FLAXON_ALLOWED_HOSTS"</span><span class="p">:</span> <span class="s2">"127.0.0.1"</span><span class="p">,</span>
+            <span class="s2">"FLAXON_DEBUG"</span><span class="p">:</span> <span class="s2">"0"</span> <span class="k">if</span> <span class="n">production</span> <span class="k">else</span> <span class="s2">"1"</span><span class="p">,</span>
+            <span class="s2">"PUBLIC_ORIGIN"</span><span class="p">:</span> <span class="n">BASE</span><span class="p">,</span>
+            <span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">:</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">48</span><span class="p">),</span>
+            <span class="s2">"COURSE_SMOKE_STAFF_PASSWORD"</span><span class="p">:</span> <span class="s2">"SmokeAa1!"</span> <span class="o">+</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"management.py"</span><span class="p">,</span> <span class="s2">"migrate"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="c1"># Bootstrap a staff account in the disposable Admin store before startup.</span>
+        <span class="n">bootstrap</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">import os</span>
+<span class="s2">from flaxon.admin.services import AdminAuth, AdminStore</span>
+<span class="s2">from settings import ADMIN_DATABASE_PATH</span>
+<span class="s2">store = AdminStore(str(ADMIN_DATABASE_PATH))</span>
+<span class="s2">auth = AdminAuth(users=[], store=store, strict_permissions=True)</span>
+<span class="s2">record = auth.add_user({'username': 'course-admin', 'password': os.environ['COURSE_SMOKE_STAFF_PASSWORD'], 'roles': ['administrator']})</span>
+<span class="s2">store.set('users', 'course-admin', record)</span>
+<span class="s2">"""</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-c"</span><span class="p">,</span> <span class="n">bootstrap</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"server.log"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"uvicorn"</span><span class="p">,</span> <span class="s2">"app:app"</span><span class="p">,</span> <span class="s2">"--port"</span><span class="p">,</span> <span class="s2">"8123"</span><span class="p">],</span>
+            <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">log</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">log</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">150</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span> <span class="n">trust_env</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">ConnectError</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Server failed to start"</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">sync_playwright</span><span class="p">()</span> <span class="k">as</span> <span class="n">playwright</span><span class="p">:</span>
+                <span class="n">browser</span> <span class="o">=</span> <span class="n">playwright</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">headless</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">staff_context</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+                <span class="n">staff_page</span> <span class="o">=</span> <span class="n">staff_context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/admin/login"</span><span class="p">)</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Username"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"course-admin"</span><span class="p">)</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Password"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                    <span class="n">env</span><span class="p">[</span><span class="s2">"COURSE_SMOKE_STAFF_PASSWORD"</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Sign in"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">wait_for_url</span><span class="p">(</span><span class="s2">"**/admin/"</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="p">(</span>
+                    <span class="n">staff_page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                        <span class="s2">"async () =&gt; (await fetch('/admin/project')).status"</span>
+                    <span class="p">)</span>
+                    <span class="o">==</span> <span class="mi">200</span>
+                <span class="p">)</span>
+                <span class="n">staff_page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/admin/cms/"</span><span class="p">)</span>
+                <span class="n">csrf</span> <span class="o">=</span> <span class="n">staff_page</span><span class="o">.</span><span class="n">locator</span><span class="p">(</span><span class="s1">'meta[name="csrf-token"]'</span><span class="p">)</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span>
+                    <span class="s2">"content"</span>
+                <span class="p">)</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">staff_page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+<span class="w">                    </span><span class="sd">"""async (csrf) =&gt; {</span>
+<span class="sd">                    const response = await fetch('/admin/cms/api/help_article/items', {</span>
+<span class="sd">                        method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},</span>
+<span class="sd">                        body: JSON.stringify({title: 'Browser help guide', summary: 'Published by staff', body: '&lt;p&gt;Safe help content.&lt;/p&gt;', status: 'published'})</span>
+<span class="sd">                    });</span>
+<span class="sd">                    return {status: response.status, body: await response.text()};</span>
+<span class="sd">                }"""</span><span class="p">,</span>
+                    <span class="n">csrf</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">assert</span> <span class="n">response</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">201</span><span class="p">,</span> <span class="n">response</span><span class="p">[</span><span class="s2">"body"</span><span class="p">]</span>
+                <span class="n">staff_context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"Staff Admin login and CMS publication passed"</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">width</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1440</span><span class="p">,</span> <span class="mi">390</span><span class="p">]:</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span>
+                        <span class="n">viewport</span><span class="o">=</span><span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">:</span> <span class="mi">900</span><span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+                    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">"pageerror"</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">error</span><span class="p">:</span> <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)))</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/login"</span><span class="p">)</span>
+                    <span class="n">register_button</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Register instead"</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">register_button</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                        <span class="s2">"element =&gt; getComputedStyle(element).backgroundColor"</span>
+                    <span class="p">)</span> <span class="o">==</span> <span class="s2">"rgb(228, 234, 245)"</span><span class="p">,</span> <span class="s2">"Login scoped secondary button style missing"</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                        <span class="s2">"getComputedStyle(document.body).margin === '0px'"</span>
+                    <span class="p">),</span> <span class="s2">"Shell document reset missing"</span>
+                    <span class="n">register_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Name"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"Course Learner"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Email"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"learner</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">@example.test"</span>
+                    <span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Password"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"SmokeAa1!"</span> <span class="o">+</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span>
+                        <span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Create account"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">page</span><span class="o">.</span><span class="n">wait_for_url</span><span class="p">(</span><span class="s2">"**/projects"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">"Browser errors:"</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">"URL:"</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">"Page:"</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">locator</span><span class="p">(</span><span class="s2">"body"</span><span class="p">)</span><span class="o">.</span><span class="n">inner_text</span><span class="p">())</span>
+                        <span class="k">raise</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Name"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"Browser project"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Description"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                        <span class="s2">"Verified in the browser"</span>
+                    <span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span>
+                        <span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Create project"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"link"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Browser project"</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span>
+                        <span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Browser project"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">add_task_button</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Add task"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">add_task_button</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                        <span class="s2">"element =&gt; getComputedStyle(element).backgroundColor"</span>
+                    <span class="p">)</span> <span class="o">==</span> <span class="s2">"rgb(37, 99, 235)"</span><span class="p">,</span> <span class="s2">"TaskForm must own its scoped button style"</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"""() =&gt; {</span>
+<span class="s2">                        const probe = document.createElement('button');</span>
+<span class="s2">                        probe.textContent = 'Unscoped probe';</span>
+<span class="s2">                        document.body.appendChild(probe);</span>
+<span class="s2">                        const colour = getComputedStyle(probe).backgroundColor;</span>
+<span class="s2">                        probe.remove();</span>
+<span class="s2">                        return colour !== 'rgb(37, 99, 235)';</span>
+<span class="s2">                    }"""</span><span class="p">),</span> <span class="s2">"Component button styles leaked outside their scope"</span>
+                    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="s1">'/assets/app.css'</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span>
+                        <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"performance.getEntriesByType('resource').map(entry =&gt; ({name: entry.name}))"</span><span class="p">)</span>
+                    <span class="p">),</span> <span class="s2">"The SPA must not load a shared app.css stylesheet"</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Task title"</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"Record the lesson"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Add task"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span><span class="s2">"Record the lesson"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Task status"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">select_option</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span><span class="s2">"100</span><span class="si">% c</span><span class="s2">omplete"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">screenshot_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"COURSE_SCREENSHOT_DIR"</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">screenshot_dir</span><span class="p">:</span>
+                        <span class="n">Path</span><span class="p">(</span><span class="n">screenshot_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">page</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">screenshot_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"project-</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">.png"</span><span class="p">),</span> <span class="n">full_page</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Filter tasks"</span><span class="p">)</span><span class="o">.</span><span class="n">select_option</span><span class="p">(</span><span class="s2">"todo"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span>
+                        <span class="s2">"No tasks match this filter."</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Filter tasks"</span><span class="p">)</span><span class="o">.</span><span class="n">select_option</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"window.courseNavigationMarker = 42"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"link"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Help"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Help centre"</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="k">assert</span> <span class="p">(</span>
+                        <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"window.courseNavigationMarker"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">42</span>
+                    <span class="p">),</span> <span class="s2">"SPA link reloaded the document"</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"link"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Browser help guide"</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span>
+                        <span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Browser help guide"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span><span class="s2">"Safe help content."</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">go_back</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Help centre"</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">go_back</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span>
+                        <span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Browser project"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span><span class="s2">"100</span><span class="si">% c</span><span class="s2">omplete"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                        <span class="s2">"document.documentElement.scrollWidth &lt;= innerWidth"</span>
+                    <span class="p">),</span> <span class="s2">"Mobile overflow"</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"link"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Account"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Sign out"</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">get_by_text</span><span class="p">(</span><span class="s2">"Signed out."</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">wait_for</span><span class="p">()</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/api/projects/"</span><span class="p">)</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">401</span>
+                    <span class="k">assert</span> <span class="ow">not</span> <span class="n">errors</span><span class="p">,</span> <span class="n">errors</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Production MinifyJS'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">production</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'Development'</span><span class="si">}</span><span class="s2"> browser workflow passed at </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">px"</span>
+                    <span class="p">)</span>
+                <span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q
+python<span class="w"> </span>scripts/browser_smoke.py
+python<span class="w"> </span>scripts/browser_smoke.py<span class="w"> </span>--production
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>All application tests and both browser modes pass. Test data stays outside your learner database. No browser console errors occur in the verified workflow.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Install Chromium before Playwright. Stop other servers using port 8123. Loopback production smoke verifies assets and behavior, not cloud infrastructure or TLS.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Complete the workflow using only the keyboard and check one layout change at both desktop and mobile sizes.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Exercise customer, staff and CMS workflows in a real browser. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 14: Full-stack verification"</span>
+</code></pre></div>
+<p><a href="13.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="15.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

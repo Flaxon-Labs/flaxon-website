@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="05 | Owned project APIs — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>05 | Owned project APIs — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>05 | Owned project APIs</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/05.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/05.md" download>Markdown</a></p><h1 id="05-owned-project-apis">05 | Owned project APIs</h1>
+<h2 id="goal">Goal</h2>
+<p>Create, list, read, update and delete projects belonging to the signed-in customer.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>owned_project combines the requested ID with the authenticated owner's ID in the ORM query. Every detail, edit and delete uses that guard. Creation takes owner_id from the session rather than accepting it from JSON. list_projects filters before returning rows. A nonexistent project and another person's project both return 404. The small HTTP demo establishes cookies and CSRF automatically, registers an account and exercises a working project endpoint.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-modulesprojectsinitpy">Step 1: CREATE - make parent folders, then create this file - modules/projects/<strong>init</strong>.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Module-owned APIs and interface files."""</span>
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-modulesprojectsmodulepy">Step 2: CREATE - make parent folders, then create this file - modules/projects/module.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Project APIs always constrain queries by the signed-in user's id."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">security</span><span class="w"> </span><span class="kn">import</span> <span class="n">require_user</span><span class="p">,</span> <span class="n">check_csrf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">json_object</span><span class="p">,</span> <span class="n">text</span>
+
+<span class="n">projects</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span>
+    <span class="s2">"projects"</span><span class="p">,</span>
+    <span class="n">ui_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"ui"</span><span class="p">,</span>
+    <span class="n">ui_routes</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"ProjectList.js"</span><span class="p">:</span> <span class="s2">"/projects"</span><span class="p">,</span>
+        <span class="s2">"ProjectDetails/[id].js"</span><span class="p">:</span> <span class="s2">"/projects/:id"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">require_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span><span class="s2">"Project not found."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">project</span>
+
+
+<span class="nd">@projects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_projects</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">require_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">"-id"</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="n">items</span><span class="p">}</span>
+
+
+<span class="nd">@projects</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_project</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">require_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">json_object</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+    <span class="p">)</span>
+    <span class="n">project_id</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="k">await</span> <span class="n">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)},</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">201</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@projects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/&lt;int:project_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="k">await</span> <span class="n">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)}</span>
+
+
+<span class="nd">@projects</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"/&lt;int:project_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">json_object</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">project</span><span class="p">[</span><span class="s2">"owner_id"</span><span class="p">])</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="k">await</span> <span class="n">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)}</span>
+
+
+<span class="nd">@projects</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/&lt;int:project_id&gt;"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">check_csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">owned_project</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">project</span><span class="p">[</span><span class="s2">"owner_id"</span><span class="p">])</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"deleted"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-scriptscourse_api_demopy">Step 3: CREATE - make parent folders, then create this file - scripts/course_api_demo.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Show the project API over HTTP; start the development server first."""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Each run creates its own learner and project in your development database.</span>
+    <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="s2">"http://127.0.0.1:8000"</span><span class="p">,</span> <span class="n">trust_env</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/api/auth/session"</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">csrf</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"csrf"</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/api/auth/register"</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"X-CSRF-Token"</span><span class="p">:</span> <span class="n">csrf</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Sample Learner"</span><span class="p">,</span> <span class="s2">"email"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"sample-</span><span class="si">{</span><span class="n">secrets</span><span class="o">.</span><span class="n">token_hex</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="si">}</span><span class="s2">@example.test"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"LearningPython123!"</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">csrf</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"csrf"</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"X-CSRF-Token"</span><span class="p">:</span> <span class="n">csrf</span><span class="p">},</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"My first project"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Record the sample lesson"</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Created:"</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/projects/</span><span class="si">{</span><span class="n">project</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Read:"</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/projects/"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"X-CSRF-Token"</span><span class="p">:</span> <span class="n">csrf</span><span class="p">},</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">" "</span><span class="p">})</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Invalid input rejected:"</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Use your own browser account to create a separate project on /projects."</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="step-4-edit-replace-the-entire-file-apppy">Step 4: EDIT - replace the entire file - app.py</h2>
+<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">argon2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.projects.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">projects</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+    <span class="n">DATA_DIR</span><span class="p">,</span>
+    <span class="n">DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+    <span class="n">DEBUG</span><span class="p">,</span>
+    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="s2">"/api/projects"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Backend lesson ready. The SPA starts in chapter 8."</span><span class="p">}}</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
+<span class="c1"># In a second terminal:</span>
+python<span class="w"> </span>scripts/course_api_demo.py
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>The HTTP demo creates a project and reads it back. Projects return a data envelope with the owner, name and description. A second customer's request cannot retrieve it.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Do not repeat /api/projects inside decorators: app.py supplies that mount prefix. Use a trailing slash for the list/create endpoint. A 401 means no valid customer session; 404 after sign-in can be an ownership denial.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Extend the demo to update a project's description and assert the read response changed.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Create, list, read, update and delete projects belonging to the signed-in customer. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 05: Owned project APIs"</span>
+</code></pre></div>
+<p><a href="04.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="06.html">Next</a></p></article>
+</main></div><div id="footer"></div></body></html>

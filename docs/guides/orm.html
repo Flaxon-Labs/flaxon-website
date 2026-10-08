@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Models, settings, and management commands — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Models, settings, and management commands — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Models, settings, and management commands</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
+<p>Flaxon 0.2.7 integrates Tortoise ORM 1.1.7. <code>flaxon.db</code> exports its models, fields,
+and transaction helpers. Existing <code>flaxon.database</code> adapters and JSON migration
+runners remain available for existing applications; new full-stack starters use
+Python migrations.</p>
+<h2 id="start-a-project">Start a project</h2>
+<p>Install this release from the repository until it is published to PyPI:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard,admin]"</span>
+flaxon<span class="w"> </span>new<span class="w"> </span>project_manager
+<span class="nb">cd</span><span class="w"> </span>project_manager
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+python<span class="w"> </span>management.py<span class="w"> </span>check
+python<span class="w"> </span>management.py<span class="w"> </span>makemigrations
+python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--plan
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<p>The CLI creates <code>.venv</code>; activate it before installing your generated project.
+<code>flaxon run app:app --reload</code> continues to work. <code>runserver</code> is a development
+command; use an ASGI server without reload for production.</p>
+<h2 id="file-responsibilities">File responsibilities</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>settings.py</code></td>
+<td>Paths, database URL, security, enabled Admin/CMS features</td>
+</tr>
+<tr>
+<td><code>app.py</code></td>
+<td>Create the application and explicitly mount modules</td>
+</tr>
+<tr>
+<td><code>models.py</code></td>
+<td>Root project models</td>
+</tr>
+<tr>
+<td><code>admin.py</code></td>
+<td><code>register(admin)</code> explicitly registers editable models</td>
+</tr>
+<tr>
+<td><code>management.py</code></td>
+<td>Small entry point to Flaxon's management command system</td>
+</tr>
+<tr>
+<td><code>migrations/</code></td>
+<td>Generated, version-controlled Python migration files</td>
+</tr>
+</tbody>
+</table>
+<p>There is no module mount list in settings. The same mounts in <code>app.py</code> are used
+by the web server and management commands. The starter's management mode skips
+Jinax/Teloce setup and AdminStore construction; model discovery doesn't compile
+JavaScript or connect to the database.</p>
+<h2 id="settings">Settings</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">env</span>
+
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">env</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">".env"</span><span class="p">)</span>
+<span class="n">PROJECT_NAME</span> <span class="o">=</span> <span class="s2">"project_manager"</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">bool</span><span class="p">(</span><span class="s2">"FLAXON_DEBUG"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">)</span>
+<span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">"DATABASE_URL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">BASE_DIR</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'data/app.sqlite3'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">"FLAXON_ALLOWED_HOSTS"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">"localhost"</span><span class="p">,</span> <span class="s2">"127.0.0.1"</span><span class="p">])</span>
+<span class="n">CSRF_TRUSTED_ORIGINS</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">"FLAXON_CSRF_TRUSTED_ORIGINS"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s2">"UTC"</span>
+<span class="n">ADMIN_ENABLED</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">CMS_ENABLED</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">ADMIN_SERVICES_ENABLED</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">ADMIN_STORAGE_PATH</span> <span class="o">=</span> <span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">"data/admin.sqlite3"</span>
+</code></pre></div>
+<p>Environment variables take precedence over <code>.env</code>. Booleans accept true/false,
+yes/no, on/off, and 1/0; other values fail clearly. Lists are comma-separated.
+Use absolute SQLite paths so commands run from any directory select the same DB.
+Production (<code>DEBUG=False</code>) requires a persistent secret of at least 32 characters
+and explicit hosts. Trusted CSRF origins include the scheme and host, without a
+path. UTC and timezone-aware ORM timestamps are the default.</p>
+<p>For PostgreSQL, install <code>flaxon[postgres]</code> and set a Tortoise-compatible URL:
+<code>postgres://USER:URL_ENCODED_PASSWORD@HOST:5432/DATABASE</code>. The starter's staff and
+CMS metadata use SQLite by default. To put them in the same ORM database, set
+<code>ADMIN_STORE_BACKEND = "orm"</code> before generating and applying migrations.
+The existing PostgreSQLAdminStore remains available for manually configured apps.
+Changing the domain ORM URL does not automatically migrate Admin metadata.</p>
+<h2 id="models-and-queries">Models and queries</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">fields</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Project</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DatetimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Launch the website"</span><span class="p">)</span>
+<span class="n">projects</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name__icontains</span><span class="o">=</span><span class="s2">"website"</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">"-created_at"</span><span class="p">)</span>
+<span class="n">project</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Launch the portfolio"</span>
+<span class="k">await</span> <span class="n">project</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+<p>Queries run in Flaxon's application-local ORM context during HTTP/WebSocket
+requests. For standalone async work, use <code>async with app.db:</code>. Do not use a
+process-global Tortoise fallback to share connections across applications.</p>
+<h2 id="module-owned-models">Module-owned models</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlaxonModule</span>
+
+<span class="n">projects</span> <span class="o">=</span> <span class="n">FlaxonModule</span><span class="p">(</span>
+    <span class="s2">"projects"</span><span class="p">,</span>
+    <span class="n">models_module</span><span class="o">=</span><span class="s2">"modules.projects.models"</span><span class="p">,</span>
+    <span class="n">admin_module</span><span class="o">=</span><span class="s2">"modules.projects.admin"</span><span class="p">,</span>
+    <span class="n">migrations_module</span><span class="o">=</span><span class="s2">"modules.projects.migrations"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Mount explicitly in <code>app.py</code> after <code>Flaxon.from_settings()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"/api/projects"</span><span class="p">)</span>
+</code></pre></div>
+<p>The migrations path defaults to the model package's <code>migrations</code> package.
+<code>admin_module</code> defaults to a sibling <code>admin.py</code> if present. Module names are ORM
+app labels and must be unique. Root models use the <code>models</code> label. Relations use
+these labels, e.g. <code>fields.ForeignKeyField("models.Project")</code>.</p>
+<h2 id="admin-registration">Admin registration</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">admin</span><span class="p">):</span>
+    <span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Project</span><span class="p">,</span> <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="n">ordering</span><span class="o">=</span><span class="p">[</span><span class="s2">"-created_at"</span><span class="p">])</span>
+</code></pre></div>
+<p>Call <code>configure_admin(app)</code> after mounting modules in the non-management branch
+of your factory. It creates a project-local registry, strict permissions, durable
+staff accounts, optional CMS, and session-bound CSRF. Only registered models are
+exposed. Primary keys and automatic timestamps are read-only. Forms derive basic
+types, required flags and length limits from ORM fields. Foreign keys use a
+permission-filtered choice list up to 100 related records, otherwise a searchable
+paginated selector. Many-to-many fields receive multiple-selection controls.
+Related models must be explicitly registered; both displayed choices and submitted
+IDs obey their model/object permissions. Model validation remains authoritative.</p>
+<h2 id="management-commands">Management commands</h2>
+<ul>
+<li><code>check</code>: validate settings, discover models, and validate Admin registrations.</li>
+<li><code>makemigrations [LABEL] --name DESCRIPTION</code>: generate Python migrations.</li>
+<li><code>makemigrations LABEL --empty</code>: scaffold a data/custom migration.</li>
+<li><code>migrate [LABEL [MIGRATION]]</code>: apply migrations or target a prior migration.</li>
+<li><code>migrate --status</code>: show applied migration history.</li>
+<li><code>migrate --plan</code>: show pending operations without applying them.</li>
+<li><code>sqlmigrate LABEL MIGRATION</code>: inspect the generated SQL.</li>
+<li><code>setup-admin</code> / <code>createsuperuser</code>: prompt for a staff account and hidden password.</li>
+<li><code>shell</code>: Tortoise's ORM-aware shell; install <code>tortoise-orm[ipython]</code> first.</li>
+<li><code>runserver</code>: development server; accepts <code>--host</code>, <code>--port</code>, <code>--no-reload</code>.</li>
+<li>Module commands remain available through <code>flaxon_cli.py</code>, e.g. <code>welcome</code>.</li>
+</ul>
+<p>Commit migration files. Review generated operations before deployment. Server
+startup opens connections, not tables; it never runs migrations automatically.
+Application-auth accounts and staff Admin accounts are separate concerns.</p>
+<h2 id="existing-json-migrations">Existing JSON migrations</h2>
+<p>Do not delete JSON history or run a new initial migration against populated
+legacy tables. Back up the database, keep the legacy runner operational, and
+compare model-generated schema with the existing schema in a disposable clone.
+A matching existing schema can be baselined with Tortoise's <code>migrate --fake</code>
+after review; use the Tortoise CLI with an explicitly exported ORM configuration
+for that advanced operation. The default Flaxon wrapper does not offer fake
+migration flags. Test subsequent migration/rollback and restore before switching
+production. There is no automatic data conversion or assumption that the old
+<code>migrations</code> tracking table means the new ORM migration has been applied.</p>
+<h2 id="admin-hardening-and-compatibility">Admin hardening and compatibility</h2>
+<p>The starter uses <code>strict_permissions=True</code> and <code>session_bound_csrf=True</code>.
+Existing manual AdminDashboard setups retain legacy defaults for compatibility;
+opt into those settings and use a shared persistent SECRET_KEY across workers.
+Always fetch a fresh CSRF token after sign-in; pre-login tokens are not valid for
+the authenticated session. Configured browser Origins are enforced on mutations.
+CSRF protection does not authorize a user: model and object rules are enforced
+separately on search, export, edit, delete, and bulk actions.</p>
+<p>CMS editing requires authentication by default. Explicit <code>allow_unauthenticated</code>
+is only for deliberately public/demonstration setups. A standalone authenticated
+CMS without AdminDashboard must supply its own CSRF protector. Publication rights
+are checked for edits to live content, imports, scheduling, and restoration.</p>
+<p>ORM lists use database pagination. Legacy custom <code>get_instances()</code> adapters and
+Python object-permission hooks may still scan records in memory; large or
+multi-tenant datasets need scoped database adapters. Audit/export/search snapshots
+redact credential-like keys. This is targeted hardening, not a complete security
+certification or parity claim with Django Admin.</p>
+<h2 id="simple-admin-customization">Simple Admin customization</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span><span class="p">,</span> <span class="n">Task</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">admin</span><span class="p">):</span>
+    <span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+        <span class="n">Project</span><span class="p">,</span>
+        <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+        <span class="n">fieldsets</span><span class="o">=</span><span class="p">{</span><span class="s2">"Details"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">]},</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="k">lambda</span> <span class="n">user</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+        <span class="n">inlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"tasks"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"model"</span><span class="p">:</span> <span class="n">Task</span><span class="p">,</span> <span class="s2">"fk"</span><span class="p">:</span> <span class="s2">"project_id"</span><span class="p">}},</span>
+    <span class="p">)</span>
+    <span class="n">admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">search_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"title"</span><span class="p">])</span>
+</code></pre></div>
+<p><code>queryset(user, query)</code> scopes the base ORM query for lists, lookups, relationship
+choices, search and export. Return a QuerySet; an async function may return one.
+Use it for tenant/ownership filtering. Optional <code>can_view</code>, <code>can_add</code>,
+<code>can_change</code>, and <code>can_delete</code> hooks provide additional business rules. Python
+object hooks filter before pagination, giving correct counts, but may scan
+records; the query hook avoids that cost for large tables.</p>
+<p><code>fieldsets</code> inserts named headings before the first configured field. Existing
+<code>fields</code> still controls order. <code>widgets={"body": "admin/widgets/body.html"}</code>
+selects a trusted Jinax template for a field; templates receive <code>field_name</code>,
+<code>schema</code>, and <code>current_value</code>. Never derive template names from request input.</p>
+<p>Inlines edit registered child models within a parent form. <code>fk</code> names the child's
+foreign-key ID column. Each operation enforces the child's create/change/delete
+permission and hook, and existing children must belong to that parent. Parent
+and child changes share a transaction. Forms support at most 100 children and
+200 many-to-many selections; larger workflows should use the separate model
+list. Inline fields currently use scalar inputs; complex child editors can use a
+custom Admin view. Custom business side effects must run after a successful
+transaction; database rollback cannot undo email or external service calls.</p>
+<p>Validation errors preserve submitted scalar values and display field errors.
+Unique/relationship conflicts remain explicit 409 responses. ORM edit forms
+include a fingerprint of the record; stale or missing versions cannot overwrite
+newer changes. Atomic conditional writes protect against concurrent saves,
+including models without <code>updated_at</code>. The fingerprint includes many-to-many selections. Inline existing-child saves
+carry child versions.</p>
+<p>Deletion confirmation shows direct dependent counts and database deletion rules.
+Cascade deletion additionally checks registered dependent-model and object delete
+permissions recursively. Protected relationships produce a readable conflict.</p>
+<p>ORM imports are atomic by default. <code>?allow_partial=true</code> gives each row its own
+transaction and reports the actual successful count; external side effects remain
+the application's responsibility. Import preview runs the configured import
+validator; database constraints are checked when applying the import.</p>
+<h2 id="orm-backed-admincms-metadata">ORM-backed Admin/CMS metadata</h2>
+<p>Opt in through <code>settings.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ADMIN_STORE_BACKEND</span> <span class="o">=</span> <span class="s2">"orm"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>makemigrations
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+</code></pre></div>
+<p>Flaxon adds the <code>flaxon_admin</code> model label and generated <code>admin_migrations/</code>
+package. Commit those Python migrations. This stores staff records, sessions,
+CMS metadata, audit metadata and operations through the ORM in <code>DATABASE_URL</code>.
+No Admin table is created silently on server startup. The store preserves the
+existing synchronous service contract using a dedicated thread/event loop with
+separate ORM connections; calls are synchronous and are not a nonblocking
+request API. Media file bytes still need persistent filesystem or object storage.</p>
+<p>To move an existing SQLite store, stop all writers, back up both databases,
+apply the ORM migrations, and copy into an <strong>empty destination</strong>:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>migrate-admin-store<span class="w"> </span>/absolute/path/to/admin.sqlite3
+</code></pre></div>
+<p>The copy is transactional, preserves operation timestamps, refuses a nonempty
+destination, and leaves the source unchanged. Test sign-in, CMS records, sessions
+and audit history before switching production traffic. Retain the source backup
+for rollback. Changing the setting by itself does not copy existing records.</p>
+<p>Admin bundles Alpine.js 3.14.3 with its MIT license so the CMS and core Admin
+interactions do not require downloading that runtime from a CDN. Cosmetic fonts,
+icons and Tailwind enhancements still reference external assets. Browser
+regression tests block those external requests and exercise the local controls.</p>
+<h2 id="admincms-and-database-adapters">Admin/CMS and database adapters</h2>
+<p>The ORM lifecycle object at <code>app.db</code> is not the older SQL adapter interface.
+Admin and CMS use their durable AdminStore by default; they only automatically
+use a legacy database object implementing both <code>execute()</code> and <code>fetch_all()</code>.
+Choose <code>ADMIN_STORE_BACKEND = "orm"</code> explicitly to store metadata through the ORM.
+Do not pass the lifecycle object as <code>database=</code> to AdminDashboard or CMS.</p></article>
+</main></div><div id="footer"></div></body></html>

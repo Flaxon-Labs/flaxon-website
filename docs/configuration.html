@@ -12,7 +12,42 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Configuration</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/configuration.md">Framework source</a> · <a href="../content/framework/docs/configuration.md" download>Markdown</a></p><h1 id="configuration">Configuration</h1>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/configuration.md">Framework source</a> · <a href="../content/framework/docs/configuration.md" download>Markdown</a></p><h1 id="configuration">Configuration</h1>
+<h2 id="generated-projects-settingspy">Generated projects: settings.py</h2>
+<p>Use <code>Flaxon.from_settings("settings")</code> in <code>app.py</code>. Both the application and
+<code>management.py</code> read this same module. <code>env.load()</code> reads <code>.env</code>; existing process
+environment variables take precedence. Only values read with <code>env.str()</code>,
+<code>env.bool()</code>, or <code>env.list()</code> are taken from the environment in this workflow.
+Do not assume every setting automatically maps to a <code>FLAXON_</code> variable.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">env</span>
+
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">env</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">".env"</span><span class="p">)</span>
+<span class="n">PROJECT_NAME</span> <span class="o">=</span> <span class="s2">"project_manager"</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">bool</span><span class="p">(</span><span class="s2">"FLAXON_DEBUG"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">)</span>
+<span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">"DATABASE_URL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">BASE_DIR</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'data/app.sqlite3'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">"FLAXON_ALLOWED_HOSTS"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">"localhost"</span><span class="p">,</span> <span class="s2">"127.0.0.1"</span><span class="p">])</span>
+<span class="n">CSRF_TRUSTED_ORIGINS</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">"FLAXON_CSRF_TRUSTED_ORIGINS"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s2">"UTC"</span>
+<span class="n">ADMIN_ENABLED</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">CMS_ENABLED</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">ADMIN_SERVICES_ENABLED</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">ADMIN_STORE_BACKEND</span> <span class="o">=</span> <span class="s2">"sqlite"</span>
+<span class="n">ADMIN_STORAGE_PATH</span> <span class="o">=</span> <span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">"data/admin.sqlite3"</span>
+</code></pre></div>
+<p><code>DEBUG=False</code> requires a persistent secret of at least 32 characters and explicit
+allowed hosts. Origins include the scheme and host, without a path. Starting the
+server opens connections and never changes the model schema. Run <code>makemigrations</code>,
+review and commit Python migrations, then run <code>migrate</code>.</p>
+<p>Use <code>app.settings</code> for validated project settings. Mount feature modules explicitly
+in <code>app.py</code>; do not put executable module composition in <code>settings.py</code>.</p>
+<p>See <a href="guides/orm.html">ORM and management</a> for PostgreSQL, model discovery, transactions,
+Admin registration and the optional ORM metadata store.</p>
+<h2 id="lower-level-configuration">Lower-level configuration</h2>
+<p>The sections below describe the independent <code>Flaxon(...)</code> / <code>Config</code> API, retained
+for backend-only applications. They do not replace the generated settings workflow.</p>
 <h2 id="overview">Overview</h2>
 <p>Flaxon provides a flexible configuration system designed for development and production environments.</p>
 <p>Configuration values can be loaded from multiple sources, allowing you to keep sensitive settings outside your source code while still providing sensible defaults.</p>

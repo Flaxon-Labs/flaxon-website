@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="15 | Production build and Render — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>15 | Production build and Render — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>15 | Production build and Render</span></nav>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/fullstack/project-manager/15.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/15.md" download>Markdown</a></p><h1 id="15-production-build-and-render">15 | Production build and Render</h1>
+<h2 id="goal">Goal</h2>
+<p>Build optimized assets and deploy one persistent application instance.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>The Blueprint installs pinned dependencies and builds Teloce with MinifyJS. The start command applies committed Python migrations, then starts one Uvicorn worker. SQLite and staff/CMS data live under /var/data on a paid persistent disk. Render's build and pre-deploy processes cannot access that disk, which is why this design migrates at startup. Set PUBLIC_ORIGIN to your exact HTTPS service URL, DEBUG to false and a persistent generated secret. This course deliberately uses one instance: scaling needs a shared database, sessions, media and CMS coordination strategy.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-envexample">Step 1: CREATE - make parent folders, then create this file - .env.example</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code>FLAXON_DEBUG=1
+PUBLIC_ORIGIN=http://127.0.0.1:8000
+# Production: FLAXON_DEBUG=0, PUBLIC_ORIGIN=https://your-app.onrender.com
+# Render persistent disk mount: DATA_DIR=/var/data
+# Generate with: python -c "import secrets; print(secrets.token_urlsafe(48))"
+FLAXON_SECRET_KEY=
+</code></pre></div>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-scriptsbuild_uipy">Step 2: CREATE - make parent folders, then create this file - scripts/build_ui.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Build production Teloce assets without touching the live database or Render disk."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">build_data</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"DATA_DIR"</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_data</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_DEBUG"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"0"</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">,</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">teloce</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'compiled'</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2"> Teloce components with MinifyJS."</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="step-3-create-make-parent-folders-then-create-this-file-renderyaml">Step 3: CREATE - make parent folders, then create this file - render.yaml</h2>
+<p>This is the complete single-instance deployment definition. Supply the service-specific HTTPS origin in Render.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flaxon-project-manager</span>
+<span class="w">    </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">    </span><span class="nt">plan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">starter</span>
+<span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python scripts/verify_vendor.py &amp;&amp; pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
+<span class="w">    </span><span class="nt">startCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python management.py migrate &amp;&amp; python -m uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1</span>
+<span class="w">    </span><span class="nt">healthCheckPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/health/course</span>
+<span class="w">    </span><span class="nt">disk</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">project-manager-data</span>
+<span class="w">      </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/data</span>
+<span class="w">      </span><span class="nt">sizeGB</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">envVars</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PYTHON_VERSION</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"3.12.14"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLAXON_DEBUG</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"0"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLAXON_SECRET_KEY</span>
+<span class="w">        </span><span class="nt">generateValue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DATA_DIR</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/data</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PUBLIC_ORIGIN</span>
+<span class="w">        </span><span class="nt">sync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/build_ui.py
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>check
+</code></pre></div>
+<h2 id="deploy-the-completed-project">Deploy the completed project</h2>
+<ol>
+<li>Stop the local server. Run all tests and both browser checks from chapter 14. Run the production build above.</li>
+<li>Commit your Python migrations, application files, vendor wheels and requirements. Keep .env, data, cookie jars and local virtual environments out of Git. Push the project to your GitHub repository.</li>
+<li>In Render, choose New &gt; Blueprint, connect your repository and select the branch containing render.yaml. Review the paid service and persistent disk before deploying.</li>
+<li>Supply PUBLIC_ORIGIN as the exact https://SERVICE.onrender.com address (or your configured HTTPS domain). Keep FLAXON_DEBUG=0, DATA_DIR=/var/data and the generated persistent secret. Python is pinned by the Blueprint.</li>
+<li>Deploy and inspect logs: migrations must complete before Uvicorn listens. Do not move SQLite migrations to a pre-deploy command; that process cannot access the attached disk.</li>
+<li>In the service Shell run python management.py setup-admin and enter staff credentials interactively. Never commit a staff password.</li>
+<li>Visit /health/course, then register a customer, create a project and task, sign into staff Admin and publish a help article. Refresh /projects/ID and /help/SLUG. Sign out and check protected API requests are rejected.</li>
+<li>Restart the service and confirm both the project and help article survive. Inspect browser cookies over HTTPS for Secure and HttpOnly. Back up data and uploads before upgrades.</li>
+</ol>
+<p>Official deployment references, checked October 2026: <a href="https://render.com/docs/blueprint-spec">Render Blueprints</a>, <a href="https://render.com/docs/disks">persistent disks</a>, <a href="https://render.com/docs/deploys">deployment lifecycle</a>, and <a href="https://render.com/docs/python-version">Python versions</a>. This book supplies deployable configuration; it does not claim a deployment has been made in your account.</p>
+<h2 id="expected-result">Expected result</h2>
+<p>After deployment, /health/course returns ok. Create a project/task, publish an article, refresh a nested route, sign out and restart the service. Customer and staff data survive; cookies use Secure and HttpOnly.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Free Render services cannot attach this persistent disk. Do not generate new migration files during deployment: commit them beforehand. An incorrect PUBLIC_ORIGIN causes CSRF failures. An ephemeral database loses records on restart. Production deployment must be verified in your account; local smoke is not proof of a live deployment.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Back up both SQLite files safely, restore them into a test environment and verify a project plus one published help article.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Build optimized assets and deploy one persistent application instance. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 15: Production build and Render"</span>
+</code></pre></div>
+<p><a href="14.html">Previous</a> | <a href="index.html">Course contents</a></p></article>
+</main></div><div id="footer"></div></body></html>

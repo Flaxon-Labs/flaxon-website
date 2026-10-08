@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>CLI Reference</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/Flaxon-Labs/flaxon/blob/0c411ded6340a8f95deb8cc6ebba6ddd7d29ee34/docs/lessons/Cli.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Cli.md" download>Markdown</a></p><h1 id="cli-reference">CLI Reference</h1>
+<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/lessons/Cli.md">Framework source</a> · <a href="../../content/framework/docs/lessons/Cli.md" download>Markdown</a></p><h1 id="cli-reference">CLI Reference</h1>
 <p>The <code>flaxon</code> command is installed automatically with the framework. Every command that takes an <code>application</code> argument expects it in <code>module:variable</code> form — the Python file (without <code>.py</code>) before the colon, the <code>Flaxon(...)</code> instance's variable name after it. Run these from the directory containing that file, or the app won't be importable.</p>
 <div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>--help<span class="w">          </span><span class="c1"># list every command</span>
 flaxon<span class="w"> </span>--version<span class="w">       </span><span class="c1"># show the installed Flaxon version</span>
@@ -81,7 +81,7 @@ Result:<span class="w"> </span><span class="m">1</span><span class="w"> </span>w
 <p><code>--fix</code> attempts automatic fixes for what it finds.</p>
 <h2 id="flaxon-new"><code>flaxon new</code></h2>
 <p>Scaffolds a modular Flaxon + Teloce welcome application by default, including TypeScript, scoped component styles, a Python API, SQLite migrations, and a protected admin.</p>
-<p>After generation, install the project, run <code>python management.py migrate</code>, and create your administrator with <code>python management.py setup-admin</code>. There is no default password. The generated project also includes <code>flaxon welcome</code> and <code>flaxon welcome-status</code>, registered by its welcome module through <code>flaxon_cli.py</code>. Use <code>--template basic</code> for the smaller API-only starter. See <a href="../getting-started/project-setup.html">getting started</a> for the complete workflow.</p>
+<p>After generation, install the project, run <code>python management.py makemigrations</code> and <code>python management.py migrate</code>, and create your administrator with <code>python management.py setup-admin</code>. There is no default password. The generated project also includes <code>flaxon welcome</code> and <code>flaxon welcome-status</code>, registered by its welcome module through <code>flaxon_cli.py</code>. Use <code>--template basic</code> for the smaller API-only starter. See <a href="../getting-started/project-setup.html">getting started</a> for the complete workflow.</p>
 <div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>my-project
 </code></pre></div>
 <p><code>--template NAME</code> picks a starter template, <code>--no-venv</code> skips creating a virtualenv.</p>
@@ -186,5 +186,16 @@ flaxon<span class="w"> </span>migrate<span class="w"> </span>--direction<span cl
 <p>Prints the installed version.</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>flaxon<span class="w"> </span>--version
 Flaxon<span class="w"> </span><span class="m">0</span>.1.4
-</code></pre></div></article>
+</code></pre></div>
+<h2 id="project-creation-progress">Project creation progress</h2>
+<p><code>flaxon new</code> generates files locally and creates a virtual environment. It does
+not download application dependencies: the printed <code>pip install -e .</code> step does
+that separately. Environment creation prints a heartbeat while Python installs
+pip and stops after 120 seconds with recovery instructions. The project files
+remain available if that step fails. In an active environment, use
+<code>flaxon new project_manager --no-venv</code> to skip creating another one.</p>
+<p><code>new</code> and version commands do not import the current project's custom CLI module
+or application. Other commands still discover custom commands once. Keep
+<code>flaxon_cli.py</code> limited to command declarations; import expensive services inside
+a command handler.</p></article>
 </main></div><div id="footer"></div></body></html>
