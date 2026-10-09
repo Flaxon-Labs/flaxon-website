@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="JSON responses and migration — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>JSON responses and migration — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>JSON responses and migration</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/guides/json-serialization.md">Framework source</a> · <a href="../../content/framework/docs/guides/json-serialization.md" download>Markdown</a></p><h1 id="json-responses-and-migration">JSON responses and migration</h1>
+<p>Flaxon now encodes JSON with <code>orjson</code>. Returning a dictionary, list, or tuple
+uses the same rules as <code>JSONResponse</code>. Python input objects are never modified.</p>
+<table>
+<thead>
+<tr>
+<th>Python value</th>
+<th>JSON output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Strings, booleans, null, finite floats</td>
+<td>Corresponding JSON value</td>
+</tr>
+<tr>
+<td>Integers from −9,007,199,254,740,991 to 9,007,199,254,740,991</td>
+<td>Number</td>
+</tr>
+<tr>
+<td>Integers outside that range</td>
+<td>Decimal string, preserving browser precision</td>
+</tr>
+<tr>
+<td><code>Decimal</code></td>
+<td>String, preserving decimal precision and trailing zeros</td>
+</tr>
+<tr>
+<td>Aware datetime</td>
+<td>ISO 8601 in UTC, ending in <code>Z</code></td>
+</tr>
+<tr>
+<td>Naive datetime</td>
+<td>ISO 8601 without a timezone; no timezone is inferred</td>
+</tr>
+<tr>
+<td>Date or time</td>
+<td>ISO 8601 string</td>
+</tr>
+<tr>
+<td>UUID</td>
+<td>String</td>
+</tr>
+<tr>
+<td>Enum</td>
+<td>Its value, under these same rules</td>
+</tr>
+<tr>
+<td>Dataclass instance or object with <code>model_dump()</code></td>
+<td>Object, under these same rules</td>
+</tr>
+</tbody>
+</table>
+<p>Nonfinite floats and decimals (<code>NaN</code>, infinity), nonstring dictionary keys,
+cycles, bytes, sets, and unsupported objects raise an encoding error. Convert
+unsupported objects explicitly. Invalid server response data is a server error,
+not a request validation error. Do not expose internal exception details in
+production.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/balance'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">balance</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">({</span><span class="s1">'amount'</span><span class="p">:</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">'12.30'</span><span class="p">),</span> <span class="s1">'record_id'</span><span class="p">:</span> <span class="mi">2</span><span class="o">**</span><span class="mi">60</span><span class="p">})</span>
+</code></pre></div>
+<p>The response is <code>{"amount":"12.30","record_id":"1152921504606846976"}</code>.
+Treat identifiers as strings in TypeScript and use a decimal library for exact
+money arithmetic. JSON whitespace can differ from earlier releases; clients
+should parse JSON instead of comparing its raw formatting.</p>
+<h2 id="preserve-previous-behavior-during-migration">Preserve previous behavior during migration</h2>
+<p>For conventional endpoint return values, add this to your project's settings:</p>
+<div class="highlight"><pre><span></span><code><span class="n">JSON_SERIALIZER</span> <span class="o">=</span> <span class="s1">'legacy'</span>
+</code></pre></div>
+<p>For an application constructed directly:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s1">'example'</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s1">'JSON_SERIALIZER'</span><span class="p">:</span> <span class="s1">'legacy'</span><span class="p">})</span>
+</code></pre></div>
+<p>Explicit responses choose their own mode:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">LegacyJSONResponse</span>
+
+<span class="k">return</span> <span class="n">LegacyJSONResponse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1"># Equivalent: JSONResponse(data, legacy=True)</span>
+</code></pre></div>
+<p>Legacy mode preserves the previous standard-library encoding, including integer
+numbers, the <code>model_dump()</code> / <code>str()</code> fallback, and nonstandard <code>NaN</code> output.
+Use it temporarily while updating clients. Explicit <code>JSONResponse</code> remains
+modern even when application settings select legacy conventional returns.</p>
+<h2 id="request-and-routing-performance">Request and routing performance</h2>
+<p>Headers, cookies, and query dictionaries are parsed once, on first access. Their
+existing mutable interfaces remain available. Accessing cookies directly avoids
+materializing unrelated headers. Existing session cookies are still loaded for
+synchronous session access; empty public requests do not create sessions.</p>
+<p>Static routes use exact lookup. Dynamic candidate lists are ordered during
+registration instead of sorted for each request. A matching dynamic route may
+handle a request whose static path exists only for a different HTTP method.
+Dependency plans cache names and annotations, never provider values. Provider
+replacement, parent containers, and request-local factories retain their behavior.</p>
+<h2 id="database-tuning">Database tuning</h2>
+<p>Measure queries before changing indexes. Use pagination for list endpoints,
+select only necessary columns, and use Tortoise <code>prefetch_related</code> / <code>select_related</code>
+where relationships otherwise cause one query per row. Check SQLite query plans
+with <code>EXPLAIN QUERY PLAN</code> and PostgreSQL plans with <code>EXPLAIN (ANALYZE, BUFFERS)</code>
+in a suitable test environment. Index actual filter and ordering patterns through
+explicit migrations; starting the server does not automatically add indexes.</p></article>
+</main></div><div id="footer"></div></body></html>

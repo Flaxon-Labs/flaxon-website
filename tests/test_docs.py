@@ -2,6 +2,7 @@
 
 import json
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -119,6 +120,30 @@ class DocumentationTests(unittest.TestCase):
                 self.assertFalse(
                     any("alpinejs" in s.get("src", "") for s in soup.select("script"))
                 )
+
+    def test_sitemap_covers_all_indexed_docs(self):
+        sitemap = ET.parse(ROOT / "sitemap.xml").getroot()
+        urls = {node.text for node in sitemap.findall("{*}url/{*}loc")}
+        for entry in self.manifest["pages"]:
+            self.assertIn("https://flaxon.dev/" + entry["url"], urls)
+        for url in urls:
+            target = ROOT / (unquote(urlsplit(url).path).lstrip("/") or "index.html")
+            if target.is_dir():
+                target = target / "index.html"
+            self.assertTrue(target.is_file(), url)
+
+    def test_latest_release_guidance_is_indexed_and_versions_are_clear(self):
+        urls = {entry["url"] for entry in self.manifest["pages"]}
+        for path in ("docs/guides/json-serialization.html", "docs/guides/request-security-upgrade.html",
+                     "docs/releases/readiness-audit.html", "docs/guides/latest-upgrade.html"):
+            self.assertIn(path, urls)
+        guide = self.html[ROOT / "docs/guides/latest-upgrade.html"].get_text(" ", strip=True)
+        for expected in ("JSON_SERIALIZER", "LegacyJSONResponse", "management.py", "Argon2id", "third of six"):
+            self.assertIn(expected, guide)
+        for entry in self.source["pages"]:
+            notices = self.html[ROOT / entry["url"]].select(".doc-version-note")
+            self.assertEqual(len(notices), 1)
+            self.assertIn("PyPI releases may lag", notices[0].get_text())
 
     def test_api_directives_are_rendered_from_real_source(self):
         self.assertTrue(self.source["api_symbols"])

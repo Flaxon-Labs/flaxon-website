@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/security.md">Framework source</a> · <a href="../content/framework/docs/security.md" download>Markdown</a></p><p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/security.md">Framework source</a> · <a href="../content/framework/docs/security.md" download>Markdown</a></p><p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
 explicit mounts in <code>app.py</code>, and <code>management.py</code> workflow. See <a href="guides/orm.html">ORM and project management</a>
 for Python migrations, model registration, permission hooks, relationship editing,
 and Admin/CMS metadata storage. Backend-only and legacy adapter examples remain supported.</p>
@@ -306,5 +306,7 @@ infrastructure layers, and define a retention policy before deployment.</p>
 <p>Contact:</p>
 <p><code>aldanehutchinson5@gmail.com</code></p>
 <p>or create a private security advisory through the Flaxon GitHub repository.</p>
-<p>Please do not publicly disclose security issues before they are reviewed and addressed.</p></article>
+<p>Please do not publicly disclose security issues before they are reviewed and addressed.</p>
+<h2 id="authentication-and-session-migration">Authentication and session migration</h2>
+<p>See <a href="guides/request-security-upgrade.html">request security upgrades</a> for standard JWTs, Argon2 upgrades, typed query validation and lazy session creation.</p></article>
 </main></div><div id="footer"></div></body></html>

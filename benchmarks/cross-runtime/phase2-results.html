@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Request and JSON performance results — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Request and JSON performance results — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Request and JSON performance results</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/PHASE2_RESULTS.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/PHASE2_RESULTS.md" download>Markdown</a></p><h1 id="request-and-json-performance-results">Request and JSON performance results</h1>
+<p>Compared with the previous request/security implementation, using one Uvicorn worker, 32 keepalive clients, three randomized three-second samples per endpoint, pinned server/client CPUs on a shared host. These are narrow benchmark results, not a production throughput guarantee.</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th style="text-align: right;">Previous req/s</th>
+<th style="text-align: right;">Updated req/s</th>
+<th style="text-align: right;">Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/plaintext</td>
+<td style="text-align: right;">26,781</td>
+<td style="text-align: right;">31,402</td>
+<td style="text-align: right;">+17.3%</td>
+</tr>
+<tr>
+<td>/json</td>
+<td style="text-align: right;">25,375</td>
+<td style="text-align: right;">26,858</td>
+<td style="text-align: right;">+5.8%</td>
+</tr>
+</tbody>
+</table>
+<p>Validated 990,461 HTTP responses with 0 errors.</p>
+<h2 id="same-code-modern-versus-legacy-response-modes">Same-code modern versus legacy response modes</h2>
+<p>Five alternating repeats through the complete in-process ASGI dispatch path. This isolates the serializer choice with identical application code; it excludes network transport.</p>
+<table>
+<thead>
+<tr>
+<th>Payload</th>
+<th style="text-align: right;">Legacy req/s</th>
+<th style="text-align: right;">Modern req/s</th>
+<th style="text-align: right;">Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>small</td>
+<td style="text-align: right;">109,662</td>
+<td style="text-align: right;">125,168</td>
+<td style="text-align: right;">1.14×</td>
+</tr>
+<tr>
+<td>1000 rows</td>
+<td style="text-align: right;">3,753</td>
+<td style="text-align: right;">13,626</td>
+<td style="text-align: right;">3.63×</td>
+</tr>
+</tbody>
+</table>
+<p>Raw samples and environment details are in <code>phase2-results.json</code> and <code>response-modes-results.json</code>. The network comparison includes lazy request parsing, routing, dependency, and JSON changes together; it cannot assign gains to each individual change. CPU usage includes startup and warmup and is diagnostic only.</p>
+<p>Validation: full suite 889 passed / 29 skipped, including both Admin/CMS browser tests; two additional contract cases passed afterward (18 contract cases total). Critical Ruff checks and targeted mypy passed.</p>
+<p>No speculative response/header allocation rewrite or automatic database indexes were added. Database tuning guidance is documented; actual application query plans determine which indexes help.</p></article>
+</main></div><div id="footer"></div></body></html>

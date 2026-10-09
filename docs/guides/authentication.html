@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Authentication</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/docs/guides/authentication.md">Framework source</a> · <a href="../../content/framework/docs/guides/authentication.md" download>Markdown</a></p><h1 id="authentication">Authentication</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/guides/authentication.md">Framework source</a> · <a href="../../content/framework/docs/guides/authentication.md" download>Markdown</a></p><h1 id="authentication">Authentication</h1>
 <h2 id="overview">Overview</h2>
 <p>Flaxon provides flexible authentication support through pluggable authentication backends.</p>
 <p>Supported approaches include:</p>
@@ -513,5 +513,7 @@ steps, or use a dedicated identity provider integration.</p>
 authorization and privileged operations on the server; components call those
 endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
 and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
-to pages, components and application modules.</p></article>
+to pages, components and application modules.</p>
+<h2 id="upgrading-authentication">Upgrading authentication</h2>
+<p><a href="request-security-upgrade.html">JWT, password and session migration</a> explains standard tokens, trusted key rotation, legacy password upgrades and secure cookie defaults. Legacy hexadecimal-signature JWTs require sign-in again.</p></article>
 </main></div><div id="footer"></div></body></html>

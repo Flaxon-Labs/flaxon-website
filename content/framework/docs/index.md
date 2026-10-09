@@ -81,6 +81,7 @@ Use the guides for explanations, the API pages for reference, and the examples f
 - [Admin and CMS Production Guide](guides/admin-cms.md)
 - [Flaxon Admin in Production](guides/admin-production.md)
 - [Authentication](guides/authentication.md)
+- [Request performance and authentication migration](guides/request-security-upgrade.md)
 - [Authorization](guides/authorization.md)
 - [Databases](guides/databases.md)
 - [Debugging](guides/debugging.md)
@@ -206,3 +207,7 @@ Use the guides for explanations, the API pages for reference, and the examples f
 - [14 | Full-stack verification](fullstack/project-manager/14.md)
 
 - [15 | Production build and Render](fullstack/project-manager/15.md)
+
+- [JSON serialization and migration](guides/json-serialization.md)
+
+- [Release readiness audit](releases/readiness-audit.md)

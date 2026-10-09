@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/aldanedev-create/flaxon",
-  "commit": "70fe276efcb75a3729535c65abd9e75e0bde57b3",
+  "commit": "f4ab3cd440234750f6220ee2fc107dde58b93132",
   "pages": [
     {
       "source": "CHANGELOG.md",
@@ -54,6 +54,54 @@
       "source": "benchmarks/README.md",
       "url": "docs/reference/benchmarks.html",
       "title": "Run all benchmarks",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/PHASE2_RESULTS.md",
+      "url": "benchmarks/cross-runtime/phase2-results.html",
+      "title": "Request and JSON performance results",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/PYTHON_FRAMEWORK_METHOD.md",
+      "url": "benchmarks/cross-runtime/python-framework-method.html",
+      "title": "Six-framework ASGI comparison",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/PYTHON_FRAMEWORK_RESULTS.md",
+      "url": "benchmarks/cross-runtime/python-framework-results.html",
+      "title": "Python framework comparison results",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/QUALITY_AUDIT.md",
+      "url": "benchmarks/cross-runtime/quality-audit.html",
+      "title": "Security and code quality audit",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/README.md",
+      "url": "benchmarks/cross-runtime/index.html",
+      "title": "Flaxon, Node.js, and Go HTTP microbenchmark",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/RESULTS.md",
+      "url": "benchmarks/cross-runtime/results.html",
+      "title": "HTTP benchmark results",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/UPDATED_RUNTIME_RESULTS.md",
+      "url": "benchmarks/cross-runtime/updated-runtime-results.html",
+      "title": "Updated Flaxon versus Node.js, Go and FastAPI",
+      "section": "Operations and reference"
+    },
+    {
+      "source": "benchmarks/cross_runtime/UPGRADE_RESULTS.md",
+      "url": "benchmarks/cross-runtime/upgrade-results.html",
+      "title": "Request performance and security upgrade results",
       "section": "Operations and reference"
     },
     {
@@ -537,6 +585,12 @@
       "section": "Core concepts"
     },
     {
+      "source": "docs/guides/json-serialization.md",
+      "url": "docs/guides/json-serialization.html",
+      "title": "JSON responses and migration",
+      "section": "Feature guides"
+    },
+    {
       "source": "docs/guides/microservices.md",
       "url": "docs/guides/microservices.html",
       "title": "Admin and CMS with microservices",
@@ -576,6 +630,12 @@
       "source": "docs/guides/pydantic.md",
       "url": "docs/guides/pydantic.html",
       "title": "Pydantic Integration",
+      "section": "Feature guides"
+    },
+    {
+      "source": "docs/guides/request-security-upgrade.md",
+      "url": "docs/guides/request-security-upgrade.html",
+      "title": "Request performance and authentication migration",
       "section": "Feature guides"
     },
     {
@@ -729,6 +789,12 @@
       "section": "Getting started"
     },
     {
+      "source": "docs/releases/readiness-audit.md",
+      "url": "docs/releases/readiness-audit.html",
+      "title": "Release readiness audit — 2026-10-09",
+      "section": "Operations and reference"
+    },
+    {
       "source": "docs/security.md",
       "url": "docs/security.html",
       "title": "Security",
@@ -868,6 +934,11 @@
       "url": "docs/fullstack/13-html-spa-routing.html",
       "title": "Lesson 13: Complete SPA routing with Flaxon and Teloce .html",
       "section": "Full-stack course"
+    },
+    {
+      "url": "docs/guides/latest-upgrade.html",
+      "title": "Upgrade to the latest Flaxon workflow",
+      "section": "Getting started"
     },
     {
       "url": "docs/guides/backend-only.html",

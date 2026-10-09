@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Upgrade to the latest Flaxon workflow — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Upgrade to the latest Flaxon workflow — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Upgrade to the latest Flaxon workflow</span></nav>
+<article class="doc-content"><h1 id="upgrade-to-the-latest-flaxon-workflow">Upgrade to the latest Flaxon workflow</h1>
+<p>This website tracks the current Flaxon source. A published PyPI version can lag
+behind these pages. Check the <a href="../changelog.html">changelog</a> before upgrading;
+the recent JSON and authentication changes require client migration.</p>
+<h2 id="choose-your-installation">Choose your installation</h2>
+<p>For the published package:</p>
+<pre><code class="language-bash">python -m pip install --upgrade "flaxon[standard,admin]"
+</code></pre>
+<p>To try the exact framework revision used for these docs in a separate environment:</p>
+<pre><code class="language-bash">python -m venv .venv
+# Activate .venv using your platform's command, then:
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@f4ab3cd440234750f6220ee2fc107dde58b93132"
+</code></pre>
+<p>Pin a tested version or commit in production. Do not treat a source installation
+as a new PyPI release. Keep backups and exercise your application before rollout.</p>
+<h2 id="start-with-the-generated-project">Start with the generated project</h2>
+<pre><code class="language-bash">flaxon new project_manager
+cd project_manager
+python management.py check
+python management.py makemigrations
+python management.py migrate
+python management.py setup-admin
+python management.py runserver
+</code></pre>
+<p><code>app.py</code> creates the application and mounts feature modules. <code>settings.py</code> owns
+configuration, <code>models.py</code> defines Tortoise-backed models, and <code>management.py</code>
+runs Flaxon's commands. Migrations are explicit Python files. Starting the server
+does not silently update tables. See the <a href="../getting-started/project-setup.html">project setup guide</a>.</p>
+<p>You can build a Teloce full-stack app, a Jinax server-rendered app, or use
+Flaxon as a <a href="backend-only.html">backend-only API</a>. Existing lessons for those
+choices remain available.</p>
+<h2 id="review-json-consumers">Review JSON consumers</h2>
+<p>The modern response path uses <code>orjson</code>. Decimal values and integers beyond
+JavaScript's safe range become strings. Aware datetimes use UTC ISO 8601;
+nonfinite numbers and unsupported values raise an encoding error.</p>
+<pre><code class="language-python">from decimal import Decimal
+from flaxon import JSONResponse
+
+@app.get('/balance')
+async def balance():
+    return JSONResponse({'amount': Decimal('12.30'), 'record_id': 2**60})
+</code></pre>
+<pre><code class="language-json">{"amount":"12.30","record_id":"1152921504606846976"}
+</code></pre>
+<p>Update TypeScript types and money handling accordingly. For conventional endpoint
+returns, a temporary setting preserves previous output:</p>
+<pre><code class="language-python"># settings.py
+JSON_SERIALIZER = 'legacy'
+</code></pre>
+<p>Explicit responses select their own mode: <code>LegacyJSONResponse(data)</code> or
+<code>JSONResponse(data, legacy=True)</code>. Read the <a href="json-serialization.html">complete JSON contract</a>.</p>
+<h2 id="authentication-and-sessions">Authentication and sessions</h2>
+<ul>
+<li>Standard JWTs replace the previous custom token format; existing tokens require
+  sign-in again. Configure a trusted algorithm, issuer/audience and rotation keys.</li>
+<li>Password hashing defaults to Argon2id. Legacy PBKDF2 hashes can still be verified;
+  successful Admin sign-in upgrades eligible hashes.</li>
+<li>Secure cookie defaults require HTTPS in production. Local development uses the
+  generated debug configuration. Persistent secrets must remain stable across
+  deployments; use shared session infrastructure for multiple workers.</li>
+<li>Public requests that do not use a session no longer create or save an empty
+  session. Existing session cookies retain their supported behavior.</li>
+<li>Typed scalar query parameters are read and validated; invalid values return 422.</li>
+</ul>
+<p>See <a href="request-security-upgrade.html">security upgrade details</a>,
+<a href="../security.html">security</a>, and <a href="../deployment.html">deployment</a>.</p>
+<h2 id="performance-statements">Performance statements</h2>
+<p>Flaxon ranked third of six tested frameworks for plaintext and small JSON in the
+single-worker ASGI comparison, and fourth for a dynamic route among 1,000 routes.
+Those measurements do not establish a universal ranking or performance equivalent
+to core Node.js/Go servers. Large-response samples were partly client-limited.</p>
+<p>Read the <a href="../../benchmarks/cross-runtime/python-framework-results.html">raw results and methodology</a>
+before quoting a performance claim.</p>
+<h2 id="release-checks">Release checks</h2>
+<p>The <a href="../releases/readiness-audit.html">release audit</a> covers package contents,
+installed-wheel starter behavior, migrations, Admin/CMS, browser workflows and
+release tooling. It records 913 passing tests and 24 skips in the audited
+configuration. Passing tests and an advisory dependency scan do not certify every
+deployment or third-party integration.</p></article>
+</main></div><div id="footer"></div></body></html>

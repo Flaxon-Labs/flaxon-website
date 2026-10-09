@@ -363,3 +363,5 @@
 .doc-table { max-width: 100%; overflow-x: auto; }
 .doc-table table { min-width: 100%; }
 #docs-navigation { box-sizing: border-box; }
+
+.doc-version-note { padding: .8rem 1rem; border-inline-start: 3px solid var(--primary-color, #3776ab); background: rgba(55, 118, 171, .08); border-radius: .3rem; font-size: .9rem; }

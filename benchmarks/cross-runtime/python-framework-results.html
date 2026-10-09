@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Python framework comparison results — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Python framework comparison results — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Python framework comparison results</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/PYTHON_FRAMEWORK_RESULTS.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/PYTHON_FRAMEWORK_RESULTS.md" download>Markdown</a></p><h1 id="python-framework-comparison-results">Python framework comparison results</h1>
+<p>Flaxon placed third of six by median throughput for plaintext and small JSON, and fourth for the last dynamic route in an application with 1,000 routes. Large-response results are partly client-limited. This run supports a workload-specific top-three statement; it does not establish Flaxon as one of the fastest Python frameworks generally.</p>
+<h2 id="median-requests-per-second">Median requests per second</h2>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th style="text-align: right;">Plaintext</th>
+<th style="text-align: right;">Small JSON</th>
+<th style="text-align: right;">1,000-row JSON</th>
+<th style="text-align: right;">1,000-route lookup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flaxon</td>
+<td style="text-align: right;">28,943</td>
+<td style="text-align: right;">28,833</td>
+<td style="text-align: right;">2,824</td>
+<td style="text-align: right;">4,462</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td style="text-align: right;">15,920</td>
+<td style="text-align: right;">13,581</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: right;">1,260</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td style="text-align: right;">34,262</td>
+<td style="text-align: right;">30,614</td>
+<td style="text-align: right;">2,787</td>
+<td style="text-align: right;">2,591</td>
+</tr>
+<tr>
+<td>Litestar</td>
+<td style="text-align: right;">23,442</td>
+<td style="text-align: right;">23,908</td>
+<td style="text-align: right;">2,862</td>
+<td style="text-align: right;">18,164</td>
+</tr>
+<tr>
+<td>Sanic</td>
+<td style="text-align: right;">14,457</td>
+<td style="text-align: right;">14,314</td>
+<td style="text-align: right;">2,849</td>
+<td style="text-align: right;">13,122</td>
+</tr>
+<tr>
+<td>Falcon</td>
+<td style="text-align: right;">36,876</td>
+<td style="text-align: right;">32,929</td>
+<td style="text-align: right;">3,046</td>
+<td style="text-align: right;">18,710</td>
+</tr>
+</tbody>
+</table>
+<p>Validated 3,320,345 measured responses with 0 errors across 72 samples. Warmup responses are not counted.</p>
+<h2 id="sample-ranges-and-latency">Sample ranges and latency</h2>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Workload</th>
+<th style="text-align: right;">Min–max req/s</th>
+<th style="text-align: right;">Median p95 ms</th>
+<th style="text-align: right;">Median client CPU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flaxon</td>
+<td>/plaintext</td>
+<td style="text-align: right;">27,896–30,241</td>
+<td style="text-align: right;">1.666</td>
+<td style="text-align: right;">44.0%</td>
+</tr>
+<tr>
+<td>Flaxon</td>
+<td>/json</td>
+<td style="text-align: right;">28,622–29,335</td>
+<td style="text-align: right;">1.772</td>
+<td style="text-align: right;">46.7%</td>
+</tr>
+<tr>
+<td>Flaxon</td>
+<td>/large-json</td>
+<td style="text-align: right;">2,636–2,885</td>
+<td style="text-align: right;">16.594</td>
+<td style="text-align: right;">100.3%</td>
+</tr>
+<tr>
+<td>Flaxon</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">4,200–4,482</td>
+<td style="text-align: right;">9.699</td>
+<td style="text-align: right;">14.9%</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td>/plaintext</td>
+<td style="text-align: right;">15,749–19,440</td>
+<td style="text-align: right;">3.037</td>
+<td style="text-align: right;">30.7%</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td>/json</td>
+<td style="text-align: right;">13,266–15,074</td>
+<td style="text-align: right;">3.480</td>
+<td style="text-align: right;">27.3%</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td>/large-json</td>
+<td style="text-align: right;">221–245</td>
+<td style="text-align: right;">310.835</td>
+<td style="text-align: right;">12.6%</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">1,249–1,266</td>
+<td style="text-align: right;">31.054</td>
+<td style="text-align: right;">8.3%</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td>/plaintext</td>
+<td style="text-align: right;">31,876–34,476</td>
+<td style="text-align: right;">1.453</td>
+<td style="text-align: right;">48.3%</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td>/json</td>
+<td style="text-align: right;">28,879–31,637</td>
+<td style="text-align: right;">1.627</td>
+<td style="text-align: right;">47.0%</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td>/large-json</td>
+<td style="text-align: right;">2,752–3,118</td>
+<td style="text-align: right;">18.207</td>
+<td style="text-align: right;">96.6%</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">2,558–2,675</td>
+<td style="text-align: right;">14.590</td>
+<td style="text-align: right;">13.2%</td>
+</tr>
+<tr>
+<td>Litestar</td>
+<td>/plaintext</td>
+<td style="text-align: right;">22,697–23,800</td>
+<td style="text-align: right;">2.183</td>
+<td style="text-align: right;">34.9%</td>
+</tr>
+<tr>
+<td>Litestar</td>
+<td>/json</td>
+<td style="text-align: right;">21,258–24,367</td>
+<td style="text-align: right;">2.224</td>
+<td style="text-align: right;">37.1%</td>
+</tr>
+<tr>
+<td>Litestar</td>
+<td>/large-json</td>
+<td style="text-align: right;">2,656–2,907</td>
+<td style="text-align: right;">15.068</td>
+<td style="text-align: right;">100.3%</td>
+</tr>
+<tr>
+<td>Litestar</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">16,458–19,747</td>
+<td style="text-align: right;">2.678</td>
+<td style="text-align: right;">36.5%</td>
+</tr>
+<tr>
+<td>Sanic</td>
+<td>/plaintext</td>
+<td style="text-align: right;">12,947–14,865</td>
+<td style="text-align: right;">3.358</td>
+<td style="text-align: right;">30.1%</td>
+</tr>
+<tr>
+<td>Sanic</td>
+<td>/json</td>
+<td style="text-align: right;">12,401–15,164</td>
+<td style="text-align: right;">3.295</td>
+<td style="text-align: right;">31.8%</td>
+</tr>
+<tr>
+<td>Sanic</td>
+<td>/large-json</td>
+<td style="text-align: right;">2,812–2,986</td>
+<td style="text-align: right;">18.723</td>
+<td style="text-align: right;">98.3%</td>
+</tr>
+<tr>
+<td>Sanic</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">11,705–13,431</td>
+<td style="text-align: right;">3.689</td>
+<td style="text-align: right;">31.1%</td>
+</tr>
+<tr>
+<td>Falcon</td>
+<td>/plaintext</td>
+<td style="text-align: right;">33,888–39,351</td>
+<td style="text-align: right;">1.367</td>
+<td style="text-align: right;">49.6%</td>
+</tr>
+<tr>
+<td>Falcon</td>
+<td>/json</td>
+<td style="text-align: right;">31,415–34,388</td>
+<td style="text-align: right;">1.613</td>
+<td style="text-align: right;">48.3%</td>
+</tr>
+<tr>
+<td>Falcon</td>
+<td>/large-json</td>
+<td style="text-align: right;">2,983–3,101</td>
+<td style="text-align: right;">17.743</td>
+<td style="text-align: right;">97.9%</td>
+</tr>
+<tr>
+<td>Falcon</td>
+<td>/routes/999/42</td>
+<td style="text-align: right;">16,231–19,093</td>
+<td style="text-align: right;">2.654</td>
+<td style="text-align: right;">32.6%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="interpretation">Interpretation</h2>
+<ul>
+<li>Falcon and Starlette had higher median plaintext and small-JSON throughput than Flaxon in this run. Flaxon exceeded FastAPI, Litestar and Sanic in these two workloads.</li>
+<li>For the dynamic route among 1,000 routes, Falcon, Litestar and Sanic exceeded Flaxon. Improving Flaxon’s dynamic route indexing is a measurable opportunity.</li>
+<li>Several large-response samples saturated the client CPU. Similar throughput among most frameworks in this workload is not proof of equivalent server capacity.</li>
+<li>FastAPI’s conventional dictionary/list return path includes encoding work that explicit responses can avoid. These adapters exercise normal response APIs; they do not rank every framework’s maximum tuned performance.</li>
+<li>Sanic uses ASGI mode, not its native server. This controlled-server result must not be generalized to Sanic’s native deployment.</li>
+<li>Three short repeats on one shared host do not establish a universal ranking. No development-time or bug-reduction percentages are measured.</li>
+</ul>
+<h2 id="supported-wording">Supported wording</h2>
+<blockquote>
+<p>Flaxon ranked in the top three of six tested Python frameworks for plaintext and small JSON in our single-worker Uvicorn benchmark. Results vary by workload and deployment.</p>
+</blockquote>
+<h2 id="reproducibility">Reproducibility</h2>
+<p>See PYTHON_FRAMEWORK_METHOD.md for commands, controls and limitations; python-framework-results.json contains all raw samples, package versions, environment information, and benchmark source checksums. The recorded Git revision precedes the added adapters; checksums identify the actual benchmark files. Framework source is unchanged from merged PR #10.</p>
+<p>An initial partial run was discarded after finding that the load client did not support chunked responses. The client was fixed, Sanic large responses passed preflight validation, and all 72 samples were restarted. Only the corrected complete run is included.</p></article>
+</main></div><div id="footer"></div></body></html>

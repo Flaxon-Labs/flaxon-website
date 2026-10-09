@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Request performance and security upgrade results — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Request performance and security upgrade results — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Request performance and security upgrade results</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/UPGRADE_RESULTS.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/UPGRADE_RESULTS.md" download>Markdown</a></p><h1 id="request-performance-and-security-upgrade-results">Request performance and security upgrade results</h1>
+<h2 id="repeated-http-samples">Repeated HTTP samples</h2>
+<p>One worker per server, separate server/client CPU affinity, 32 keep-alive connections, one-second warmup and three three-second samples in randomized order. Same Uvicorn/uvloop/httptools configuration for all Python servers. No database or optional middleware in this first comparison. Flaxon keeps default request ID and security headers. Stateless clients do not retain cookies. Baseline Flaxon therefore allocates a session on every request; optimized Flaxon does not.</p>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th style="text-align: right;">Plaintext median requests/s</th>
+<th style="text-align: right;">JSON median requests/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flaxon baseline</td>
+<td style="text-align: right;">13,765</td>
+<td style="text-align: right;">13,675</td>
+</tr>
+<tr>
+<td>Flaxon</td>
+<td style="text-align: right;">24,730</td>
+<td style="text-align: right;">22,637</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td style="text-align: right;">16,579</td>
+<td style="text-align: right;">13,350</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td style="text-align: right;">32,759</td>
+<td style="text-align: right;">30,349</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td style="text-align: right;">62,049</td>
+<td style="text-align: right;">65,175</td>
+</tr>
+<tr>
+<td>Go</td>
+<td style="text-align: right;">90,274</td>
+<td style="text-align: right;">86,657</td>
+</tr>
+</tbody>
+</table>
+<p>/plaintext: 79.7% higher throughput than unchanged Flaxon in the same run (1.80×).</p>
+<p>/json: 65.5% higher throughput than unchanged Flaxon in the same run (1.66×).</p>
+<p>All 4237972 measured responses passed validation. These percentages describe HTTP throughput, not developer productivity or defects. Short samples on shared hardware have meaningful variation; raw ranges and p95 latency are in optimized-results.json. Node and Go remain faster here. Do not generalize the FastAPI/Flaxon ordering to other endpoints or configurations.</p>
+<h2 id="separate-flaxon-workloads">Separate Flaxon workloads</h2>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th style="text-align: right;">Median requests/s</th>
+<th style="text-align: right;">Median run p95 ms</th>
+<th style="text-align: right;">Invalid responses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/session</td>
+<td style="text-align: right;">16,751</td>
+<td style="text-align: right;">3.023</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/validate?n=123</td>
+<td style="text-align: right;">19,400</td>
+<td style="text-align: right;">2.488</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/db</td>
+<td style="text-align: right;">12,482</td>
+<td style="text-align: right;">3.277</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>The session workload retains a cookie per connection and mutates its counter. The validation workload converts an integer query parameter. Database work is a parameterized count query against asynchronous in-memory SQLite; this is not a production ORM or disk-backed database benchmark. These workloads are diagnostics for optimized Flaxon only.</p>
+<h2 id="profiling">Profiling</h2>
+<p>In 5,000 direct ASGI requests, the baseline called inspect.signature 10,000 times and get_type_hints 10,000 times, created 5,000 sessions and invoked backend save 10,000 times. The optimized profile contains no endpoint inspection, session creation or backend save calls for this stateless workload. Dependency values still resolve on every request; route matching remains active. Profiles include diagnostic cProfile overhead and are not throughput benchmarks.</p>
+<h2 id="json-serialization">JSON serialization</h2>
+<ul>
+<li>small: orjson serializer alone was 16.4× faster in the recorded microbenchmark.</li>
+<li>list: orjson serializer alone was 8.4× faster in the recorded microbenchmark.</li>
+</ul>
+<p>The default JSONResponse remains stdlib-based: direct substitution changes datetime formatting, large integer handling, non-string keys and non-finite numbers. Whitespace differences are not semantic differences. A faster serializer is not an equal multiplier for end-to-end HTTP speed. See serializer-results.json.</p>
+<h2 id="security-and-quality">Security and quality</h2>
+<p>JWTs now use PyJWT with a fixed algorithm, required expiry and configurable issuer/audience and trusted key IDs. New password hashes use Argon2id; Admin upgrades legacy hashes on successful password verification. Existing insecure-format JWTs are rejected and require sign-in again. Cookies default to Secure in explicitly constructed session helpers. Unexpected authentication/authorization failures propagate; isolated optional plugin failures produce warnings.</p>
+<p>Repository-wide style and typing debt remains. Critical undefined-name/syntax lint checks pass across src/flaxon; new execution-plan and JWT modules pass targeted strict mypy checks. The corrected full mypy run exposed existing errors instead of stopping at invalid configuration. See QUALITY_AUDIT.md.</p>
+<h2 id="reproduction-and-scope">Reproduction and scope</h2>
+<ul>
+<li>python: 3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]</li>
+<li>node: v24.19.0</li>
+<li>go: go version go1.27.2 linux/amd64</li>
+<li>flaxon: 0.2.7</li>
+<li>flaxon_distribution_metadata: 0.2.6</li>
+<li>flaxon_source: /workspace/scratch/67da7b153f3e/flaxon-orm/src/flaxon/<strong>init</strong>.py</li>
+<li>fastapi: 0.143.0</li>
+<li>starlette: 1.7.0</li>
+<li>uvicorn: 0.54.0</li>
+<li>uvloop: 0.23.0</li>
+<li>httptools: 0.8.0</li>
+<li>os: Linux-6.18.44-x86_64-with-glibc2.39</li>
+<li>cpu_model: AMD EPYC 9V74 80-Core Processor</li>
+<li>cpu_quota: 800000 100000</li>
+<li>affinity: [0, 1]</li>
+<li>git_revision: ac4ec523010f1d625e0ca78ece7c63b0423167cf</li>
+</ul>
+<p>Framework revision is the pre-change parent; security/performance source changes are supplied in the accompanying commit. Unchanged source was selected through PYTHONPATH from a detached worktree at that revision. Raw input hashes record the benchmark files at measurement time; the stateless load script is retained as load-stateless.mjs. Server CPU includes startup/warmup and is a diagnostic estimate.</p>
+<p>No development-time or developer-defect study was conducted. Those percentages remain unmeasured.</p></article>
+</main></div><div id="footer"></div></body></html>
