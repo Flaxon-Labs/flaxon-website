@@ -16,6 +16,8 @@ import re
 import shutil
 import subprocess
 import zipfile
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit
 
@@ -308,6 +310,7 @@ def sync(checkout, revision=None):
     manifest = {
         "repository": REPO,
         "commit": commit,
+        "lastmod": datetime.fromisoformat(subprocess.check_output(["git", "-C", str(checkout), "show", "-s", "--format=%cI", "HEAD"], text=True).strip()).astimezone(timezone.utc).date().isoformat(),
         "pages": entries,
         "api_symbols": symbols,
     }
@@ -384,7 +387,7 @@ def page_shell(entry, body, manifest=None):
     if manifest:
         path = entry["source"]
         source_url = f"{manifest['repository']}/blob/{manifest['commit']}/{quote(path)}"
-        source_note = f'<p class="doc-source"><a href="{source_url}">Framework source</a> · <a href="{r("content/framework/" + path)}" download>Markdown</a></p>'
+        source_note = f'<p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="{r("docs/guides/latest-upgrade.html")}">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="{source_url}">Framework source</a> · <a href="{r("content/framework/" + path)}" download>Markdown</a></p>'
     output = f'''<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -420,6 +423,9 @@ def build():
     routing_url = "docs/fullstack/13-html-spa-routing.html"
     routing_body = markdown.markdown((ROOT / "content/tutorials/html-spa-routing.md").read_text(), extensions=["tables", "fenced_code", "toc"])
     preserved.append({"url": routing_url, "title": "Lesson 13: Complete SPA routing with Flaxon and Teloce .html", "section": "Full-stack course", "body": routing_body})
+    upgrade_url = "docs/guides/latest-upgrade.html"
+    upgrade_body = markdown.markdown((ROOT / "content/tutorials/latest-upgrade.md").read_text(), extensions=["tables", "fenced_code", "toc"])
+    preserved.append({"url": upgrade_url, "title": "Upgrade to the latest Flaxon workflow", "section": "Getting started", "body": upgrade_body})
     downloads = ROOT / "downloads"
     downloads.mkdir(exist_ok=True)
     with zipfile.ZipFile(downloads / "flaxon-guessing-game.zip", "w", zipfile.ZIP_DEFLATED) as archive:
@@ -431,7 +437,7 @@ def build():
                 archive.writestr(entry, source.read_bytes())
     for file in sorted((ROOT / "docs").rglob("*.html")):
         url = file.relative_to(ROOT).as_posix()
-        if url in imported or url in {tutorial_url, api_lesson_url, routing_url}:
+        if url in imported or url in {tutorial_url, api_lesson_url, routing_url, upgrade_url}:
             continue
         soup = BeautifulSoup(file.read_text(), "html.parser")
         content = soup.select_one(".doc-content")
@@ -530,7 +536,7 @@ def build():
         )
     grouped = {name: [e for e in all_pages if e["section"] == name] for name in GROUPS}
     nav = '<nav id="docs-navigation" aria-label="Flaxon documentation"><label for="docs-nav-filter">Find a page</label><input id="docs-nav-filter" type="search" placeholder="Filter navigation…" autocomplete="off"><a href="/docs.html" class="docs-home">Documentation home</a>'
-    catalog = '<h1>Flaxon documentation</h1><p>Build complete applications with Python and Teloce, server-rendered pages with Jinax, or combine both. Flaxon includes Admin, CMS, authentication, WebSockets, database tools, and reusable modules.</p><div class="doc-paths"><a href="docs/getting-started/project-setup.html"><strong>Create your first project</strong><span>Welcome app, management.py, migrations, and protected Admin.</span></a><a href="docs/fullstack/index.html"><strong>Learn full-stack development</strong><span>Twelve lessons including a Teloce SPA capstone, Admin, Render, and a practical API guide.</span></a><a href="docs/guides/jinax.html"><strong>Build with Jinax</strong><span>Complete server-rendered applications and reusable templates.</span></a><a href="docs/guides/admin-cms.html"><strong>Configure Admin and CMS</strong><span>Users, permissions, content, media, and operational tools.</span></a></div><p>Using a separate frontend? Start with the <a href="docs/guides/backend-only.html">backend-only quick start</a> and the <a href="examples.html">examples directory</a>.</p><h2>Complete documentation directory</h2>'
+    catalog = '<h1>Flaxon documentation</h1><p>Build complete applications with Python and Teloce, server-rendered pages with Jinax, or combine both. Flaxon includes Admin, CMS, authentication, WebSockets, database tools, and reusable modules.</p><div class="doc-paths"><a href="docs/getting-started/project-setup.html"><strong>Create your first project</strong><span>Welcome app, management.py, migrations, and protected Admin.</span></a><a href="docs/fullstack/index.html"><strong>Learn full-stack development</strong><span>Complete lessons including a Teloce SPA capstone, Admin, Render, and a practical API guide.</span></a><a href="docs/guides/jinax.html"><strong>Build with Jinax</strong><span>Complete server-rendered applications and reusable templates.</span></a><a href="docs/guides/admin-cms.html"><strong>Configure Admin and CMS</strong><span>Users, permissions, content, media, and operational tools.</span></a></div><p>Using a separate frontend? Start with the <a href="docs/guides/backend-only.html">backend-only quick start</a> and the <a href="examples.html">examples directory</a>.</p><h2>Complete documentation directory</h2>'
     for name, entries in grouped.items():
         if not entries:
             continue
@@ -578,6 +584,31 @@ def build():
         )
         + "\n"
     )
+    # Retain existing public URLs and add every indexed document.
+    namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
+    ET.register_namespace("", namespace)
+    sitemap = ET.parse(ROOT / "sitemap.xml").getroot()
+    for node in list(sitemap):
+        location = node.findtext(f"{{{namespace}}}loc") or ""
+        target = ROOT / (unquote(urlsplit(location).path).lstrip("/") or "index.html")
+        if target.is_dir():
+            target = target / "index.html"
+        if not target.is_file():
+            sitemap.remove(node)
+    existing = {node.findtext(f"{{{namespace}}}loc"): node for node in sitemap}
+    for entry in all_pages:
+        location = "https://flaxon.dev/" + quote(entry["url"], safe="/")
+        node = existing.get(location)
+        if node is None:
+            node = ET.SubElement(sitemap, f"{{{namespace}}}url")
+            ET.SubElement(node, f"{{{namespace}}}loc").text = location
+        lastmod = node.find(f"{{{namespace}}}lastmod")
+        if lastmod is None:
+            lastmod = ET.SubElement(node, f"{{{namespace}}}lastmod")
+        lastmod.text = manifest.get("lastmod", "2026-10-09")
+    ET.indent(sitemap, space="  ")
+    ET.ElementTree(sitemap).write(ROOT / "sitemap.xml", encoding="utf-8", xml_declaration=True)
+
     print(
         f"Built {len(pages)} framework pages, retained {len(preserved)} website guides, indexed {len(search)} docs pages"
     )

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Security and code quality audit — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Security and code quality audit — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Security and code quality audit</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/QUALITY_AUDIT.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/QUALITY_AUDIT.md" download>Markdown</a></p><h1 id="security-and-code-quality-audit">Security and code quality audit</h1>
+<p>The mypy <code>target_platform</code> key was invalid; it is now <code>platform</code>. Development/CI tooling is constrained to mypy &lt;2 after intermittent internal crashes with 2.4.0; targeted checks passed on mypy 1.20.2.</p>
+<ul>
+<li>Critical Ruff syntax/undefined-name checks pass across src/flaxon.</li>
+<li>Full Ruff inventory at audit time: 3,864 issues, dominated by missing method/class docstrings (1,777/479), long lines (478), and intentional or legacy local imports (234). There are 62 C901 complexity findings. This is remaining debt, not a clean full Ruff run.</li>
+<li>Full strict mypy now runs and reports 896 errors in 177 files, including missing optional dependency stubs and legacy untyped code. New endpoint-plan and JWT modules pass targeted strict checks with imports skipped. This is not equivalent to full-repository type safety.</li>
+<li>All 12 previously silent direct <code>except Exception: pass</code> handlers were reviewed. Optional plugin/listener failures now warn with the exception type, queue errors propagate, platform/finalizer handlers catch expected exceptions. No direct catch-all <code>pass</code> handlers remain in src/flaxon.</li>
+<li>There are 94 total broad Exception handlers (including named exceptions and application boundaries). They are inventoried in exception-audit.json. Retaining a top-level error-to-response boundary or cleanup-and-rethrow is deliberate; not every broad catch is a swallowed failure. Further review remains appropriate.</li>
+</ul>
+<p>Security changes cover both JWT and JWTBackend, legacy password verification and Admin upgrade-on-login, inferred query validation, lazy session creation and secure helper defaults. JWTBackend revocation is instance-local; a distributed deployment needs a shared revocation design.</p>
+<p>Fixes discovered while checking critical lint include missing MySQL cursor, retry asyncio, template Callable and audit Request imports. Compression now invokes the ASGI app with receive/send, emits exactly one response-start event, preserves chunked finite bodies, and uses gzip's correct compresslevel argument. Unknown-length streams pass through without buffering.</p>
+<p>Verification before publishing: the final complete framework suite passed <strong>873 tests</strong>, with <strong>29 skipped</strong> (benchmark timing disabled for this correctness run). Both Admin/CMS and ORM Admin real-browser tests passed. Final targeted security/state/authentication checks passed <strong>216 tests</strong>, with <strong>2 skipped</strong>. Critical Ruff checks pass; new execution-plan and JWT modules pass targeted strict mypy checks.</p>
+<p>No independent penetration test or human developer productivity study was conducted. Percentages reported in UPGRADE_RESULTS.md concern HTTP throughput only.</p></article>
+</main></div><div id="footer"></div></body></html>

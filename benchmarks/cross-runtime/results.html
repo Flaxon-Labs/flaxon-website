@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="HTTP benchmark results — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>HTTP benchmark results — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>HTTP benchmark results</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/RESULTS.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/RESULTS.md" download>Markdown</a></p><h1 id="http-benchmark-results">HTTP benchmark results</h1>
+<p>Measured on 2026-10-09 UTC. These are local HTTP microbenchmarks, not a developer-productivity study.</p>
+<h2 id="environment">Environment</h2>
+<ul>
+<li><strong>python</strong>: 3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]</li>
+<li><strong>node</strong>: v24.19.0</li>
+<li><strong>go</strong>: go version go1.27.2 linux/amd64</li>
+<li><strong>flaxon</strong>: 0.2.7</li>
+<li><strong>uvicorn</strong>: 0.54.0</li>
+<li><strong>uvloop</strong>: 0.23.0</li>
+<li><strong>httptools</strong>: 0.8.0</li>
+<li><strong>os</strong>: Linux-6.18.44-x86_64-with-glibc2.39</li>
+<li><strong>cpu_model</strong>: AMD EPYC 9V74 80-Core Processor</li>
+<li><strong>cpu_quota</strong>: 800000 100000</li>
+<li><strong>affinity</strong>: [0, 1]</li>
+<li><strong>git_revision</strong>: ac4ec523010f1d625e0ca78ece7c63b0423167cf</li>
+<li><strong>flaxon_distribution_metadata</strong>: 0.2.6</li>
+<li><strong>flaxon_source</strong>: /workspace/scratch/67da7b153f3e/flaxon-orm/src/flaxon/<strong>init</strong>.py</li>
+</ul>
+<h2 id="method">Method</h2>
+<p>One server worker pinned to one CPU; client pinned to another. 32 persistent connections, no pipelining. One-second warmup, three five-second samples per endpoint/runtime, randomized order. Plaintext bytes and JSON values were checked on every response. Flaxon uses Uvicorn with uvloop and httptools. Node uses core HTTP; Go uses net/http with GOMAXPROCS=1. No database, TLS, authentication, Admin, CMS, or optional middleware.</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Server</th>
+<th style="text-align: right;">Median requests/s</th>
+<th style="text-align: right;">Sample range</th>
+<th style="text-align: right;">Median run p95 (ms)</th>
+<th style="text-align: right;">Invalid responses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/plaintext</td>
+<td>Flaxon</td>
+<td style="text-align: right;">14,291</td>
+<td style="text-align: right;">11,828–15,210</td>
+<td style="text-align: right;">3.319</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/plaintext</td>
+<td>Node.js</td>
+<td style="text-align: right;">65,768</td>
+<td style="text-align: right;">65,001–67,357</td>
+<td style="text-align: right;">0.881</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/plaintext</td>
+<td>Go</td>
+<td style="text-align: right;">90,614</td>
+<td style="text-align: right;">87,406–92,102</td>
+<td style="text-align: right;">0.797</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/json</td>
+<td>Flaxon</td>
+<td style="text-align: right;">12,548</td>
+<td style="text-align: right;">11,913–13,947</td>
+<td style="text-align: right;">3.689</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/json</td>
+<td>Node.js</td>
+<td style="text-align: right;">60,786</td>
+<td style="text-align: right;">56,856–60,836</td>
+<td style="text-align: right;">0.935</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>/json</td>
+<td>Go</td>
+<td style="text-align: right;">78,974</td>
+<td style="text-align: right;">78,632–95,499</td>
+<td style="text-align: right;">0.864</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="throughput-differences">Throughput differences</h2>
+<ul>
+<li>/plaintext: Flaxon processed 21.7% of Node.js's request rate (78.3% lower throughput); Node.js was 4.60× as fast by this measure.</li>
+<li>/plaintext: Flaxon processed 15.8% of Go's request rate (84.2% lower throughput); Go was 6.34× as fast by this measure.</li>
+<li>/json: Flaxon processed 20.6% of Node.js's request rate (79.4% lower throughput); Node.js was 4.84× as fast by this measure.</li>
+<li>/json: Flaxon processed 15.9% of Go's request rate (84.1% lower throughput); Go was 6.29× as fast by this measure.</li>
+</ul>
+<h2 id="cpu-and-limitations">CPU and limitations</h2>
+<ul>
+<li>Flaxon: client CPU 23.4–27.3% of one core; server CPU including startup/warmup 100.4–101.7% of one core.</li>
+<li>Node.js: client CPU 61.8–68.1% of one core; server CPU including startup/warmup 98.4–99.6% of one core.</li>
+<li>Go: client CPU 77.0–80.5% of one core; server CPU including startup/warmup 95.7–96.6% of one core.</li>
+</ul>
+<p>Server CPU includes startup and warmup, so it can exceed 100% when normalized only over warmup plus measured duration. Client CPU is measured during the sample, with small startup overhead. This is a shared virtual machine; repeats are short. Closed-loop latency does not represent behavior under a fixed overloaded arrival rate. The client shares the host and faster servers may approach its capacity. Results should be repeated on dedicated hardware, with longer runs and a separate load machine, before making public performance claims.</p>
+<p>The measured endpoints do not justify claiming Flaxon is on par with Node.js or Go. Application-level results may differ when databases and other I/O dominate.</p>
+<h2 id="development-improvement-and-fewer-bugs">Development improvement and fewer bugs</h2>
+<p><strong>Development time reduction: unmeasured. Developer defect reduction: unmeasured.</strong> No human development study was conducted, and neither percentage can be inferred from HTTP throughput, generated code, or passing tests.</p>
+<p>Observed HTTP response failure rate is 0% if all samples have zero errors; this describes these benchmark requests only. It is not evidence of a 0% developer defect rate or of fewer bugs than another framework.</p>
+<p>See README.md for a controlled study design and separate time-reduction, throughput-improvement, and defect-reduction formulas.</p>
+<p>Raw per-run data: results.json. Reproduce with run.py.</p></article>
+</main></div><div id="footer"></div></body></html>

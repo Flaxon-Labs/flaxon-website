@@ -12,16 +12,38 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
-<article class="doc-content"><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/70fe276efcb75a3729535c65abd9e75e0bde57b3/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
 <h2 id="unreleased">Unreleased</h2>
+<ul>
+<li>
+<p>Release readiness: preserve environment secret strings, repair version/changelog/artifact/tag tooling, support prerelease versions, verify installed wheels, and make CDN browser tests reproducible.</p>
+</li>
+<li>
+<p>Use browser-safe orjson encoding by default; add explicit legacy response and settings modes. See <a href="guides/json-serialization.html">migration rules</a>.</p>
+</li>
+<li>Parse request headers, cookies, and query parameters lazily.</li>
+<li>Prepare dependency names once and order route candidates during registration.</li>
+<li>
+<p>Fix dynamic method fallback when a static path exists for another method.</p>
+</li>
+<li>
+<p>Avoid session storage and cookies for untouched requests; prepare endpoint arguments at registration while resolving dependencies per request.</p>
+</li>
+<li>Infer and validate scalar query parameters, returning 422 for invalid input and documenting them in OpenAPI.</li>
+<li>Replace custom JWT signing with PyJWT, require expiry and support configured issuer/audience and trusted key rotation. Legacy tokens require sign-in again.</li>
+<li>Default to Argon2id, retain legacy PBKDF2 verification, upgrade Admin hashes after successful login, and default explicit session cookies to Secure.</li>
+<li>Surface isolated plugin failures, propagate unexpected auth/permission errors, fix compression ASGI handling and missing imports, and repair the mypy platform setting.</li>
+</ul>
+<h2 id="027">[0.2.7]</h2>
 <ul>
 <li>Project CLI: discover commands once, avoid importing project commands for new/version, flush setup messages, show environment progress and stop after a 120-second timeout with recovery instructions.</li>
 <li>Admin/CMS: distinguish the ORM lifecycle object from legacy SQL adapters so generated ORM applications use their metadata store without page errors.</li>
-<li>Documentation: shared settings/management/ORM workflow and a verified 15-chapter, complete-code project-manager ebook covering Teloce HTML, scoped CSS, signals, SPA routing, staff Admin/CMS and Render.</li>
-</ul>
-<h2 id="027-unreleased">[0.2.7] — Unreleased</h2>
-<ul>
-<li>Bundle Alpine.js for essential Admin/CMS interactions.</li>
+<li>
+<p>Documentation: shared settings/management/ORM workflow and a verified 15-chapter, complete-code project-manager ebook covering Teloce HTML, scoped CSS, signals, SPA routing, staff Admin/CMS and Render.</p>
+</li>
+<li>
+<p>Bundle Alpine.js for essential Admin/CMS interactions.</p>
+</li>
 <li>Add permission-filtered relationship selectors, many-to-many forms, optional
   child inlines, query scoping, field groups and custom widget templates.</li>
 <li>Make ORM imports transactional, show field validation errors, reject stale ORM

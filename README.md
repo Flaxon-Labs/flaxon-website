@@ -247,3 +247,5 @@ The [playground](playground.html) offers editable API, Jinax, Teloce, and module
 The [guessing-game capstone](docs/fullstack/11-guessing-game.html) includes the complete SPA, protected Admin, SQLite persistence, tests, and Render deployment. Its source lives in `examples/guessing-game/`; the guide source is `content/tutorials/guessing-game.md`. Rebuild published pages and the project download with `python scripts/sync_docs.py`.
 
 The game uses module-owned Teloce pages and `data-teloce-link`. [Lesson 12](docs/fullstack/12-teloce-flaxon-apis.html) maps Teloce component, router, signal, compiler, data, runtime, and Flaxon server APIs to practical uses.
+
+The documentation now tracks framework revision `f4ab3cd440234750f6220ee2fc107dde58b93132`. The [upgrade guide](docs/guides/latest-upgrade.html) distinguishes current-source behavior from published PyPI packages and covers JSON/authentication migration.

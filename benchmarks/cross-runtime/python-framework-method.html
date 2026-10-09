@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Six-framework ASGI comparison — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Six-framework ASGI comparison — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Six-framework ASGI comparison</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/PYTHON_FRAMEWORK_METHOD.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/PYTHON_FRAMEWORK_METHOD.md" download>Markdown</a></p><h1 id="six-framework-asgi-comparison">Six-framework ASGI comparison</h1>
+<p>This suite evaluates Flaxon, FastAPI, Starlette, Litestar, Sanic and Falcon.
+It tests a hypothesis; it does not assume Flaxon wins.</p>
+<h2 id="workloads">Workloads</h2>
+<p>Every app registers the same three fixed endpoints and 1,000 dynamic routes.
+The dynamic request targets the last registered route. Each framework uses its
+normal JSON response API, with serialization performed for every request.</p>
+<ul>
+<li><code>/plaintext</code>: thirteen-byte plaintext response.</li>
+<li><code>/json</code>: a single-field JSON object.</li>
+<li><code>/large-json</code>: 1,000 task objects with identical values.</li>
+<li><code>/routes/999/42</code>: typed dynamic route, returning the identifier and route index.</li>
+</ul>
+<p>These apps intentionally have no database, authentication, sessions in use,
+application middleware, or templates. Large route sets help reveal routing
+cost that a two-route hello-world comparison misses. They are not equivalent
+to a complete production application.</p>
+<h2 id="controls">Controls</h2>
+<p>One Uvicorn worker per app, uvloop, httptools, access logging disabled. Server
+and client pinned to separate CPUs; 32 keepalive connections with one request
+outstanding per connection. Three randomized three-second samples per
+framework/workload, each preceded by a one-second warmup. All frameworks run
+on the same shared Linux host. Record exact versions and source checksums.</p>
+<p>The client handles Content-Length and chunked transfer encoding, parses JSON,
+and verifies every field and row. Any response or connection error invalidates
+the run rather than contributing to a speed ranking. Latency starts when a
+request is sent; this closed-loop test does not measure overload behavior.</p>
+<p>Sanic is measured in ASGI mode to keep the server controlled; these numbers do
+not rank Sanic's native server. Falcon is its ASGI implementation. Neither
+framework is given pre-encoded JSON or response caching. Framework defaults
+can still differ in included functionality and serialization behavior.</p>
+<p>CPU counters include startup and warmup, so use them only diagnostically.
+Large-response JSON verification may saturate the client CPU: such samples
+cannot establish the server's maximum throughput. Report all sample ranges,
+not only an aggregate score.</p>
+<h2 id="reproduce">Reproduce</h2>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">'.[standard]'</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>benchmarks/cross_runtime/requirements-frameworks.txt
+python<span class="w"> </span>benchmarks/cross_runtime/run.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--go<span class="w"> </span>/path/to/go<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--runtimes<span class="w"> </span>Flaxon,FastAPI,Starlette,Litestar,Sanic,Falcon<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--flaxon-app<span class="w"> </span>framework_apps:flaxon_app<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--paths<span class="w"> </span>/plaintext<span class="w"> </span>/json<span class="w"> </span>/large-json<span class="w"> </span>/routes/999/42<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--seconds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--repeats<span class="w"> </span><span class="m">3</span><span class="w"> </span>--output<span class="w"> </span>python-framework-results.json
+</code></pre></div>
+<p>The existing runner records Node/Go versions and builds the Go reference binary,
+even when selecting Python-only runtimes; Node is the shared load generator.</p>
+<h2 id="claims-this-can-support">Claims this can support</h2>
+<p>A supported statement names the tested frameworks, workload, versions, server,
+and machine. A single shared-host run cannot establish a global ranking among
+all Python frameworks. Extend with longer samples, independent hardware,
+concurrency sweeps, database and validation workloads, and native-server tests
+before using a broad marketing superlative.</p>
+<p>Official API references used for the adapters:</p>
+<ul>
+<li>https://docs.litestar.dev/main/usage/routing/handlers.html</li>
+<li>https://sanic.dev/en/guide/running/running.md</li>
+<li>https://falcon.readthedocs.io/en/stable/user/quickstart.html</li>
+</ul></article>
+</main></div><div id="footer"></div></body></html>

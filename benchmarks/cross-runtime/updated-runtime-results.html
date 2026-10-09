@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Updated Flaxon versus Node.js, Go and FastAPI — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Updated Flaxon versus Node.js, Go and FastAPI — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Updated Flaxon versus Node.js, Go and FastAPI</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../docs/guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/benchmarks/cross_runtime/UPDATED_RUNTIME_RESULTS.md">Framework source</a> · <a href="../../content/framework/benchmarks/cross_runtime/UPDATED_RUNTIME_RESULTS.md" download>Markdown</a></p><h1 id="updated-flaxon-versus-nodejs-go-and-fastapi">Updated Flaxon versus Node.js, Go and FastAPI</h1>
+<p>Measured after commit c4dcd93 (default orjson and request dispatch improvements). Three randomized five-second samples for each endpoint/runtime; medians shown. One server worker, 32 keepalive connections, separate pinned server and client CPUs, AMD EPYC 9V74 shared host.</p>
+<table>
+<thead>
+<tr>
+<th>Runtime</th>
+<th style="text-align: right;">Plaintext req/s</th>
+<th style="text-align: right;">Plaintext p95 ms</th>
+<th style="text-align: right;">JSON req/s</th>
+<th style="text-align: right;">JSON p95 ms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flaxon</td>
+<td style="text-align: right;">20,366</td>
+<td style="text-align: right;">2.426</td>
+<td style="text-align: right;">19,657</td>
+<td style="text-align: right;">2.068</td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td style="text-align: right;">13,032</td>
+<td style="text-align: right;">3.215</td>
+<td style="text-align: right;">13,664</td>
+<td style="text-align: right;">3.377</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td style="text-align: right;">58,314</td>
+<td style="text-align: right;">0.996</td>
+<td style="text-align: right;">61,532</td>
+<td style="text-align: right;">0.996</td>
+</tr>
+<tr>
+<td>Go</td>
+<td style="text-align: right;">60,504</td>
+<td style="text-align: right;">1.078</td>
+<td style="text-align: right;">67,537</td>
+<td style="text-align: right;">1.166</td>
+</tr>
+</tbody>
+</table>
+<p>Validated 4,783,864 measured responses with 0 errors (warmup excluded).</p>
+<p>Flaxon throughput for /plaintext was 56.3% higher than FastAPI in this run.
+Flaxon throughput for /json was 43.9% higher than FastAPI in this run.</p>
+<p>Node and Go are core HTTP servers rather than equivalent full-stack frameworks. Flaxon and FastAPI run identical Uvicorn/uvloop/httptools settings. Endpoints return a fixed small response with no database, authentication, templates, or application middleware. These results do not establish equivalent performance for real applications or measure development speed or bug rates. p95 values are medians of per-sample p95s, not a pooled percentile.</p>
+<p>Versions: Python 3.12.14, Node v24.19.0, go version go1.27.2 linux/amd64, FastAPI 0.143.0. Flaxon source reports 0.2.7 and includes unreleased PR #10; editable distribution metadata still reports 0.2.6. The exact source revision and raw samples are recorded in updated-runtime-results.json.</p>
+<p>Reproduce:
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>benchmarks/cross_runtime/run.py<span class="w"> </span>--go<span class="w"> </span>/path/to/go<span class="w"> </span>--runtimes<span class="w"> </span>Flaxon,Node.js,Go,FastAPI<span class="w"> </span>--seconds<span class="w"> </span><span class="m">5</span><span class="w"> </span>--repeats<span class="w"> </span><span class="m">3</span><span class="w"> </span>--output<span class="w"> </span>updated-runtime-results.json
+</code></pre></div></p></article>
+</main></div><div id="footer"></div></body></html>

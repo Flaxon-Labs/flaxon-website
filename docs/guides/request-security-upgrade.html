@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Request performance and authentication migration — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Request performance and authentication migration — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Request performance and authentication migration</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/guides/request-security-upgrade.md">Framework source</a> · <a href="../../content/framework/docs/guides/request-security-upgrade.md" download>Markdown</a></p><h1 id="request-performance-and-authentication-migration">Request performance and authentication migration</h1>
+<p>Flaxon keeps security headers and request IDs enabled. Public HTTP handlers
+no longer allocate a stored session or emit a session cookie automatically.</p>
+<h2 id="sessions">Sessions</h2>
+<p><code>request.session</code> remains a synchronous mapping. A request without a valid
+cookie creates an unsaved session on first access. Setting, updating, clearing,
+regenerating or deleting values makes it dirty; Flaxon saves the dirty session
+and sends its signed cookie at response time. Reading an empty session does not
+create server-side state. Existing signed cookies are verified and loaded before
+the handler, preserving synchronous access to database/Redis session data.
+This is lazy creation, not lazy asynchronous loading of existing sessions.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/public'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">public</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">'message'</span><span class="p">:</span> <span class="s1">'No session cookie needed'</span><span class="p">}</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/preferences'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">preferences</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'theme'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dark'</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">'saved'</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div>
+<p>Directly constructed session cookie managers default to Secure, HttpOnly and
+SameSite=Lax. <code>Flaxon(debug=True)</code> explicitly permits HTTP development cookies;
+production uses Secure cookies. Do not enable debug to work around production
+HTTPS configuration. Application-owned cookies still need explicit secure flags.</p>
+<p>Reads do not refresh expiry. Nested mutable values must be reassigned to the
+session mapping after editing so the dirty flag is set. Keep session regeneration
+on login and revocation on logout. CSRF protection remains required for mutations.</p>
+<h2 id="typed-query-parameters">Typed query parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/items/&lt;int:item_id&gt;'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="n">item_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">item_id</span><span class="p">,</span> <span class="s1">'verbose'</span><span class="p">:</span> <span class="n">verbose</span><span class="p">,</span> <span class="s1">'n'</span><span class="p">:</span> <span class="n">n</span><span class="p">}</span>
+</code></pre></div>
+<p><code>/items/1?verbose=true&amp;n=3</code> returns converted values. <code>?n=abc</code> and
+<code>?verbose=maybe</code> return 422. A scalar without a default is required. Optional
+scalars need an explicit <code>None</code> default to be optional. Supported inferred types
+are str, int, float and bool, including optional versions of those types.
+Unannotated parameters with defaults still use their defaults. For collections,
+aliases or constraints, declare an explicit <code>Query(...)</code> or parse deliberately.</p>
+<p>Resolution order is path values, reserved request/socket arguments, registered
+container dependencies, explicit Query, inferred scalar query, then body schemas
+and ordinary defaults. Existing container values stay dynamic per request.
+OpenAPI includes inferred queries. This is a behavior change: URLs that supplied
+previously ignored scalar parameters may now change the result or return 422.</p>
+<p>Endpoint signatures and type hints are prepared at registration. Define model
+classes before registering handlers. Replace/re-register an endpoint instead of
+mutating its annotations after registration.</p>
+<h2 id="jwt-migration">JWT migration</h2>
+<p>Flaxon JWT and JWTBackend now use PyJWT. Algorithms are explicitly configured
+HS256, HS384 or HS512; an untrusted header cannot change the algorithm. Expiration
+is required. Use at least 32 random bytes for HS256, 48 for HS384 and 64 for HS512.
+Configure issuer and audience for tokens shared with another service.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWT</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">JWT</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SECRET_KEY</span><span class="p">,</span> <span class="n">issuer</span><span class="o">=</span><span class="s1">'project-manager'</span><span class="p">,</span> <span class="n">audience</span><span class="o">=</span><span class="s1">'project-api'</span><span class="p">,</span>
+             <span class="n">key_id</span><span class="o">=</span><span class="s1">'2026-10'</span><span class="p">,</span> <span class="n">verification_keys</span><span class="o">=</span><span class="p">{</span><span class="s1">'2026-09'</span><span class="p">:</span> <span class="n">previous_secret</span><span class="p">})</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s1">'user_id'</span><span class="p">:</span> <span class="s1">'42'</span><span class="p">})</span>
+<span class="n">claims</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</code></pre></div>
+<p>Only explicitly configured keys can be selected by kid. Unknown key IDs fail.
+Keep old keys only for the intended rotation period. Never fetch a key from a
+URL supplied in a token. Without kid, the configured signing key is used.</p>
+<p>Old Flaxon tokens used hexadecimal HMAC signatures and are intentionally rejected.
+Deploy the producer and consumer together and have users sign in again. There is
+no automatic insecure legacy-token fallback. JWTBackend token revocation is local
+to its instance; multiple workers require a shared revocation implementation or
+short-lived tokens and centrally managed refresh tokens.</p>
+<h2 id="password-migration">Password migration</h2>
+<p>New framework hashes use Argon2id with 19 MiB memory, time cost 2 and parallelism 1.
+argon2-cffi and PyJWT are core dependencies. Legacy PBKDF2-SHA256 hashes still verify.
+Admin upgrades a legacy password hash after successful verification, and preserves
+it after a failed attempt. Applications using the standalone helpers must save
+upgrades themselves:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">hash_password</span><span class="p">,</span> <span class="n">verify_password</span><span class="p">,</span> <span class="n">needs_rehash</span>
+
+<span class="k">if</span> <span class="n">verify_password</span><span class="p">(</span><span class="n">password</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">password_hash</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">needs_rehash</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">password_hash</span><span class="p">):</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">password_hash</span> <span class="o">=</span> <span class="n">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">update_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">'password_hash'</span><span class="p">])</span>
+</code></pre></div>
+<p>Explicit PBKDF2 remains available with a default 600,000 iterations. Benchmark
+hashing on deployment hardware; do not reduce cost just to improve HTTP benchmark
+scores. Hashing is synchronous: async handlers should offload expensive hashing
+to a bounded worker pool and rate-limit authentication requests. The full-stack
+course already uses Argon2 and application-owned ORM sessions; its customer login
+flow does not need conversion to the framework session or JWT system.</p>
+<h2 id="exceptions-and-checks">Exceptions and checks</h2>
+<p>Unexpected authentication and permission errors now propagate instead of being
+silently treated as an ordinary denial. Optional plugin and callback failures
+remain isolated but emit warnings without logging submitted payloads. Database
+initialization cleanup re-raises the original error.</p>
+<p>The mypy platform setting is corrected. Repository-wide typing and style debt is
+recorded in the benchmark audit; do not confuse passing critical lint checks with
+a completely lint-clean or fully typed repository.</p>
+<h2 id="application-performance">Application performance</h2>
+<p>Use persistent database connections, index actual filter/order columns, avoid
+queries inside loops, paginate lists, and measure query counts. Keep ownership
+filters on every data query. Cache public or correctly scoped data with explicit
+expiry and invalidation; do not cache one user's response under a shared key.
+Move blocking I/O off the event loop. Run multiple workers only after sharing
+sessions, rate limits, task coordination and WebSocket fan-out appropriately.
+MinifyJS changes browser assets; it does not accelerate Python API handlers.</p></article>
+</main></div><div id="footer"></div></body></html>
