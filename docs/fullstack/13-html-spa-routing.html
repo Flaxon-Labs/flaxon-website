@@ -256,5 +256,8 @@ app.mount_module(users, prefix="/api/users")
 <li>Request <code>/api/missing</code>; confirm it returns an error instead of the SPA shell.</li>
 <li>Check modified clicks, mobile navigation, keyboard focus, and production-generated assets.</li>
 </ul>
-<p><a href="12-teloce-flaxon-apis.html">Previous: Teloce and Flaxon APIs</a> · <a href="index.html">Course contents</a></p></article>
+<p><a href="12-teloce-flaxon-apis.html">Previous: Teloce and Flaxon APIs</a> · <a href="index.html">Course contents</a></p>
+<h2 id="optional-ssr-and-integrated-debugging">Optional SSR and integrated debugging</h2>
+<p>The client-rendered workflow above remains supported. To render the initial <code>.html</code> entry on the server, follow the <a href="../guides/teloce-ssr-debugging.html">Flaxon SSR and debugger guide</a> and <a href="../guides/teloce-ssr-reference.html">Teloce SSR reference</a>. Use explicit public props, SSR-compatible templates, and matching packages from the <a href="../guides/latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging">preview installation guide</a>.</p>
+<p><code>data-teloce-link</code> still handles subsequent browser navigation. With <code>debug=True</code>, runtime errors, hydration diagnostics, and failed same-origin API requests appear in the overlay and <code>/__debug__</code>, with request IDs connecting API failures to Python errors. Production disables this development client and reporting endpoint.</p></article>
 </main></div><div id="footer"></div></body></html>

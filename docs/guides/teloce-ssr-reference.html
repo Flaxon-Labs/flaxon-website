@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Teloce SSR and hydration reference — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Teloce SSR and hydration reference — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Teloce SSR and hydration reference</span></nav>
+<article class="doc-content"><blockquote>
+<p>Preview documentation: these APIs require the coordinated commits in the <a href="https://github.com/aldanedev-create/teloce-py/blob/94df54e72ba4bf0df127ff87018e8490d6dd7a78/docs/latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging">installation guide</a>. This is not a new PyPI release.</p>
+</blockquote>
+<h1 id="server-rendering-and-hydration">Server rendering and hydration</h1>
+<p>Teloce can compile <code>.html</code> and <code>.vel</code> templates into browser modules and a separate, versioned server render program. The server renderer has no Flaxon dependency and never executes the component's JavaScript. Flaxon, Flask, or another host loads application data and passes an explicit public snapshot to it.</p>
+<h2 id="build-an-ssr-entry">Build an SSR entry</h2>
+<p>Put components in <code>ui/</code> and configure <code>teloce.config.json</code>:</p>
+<pre><code class="language-json">{
+  "build": {
+    "html_mode": true,
+    "source_roots": ["ui"],
+    "ssr": true,
+    "ssr_entries": ["ui/App.html"],
+    "bundle": true,
+    "bundler": "minifyjs",
+    "minifier": "minifyjs"
+  }
+}
+</code></pre>
+<p>Run <code>teloce build</code>. The build produces browser modules, scoped CSS, <code>.ssr.json</code> programs and <code>manifest.json</code>. Selected entries include their imported component dependencies. Other components still compile for browser use. Omitting <code>ssr_entries</code> validates every component for SSR. AST SSR requires the shared runtime, which is enabled by default.</p>
+<p>Use the renderer independently:</p>
+<pre><code class="language-python">from teloce.server import Renderer
+
+renderer = Renderer("dist")
+result = renderer.render("ui/App.html", {"title": "Projects"})
+# result.html, result.props_json, result.assets, result.diagnostics
+</code></pre>
+<p>Load the renderer once per build. Replace it after rebuilding. Entry names must exist in the manifest; the renderer does not import arbitrary component paths.</p>
+<h2 id="supported-template-expressions">Supported template expressions</h2>
+<p>The server compiler consumes Teloce's canonical template AST and expression AST. It emits validated JSON instructions rather than translating JavaScript with regular expressions or evaluating application Python objects.</p>
+<p>Supported constructs include text interpolation, <code>v-if</code>/<code>v-else</code>, indexed <code>v-for</code>, keyed rows, <code>:attribute</code>, <code>v-text</code>, <code>v-show</code>/<code>v-hide</code>, imported child components, and default/named slots. Slots use the parent's public scope. Scoped CSS uses the same scope identifier as the browser compiler.</p>
+<p>Expressions support public identifiers, plain arrays/objects, property and computed access, ternaries, arithmetic, comparisons, equality, <code>typeof</code>, <code>!</code>, <code>&amp;&amp;</code>, <code>||</code>, and <code>??</code>. Empty arrays and objects are truthy; booleans remain distinct from numbers under <code>===</code>. Optional property access is supported, but mixed optional/nonoptional chains are rejected: use explicit conditionals instead. Template literals, arbitrary calls, assignments, spreads, dynamic components, virtual lists and raw <code>v-html</code> are outside the initial SSR subset. <code>v-model</code> remains browser-only in this release.</p>
+<p>String methods are <code>toUpperCase()</code>, <code>toLowerCase()</code>, <code>trim()</code>, <code>includes(value)</code>, <code>startsWith(value)</code> and <code>endsWith(value)</code>. Arrays support <code>includes(value)</code> and <code>join(separator)</code>. These methods accept only the documented arguments; position arguments and optional method calls are not supported. Expressions with unsupported syntax fail during the build with an original component location. Public values missing at request time raise <code>SSRRenderError</code> with the affected template location.</p>
+<p>This is a tested subset of JavaScript semantics, not a general JavaScript engine. Server/client parity fixtures run against Node, and Chromium tests cover development and production output.</p>
+<h2 id="public-data-and-security">Public data and security</h2>
+<p>Pass a plain dictionary containing only JSON-compatible values. Nested objects must be plain dictionaries/lists, not models, functions, dates, or arbitrary application objects. Convert dates, money and large integers to strings explicitly. Nonfinite numbers and numbers outside JavaScript's safe range are rejected. Do not pass an entire user/database object or server settings: every public value is also sent to the browser.</p>
+<p>Interpolations and attributes are escaped for their HTML contexts. Script props escape <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code> and Unicode line separators. URL bindings reject executable schemes and backslashes; inline event attributes and raw HTML are rejected. Rendering has limits on data depth/items, expression size/nodes, component nesting, iterations, and output size. SSR does not run <code>data()</code>, methods, or lifecycle hooks on the server. Supply every server-rendered state field explicitly, including child props.</p>
+<h2 id="hydrate-an-existing-root">Hydrate an existing root</h2>
+<p>Your host injects the server HTML and the <strong>same public snapshot</strong> into a marked root:</p>
+<pre><code class="language-html">&lt;div id="app" data-teloce-ssr="1"&gt;...server HTML...&lt;/div&gt;
+</code></pre>
+<p>Then import <code>hydrate</code> from the manifest's client entry and call <code>hydrate("#app", publicProps)</code>. <code>hydrate</code> is also available on the component's default export. The shared runtime reconciles matching nodes in place, initializes props, binds events once, and hydrates imported child components. Keyed rows retain their identity.</p>
+<p>Signals remain signals. If client <code>data()</code> returns <code>count: signal(0)</code>, seed it with <code>{"count": {"value": 4}}</code>; hydration writes its value and subscribes to subsequent changes. Signal helpers are provided by the compiler's runtime imports; no manual import is needed in the normal component workflow.</p>
+<p>Matching input nodes preserve the value, selection and focus present before startup. Replaced nodes cannot preserve their identity. Because <code>v-model</code> is not in the SSR subset, restored input values do not automatically become application state; bind your input handler deliberately or keep that form client-only.</p>
+<p>Structural/version mismatches emit a <code>hydration</code> diagnostic and reconcile the affected component. Browser-only lifecycle hooks still run. Avoid fetching the same data again in <code>mounted()</code> when the public snapshot already contains it. <code>unmount()</code> removes event handlers, signal subscriptions and child instances. SPA routers can continue using ordinary client mounts for later navigation.</p>
+<h2 id="prerender-and-cache">Prerender and cache</h2>
+<p>After an SSR build, create <code>public.json</code> containing the public snapshot:</p>
+<pre><code class="language-bash">teloce prerender ui/App.html --data public.json --build-dir dist --output index.html
+</code></pre>
+<p>The command writes hydrated HTML, safe props and stylesheet links inside the build directory. Serve <code>dist/</code> at the site root. Unsupported/missing entries return a nonzero status.</p>
+<p><code>Renderer("dist", cache_size=32)</code> enables an optional LRU render cache. Its key includes the entry and complete public snapshot; it is limited to 256 entries and 8 MB of serialized data/output. The default is disabled. It does not cache authentication, HTTP responses, data-loading queries or secret context. Recreate the renderer after each build.</p>
+<h2 id="development-diagnostics">Development diagnostics</h2>
+<p>The runtime exposes <code>onTeloceError(listener)</code> and <code>reportTeloceError(error, detail)</code> from the shared runtime, and dispatches a <code>teloce:error</code> browser event. Reports include category, component and available original expression locations. A failing reporter cannot interrupt application updates. Hosts can subscribe without making Teloce depend on them.</p>
+<p>Flaxon's adapter adds the development overlay, source-map resolution and dashboard transport. See Flaxon's SSR/debugger guide. Source maps resolve the nearest emitted mapping; they are not a guarantee of token-level accuracy for every transformed expression.</p>
+<h2 id="legacy-compatibility">Legacy compatibility</h2>
+<p><code>ssr: "legacy"</code> retains Jinax/Jinja <code>.html</code> artifacts. Existing <code>teloce.ssr.render_ssr()</code> remains a legacy adapter and does not acquire the explicit hydration contract. The new <code>ssr: true</code> build uses AST programs. <code>teloce build --static</code> retains legacy output unless <code>ssr</code> is explicitly configured. Migrate a host to <code>teloce.server.Renderer</code> before switching its artifact reader.</p></article>
+</main></div><div id="footer"></div></body></html>

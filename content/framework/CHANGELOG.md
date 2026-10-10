@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### Added
+- Teloce AST SSR with explicit public props, hydration, metadata, asset preloads and configurable rendering fallback/cache.
+- Development browser overlay and dashboard reports for compiler, SSR, runtime, hydration and API failures, with bounded source mapping.
+- Scoped-CSS SSR example and documentation; production debugger absence and real-browser regression checks.
+
+### Fixed
+- Escape untrusted error fields in the dashboard and correlate validated request IDs without overwriting independent server errors.
+
+- Complete the configured Ruff cleanup and reduce the active lint baseline to zero. Keep all configured rules enabled, with documented local exceptions for established positional APIs and explicit trusted boundaries.
+- Split Admin, CMS, ORM adapters, GraphQL, OpenAPI, module mounting, and management commands into focused helpers; retain lazy optional imports.
+- Validate SQL identifiers before composing database statements; restrict task pickle loading by default. Application-defined pickle classes require `from_pickle(data, trusted=True)` and authenticated, trusted payloads.
+- Fix synchronous cache writes/invalidation and keep notification delivery tasks referenced until completion.
+
+- Reduce Ruff findings from 3,442 to 2,973 without disabling rules; document cache, dependency, task, and logging APIs and tighten the per-file/rule CI budget.
+- Isolate request, logging, task, and dependency context values across concurrent tasks; copy logging configuration handlers and repair rotating file handler options. Add regression tests and expand strict typing checks to 15 core modules.
+
+- Index dynamic HTTP candidates by their full literal prefix and cache route specificity, preserving typed converters, method fallback, mounted routes, and registration-order ties.
+- Log task signal and worker failures; use bounded worker retry delays; propagate S3 access/backend errors instead of reporting missing objects.
+- Narrow request decoding, annotation resolution, persisted-query, and WebSocket token error boundaries.
+- Fix mypy source-package discovery, check 11 core modules, consolidate tool configuration, and add a per-file/rule lint budget in CI. See [quality audit](docs/quality-audit.md) for remaining debt and route-only measurements.
+
 - Release readiness: preserve environment secret strings, repair version/changelog/artifact/tag tooling, support prerelease versions, verify installed wheels, and make CDN browser tests reproducible.
 
 - Use browser-safe orjson encoding by default; add explicit legacy response and settings modes. See [migration rules](docs/guides/json-serialization.md).

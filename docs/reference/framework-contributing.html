@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Contributing to Flaxon</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/CONTRIBUTING.md">Framework source</a> · <a href="../../content/framework/CONTRIBUTING.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/CONTRIBUTING.md">Framework source</a> · <a href="../../content/framework/CONTRIBUTING.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
 <p>Thank you for your interest in contributing to Flaxon! 🎉</p>
 <h2 id="code-of-conduct">Code of Conduct</h2>
 <p>By participating in this project, you agree to abide by our <a href="code-of-conduct.html">Code of Conduct</a>.</p>
@@ -41,8 +41,8 @@
 <li>Make your changes with tests</li>
 <li><strong>Run the full test suite</strong> (see below) and confirm it passes -- a partial
    or single-file test run is not sufficient before opening a PR</li>
-<li>Run linting: <code>ruff check .</code></li>
-<li>Run type checking: <code>mypy .</code></li>
+<li>Run linting: <code>python scripts/check_lint_budget.py</code></li>
+<li>Run type checking: <code>python scripts/typecheck.py</code></li>
 <li>Commit with clear messages</li>
 <li>Push and open a Pull Request</li>
 </ol>
@@ -97,9 +97,17 @@ submitting a PR -- CI (and reviewers) will run the complete suite regardless.</p
 <li>Prefer async/await for I/O operations</li>
 </ul>
 <h2 id="linting-configuration">Linting Configuration</h2>
-<p>Flaxon uses <code>ruff</code> for linting and formatting. Configuration is in <code>ruff.toml</code>.</p>
+<p>Flaxon uses Ruff for linting and formatting. Configuration is in <code>ruff.toml</code>;
+use the pinned development version so the legacy budget is reproducible.
+<code>python scripts/check_lint_budget.py</code> rejects increases for every file/rule pair.
+<code>ruff check src/flaxon</code> reports the full remaining debt. Reduce the checked-in
+baseline when fixing old findings; do not increase it to accept new warnings.</p>
 <h2 id="type-checking">Type Checking</h2>
-<p>Flaxon uses <code>mypy</code> for static type checking. Configuration is in <code>mypy.ini</code>.</p>
+<p>Flaxon uses mypy for static type checking. Configuration is in <code>mypy.ini</code>.
+<code>python scripts/typecheck.py</code> checks 11 core modules with the strict configuration.
+Imports from unchecked modules are not followed by this gate. Run
+<code>python scripts/typecheck.py --full</code> to audit the whole package; that command
+currently fails on existing typing debt. See <a href="../quality-audit.html">the audit</a>.</p>
 <h2 id="test-organization">Test Organization</h2>
 <ul>
 <li>Unit tests in <code>tests/unit/</code> -- test individual components</li>

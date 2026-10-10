@@ -426,6 +426,9 @@ def build():
     upgrade_url = "docs/guides/latest-upgrade.html"
     upgrade_body = markdown.markdown((ROOT / "content/tutorials/latest-upgrade.md").read_text(), extensions=["tables", "fenced_code", "toc"])
     preserved.append({"url": upgrade_url, "title": "Upgrade to the latest Flaxon workflow", "section": "Getting started", "body": upgrade_body})
+    reference_url = "docs/guides/teloce-ssr-reference.html"
+    reference_body = markdown.markdown((ROOT / "content/tutorials/teloce-ssr-reference.md").read_text(), extensions=["tables", "fenced_code", "toc"])
+    preserved.append({"url": reference_url, "title": "Teloce SSR and hydration reference", "section": "Feature guides", "body": reference_body})
     downloads = ROOT / "downloads"
     downloads.mkdir(exist_ok=True)
     with zipfile.ZipFile(downloads / "flaxon-guessing-game.zip", "w", zipfile.ZIP_DEFLATED) as archive:
@@ -437,7 +440,7 @@ def build():
                 archive.writestr(entry, source.read_bytes())
     for file in sorted((ROOT / "docs").rglob("*.html")):
         url = file.relative_to(ROOT).as_posix()
-        if url in imported or url in {tutorial_url, api_lesson_url, routing_url, upgrade_url}:
+        if url in imported or url in {tutorial_url, api_lesson_url, routing_url, upgrade_url, reference_url}:
             continue
         soup = BeautifulSoup(file.read_text(), "html.parser")
         content = soup.select_one(".doc-content")
@@ -486,6 +489,16 @@ def build():
         )
         soup = BeautifulSoup(body, "html.parser")
         rewrite_links(soup, entry, mapping, manifest)
+        for link in soup.select('a[href="https://github.com/aldanedev-create/teloce-py/blob/main/docs/ssr-and-hydration.md"]'):
+            link["href"] = relative("docs/guides/teloce-ssr-reference.html", entry["url"])
+        if entry["source"] in {"docs/guides/teloce-ssr-debugging.md", "examples/teloce_ssr/README.md"}:
+            notice = soup.new_tag("p", attrs={"class": "doc-preview-note"})
+            notice.append("Preview: this integration is pending merge/release. ")
+            link = soup.new_tag("a", href=relative("docs/guides/latest-upgrade.html", entry["url"]) + "#preview-teloce-ssr-hydration-and-browser-debugging")
+            link.string = "Install matching tested commits"
+            notice.append(link)
+            soup.insert(0, notice)
+
         # One page heading; subsequent source headings retain their original IDs.
         if not soup.find("h1"):
             heading = soup.new_tag("h1")

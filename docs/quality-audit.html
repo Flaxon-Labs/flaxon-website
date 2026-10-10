@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Routing and quality audit — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Routing and quality audit — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Routing and quality audit</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/quality-audit.md">Framework source</a> · <a href="../content/framework/docs/quality-audit.md" download>Markdown</a></p><h1 id="routing-and-quality-audit">Routing and quality audit</h1>
+<p>This audit starts from commit <code>f4ab3cd440234750f6220ee2fc107dde58b93132</code>.
+It improves HTTP route lookup and error visibility, fixes the whole-package
+mypy invocation, and adds gates against new lint debt. The historical measurements below precede the complete lint cleanup documented
+at the end. Flaxon is not fully type-checked.</p>
+<h2 id="http-routing">HTTP routing</h2>
+<p>Dynamic routes are indexed by their literal path segments before the first
+parameter. <code>/api/projects/&lt;int:project_id&gt;</code> no longer needs to check unrelated
+<code>/api/tasks/...</code> routes. The index stops before a mixed segment or parameter:
+custom converters and <code>&lt;path:...&gt;</code> may match slashes, so their regex remains
+the authority. Candidate lists retain specificity and registration order;
+specificity is calculated once rather than repeatedly during matching.</p>
+<p>Exact static routes keep the dictionary lookup. A static route for a different
+HTTP method still allows a matching dynamic route to handle the request.
+Typed conversion, 404/405 handling, mounting, and late registration are covered
+by regression tests against an ordered reference matcher. Registration updates
+the index immediately; it does not cache request values or dependency instances.</p>
+<p>Routes with an early parameter can still share a broad candidate list. This is
+not a complete segment trie for every converter, and WebSocket matching is
+unchanged. Treat registered route definitions as immutable; add routes through
+<code>Router</code> decorators and <code>include_router()</code>.</p>
+<h3 id="route-only-measurements">Route-only measurements</h3>
+<p>Measured in the same Linux container with Python 3.12.14 on AMD EPYC 9V74.
+Each resource has one static route and one dynamic route under <code>/api</code>.
+Each value is the median of seven samples, each containing 3,000 verified
+lookups. Paths and IDs vary during the dynamic run. Before uses the base commit;
+after uses this implementation. Values are microseconds per lookup.</p>
+<table>
+<thead>
+<tr>
+<th>Resource pairs</th>
+<th style="text-align: right;">Dynamic before</th>
+<th style="text-align: right;">Dynamic after</th>
+<th style="text-align: right;">404 before</th>
+<th style="text-align: right;">404 after</th>
+<th style="text-align: right;">405 before</th>
+<th style="text-align: right;">405 after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td style="text-align: right;">7.63</td>
+<td style="text-align: right;">1.82</td>
+<td style="text-align: right;">7.93</td>
+<td style="text-align: right;">1.76</td>
+<td style="text-align: right;">8.82</td>
+<td style="text-align: right;">2.44</td>
+</tr>
+<tr>
+<td>100</td>
+<td style="text-align: right;">27.30</td>
+<td style="text-align: right;">1.91</td>
+<td style="text-align: right;">33.15</td>
+<td style="text-align: right;">1.71</td>
+<td style="text-align: right;">36.14</td>
+<td style="text-align: right;">2.61</td>
+</tr>
+<tr>
+<td>1,000</td>
+<td style="text-align: right;">245.95</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">298.53</td>
+<td style="text-align: right;">1.89</td>
+<td style="text-align: right;">296.62</td>
+<td style="text-align: right;">2.73</td>
+</tr>
+</tbody>
+</table>
+<p>Static hits measured approximately 0.37–0.47 microseconds in both versions.
+The large dynamic improvement applies to this common-prefix workload. It does
+not measure HTTP throughput, middleware, database queries, or application work,
+and it does not establish a ranking against other frameworks. Shared-container
+load and path shape affect the numbers.</p>
+<p>Run from an installed checkout:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>benchmarks/router_scaling.py
+python<span class="w"> </span>-m<span class="w"> </span>cProfile<span class="w"> </span>-s<span class="w"> </span>cumulative<span class="w"> </span>benchmarks/router_scaling.py<span class="w"> </span>--iterations<span class="w"> </span><span class="m">1000</span>
+</code></pre></div>
+<h2 id="exception-boundaries">Exception boundaries</h2>
+<p>Counting only unnamed <code>except Exception:</code> misses most broad handlers. The base
+has 94 broad handlers (30 unnamed), plus one <code>suppress(Exception)</code>. This change
+has 88 broad handlers (26 unnamed) and no <code>suppress(Exception)</code>.</p>
+<p>The important changes are behavior, not the count:</p>
+<ul>
+<li>Task signal listeners log failures with tracebacks and continue to other
+  listeners. Cancellation propagates. Listener subscriptions are snapshotted
+  for each emission so disconnecting during dispatch cannot skip another listener.</li>
+<li>Worker queue failures log and retry with exponential delays from 0.1 seconds
+  to a maximum of five seconds. Successful queue reads reset the delay. This
+  prevents an unavailable backend from causing a busy loop.</li>
+<li>S3 <code>exists()</code> returns <code>False</code> only for a missing object. Access-denied,
+  connection, service, and unexpected errors propagate instead of masquerading
+  as missing files. Applications relying on the previous fallback must handle
+  those backend errors explicitly.</li>
+<li>Annotation resolution catches expected unresolved-annotation errors.
+  Compression decoding translates known gzip/deflate errors into <code>BadRequest</code>
+  while unexpected programming errors propagate.</li>
+<li>Persisted queries tolerate invalid JSON and malformed extension shapes;
+  unexpected request-reader errors propagate. WebSocket token decoding catches
+  known malformed-value errors rather than every exception.</li>
+</ul>
+<p>Retained broad catches serve different contracts: user callback/plugin/CLI
+boundaries record failures, application recovery translates unexpected errors
+into server responses, cleanup handlers rethrow after releasing resources,
+database health probes report unavailability, debug inspection protects the
+original error from failing <code>repr</code>/inspection, and validation or disconnected
+WebSocket handling fails closed. These should be reviewed by their contract;
+mechanically replacing them with <code>suppress(Exception)</code> hides the same problem.
+This audit is not an independent security assessment of every subsystem.</p>
+<p>Inventory named catches, unnamed catches, and suppressions together:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/audit_exceptions.py
+</code></pre></div>
+<h2 id="typing">Typing</h2>
+<p><code>mypy_path</code> now points to the repository's <code>src</code> directory. The whole-package
+command no longer stops because <code>src.flaxon.exceptions</code> and <code>flaxon.exceptions</code>
+are discovered as different modules.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/typecheck.py<span class="w">        </span><span class="c1"># Required core gate</span>
+python<span class="w"> </span>scripts/typecheck.py<span class="w"> </span>--full<span class="w"> </span><span class="c1"># Report wider debt; currently fails</span>
+</code></pre></div>
+<p>The strict core gate grew from three to 11 modules: route preparation,
+converters, parameters, definitions and matching, dependency resolution, task
+signals/workers, body decoding, JSON serialization, and JWT. The gate does not
+follow imports into unchecked modules; passing it is not a whole-package typing
+claim. The full command reported 881 errors across 172 files in the validation
+environment. Optional dependencies can affect that report. No global
+<code>ignore_errors</code> or <code>ignore_missing_imports</code> was added to mask this debt.</p>
+<p><code>mypy.ini</code>, <code>ruff.toml</code>, and <code>tox.ini</code> are the authoritative configurations;
+competing configurations were removed from <code>pyproject.toml</code>.</p>
+<h2 id="lint-debt">Lint debt</h2>
+<p>Using Ruff 0.16.10, findings dropped from 3,871 to 3,442 through safe import,
+docstring-format, newline and stale-suppression fixes, targeted API documentation,
+and formatting of smaller affected modules. No rules were disabled to obtain
+that reduction. Public docstrings, embedded long lines, and complex functions
+still account for substantial debt.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/check_lint_budget.py<span class="w"> </span><span class="c1"># Reject increases by file and rule</span>
+ruff<span class="w"> </span>check<span class="w"> </span>src/flaxon<span class="w">             </span><span class="c1"># Show every remaining finding</span>
+</code></pre></div>
+<p>CI uses the pinned Ruff version and <code>scripts/lint-baseline.json</code>. New files have
+no allowance. Fix new findings; never increase the baseline to accept them.
+When reducing existing debt, lower the corresponding allowances in the same PR.
+The budget does not turn existing warnings into clean code, and per-file counts
+cannot identify a replacement warning when another warning of the same rule was
+removed. Review changed code and continue reducing the baseline.</p>
+<h2 id="verification-and-remaining-coverage-gap">Verification and remaining coverage gap</h2>
+<p>The full suite with benchmark timing disabled completed with <strong>933 passed and
+32 skipped</strong>. The unchanged base completed with <strong>905 passed and 32 skipped</strong>
+in the same environment. Real browser and externally configured integrations
+require their separate test environments.</p>
+<p>Both coverage-enabled commands exited unsuccessfully because the configured
+80% threshold is not reached: <strong>46.41% before, 47.11% after</strong>. The threshold was
+not lowered. Test assertions passing does not mean the coverage gate passed.
+The expanded request/security CI command, which intentionally runs without
+coverage options, passed <strong>279 tests, with two skipped</strong>. All four benchmark
+fixture tests also passed with benchmark measurements enabled.</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>tests<span class="w"> </span>--benchmark-disable
+<span class="c1"># Runs all assertions and reports the existing coverage-threshold failure.</span>
+</code></pre></div>
+<h2 id="follow-up-lint-cleanup">Follow-up lint cleanup</h2>
+<p>A second pass reduced Ruff 0.16.10 findings from <strong>3,442 to 2,973</strong> (469
+removed). It adds 388 public API docstrings across caching, dependency injection,
+tasks, and logging, plus reviewed import and formatting cleanup. Parent-relative
+imports now use equivalent absolute Flaxon paths. Optional integrations retain
+their lazy imports. No lint rules were disabled, and every file/rule allowance
+was reduced or kept unchanged.</p>
+<p>The pass also fixes shared mutable context defaults and cached context
+dictionaries. Request and logging helpers read the active context dynamically;
+context mutations copy their dictionaries so child tasks cannot overwrite their
+parent's values. Task and dependency contexts use immutable defaults. Logging
+configurations copy handler definitions, and rotating file handlers now pass
+size, backup count, and encoding by name to the standard library handler.</p>
+<p>Thirteen regression tests cover independent contexts, concurrent tasks and
+logging middleware, nested context restoration, configuration isolation, and
+actual log rollover. These tests are included in the request/security CI job.
+The strict typing gate now checks <strong>15 modules</strong>, adding the four context
+modules. This remains targeted coverage rather than a whole-package typing
+claim.</p>
+<p>The full suite completed with <strong>946 passed and 32 skipped</strong>, with default
+coverage options and benchmark timing disabled. This verifies test assertions;
+the existing coverage gap described above remains.</p>
+<h2 id="complete-configured-lint-cleanup">Complete configured lint cleanup</h2>
+<p>The remaining 2,973 active findings are resolved. Ruff 0.16.10 now passes
+<code>ruff check src/flaxon</code>, and the per-file baseline is empty. CI runs every
+configured rule. No rule selection or global/per-file ignore was broadened.
+This means clean under the repository's existing configuration, not every
+possible Ruff rule or a complete security/type audit.</p>
+<p>The changes document public APIs, simplify large handlers, validate SQL
+identifiers, preserve lazy optional imports, and fix synchronous cache writes.
+Admin/CMS authorization, CSRF checks, transaction boundaries, stale-edit checks,
+and route registration order remain part of regression testing.</p>
+<p>Reviewed local exceptions retain established positional public APIs and the
+standard-library redirect-handler signature (PLR0917). CLI subprocess calls
+use argument lists without a shell (S603); outbound service requests validate
+HTTP(S) URLs and disable redirects (S310). The explicit trusted pickle mode
+retains S301 with a warning at the call site. These exceptions are visible
+<code>noqa</code> annotations with reasons, not globally disabled rules. Therefore this
+is not a claim that every former finding was fixed without suppressions.</p>
+<p>Task pickle loading now rejects arbitrary imported globals by default. Ordinary
+containers and allowlisted datetime, decimal and UUID values still round-trip.
+Custom classes need <code>Serializer.from_pickle(data, trusted=True)</code>, which can
+execute code and must never receive user-controlled or unauthenticated input.
+The restricted loader does not prevent memory-exhaustion or other resource attacks;
+prefer JSON for external inputs. Existing exception imports retain aliases to
+Error-suffixed classes; code relying on an exception's <code>__name__</code> should migrate.</p>
+<p>The strict typing gate remains limited to 15 core modules. The existing overall
+coverage threshold and optional browser/service test requirements are unchanged.</p></article>
+</main></div><div id="footer"></div></body></html>

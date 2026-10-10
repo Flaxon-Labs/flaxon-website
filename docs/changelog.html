@@ -12,9 +12,41 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
 <h2 id="unreleased">Unreleased</h2>
+<h3 id="added">Added</h3>
 <ul>
+<li>Teloce AST SSR with explicit public props, hydration, metadata, asset preloads and configurable rendering fallback/cache.</li>
+<li>Development browser overlay and dashboard reports for compiler, SSR, runtime, hydration and API failures, with bounded source mapping.</li>
+<li>Scoped-CSS SSR example and documentation; production debugger absence and real-browser regression checks.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>
+<p>Escape untrusted error fields in the dashboard and correlate validated request IDs without overwriting independent server errors.</p>
+</li>
+<li>
+<p>Complete the configured Ruff cleanup and reduce the active lint baseline to zero. Keep all configured rules enabled, with documented local exceptions for established positional APIs and explicit trusted boundaries.</p>
+</li>
+<li>Split Admin, CMS, ORM adapters, GraphQL, OpenAPI, module mounting, and management commands into focused helpers; retain lazy optional imports.</li>
+<li>Validate SQL identifiers before composing database statements; restrict task pickle loading by default. Application-defined pickle classes require <code>from_pickle(data, trusted=True)</code> and authenticated, trusted payloads.</li>
+<li>
+<p>Fix synchronous cache writes/invalidation and keep notification delivery tasks referenced until completion.</p>
+</li>
+<li>
+<p>Reduce Ruff findings from 3,442 to 2,973 without disabling rules; document cache, dependency, task, and logging APIs and tighten the per-file/rule CI budget.</p>
+</li>
+<li>
+<p>Isolate request, logging, task, and dependency context values across concurrent tasks; copy logging configuration handlers and repair rotating file handler options. Add regression tests and expand strict typing checks to 15 core modules.</p>
+</li>
+<li>
+<p>Index dynamic HTTP candidates by their full literal prefix and cache route specificity, preserving typed converters, method fallback, mounted routes, and registration-order ties.</p>
+</li>
+<li>Log task signal and worker failures; use bounded worker retry delays; propagate S3 access/backend errors instead of reporting missing objects.</li>
+<li>Narrow request decoding, annotation resolution, persisted-query, and WebSocket token error boundaries.</li>
+<li>
+<p>Fix mypy source-package discovery, check 11 core modules, consolidate tool configuration, and add a per-file/rule lint budget in CI. See <a href="quality-audit.html">quality audit</a> for remaining debt and route-only measurements.</p>
+</li>
 <li>
 <p>Release readiness: preserve environment secret strings, repair version/changelog/artifact/tag tooling, support prerelease versions, verify installed wheels, and make CDN browser tests reproducible.</p>
 </li>
@@ -120,7 +152,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <p>This release consolidates the Admin/CMS, module, router, OpenAPI, and testing
 work completed after 0.2.4. It is the current development baseline for the
 framework.</p>
-<h3 id="added">Added</h3>
+<h3 id="added_1">Added</h3>
 <ul>
 <li>Admin control plane routes and pages for service registration, health,
   metrics, logs, traces, queues, events, deployments, API keys, audit, storage,
@@ -147,7 +179,7 @@ framework.</p>
 <p>A large amount of work landed between 0.1.0 and this release without
 intermediate changelog entries being kept up to date. This entry
 consolidates that work rather than reconstructing exact per-commit history.</p>
-<h3 id="added_1">Added</h3>
+<h3 id="added_2">Added</h3>
 <ul>
 <li>Admin dashboard: user accounts, sessions, role-based access control,
   TOTP-based multi-factor authentication with recovery codes, password
@@ -182,7 +214,7 @@ consolidates that work rather than reconstructing exact per-commit history.</p>
   richtext field validation</li>
 <li>Rate limiting on admin/CMS mutation endpoints</li>
 </ul>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed_1">Fixed</h3>
 <ul>
 <li><code>flaxon generate schema/service/middleware</code> produced syntactically
   invalid Python (an unsubstituted template placeholder)</li>
@@ -222,7 +254,7 @@ consolidates that work rather than reconstructing exact per-commit history.</p>
   field's declared type before being persisted</li>
 </ul>
 <h2 id="010-2026-07-22">[0.1.0] - 2026-07-22</h2>
-<h3 id="added_2">Added</h3>
+<h3 id="added_3">Added</h3>
 <ul>
 <li>Initial alpha release</li>
 <li>Core framework prototype</li>

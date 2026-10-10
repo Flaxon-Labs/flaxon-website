@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/aldanedev-create/flaxon",
-  "commit": "f4ab3cd440234750f6220ee2fc107dde58b93132",
+  "commit": "abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca",
   "pages": [
     {
       "source": "CHANGELOG.md",
@@ -669,6 +669,12 @@
       "section": "Core concepts"
     },
     {
+      "source": "docs/guides/teloce-ssr-debugging.md",
+      "url": "docs/guides/teloce-ssr-debugging.html",
+      "title": "Teloce SSR and the Flaxon debugger",
+      "section": "Feature guides"
+    },
+    {
       "source": "docs/guides/testing.md",
       "url": "docs/guides/testing.html",
       "title": "Testing",
@@ -781,6 +787,12 @@
       "url": "docs/philosophy.html",
       "title": "Philosophy",
       "section": "Getting started"
+    },
+    {
+      "source": "docs/quality-audit.md",
+      "url": "docs/quality-audit.html",
+      "title": "Routing and quality audit",
+      "section": "Operations and reference"
     },
     {
       "source": "docs/quickstart.md",
@@ -903,6 +915,12 @@
       "section": "Runnable projects"
     },
     {
+      "source": "examples/teloce_ssr/README.md",
+      "url": "docs/projects/teloce-ssr/index.html",
+      "title": "Flaxon + Teloce SSR",
+      "section": "Runnable projects"
+    },
+    {
       "source": "examples/teloce_taskboard/README.md",
       "url": "docs/projects/teloce-taskboard/index.html",
       "title": "Taskboard course example",
@@ -939,6 +957,11 @@
       "url": "docs/guides/latest-upgrade.html",
       "title": "Upgrade to the latest Flaxon workflow",
       "section": "Getting started"
+    },
+    {
+      "url": "docs/guides/teloce-ssr-reference.html",
+      "title": "Teloce SSR and hydration reference",
+      "section": "Feature guides"
     },
     {
       "url": "docs/guides/backend-only.html",

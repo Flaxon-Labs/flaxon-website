@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Debugging</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/guides/debugging.md">Framework source</a> · <a href="../../content/framework/docs/guides/debugging.md" download>Markdown</a></p><h1 id="debugging">Debugging</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/guides/debugging.md">Framework source</a> · <a href="../../content/framework/docs/guides/debugging.md" download>Markdown</a></p><h1 id="debugging">Debugging</h1>
 <h2 id="overview">Overview</h2>
 <p>Flaxon includes a built-in debugging system designed to help developers identify and fix application issues quickly.</p>
 <p>The debugger provides:</p>
@@ -331,5 +331,11 @@ Check if the database query returned a valid user.
 authorization and privileged operations on the server; components call those
 endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
 and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
-to pages, components and application modules.</p></article>
+to pages, components and application modules.</p>
+<h2 id="teloce-browser-and-ssr-diagnostics">Teloce browser and SSR diagnostics</h2>
+<p>Compiled Teloce pages receive a development-only overlay and bounded reporter
+when <code>debug=True</code>. Compiler, SSR, runtime, hydration and failed API diagnostics
+appear in the same dashboard; request IDs connect API reports to server errors.
+See <a href="teloce-ssr-debugging.html">Teloce SSR and browser debugging</a> for setup, source
+mapping limits, reporting safeguards and production behavior.</p></article>
 </main></div><div id="footer"></div></body></html>

@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Lesson 5: Configure the document head and CDN resources</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/fullstack/05-head-and-cdn.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/05-head-and-cdn.md" download>Markdown</a></p><h1 id="lesson-5-configure-the-document-head-and-cdn-resources">Lesson 5: Configure the document head and CDN resources</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/05-head-and-cdn.md">Framework source</a> · <a href="../../content/framework/docs/fullstack/05-head-and-cdn.md" download>Markdown</a></p><h1 id="lesson-5-configure-the-document-head-and-cdn-resources">Lesson 5: Configure the document head and CDN resources</h1>
 <p>Keep metadata in Python and application markup in Teloce:</p>
 <div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/static"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">))</span>
 <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
@@ -36,7 +36,7 @@ to account for the generated inline module bootstrap.</p>
 Confirm which external enhancements fail and that the core workflow remains
 usable. See the <a href="../api/teloce.html">resource attribute reference</a>.</p>
 <h2 id="keep-cdn-configuration-outside-component-code">Keep CDN configuration outside component code</h2>
-<p>The <a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/examples/teloce_head_ts/app.py">converter</a> shows two separately named
+<p>The <a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/examples/teloce_head_ts/app.py">converter</a> shows two separately named
 CDN variables. Multiple <code>cdn = ...</code> assignments overwrite one Python variable.
 Use lists when loading several resources:</p>
 <div class="highlight"><pre><span></span><code><span class="n">stylesheets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"/static/base.css"</span><span class="p">,</span> <span class="n">theme_cdn</span><span class="p">]</span>

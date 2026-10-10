@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Contributing to Flaxon</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/contributing.md">Framework source</a> · <a href="../content/framework/docs/contributing.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/contributing.md">Framework source</a> · <a href="../content/framework/docs/contributing.md" download>Markdown</a></p><h1 id="contributing-to-flaxon">Contributing to Flaxon</h1>
 <p>Welcome! This document covers everything you need to know to contribute to Flaxon's core.</p>
 <h2 id="developer-setup">Developer Setup</h2>
 <p>To get started contributing, you need:</p>
@@ -43,10 +43,15 @@ poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="
 <li><strong>black</strong>: Code formatting (handled by Ruff)</li>
 </ul>
 <p>Run linters manually:</p>
-<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>src/
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/check_lint_budget.py
 poetry<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>src/
-poetry<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src/
+python<span class="w"> </span>scripts/typecheck.py
 </code></pre></div>
+<p>The lint budget prevents increases by file and rule; <code>ruff check src/flaxon</code>
+still reports all legacy findings. Do not expand the budget to hide new debt.
+The typing command checks 11 core modules without following unchecked imports.
+Use <code>python scripts/typecheck.py --full</code> for the wider audit, which currently
+reports existing failures. <a href="quality-audit.html">Quality audit and measurements</a>.</p>
 <h2 id="debugging-issues">Debugging Issues</h2>
 <p>If you encounter test failures:</p>
 <ol>
