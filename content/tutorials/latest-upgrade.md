@@ -17,7 +17,7 @@ To try the exact framework revision used for these docs in a separate environmen
 ```bash
 python -m venv .venv
 # Activate .venv using your platform's command, then:
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
 ```
 
 Pin a tested version or commit in production. Do not treat a source installation
@@ -110,13 +110,19 @@ deployment or third-party integration.
 
 ## Preview: Teloce SSR, hydration, and browser debugging
 
-These features are implemented in [Flaxon PR #18](https://github.com/aldanedev-create/flaxon/pull/18) and [Teloce PR #6](https://github.com/aldanedev-create/teloce-py/pull/6). They are pending merge/release; the published packages may not include them. For this preview, install both tested commits in a separate environment:
+These features are implemented in [Flaxon PR #18](https://github.com/aldanedev-create/flaxon/pull/18) and [Teloce PR #6](https://github.com/aldanedev-create/teloce-py/pull/6). They are merged in source and await a coordinated package release; the published packages may not include them. For this preview, install both tested commits in a separate environment:
 
 ```bash
 python -m pip install "teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@94df54e72ba4bf0df127ff87018e8490d6dd7a78"
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
 ```
 
 Follow the [Flaxon SSR and debugger guide](teloce-ssr-debugging.html) for a complete scoped-CSS component, explicit public props, metadata, and error policies. Read the [Teloce renderer reference](teloce-ssr-reference.html) for supported expressions, hydration, slots, prerendering, and limits.
 
 SSR renders the initial entry. Later `data-teloce-link` navigation uses the browser router; an outlet page is not automatically a second server-rendered entry. Existing backend-only and client-rendered lessons continue to work. Detailed overlays and the browser reporting endpoint are development-only.
+
+## Project manager course and planned Flaxon 3.0.0
+
+The [recording ebook](../fullstack/project-manager/index.html) teaches the complete CLI-to-production project manager with exact incremental edits, scoped CSS, modules, ORM models and Python migrations. Its planned recording target is `flaxon[standard,admin]==3.0.0`. That release path is explicitly for use after publication and verification; preview wheels remain the tested rehearsal option. This website does not claim 3.0.0 is currently published.
+
+Admin setup now accepts your chosen nonempty password up to 128 characters. In development it does not warn about strength; in production it recommends a stronger password without blocking creation. Confirmation must match. This applies to `setup-admin` and `createsuperuser`; web password validation remains separate. See [Admin setup](admin-cms.html#generated-project-admin-setup).

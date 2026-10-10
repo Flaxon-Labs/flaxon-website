@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
 <h2 id="unreleased">Unreleased</h2>
 <h3 id="added">Added</h3>
 <ul>
@@ -22,6 +22,7 @@
 </ul>
 <h3 id="fixed">Fixed</h3>
 <ul>
+<li>Let <code>setup-admin</code> and <code>createsuperuser</code> accept nonempty passwords up to 128 characters; recommend stronger passwords without blocking production setup and stay quiet in development.</li>
 <li>
 <p>Escape untrusted error fields in the dashboard and correlate validated request IDs without overwriting independent server errors.</p>
 </li>

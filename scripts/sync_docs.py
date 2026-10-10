@@ -493,7 +493,7 @@ def build():
             link["href"] = relative("docs/guides/teloce-ssr-reference.html", entry["url"])
         if entry["source"] in {"docs/guides/teloce-ssr-debugging.md", "examples/teloce_ssr/README.md"}:
             notice = soup.new_tag("p", attrs={"class": "doc-preview-note"})
-            notice.append("Preview: this integration is pending merge/release. ")
+            notice.append("Preview: this integration is merged in source and awaits a coordinated package release. ")
             link = soup.new_tag("a", href=relative("docs/guides/latest-upgrade.html", entry["url"]) + "#preview-teloce-ssr-hydration-and-browser-debugging")
             link.string = "Install matching tested commits"
             notice.append(link)
