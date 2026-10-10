@@ -12,15 +12,16 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>09 | Login and project screens</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/project-manager/09.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/09.md" download>Markdown</a></p><h1 id="09-login-and-project-screens">09 | Login and project screens</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/09.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/09.md" download>Markdown</a></p><h1 id="09-login-and-project-screens">09 | Login and project screens</h1>
 <h2 id="goal">Goal</h2>
 <p>Replace placeholders with working account forms and a project list.</p>
 <h2 id="what-you-are-building">What you are building</h2>
 <p>Login uses the shared API helper to load the anonymous session, submit register/login, and replace cached session state after rotation. Loading guards disable duplicate submissions and error messages remain visible. ProjectList requests only authorized records from the API and creates a project from a form. Internal project anchors use data-teloce-link. The server owns authorization; TypeScript types and disabled buttons do not enforce permissions.</p>
 <h2 id="build-this-chapter">Build this chapter</h2>
-<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
 <h2 id="step-1-edit-replace-the-entire-file-modulesauthuipagesloginhtml">Step 1: EDIT - replace the entire file - modules/auth/ui/pages/Login.html</h2>
-<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Replace the placeholder with account forms. Use the session API and rotated CSRF token; do not read the HttpOnly cookie from JavaScript.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">"narrow"</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Your account<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
@@ -203,8 +204,12 @@
 <span class="p">}</span>
 <span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </code></pre></div>
+<p><strong>Say:</strong> "Replace the placeholder with account forms. Use the session API and rotated CSRF token; do not read the HttpOnly cookie from JavaScript."</p>
+<p><strong>Type:</strong> Follow the action above in <code>modules/auth/ui/pages/Login.html</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-2-edit-replace-the-entire-file-modulesprojectsuipagesprojectlisthtml">Step 2: EDIT - replace the entire file - modules/projects/ui/pages/ProjectList.html</h2>
-<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Replace the placeholder with the complete projects screen. Connect its form to the typed API helper; show loading, error and empty states. Keep all CSS inside style scoped.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Your projects<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
@@ -371,6 +376,9 @@
 <span class="p">}</span>
 <span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </code></pre></div>
+<p><strong>Say:</strong> "Replace the placeholder with the complete projects screen. Connect its form to the typed API helper; show loading, error and empty states. Keep all CSS inside style scoped."</p>
+<p><strong>Type:</strong> Follow the action above in <code>modules/projects/ui/pages/ProjectList.html</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="run-and-check">Run and check</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
 <span class="c1"># Open /login; register; create a project on /projects.</span>

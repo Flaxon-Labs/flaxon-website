@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Admin and CMS Production Guide</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/guides/admin-cms.md">Framework source</a> · <a href="../../content/framework/docs/guides/admin-cms.md" download>Markdown</a></p><h1 id="admin-and-cms-production-guide">Admin and CMS Production Guide</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/guides/admin-cms.md">Framework source</a> · <a href="../../content/framework/docs/guides/admin-cms.md" download>Markdown</a></p><h1 id="admin-and-cms-production-guide">Admin and CMS Production Guide</h1>
 <p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
 explicit mounts in <code>app.py</code>, and <code>management.py</code> workflow. See <a href="orm.html">ORM and project management</a>
 for Python migrations, model registration, permission hooks, relationship editing,
@@ -29,8 +29,11 @@ and Admin/CMS metadata storage. Backend-only and legacy adapter examples remain 
 JSON API, so a team can replace the SPA with React, Vue, mobile, or server-side
 clients without replacing the backend contracts.</p>
 <h2 id="quick-start">Quick Start</h2>
-<p>first pip install flaxon[admin]</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+<p>Install the Admin extra:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[admin]"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminConfig</span><span class="p">,</span> <span class="n">AdminDashboard</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.cms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMS</span>
 
@@ -41,7 +44,7 @@ clients without replacing the backend contracts.</p>
     <span class="n">config</span><span class="o">=</span><span class="n">AdminConfig</span><span class="p">(</span><span class="n">site_title</span><span class="o">=</span><span class="s2">"Acme Backoffice"</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s2">"UTC"</span><span class="p">),</span>
     <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin"</span><span class="p">,</span>
     <span class="n">storage_path</span><span class="o">=</span><span class="s2">"admin.sqlite3"</span><span class="p">,</span>
-    <span class="n">users</span><span class="o">=</span><span class="p">[{</span><span class="s2">"username"</span><span class="p">:</span> <span class="s2">"admin"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"change-me"</span><span class="p">}],</span>
+    <span class="n">users</span><span class="o">=</span><span class="p">[{</span><span class="s2">"username"</span><span class="p">:</span> <span class="s2">"admin"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_ADMIN_PASSWORD"</span><span class="p">]}],</span>
 <span class="p">)</span>
 
 <span class="n">cms</span> <span class="o">=</span> <span class="n">CMS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">"/admin/cms"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Acme Content"</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">auth</span><span class="p">)</span>
@@ -49,8 +52,16 @@ clients without replacing the backend contracts.</p>
 <p>Run locally:</p>
 <div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
 </code></pre></div>
-<p>Use <code>/admin/login</code>, <code>/admin/</code>, and <code>/admin/cms/</code>. Development credentials
-should be replaced with environment-managed credentials before deployment.</p>
+<p>Set <code>FLAXON_ADMIN_PASSWORD</code> through your environment before starting this standalone example. Its programmatic <code>users</code> registration still enforces the Admin password validator. No default password is provided. Use <code>/admin/login</code>, <code>/admin/</code>, and <code>/admin/cms/</code>.</p>
+<h3 id="generated-project-admin-setup">Generated-project Admin setup</h3>
+<p>For the generated <code>settings.py</code>/<code>management.py</code> workflow, create staff credentials interactively instead of putting passwords in application code:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+<span class="c1"># Equivalent alias:</span>
+<span class="c1"># python management.py createsuperuser</span>
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<p>Both setup commands accept a nonempty password up to 128 characters, with matching confirmation. <code>DEBUG=True</code> accepts weak passwords quietly. <code>DEBUG=False</code> recommends a long, unique production password when the chosen password fails the strength checks but still creates the account. Passwords are hidden during entry and securely hashed in storage. Existing usernames are never overwritten. Web Admin account creation, password changes and resets retain their existing validator. Restart an already running server after command-line account creation.</p>
+<p>See <a href="../getting-started/project-setup.html">project setup</a> and the <a href="../fullstack/project-manager/12.html">recording course</a>.</p>
 <h2 id="persistence-and-migrations">Persistence and Migrations</h2>
 <p>For a self-contained local store, set <code>storage_path</code> (the parent directory must
 already exist). This persists users,

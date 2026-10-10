@@ -12,15 +12,16 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>03 | Models and Python migrations</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/project-manager/03.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/03.md" download>Markdown</a></p><h1 id="03-models-and-python-migrations">03 | Models and Python migrations</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/03.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/03.md" download>Markdown</a></p><h1 id="03-models-and-python-migrations">03 | Models and Python migrations</h1>
 <h2 id="goal">Goal</h2>
 <p>Define all five application tables and apply the first Python migration.</p>
 <h2 id="what-you-are-building">What you are building</h2>
 <p>User owns projects; Project owns tasks. The ForeignKeyField names use the root ORM label models. Cascading a project deletion removes its tasks. Session stores a digest of an opaque cookie and an expiry; AuthAttempt persists login attempt counts. Define the schema once in models.py. makemigrations compares models with migration history and generates Python code; migrate applies that code. Commit the generated file. No JSON migration is needed. We define the complete schema now so later API chapters focus on behavior rather than repeated table changes.</p>
 <h2 id="build-this-chapter">Build this chapter</h2>
-<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
 <h2 id="step-1-create-make-parent-folders-then-create-this-file-modelspy">Step 1: CREATE - make parent folders, then create this file - models.py</h2>
 <p>These five models are the complete schema. Relationships define ownership and deletion behavior; handlers add authorization.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Application tables. Generate Python migrations whenever these models change."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">fields</span>
@@ -90,62 +91,39 @@
     <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
         <span class="n">table</span> <span class="o">=</span> <span class="s2">"auth_attempts"</span>
 </code></pre></div>
+<p><strong>Say:</strong> "These five models are the complete schema. Relationships define ownership and deletion behavior; handlers add authorization."</p>
+<p><strong>Type:</strong> Follow the action above in <code>models.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-2-edit-replace-the-entire-file-adminpy">Step 2: EDIT - replace the entire file - admin.py</h2>
 <p>Keep explicit registration in this file. At chapter 3 it is empty; chapter 12 adds the domain models.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Staff model registration is added in chapter 12."""</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">admin</span><span class="p">):</span>
     <span class="k">pass</span>
 </code></pre></div>
+<p><strong>Say:</strong> "Keep explicit registration in this file. At chapter 3 it is empty; chapter 12 adds the domain models."</p>
+<p><strong>Type:</strong> Follow the action above in <code>admin.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-3-create-make-parent-folders-then-create-this-file-migrationsinitpy">Step 3: CREATE - make parent folders, then create this file - migrations/<strong>init</strong>.py</h2>
 <p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code>
 </code></pre></div>
-<h2 id="step-4-edit-replace-the-entire-file-apppy">Step 4: EDIT - replace the entire file - app.py</h2>
-<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
-<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>migrations/__init__.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-4-edit-replace-the-marked-blocks-apppy">Step 4: EDIT - replace the marked blocks - app.py</h2>
+<p>The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact.</p>
+<h3 id="edit-1-find-this-exact-block">Edit 1: find this exact block</h3>
+<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code>    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ROOT</span><span class="p">,</span>
-    <span class="n">DATA_DIR</span><span class="p">,</span>
-    <span class="n">DATABASE_PATH</span><span class="p">,</span>
-    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
-    <span class="n">DEBUG</span><span class="p">,</span>
-    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
-    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
-    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
-            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
-        <span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
-    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
-    <span class="p">]:</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">app</span>
-
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="replace-that-block-with">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code>    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
 
@@ -153,14 +131,11 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
 
     <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Backend lesson ready. The SPA starts in chapter 8."</span><span class="p">}}</span>
-
-    <span class="k">return</span> <span class="n">app</span>
-
-
-<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
 </code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>
+<p><strong>Type:</strong> Follow the action above in <code>app.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="run-and-check">Run and check</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>check
 python<span class="w"> </span>management.py<span class="w"> </span>makemigrations<span class="w"> </span>--name<span class="w"> </span>initial
@@ -169,6 +144,54 @@ python<span class="w"> </span>management.py<span class="w"> </span>migrate
 python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--status
 python<span class="w"> </span>management.py<span class="w"> </span>runserver
 </code></pre></div>
+<h2 id="flaxon-api-and-orm-the-commands-you-will-teach">Flaxon API and ORM: the commands you will teach</h2>
+<p>This course uses the current Flaxon public integration rather than JSON migrations or hand-written SQL. Flaxon's <code>Model</code> and <code>fields</code> come from Tortoise; queries are asynchronous. The Flaxon 3.0.0 release target must export the same APIs before recording the release installation path.</p>
+<p><strong>Say:</strong> "Models describe tables. Settings choose the database. Flaxon opens and closes connections. Migrations record schema changes, and management.py applies them explicitly."</p>
+<p>In <code>models.py</code>, the exact imports are:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">fields</span>
+</code></pre></div>
+<p>You have already created <code>Project</code> in this chapter. After migrating, use these queries in an async handler or the management shell. These examples explain the API; do not paste them at module scope, and do not add an unsecured demonstration route:</p>
+<div class="highlight"><pre><span></span><code><span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Record the course"</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"First project"</span>
+<span class="p">)</span>
+<span class="n">projects</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">"-created_at"</span><span class="p">)</span>
+<span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"New name"</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</code></pre></div>
+<p><code>user</code> is the authenticated customer dictionary and <code>project_id</code> is the validated route parameter introduced in chapters 4-5. Never trust an owner ID supplied by the browser. A model relationship does not perform authorization automatically.</p>
+<p>For an operation that must commit or roll back together:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_transaction</span>
+
+<span class="k">async</span> <span class="k">with</span> <span class="n">in_transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">owner_id</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Atomic project"</span><span class="p">,</span> <span class="n">using_db</span><span class="o">=</span><span class="n">connection</span>
+    <span class="p">)</span>
+    <span class="k">await</span> <span class="n">Task</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"First task"</span><span class="p">,</span> <span class="n">using_db</span><span class="o">=</span><span class="n">connection</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>The server manages normal connection startup and shutdown through <code>Flaxon.from_settings(...)</code>. The course tests create disposable schemas explicitly; normal application startup never silently changes tables.</p>
+<p>Keep these responsibilities separate:</p>
+<ul>
+<li><code>settings.py</code>: <code>DATABASE_URL</code>, debug mode, secrets and deployment configuration.</li>
+<li><code>models.py</code>: fields, foreign keys, indexes and readable model names.</li>
+<li><code>app.py</code>: <code>Flaxon.from_settings(...)</code>, middleware and <code>app.mount_module(...)</code>.</li>
+<li><code>management.py</code>: one short entry point backed by <code>flaxon.management.execute</code>.</li>
+<li><code>admin.py</code>: explicit staff model registration; chapter 12 adds controlled adapters.</li>
+</ul>
+<p>Run these from <code>project_manager</code>:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>check
+python<span class="w"> </span>management.py<span class="w"> </span>makemigrations<span class="w"> </span>--name<span class="w"> </span>initial
+python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--plan
+python<span class="w"> </span>management.py<span class="w"> </span>migrate
+python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span>--status
+python<span class="w"> </span>management.py<span class="w"> </span>shell
+python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
+python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<p>Only run <code>makemigrations --name initial</code> once for this initial schema. Later changes use a descriptive new name. <code>createsuperuser</code> is an alias for <code>setup-admin</code>; migration files are Python and belong in Git. Stop the server before changing configuration. Staff credentials and customer accounts are separate.</p>
+<p>The later chapters show actual <code>FlaxonModule</code> definitions, JSON responses, request parsing, middleware, Teloce compilation and Admin/CMS integration in their complete files. Optional SSR is outside this course's client-rendered SPA; use the dedicated framework guide when adding it.</p>
 <h2 id="expected-result">Expected result</h2>
 <p>check reports valid settings and registrations. makemigrations creates migrations/0001_initial.py. migrate applies it; status lists it as applied. A second migrate performs no new schema changes.</p>
 <h2 id="common-errors">Common errors</h2>

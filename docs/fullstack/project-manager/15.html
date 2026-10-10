@@ -12,15 +12,16 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>15 | Production build and Render</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/project-manager/15.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/15.md" download>Markdown</a></p><h1 id="15-production-build-and-render">15 | Production build and Render</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/15.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/15.md" download>Markdown</a></p><h1 id="15-production-build-and-render">15 | Production build and Render</h1>
 <h2 id="goal">Goal</h2>
 <p>Build optimized assets and deploy one persistent application instance.</p>
 <h2 id="what-you-are-building">What you are building</h2>
 <p>The Blueprint installs pinned dependencies and builds Teloce with MinifyJS. The start command applies committed Python migrations, then starts one Uvicorn worker. SQLite and staff/CMS data live under /var/data on a paid persistent disk. Render's build and pre-deploy processes cannot access that disk, which is why this design migrates at startup. Set PUBLIC_ORIGIN to your exact HTTPS service URL, DEBUG to false and a persistent generated secret. This course deliberately uses one instance: scaling needs a shared database, sessions, media and CMS coordination strategy.</p>
 <h2 id="build-this-chapter">Build this chapter</h2>
-<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
 <h2 id="step-1-create-make-parent-folders-then-create-this-file-envexample">Step 1: CREATE - make parent folders, then create this file - .env.example</h2>
 <p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code>FLAXON_DEBUG=1
 PUBLIC_ORIGIN=http://127.0.0.1:8000
 # Production: FLAXON_DEBUG=0, PUBLIC_ORIGIN=https://your-app.onrender.com
@@ -28,8 +29,12 @@ PUBLIC_ORIGIN=http://127.0.0.1:8000
 # Generate with: python -c "import secrets; print(secrets.token_urlsafe(48))"
 FLAXON_SECRET_KEY=
 </code></pre></div>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>.env.example</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-2-create-make-parent-folders-then-create-this-file-scriptsbuild_uipy">Step 2: CREATE - make parent folders, then create this file - scripts/build_ui.py</h2>
 <p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Build production Teloce assets without touching the live database or Render disk."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -49,8 +54,12 @@ FLAXON_SECRET_KEY=
     <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">teloce</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'compiled'</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2"> Teloce components with MinifyJS."</span><span class="p">)</span>
 </code></pre></div>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/build_ui.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-3-create-make-parent-folders-then-create-this-file-renderyaml">Step 3: CREATE - make parent folders, then create this file - render.yaml</h2>
 <p>This is the complete single-instance deployment definition. Supply the service-specific HTTPS origin in Render.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flaxon-project-manager</span>
@@ -75,10 +84,21 @@ FLAXON_SECRET_KEY=
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PUBLIC_ORIGIN</span>
 <span class="w">        </span><span class="nt">sync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
+<p><strong>Say:</strong> "This is the complete single-instance deployment definition. Supply the service-specific HTTPS origin in Render."</p>
+<p><strong>Type:</strong> Follow the action above in <code>render.yaml</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="run-and-check">Run and check</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/build_ui.py
 python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>check
 </code></pre></div>
+<h2 id="release-only-edit-render-installation">Release-only edit: Render installation</h2>
+<p>If you chose the published Flaxon 3.0.0 path, use <code>requirements-release.txt</code> as your project's <code>requirements.txt</code>. In <code>render.yaml</code>, find:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python scripts/verify_vendor.py &amp;&amp; pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
+</code></pre></div>
+<p>Replace only that line with:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
+</code></pre></div>
+<p>Leave the rest of the Blueprint unchanged. The preview path keeps wheel verification and includes <code>vendor/</code>. The release path installs the pinned published packages and does not need preview wheels. This release branch must pass the clean course rehearsal after publication before you record it.</p>
 <h2 id="deploy-the-completed-project">Deploy the completed project</h2>
 <ol>
 <li>Stop the local server. Run all tests and both browser checks from chapter 14. Run the production build above.</li>

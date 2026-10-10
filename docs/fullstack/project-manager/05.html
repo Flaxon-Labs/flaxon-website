@@ -12,19 +12,24 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>05 | Owned project APIs</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/project-manager/05.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/05.md" download>Markdown</a></p><h1 id="05-owned-project-apis">05 | Owned project APIs</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/05.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/05.md" download>Markdown</a></p><h1 id="05-owned-project-apis">05 | Owned project APIs</h1>
 <h2 id="goal">Goal</h2>
 <p>Create, list, read, update and delete projects belonging to the signed-in customer.</p>
 <h2 id="what-you-are-building">What you are building</h2>
 <p>owned_project combines the requested ID with the authenticated owner's ID in the ORM query. Every detail, edit and delete uses that guard. Creation takes owner_id from the session rather than accepting it from JSON. list_projects filters before returning rows. A nonexistent project and another person's project both return 404. The small HTTP demo establishes cookies and CSRF automatically, registers an account and exercises a working project endpoint.</p>
 <h2 id="build-this-chapter">Build this chapter</h2>
-<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
 <h2 id="step-1-create-make-parent-folders-then-create-this-file-modulesprojectsinitpy">Step 1: CREATE - make parent folders, then create this file - modules/projects/<strong>init</strong>.py</h2>
 <p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Module-owned APIs and interface files."""</span>
 </code></pre></div>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>modules/projects/__init__.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-2-create-make-parent-folders-then-create-this-file-modulesprojectsmodulepy">Step 2: CREATE - make parent folders, then create this file - modules/projects/module.py</h2>
-<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the projects module, then implement owned_project before the handlers that use it. The mount adds /api/projects once. Every ORM query for an existing project includes the signed-in customer's owner ID.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Project APIs always constrain queries by the signed-in user's id."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -101,8 +106,12 @@
     <span class="k">await</span> <span class="n">Project</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="n">project</span><span class="p">[</span><span class="s2">"owner_id"</span><span class="p">])</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"deleted"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
 </code></pre></div>
+<p><strong>Say:</strong> "Create the projects module, then implement owned_project before the handlers that use it. The mount adds /api/projects once. Every ORM query for an existing project includes the signed-in customer's owner ID."</p>
+<p><strong>Type:</strong> Follow the action above in <code>modules/projects/module.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-3-create-make-parent-folders-then-create-this-file-scriptscourse_api_demopy">Step 3: CREATE - make parent folders, then create this file - scripts/course_api_demo.py</h2>
 <p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Show the project API over HTTP; start the development server first."""</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
@@ -141,74 +150,52 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="step-4-edit-replace-the-entire-file-apppy">Step 4: EDIT - replace the entire file - app.py</h2>
-<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
-<div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">TrustedHostsMiddleware</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">argon2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PasswordHasher</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/course_api_demo.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-4-edit-replace-the-marked-blocks-apppy">Step 4: EDIT - replace the marked blocks - app.py</h2>
+<p>The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact.</p>
+<h3 id="edit-1-find-this-exact-block">Edit 1: find this exact block</h3>
+<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ROOT</span><span class="p">,</span>
+</code></pre></div>
+<h3 id="replace-that-block-with">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">modules.auth.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">modules.projects.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">projects</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">modules.welcome.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">welcome</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ROOT</span><span class="p">,</span>
-    <span class="n">DATA_DIR</span><span class="p">,</span>
-    <span class="n">DATABASE_PATH</span><span class="p">,</span>
-    <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
-    <span class="n">DEBUG</span><span class="p">,</span>
-    <span class="n">PUBLIC_ORIGIN</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">debug</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
-    <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">DEBUG</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">database_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">values</span><span class="p">[</span><span class="s2">"DATABASE_URL"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"sqlite://</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
-    <span class="k">if</span> <span class="n">admin_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">values</span><span class="p">[</span><span class="s2">"ADMIN_STORAGE_PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="vm">__file__</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">))</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">BodyLimitMiddleware</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
-            <span class="n">TrustedHostsMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">PUBLIC_ORIGIN</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span><span class="p">]</span>
-        <span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">public_origin</span> <span class="o">=</span> <span class="n">PUBLIC_ORIGIN</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">PasswordHasher</span><span class="p">()</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+</code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<h3 id="edit-2-find-this-exact-block">Edit 2: find this exact block</h3>
+<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code>    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="replace-that-block-with_1">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code>    <span class="n">app</span><span class="o">.</span><span class="n">dummy_password_hash</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">hasher</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">"dummy-password-for-timing-only"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">"/api/auth"</span><span class="p">),</span>
         <span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="s2">"/api/projects"</span><span class="p">),</span>
         <span class="p">(</span><span class="n">welcome</span><span class="p">,</span> <span class="s2">"/api/welcome"</span><span class="p">),</span>
     <span class="p">]:</span>
         <span class="n">app</span><span class="o">.</span><span class="n">mount_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">app</span>
-
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
-
-        <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"ok"</span><span class="p">}}</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Backend lesson ready. The SPA starts in chapter 8."</span><span class="p">}}</span>
-
-    <span class="k">return</span> <span class="n">app</span>
-
-
-<span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
 </code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>
+<p><strong>Type:</strong> Follow the action above in <code>app.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="run-and-check">Run and check</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
 <span class="c1"># In a second terminal:</span>

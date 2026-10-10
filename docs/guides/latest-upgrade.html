@@ -23,7 +23,7 @@ the recent JSON and authentication changes require client migration.</p>
 <p>To try the exact framework revision used for these docs in a separate environment:</p>
 <pre><code class="language-bash">python -m venv .venv
 # Activate .venv using your platform's command, then:
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
 </code></pre>
 <p>Pin a tested version or commit in production. Do not treat a source installation
 as a new PyPI release. Keep backups and exercise your application before rollout.</p>
@@ -92,10 +92,13 @@ release tooling. It records 913 passing tests and 24 skips in the audited
 configuration. Passing tests and an advisory dependency scan do not certify every
 deployment or third-party integration.</p>
 <h2 id="preview-teloce-ssr-hydration-and-browser-debugging">Preview: Teloce SSR, hydration, and browser debugging</h2>
-<p>These features are implemented in <a href="https://github.com/aldanedev-create/flaxon/pull/18">Flaxon PR #18</a> and <a href="https://github.com/aldanedev-create/teloce-py/pull/6">Teloce PR #6</a>. They are pending merge/release; the published packages may not include them. For this preview, install both tested commits in a separate environment:</p>
+<p>These features are implemented in <a href="https://github.com/aldanedev-create/flaxon/pull/18">Flaxon PR #18</a> and <a href="https://github.com/aldanedev-create/teloce-py/pull/6">Teloce PR #6</a>. They are merged in source and await a coordinated package release; the published packages may not include them. For this preview, install both tested commits in a separate environment:</p>
 <pre><code class="language-bash">python -m pip install "teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@94df54e72ba4bf0df127ff87018e8490d6dd7a78"
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
 </code></pre>
 <p>Follow the <a href="teloce-ssr-debugging.html">Flaxon SSR and debugger guide</a> for a complete scoped-CSS component, explicit public props, metadata, and error policies. Read the <a href="teloce-ssr-reference.html">Teloce renderer reference</a> for supported expressions, hydration, slots, prerendering, and limits.</p>
-<p>SSR renders the initial entry. Later <code>data-teloce-link</code> navigation uses the browser router; an outlet page is not automatically a second server-rendered entry. Existing backend-only and client-rendered lessons continue to work. Detailed overlays and the browser reporting endpoint are development-only.</p></article>
+<p>SSR renders the initial entry. Later <code>data-teloce-link</code> navigation uses the browser router; an outlet page is not automatically a second server-rendered entry. Existing backend-only and client-rendered lessons continue to work. Detailed overlays and the browser reporting endpoint are development-only.</p>
+<h2 id="project-manager-course-and-planned-flaxon-300">Project manager course and planned Flaxon 3.0.0</h2>
+<p>The <a href="../fullstack/project-manager/index.html">recording ebook</a> teaches the complete CLI-to-production project manager with exact incremental edits, scoped CSS, modules, ORM models and Python migrations. Its planned recording target is <code>flaxon[standard,admin]==3.0.0</code>. That release path is explicitly for use after publication and verification; preview wheels remain the tested rehearsal option. This website does not claim 3.0.0 is currently published.</p>
+<p>Admin setup now accepts your chosen nonempty password up to 128 characters. In development it does not warn about strength; in production it recommends a stronger password without blocking creation. Confirmation must match. This applies to <code>setup-admin</code> and <code>createsuperuser</code>; web password validation remains separate. See <a href="admin-cms.html#generated-project-admin-setup">Admin setup</a>.</p></article>
 </main></div><div id="footer"></div></body></html>

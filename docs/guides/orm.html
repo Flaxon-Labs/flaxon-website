@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Models, settings, and management commands</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
 <p>Flaxon 0.2.7 integrates Tortoise ORM 1.1.7. <code>flaxon.db</code> exports its models, fields,
 and transaction helpers. Existing <code>flaxon.database</code> adapters and JSON migration
 runners remain available for existing applications; new full-stack starters use
@@ -273,5 +273,7 @@ regression tests block those external requests and exercise the local controls.<
 Admin and CMS use their durable AdminStore by default; they only automatically
 use a legacy database object implementing both <code>execute()</code> and <code>fetch_all()</code>.
 Choose <code>ADMIN_STORE_BACKEND = "orm"</code> explicitly to store metadata through the ORM.
-Do not pass the lifecycle object as <code>database=</code> to AdminDashboard or CMS.</p></article>
+Do not pass the lifecycle object as <code>database=</code> to AdminDashboard or CMS.</p>
+<h2 id="learn-the-orm-by-building-an-application">Learn the ORM by building an application</h2>
+<p>The <a href="../fullstack/project-manager/03.html">project manager models chapter</a> supplies complete models and exact migration commands, then explains <code>flaxon.db.Model</code>, <code>fields</code>, async ownership-scoped queries and <code>in_transaction</code>. Continue through authentication, projects, tasks and staff registration. The <a href="../fullstack/project-manager/index.html">course contents</a> distinguishes the planned Flaxon 3.0.0 release install from the bundled preview.</p></article>
 </main></div><div id="footer"></div></body></html>

@@ -12,15 +12,16 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>02 | Settings, management and application composition</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/fullstack/project-manager/02.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/02.md" download>Markdown</a></p><h1 id="02-settings-management-and-application-composition">02 | Settings, management and application composition</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/02.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/02.md" download>Markdown</a></p><h1 id="02-settings-management-and-application-composition">02 | Settings, management and application composition</h1>
 <h2 id="goal">Goal</h2>
 <p>Replace the welcome shell with a small backend and keep one shared configuration.</p>
 <h2 id="what-you-are-building">What you are building</h2>
 <p>settings.py reads environment values and gives both the server and management commands the same database location. app.py creates an application from those settings and mounts modules explicitly. management.py delegates to Flaxon; you do not maintain a second command framework. The factory returns early in management mode so migration commands do not compile browser assets or open the staff store. For now, the only mounted feature is the generated welcome module. Later chapters add each module when its code is ready.</p>
 <h2 id="build-this-chapter">Build this chapter</h2>
-<p>Stop the server. Work in project_manager. Copy each complete file below in order.</p>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
 <h2 id="step-1-edit-replace-the-entire-file-settingspy">Step 1: EDIT - replace the entire file - settings.py</h2>
 <p>Read this first: choose paths and environment values in one place. The rest of the app uses these values.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Shared configuration for the server and management commands."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -49,8 +50,12 @@
 <span class="n">ADMIN_STORE_BACKEND</span> <span class="o">=</span> <span class="s2">"sqlite"</span>
 <span class="n">ADMIN_STORAGE_PATH</span> <span class="o">=</span> <span class="n">ADMIN_DATABASE_PATH</span>
 </code></pre></div>
+<p><strong>Say:</strong> "Read this first: choose paths and environment values in one place. The rest of the app uses these values."</p>
+<p><strong>Type:</strong> Follow the action above in <code>settings.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-2-edit-replace-the-entire-file-managementpy">Step 2: EDIT - replace the entire file - management.py</h2>
 <p>This short entry point delegates commands to Flaxon and fixes the project root.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""One entry point for Flaxon's project commands."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -64,8 +69,12 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
+<p><strong>Say:</strong> "This short entry point delegates commands to Flaxon and fixes the project root."</p>
+<p><strong>Type:</strong> Follow the action above in <code>management.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="step-3-edit-replace-the-entire-file-apppy">Step 3: EDIT - replace the entire file - app.py</h2>
-<p>Replace the factory with this chapter's complete version. It mounts only the features already introduced.</p>
+<p>The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact.</p>
+<p>Select all existing contents of this file and replace them with the complete code below.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Compose the CLI starter's modules, staff backoffice, and Teloce SPA."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">settings</span>
@@ -122,6 +131,9 @@
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
 </code></pre></div>
+<p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>
+<p><strong>Type:</strong> Follow the action above in <code>app.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
 <h2 id="run-and-check">Run and check</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>runserver
 <span class="c1"># In a second terminal:</span>
