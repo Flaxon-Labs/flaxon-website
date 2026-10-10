@@ -21,6 +21,19 @@ class DocumentationTests(unittest.TestCase):
             p: BeautifulSoup(p.read_text(), "html.parser") for p in ROOT.rglob("*.html") if "templates" not in p.relative_to(ROOT).parts and not p.is_relative_to(ROOT / "examples/guessing-game")
         }
 
+    def test_ssr_preview_is_discoverable_and_installation_is_coordinated(self):
+        expected = {"/docs/guides/teloce-ssr-debugging.html", "/docs/guides/teloce-ssr-reference.html", "/docs/projects/teloce-ssr/index.html"}
+        self.assertTrue(expected.issubset({entry["url"] for entry in self.search}))
+        guide = self.html[ROOT / "docs/guides/teloce-ssr-debugging.html"]
+        self.assertIn("pending merge/release", guide.get_text(" ", strip=True))
+        self.assertIn("teloce-ssr-reference.html", {a["href"] for a in guide.select("a[href]")})
+        install = self.html[ROOT / "docs/guides/latest-upgrade.html"].get_text(" ", strip=True)
+        for commit in ("94df54e72ba4bf0df127ff87018e8490d6dd7a78", "abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"):
+            self.assertIn(commit, install)
+        for page in ("12-teloce-flaxon-apis", "13-html-spa-routing"):
+            links = {a["href"] for a in self.html[ROOT / f"docs/fullstack/{page}.html"].select("a[href]")}
+            self.assertIn("../guides/teloce-ssr-debugging.html", links)
+
     def test_all_synced_markdown_has_a_published_page(self):
         for entry in self.source["pages"]:
             with self.subTest(source=entry["source"]):

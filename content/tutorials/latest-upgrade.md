@@ -17,7 +17,7 @@ To try the exact framework revision used for these docs in a separate environmen
 ```bash
 python -m venv .venv
 # Activate .venv using your platform's command, then:
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@f4ab3cd440234750f6220ee2fc107dde58b93132"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
 ```
 
 Pin a tested version or commit in production. Do not treat a source installation
@@ -107,3 +107,16 @@ installed-wheel starter behavior, migrations, Admin/CMS, browser workflows and
 release tooling. It records 913 passing tests and 24 skips in the audited
 configuration. Passing tests and an advisory dependency scan do not certify every
 deployment or third-party integration.
+
+## Preview: Teloce SSR, hydration, and browser debugging
+
+These features are implemented in [Flaxon PR #18](https://github.com/aldanedev-create/flaxon/pull/18) and [Teloce PR #6](https://github.com/aldanedev-create/teloce-py/pull/6). They are pending merge/release; the published packages may not include them. For this preview, install both tested commits in a separate environment:
+
+```bash
+python -m pip install "teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@94df54e72ba4bf0df127ff87018e8490d6dd7a78"
+python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca"
+```
+
+Follow the [Flaxon SSR and debugger guide](teloce-ssr-debugging.html) for a complete scoped-CSS component, explicit public props, metadata, and error policies. Read the [Teloce renderer reference](teloce-ssr-reference.html) for supported expressions, hydration, slots, prerendering, and limits.
+
+SSR renders the initial entry. Later `data-teloce-link` navigation uses the browser router; an outlet page is not automatically a second server-rendered entry. Existing backend-only and client-rendered lessons continue to work. Detailed overlays and the browser reporting endpoint are development-only.

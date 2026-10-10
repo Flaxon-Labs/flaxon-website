@@ -226,3 +226,9 @@ Use the [complete guessing game](11-guessing-game.html) to see two working featu
 - Check modified clicks, mobile navigation, keyboard focus, and production-generated assets.
 
 [Previous: Teloce and Flaxon APIs](12-teloce-flaxon-apis.html) · [Course contents](index.html)
+
+## Optional SSR and integrated debugging
+
+The client-rendered workflow above remains supported. To render the initial `.html` entry on the server, follow the [Flaxon SSR and debugger guide](../guides/teloce-ssr-debugging.html) and [Teloce SSR reference](../guides/teloce-ssr-reference.html). Use explicit public props, SSR-compatible templates, and matching packages from the [preview installation guide](../guides/latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging).
+
+`data-teloce-link` still handles subsequent browser navigation. With `debug=True`, runtime errors, hydration diagnostics, and failed same-origin API requests appear in the overlay and `/__debug__`, with request IDs connecting API failures to Python errors. Production disables this development client and reporting endpoint.

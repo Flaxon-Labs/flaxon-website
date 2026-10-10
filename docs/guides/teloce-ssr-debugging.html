@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Teloce SSR and the Flaxon debugger — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Teloce SSR and the Flaxon debugger — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Teloce SSR and the Flaxon debugger</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/guides/teloce-ssr-debugging.md">Framework source</a> · <a href="../../content/framework/docs/guides/teloce-ssr-debugging.md" download>Markdown</a></p><p class="doc-preview-note">Preview: this integration is pending merge/release. <a href="latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging">Install matching tested commits</a></p><h1 id="teloce-ssr-and-the-flaxon-debugger">Teloce SSR and the Flaxon debugger</h1>
+<p>Flaxon loads application data and returns HTTP responses. Teloce owns template compilation, server rendering and browser hydration. Its independent renderer does not import Flaxon. Use matching package versions containing the AST renderer; while developing these changes, install both updated checkouts with <code>pip install -e /path/to/teloce-py -e /path/to/flaxon</code>.</p>
+<h2 id="enable-ssr-deliberately">Enable SSR deliberately</h2>
+<p>In <code>app.py</code>, keep your existing factory, settings and mounted modules. Configure the UI integration after creating the application:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span><span class="p">,</span> <span class="n">Request</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s1">'Projects'</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">'ssr'</span><span class="p">:</span> <span class="s1">'opt-in'</span><span class="p">,</span>
+    <span class="s1">'ssr_entries'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'app.html'</span><span class="p">],</span>
+    <span class="s1">'ssr_fallback'</span><span class="p">:</span> <span class="s1">'error'</span><span class="p">,</span>
+<span class="p">})</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="c1"># Construct the public snapshot deliberately; do not serialize a whole user.</span>
+    <span class="n">public_props</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Projects'</span><span class="p">,</span>
+        <span class="s1">'count'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'value'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="s1">'projects'</span><span class="p">:</span> <span class="p">[{</span><span class="s1">'id'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="s1">'Learn Flaxon'</span><span class="p">}],</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="s1">'app.html'</span><span class="p">,</span>
+        <span class="n">public_props</span><span class="p">,</span>
+        <span class="n">ssr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Projects'</span><span class="p">,</span>
+            <span class="s1">'description'</span><span class="p">:</span> <span class="s1">'Manage your projects'</span><span class="p">,</span>
+            <span class="s1">'canonical'</span><span class="p">:</span> <span class="s1">'https://example.com/'</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Create <code>ui/app.html</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">v-for</span><span class="o">=</span><span class="s">"project in projects"</span> <span class="na">:key</span><span class="o">=</span><span class="s">"project.id"</span><span class="p">&gt;</span>{{ project.name }}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ count.value }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="err">@</span><span class="na">click</span><span class="o">=</span><span class="s">"count.value++"</span><span class="p">&gt;</span>Increase<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="nx">projects</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nx">count</span><span class="o">:</span><span class="w"> </span><span class="nx">signal</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="nt">main</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="kt">rem</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span><span class="w"> </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Run the normal generated-project command, <code>python management.py runserver</code>. Flaxon builds the browser assets and SSR programs, renders into a marked <code>#app</code>, adds escaped public props, metadata, styles and module preloads, then calls Teloce's <code>hydrate</code>. Teloce preserves matching nodes and seeds <code>count.value</code> without replacing the signal. You do not manually import signal helpers in this component workflow.</p>
+<p><code>ssr: 'opt-in'</code> keeps routes client-rendered unless they pass <code>ssr=True</code>. <code>ssr_entries</code> names entries relative to registered UI sources; imported child components are included automatically. It defaults to the configured app entry. This allows browser-only forms/components elsewhere in the project. <code>ssr: True</code> renders by default and, without selected entries, validates all components for SSR. You can still pass <code>ssr=False</code> for a client-only page.</p>
+<h2 id="public-state-and-supported-syntax">Public state and supported syntax</h2>
+<p>Public props must be a plain JSON dictionary, with plain nested dictionaries/lists. Convert models, dates, decimals and unsafe integers explicitly. Nonfinite/unsafe numbers and arbitrary objects are rejected. The complete public snapshot reaches the browser; keep secrets, internal records and permission decisions on the server.</p>
+<p>The first SSR subset supports interpolation, conditionals, indexed/keyed loops, safe attributes, text/show/hide bindings, imported children, and default/named slots. It implements explicit JavaScript truthiness/equality/coercion helpers with Node parity tests. Raw HTML, <code>v-model</code>, virtual lists, arbitrary calls, spreads, template literals and dynamic components are outside this subset. Unsupported syntax is a build diagnostic, not silently empty output. Browser lifecycle hooks remain client-only. Missing public values are request-time render errors.</p>
+<p>Use the <a href="teloce-ssr-reference.html">Teloce SSR guide</a> for the exact supported expressions, limits and hydration contract. Client-only pages continue to support the broader browser API.</p>
+<h2 id="errors-in-the-browser-and-dashboard">Errors in the browser and dashboard</h2>
+<p>With <code>debug=True</code>, Flaxon injects a development error client into compiled pages. It captures:</p>
+<ul>
+<li>Teloce runtime/event failures and hydration mismatch diagnostics.</li>
+<li>Unhandled browser errors and promise rejections.</li>
+<li>Same-origin failed API requests with status 500 or greater, and network failures.</li>
+</ul>
+<p>An overlay shows the message, available original component location, source excerpt and stack. Its dashboard link opens <code>/__debug__</code>. The dashboard also records compiler and server-rendering errors. Failed builds leave the development dashboard available so you can inspect diagnostics and restart/rebuild after fixing the source.</p>
+<p>Request IDs connect API reports to the corresponding Python failure. Incoming request IDs are bounded and validated; each stored server error has its own unique ID. The reporter does not collect response bodies, request bodies, cookies, headers or the entire component state. Reports are marked as client-reported, and all displayed values are escaped.</p>
+<p>Runtime hooks supply original expression positions. For generated stacks, Flaxon reads only known build source maps and registered UI inputs, using the nearest available mapping. Some transformations lack token-level mappings; diagnostics may point to the handler expression rather than an exact inner statement. Unsupported/malformed locations cannot read arbitrary server files.</p>
+<p>The development endpoint requires a same-origin request and a per-app token, limits bodies to 32 KB during receipt, limits field lengths, rate-limits reports and redacts recognized sensitive data. Redaction is best effort: keep real secrets out of error messages and development source. Run the debugger only in a trusted local development environment.</p>
+<p>Teloce remains usable without this adapter: hosts can subscribe to <code>onTeloceError</code> or <code>teloce:error</code> browser events from its shared runtime.</p>
+<h2 id="error-and-production-policies">Error and production policies</h2>
+<p>The default <code>ssr_fallback: 'error'</code> exposes rendering failures through Flaxon's normal error response. Development records the SSR location. An explicitly configured <code>ssr_fallback: 'client'</code> logs an SSR rendering failure and serves the client shell for that page. This fallback handles render errors only; invalid public data, missing manifests, configuration failures and route/authentication errors keep their normal failure behavior. Apply authentication and authorization before calling <code>request.compile()</code>.</p>
+<p><code>debug=False</code> removes the injected client and disables the reporting endpoint/dashboard. A production build uses MinifyJS defaults for browser optimization; source maps are disabled unless explicitly requested. Optional production monitoring is a separate integration, not this development transport.</p>
+<p>The default render cache is disabled. <code>ssr_cache_size: 32</code> enables Teloce's bounded cache keyed by entry and the complete public snapshot. This cache never bypasses route authentication or application data loading. A new build replaces the renderer/cache. Teloce also offers <code>teloce prerender</code> for public static pages.</p>
+<p>SPA navigation with <code>data-teloce-link</code> continues to use the existing router. SSR applies to the requested entry; later client page navigation mounts normal browser components. The initial router outlet is not automatically server-rendered as a second independently loaded page. Keep server data loading for that shell explicit, and use API loaders for later navigation.</p>
+<p>A runnable example is in <a href="../projects/teloce-ssr/index.html">examples/teloce_ssr</a>.</p></article>
+</main></div><div id="footer"></div></body></html>

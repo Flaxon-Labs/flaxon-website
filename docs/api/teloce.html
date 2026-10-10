@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Teloce full-stack integration: API reference</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/f4ab3cd440234750f6220ee2fc107dde58b93132/docs/api/teloce.md">Framework source</a> · <a href="../../content/framework/docs/api/teloce.md" download>Markdown</a></p><h1 id="teloce-full-stack-integration-api-reference">Teloce full-stack integration: API reference</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/abfc56fdda34f555ac6f19feb28b8cb77c6fd8ca/docs/api/teloce.md">Framework source</a> · <a href="../../content/framework/docs/api/teloce.md" download>Markdown</a></p><h1 id="teloce-full-stack-integration-api-reference">Teloce full-stack integration: API reference</h1>
 <p>Flaxon owns HTTP, APIs and WebSockets. Teloce compiles UI components and handles
 browser state and navigation. MinifyJS optimizes generated production JavaScript;
 it does not execute requests or replace Teloce's compiler.</p>
@@ -267,5 +267,15 @@ Windows icons. Manifest and arbitrary head HTML are not part of this API.</p>
 <p>For TypeScript, use <code>&lt;script lang="ts"&gt;</code> and import <code>.ts</code> helpers with a compatible
 Teloce version. Output is JavaScript; transpilation does not replace type checking.
 See the <a href="../projects/teloce-head-ts/index.html">tested example</a> and
-<a href="../fullstack/index.html">10 full-stack lessons</a>.</p></article>
+<a href="../fullstack/index.html">10 full-stack lessons</a>.</p>
+<h2 id="ssr-and-metadata-options">SSR and metadata options</h2>
+<p><code>await request.compile(entry, public_props, ssr=True, meta={...})</code> renders a
+manifest-linked AST program and hydrates the same public snapshot. <code>meta</code>
+supports title, description, canonical, Open Graph title/description/image/url/type,
+and <code>twitter:card</code>; values are escaped and resource URLs are validated.</p>
+<p>Use <code>options={"ssr": "opt-in", "ssr_entries": ["app.html"]}</code> for selected pages.
+<code>ssr_fallback</code> defaults to <code>"error"</code>; <code>"client"</code> explicitly allows render-error
+fallback. <code>ssr_cache_size</code> enables bounded rendering cache; default is zero.
+Read <a href="../guides/teloce-ssr-debugging.html">SSR and browser debugging</a> for the
+supported syntax, public-data rules, diagnostics, and production boundaries.</p></article>
 </main></div><div id="footer"></div></body></html>
