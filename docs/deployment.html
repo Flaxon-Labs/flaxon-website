@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Deployment</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/deployment.md">Framework source</a> · <a href="../content/framework/docs/deployment.md" download>Markdown</a></p><h1 id="deployment">Deployment</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/deployment.md">Framework source</a> · <a href="../content/framework/docs/deployment.md" download>Markdown</a></p><h1 id="deployment">Deployment</h1>
 <p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
 explicit mounts in <code>app.py</code>, and <code>management.py</code> workflow. See <a href="guides/orm.html">ORM and project management</a>
 for Python migrations, model registration, permission hooks, relationship editing,
@@ -280,5 +280,26 @@ an ASGI server such as Uvicorn:</p>
 <li>Scaling and Performance</li>
 <li>Monitoring and Observability</li>
 </ul>
-<p>These topics are covered in the remaining Flaxon documentation.</p></article>
+<p>These topics are covered in the remaining Flaxon documentation.</p>
+<h2 id="generated-full-stack-starter-on-render">Generated full-stack starter on Render</h2>
+<p>Build command:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>management.py<span class="w"> </span>build
+</code></pre></div>
+<p>Start command for a single instance with SQLite on a persistent disk:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>migrate<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>uvicorn<span class="w"> </span>app:app<span class="w"> </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="w"> </span><span class="nv">$PORT</span><span class="w"> </span>--workers<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Keep committed migration files in the repository. Configure production secrets,
+debug off, allowed hosts and trusted origins. Set database, Admin storage and
+upload paths to durable storage; ordinary local files are ephemeral. The UI
+build needs no live database connection or access to the persistent disk.
+For PostgreSQL and multiple instances, run migrations once as a deployment
+step and use shared session, media and CMS storage.</p>
+<h3 id="compiler-release-and-ci">Compiler release and CI</h3>
+<p>Flaxon's dependency minimum is the published <code>teloce-py&gt;=0.2.6</code>. CI uses the
+exact compiler source revision in <code>requirements/ci.txt</code> to verify unreleased
+SSR, hydration and runtime fixes. This constraint also applies to the isolated
+wheel installation test. Publishing a new Flaxon release that depends on those
+fixes requires publishing the corresponding Teloce release first and then
+raising the dependency minimum. A passing source-integration job does not
+prove an unreleased compiler is available from PyPI.</p></article>
 </main></div><div id="footer"></div></body></html>

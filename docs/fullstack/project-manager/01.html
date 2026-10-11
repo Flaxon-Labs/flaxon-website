@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>01 | Preview and CLI setup</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/01.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/01.md" download>Markdown</a></p><h1 id="01-preview-and-cli-setup">01 | Preview and CLI setup</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/01.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/01.md" download>Markdown</a></p><h1 id="01-preview-and-cli-setup">01 | Preview and CLI setup</h1>
 <h2 id="goal">Goal</h2>
 <p>Generate your own project and run its welcome screen.</p>
 <h2 id="what-you-are-building">What you are building</h2>
@@ -35,7 +35,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>welcome
 python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>run<span class="w"> </span>app:app<span class="w"> </span>--reload
 </code></pre></div>
-<p><strong>CREATE <code>requirements.txt</code>:</strong> after the release passes the course checks, copy the complete contents of <code>requirements-release.txt</code> from the course repository into the generated project. Keep that file in Git. Chapters 2-15 then use the same application code and commands. Skip <code>prepare_course.py</code> and the preview wheel-copying commands on this path. Chapter 15 deployment uses your release requirements; its vendor-verification helper runs only for the preview path.</p>
+<p><strong>CREATE <code>requirements.txt</code>:</strong> after the release passes the course checks, copy the complete contents of <code>requirements-release.txt</code> from the course repository into the generated project. Keep that file in Git. Chapters 2-16 then use the same application code and commands. Skip <code>prepare_course.py</code> and the preview wheel-copying commands on this path. Chapter 15 deployment uses your release requirements; its vendor-verification helper runs only for the preview path.</p>
 <p><strong>Say:</strong> "We installed the published course version, then generated our own project. Flaxon already includes the ORM integration. We still apply migrations explicitly."</p>
 <p><strong>Viewers should see:</strong> the generated welcome screen and a successful Python API request. If the exact release cannot be installed, it has not been published on the configured package index; use the labelled preview path to rehearse, not a different version presented as 3.0.0.</p>
 <h3 id="preview-path-verified-bundled-build-before-release">Preview path: verified bundled build before release</h3>
@@ -118,6 +118,5 @@ project_manager directory by running the generation command again inside it.</p>
 <h2 id="save-your-checkpoint">Save your checkpoint</h2>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
 git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 01: Preview and CLI setup"</span>
-</code></pre></div>
-<p><a href="index.html">Course contents</a> | <a href="02.html">Next</a></p></article>
+</code></pre></div></article>
 </main></div><div id="footer"></div></body></html>

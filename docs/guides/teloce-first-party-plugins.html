@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Optional first-party plugins — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Optional first-party plugins — Flaxon Docs</title>
+<link rel="icon" href="../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/docs.css">
+<script src="../../assets/js/dark-mode.js"></script>
+<script defer src="../../assets/js/site-shell.js"></script>
+<script defer src="../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Optional first-party plugins</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/guides/teloce-first-party-plugins.md">Framework source</a> · <a href="../../content/framework/docs/guides/teloce-first-party-plugins.md" download>Markdown</a></p><h1 id="optional-first-party-plugins">Optional first-party plugins</h1>
+<p>These modules ship inside <code>teloce-py</code>, but builds include only modules you enable.
+They work without Flaxon. They do not replace server validation, authorization,
+SEO content rendered on the server, or an application-specific offline sync design.</p>
+<h2 id="configure-a-flaxon-application">Configure a Flaxon application</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flaxon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flaxon</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flaxon</span><span class="p">(</span><span class="s2">"project-manager"</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+    <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+    <span class="n">plugins</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"forms"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"i18n"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"locale"</span><span class="p">:</span> <span class="s2">"en"</span><span class="p">,</span>
+            <span class="s2">"fallback"</span><span class="p">:</span> <span class="s2">"en"</span><span class="p">,</span>
+            <span class="s2">"messages"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"en"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"welcome"</span><span class="p">:</span> <span class="s2">"Welcome, </span><span class="si">{name}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"tasks"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"one"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{count}</span><span class="s2"> task"</span><span class="p">,</span> <span class="s2">"other"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{count}</span><span class="s2"> tasks"</span><span class="p">}},</span>
+                <span class="s2">"es"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"welcome"</span><span class="p">:</span> <span class="s2">"Hola, </span><span class="si">{name}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"tasks"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"one"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{count}</span><span class="s2"> tarea"</span><span class="p">,</span> <span class="s2">"other"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{count}</span><span class="s2"> tareas"</span><span class="p">}},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">"accessibility"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"head"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Project manager"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Manage projects and tasks"</span><span class="p">,</span>
+            <span class="s2">"pages"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"/projects"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Your projects"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Your project dashboard"</span><span class="p">}},</span>
+        <span class="p">},</span>
+        <span class="s2">"pwa"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Project manager"</span><span class="p">,</span>
+            <span class="s2">"short_name"</span><span class="p">:</span> <span class="s2">"Projects"</span><span class="p">,</span>
+            <span class="s2">"start_url"</span><span class="p">:</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="s2">"scope"</span><span class="p">:</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="s2">"theme_color"</span><span class="p">:</span> <span class="s2">"#0f172a"</span><span class="p">,</span>
+            <span class="s2">"icons"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/icon-192.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"192x192"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/icon-512.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"512x512"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Provide real icon files at those URLs and mount their static directory. HTTPS (or
+localhost) is required for service workers. PWA registration is disabled in development.
+Browser installation eligibility depends on the manifest, icons and browser rules;
+setting <code>pwa=True</code> alone does not guarantee an installation prompt.</p>
+<p>Flaxon serves <code>/teloce-sw.js</code>, sets its allowed scope, adds the manifest link, initializes
+plugins before mounting components, and connects Head/accessibility to its Teloce router.
+Per-page <code>request.compile(..., meta={...})</code> overrides Head defaults in the initial HTML.
+Omit a plugin, use <code>False</code>, or use <code>{"enabled": False}</code> to disable it. No extra pip package
+is needed. This requires the matching new Teloce and Flaxon versions containing this integration.</p>
+<h2 id="forms">Forms</h2>
+<p>Browser modules are available as <code>globalThis.telocePlugins</code> after initialization.
+The API is explicit: <code>v-model</code> updates component state; copy that value into the form
+before submitting. Forms do not intercept requests or attach authentication headers.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createForm</span><span class="p">,</span><span class="w"> </span><span class="nx">required</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">,</span><span class="w"> </span><span class="nx">minLength</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="p">.</span><span class="nx">forms</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">form</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createForm</span><span class="p">(</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">required</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">],</span><span class="w"> </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">required</span><span class="p">,</span><span class="w"> </span><span class="nx">minLength</span><span class="p">(</span><span class="mf">8</span><span class="p">)]</span><span class="w"> </span><span class="p">},</span>
+<span class="p">);</span>
+<span class="nx">form</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"email"</span><span class="p">,</span><span class="w"> </span><span class="s2">"person@example.com"</span><span class="p">);</span>
+<span class="nx">form</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"password"</span><span class="p">,</span><span class="w"> </span><span class="s2">"example-password"</span><span class="p">);</span>
+<span class="nx">form</span><span class="p">.</span><span class="nx">touch</span><span class="p">(</span><span class="s2">"email"</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">unsubscribe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Copy status into a component field or signal so its UI reacts.</span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">errors</span><span class="p">,</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">submitting</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="k">await</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">submit</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="nx">values</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"/api/login"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">"POST"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="s2">"same-origin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"content-type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"application/json"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">values</span><span class="p">),</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">form</span><span class="p">.</span><span class="nx">setServerErrors</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">unsubscribe</span><span class="p">();</span><span class="w"> </span><span class="c1">// Do this when the owning component unmounts.</span>
+</code></pre></div>
+<p><code>validate()</code> returns a boolean. Validation is synchronous; rules return an error string
+or null. Duplicate submissions are ignored. Submission flags reset even when the handler
+throws; catch failures in your UI. Values are plain structured-cloneable data.
+<code>setServerErrors</code> accepts a field dictionary or an <code>errors</code>/<code>detail</code> array with <code>loc</code> or
+<code>field</code> paths. Unknown paths become <code>_form</code> errors. <code>reset()</code> clears values, touched fields
+and errors; resetting while submitting raises an error.</p>
+<h2 id="internationalization">Internationalization</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">i18n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="p">.</span><span class="nx">i18n</span><span class="p">;</span>
+<span class="nx">i18n</span><span class="p">.</span><span class="nx">t</span><span class="p">(</span><span class="s2">"welcome"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">"Aldane"</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">i18n</span><span class="p">.</span><span class="nx">t</span><span class="p">(</span><span class="s2">"tasks"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">count</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">i18n</span><span class="p">.</span><span class="nx">number</span><span class="p">(</span><span class="mf">1200</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">style</span><span class="o">:</span><span class="w"> </span><span class="s2">"currency"</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="s2">"JMD"</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">i18n</span><span class="p">.</span><span class="nx">date</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">dateStyle</span><span class="o">:</span><span class="w"> </span><span class="s2">"long"</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">i18n</span><span class="p">.</span><span class="nx">setLocale</span><span class="p">(</span><span class="s2">"es"</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">unsubscribe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">i18n</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">lang</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">i18n</span><span class="p">.</span><span class="nx">locale</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Update translated component fields/signals here.</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Messages are text, not HTML. Named placeholders and <code>Intl.PluralRules</code> categories are
+supported; this is not a full ICU MessageFormat parser. Missing translations use the
+fallback locale, then the key. Subscriptions must be removed on component cleanup.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">a11y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="p">.</span><span class="nx">accessibility</span><span class="p">;</span>
+<span class="nx">a11y</span><span class="p">.</span><span class="nx">announce</span><span class="p">(</span><span class="s2">"Task saved"</span><span class="p">);</span>
+<span class="nx">a11y</span><span class="p">.</span><span class="nx">focus</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"h1"</span><span class="p">));</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">a11y</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">"dialog"</span><span class="p">));</span>
+<span class="c1">// Later:</span>
+<span class="nx">close</span><span class="p">();</span>
+</code></pre></div>
+<p>Use a labelled native <code>&lt;dialog&gt;</code> containing your normal buttons/forms. <code>showModal()</code>
+provides browser keyboard containment and Escape handling; close restores focus to the
+opener when it is still present. Router completion announces the current document title.
+This does not supply missing labels, color contrast, or a complete accessible design.</p>
+<h2 id="head-seo">Head / SEO</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="p">.</span><span class="nx">head</span><span class="p">;</span>
+<span class="nx">head</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">"Project: Website"</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s2">"Tasks for your website project"</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">canonical</span><span class="o">:</span><span class="w"> </span><span class="s2">"https://example.com/projects/website"</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">ogTitle</span><span class="o">:</span><span class="w"> </span><span class="s2">"Website project"</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">ogDescription</span><span class="o">:</span><span class="w"> </span><span class="s2">"A project dashboard"</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">ogImage</span><span class="o">:</span><span class="w"> </span><span class="s2">"https://example.com/static/share.png"</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div>
+<p><code>set</code> replaces the plugin-owned metadata using defaults plus the current page.
+<code>og:title</code>, <code>og:description</code>, and <code>og:image</code> names are also accepted. URLs must be HTTP(S).
+Tags are created with DOM APIs; strings are not injected as HTML. Router paths can map to
+metadata through <code>head.pages</code>; dynamic projects call <code>set</code> after their data loads.
+For discoverable content use SSR and Flaxon's per-page metadata; client-side tags alone
+cannot guarantee crawler indexing.</p>
+<h2 id="pwa-updates-and-caching">PWA updates and caching</h2>
+<div class="highlight"><pre><span></span><code><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"teloce:pwa-update"</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Show your own 'Update available' button.</span>
+<span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pwa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="p">.</span><span class="nx">pwa</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">pwa</span><span class="o">?</span><span class="p">.</span><span class="nx">updateAvailable</span><span class="p">)</span><span class="w"> </span><span class="nx">pwa</span><span class="p">.</span><span class="nx">activateUpdate</span><span class="p">();</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">pwa</span><span class="o">?</span><span class="p">.</span><span class="nx">checkForUpdate</span><span class="p">();</span>
+</code></pre></div>
+<p>Registration happens asynchronously and does not block application mounting. Unsupported
+browsers return null; registration failures emit <code>teloce:pwa-error</code>. The update controller
+has <code>registration</code>, <code>updateAvailable</code>, <code>checkForUpdate</code>, <code>activateUpdate</code> and <code>destroy</code>.
+Activation is explicit, without an automatic refresh that could erase unfinished forms.
+Reload after choosing to activate a waiting update. No install-prompt UI is supplied.</p>
+<p>The worker precaches emitted JS/CSS and a generic offline page. It ignores non-GET requests,
+cross-origin requests, query-bearing asset requests and all non-allowlisted API/data URLs.
+Navigation stays network-first and is not cached; network failure shows the static offline
+page. Sessions, Admin responses and private user data are never added by this worker.
+Offline database edits, queues and conflict resolution are not provided. Cache cleanup is
+namespaced by asset base and scope, and deletes only this application's old caches.</p>
+<h2 id="using-another-python-framework">Using another Python framework</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">teloce.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_project</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">build_project</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="s2">"dist"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">"plugins"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"forms"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"i18n"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"locale"</span><span class="p">:</span> <span class="s2">"en"</span><span class="p">}},</span>
+    <span class="s2">"public_path"</span><span class="p">:</span> <span class="s2">"/static/"</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Read <code>result["plugins"]["entry"]</code> (also in <code>manifest.json</code>), serve the output folder and
+initialize plugins before mounting your component:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">installPlugins</span><span class="p">,</span><span class="w"> </span><span class="nx">connectPlugins</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"/static/teloce-plugins/index.js"</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">installPlugins</span><span class="p">();</span>
+<span class="c1">// Mount your component/router here, then:</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">disconnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">connectPlugins</span><span class="p">(</span><span class="nx">plugins</span><span class="p">,</span><span class="w"> </span><span class="nx">router</span><span class="p">);</span>
+</code></pre></div>
+<p>For PWA, also add a manifest link and serve the emitted worker at your configured
+<code>workerURL</code> with an appropriate <code>Service-Worker-Allowed</code> header. Flaxon supplies those
+steps automatically; other frameworks must do them explicitly. Runtime module factories
+can also be imported directly from their emitted files for per-component instances.
+Call instance cleanup methods and router disconnect functions when their owners unmount.</p></article>
+</main></div><div id="footer"></div></body></html>

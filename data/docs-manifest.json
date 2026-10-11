@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/aldanedev-create/flaxon",
-  "commit": "054f12804d53fff08320c7ed7638365c0ab30612",
+  "commit": "3ac6041ee93e759b723f05b7e639b7349978c0a4",
   "pages": [
     {
       "source": "CHANGELOG.md",
@@ -495,6 +495,12 @@
       "section": "Full-stack course"
     },
     {
+      "source": "docs/fullstack/project-manager/16.md",
+      "url": "docs/fullstack/project-manager/16.html",
+      "title": "16 | PWA: installation, offline fallback and updates",
+      "section": "Full-stack course"
+    },
+    {
       "source": "docs/fullstack/project-manager/index.md",
       "url": "docs/fullstack/project-manager/index.html",
       "title": "Project Manager: complete full-stack ebook",
@@ -667,6 +673,12 @@
       "url": "docs/guides/tasks.html",
       "title": "Tasks",
       "section": "Core concepts"
+    },
+    {
+      "source": "docs/guides/teloce-first-party-plugins.md",
+      "url": "docs/guides/teloce-first-party-plugins.html",
+      "title": "Optional first-party plugins",
+      "section": "Feature guides"
     },
     {
       "source": "docs/guides/teloce-ssr-debugging.md",

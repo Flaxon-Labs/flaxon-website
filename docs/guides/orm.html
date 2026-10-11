@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Models, settings, and management commands</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
 <p>Flaxon 0.2.7 integrates Tortoise ORM 1.1.7. <code>flaxon.db</code> exports its models, fields,
 and transaction helpers. Existing <code>flaxon.database</code> adapters and JSON migration
 runners remain available for existing applications; new full-stack starters use
@@ -29,6 +29,8 @@ python<span class="w"> </span>management.py<span class="w"> </span>migrate<span 
 python<span class="w"> </span>management.py<span class="w"> </span>migrate
 python<span class="w"> </span>management.py<span class="w"> </span>setup-admin
 python<span class="w"> </span>management.py<span class="w"> </span>runserver
+<span class="c1"># Prepare the full-stack starter for deployment:</span>
+python<span class="w"> </span>management.py<span class="w"> </span>build
 </code></pre></div>
 <p>The CLI creates <code>.venv</code>; activate it before installing your generated project.
 <code>flaxon run app:app --reload</code> continues to work. <code>runserver</code> is a development

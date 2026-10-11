@@ -256,3 +256,72 @@ Use `options={"ssr": "opt-in", "ssr_entries": ["app.html"]}` for selected pages.
 fallback. `ssr_cache_size` enables bounded rendering cache; default is zero.
 Read [SSR and browser debugging](../guides/teloce-ssr-debugging.md) for the
 supported syntax, public-data rules, diagnostics, and production boundaries.
+
+## Build the generated starter for production
+
+```bash
+python management.py build
+```
+
+This command forces a production Teloce build with MinifyJS bundling and
+minification, extracted scoped CSS, hashed assets, and no development source
+maps or debugger client. It includes the UI contributed by mounted modules.
+Compilation errors exit unsuccessfully so deployment stops.
+
+In `app.py`, call `app.use_teloce(...)` after mounting modules and before the
+`if app.is_management: return app` guard. Keep database connections and Admin
+store initialization after that guard. `build` does not run startup hooks or
+apply migrations. Backend-only projects do not need this command.
+
+## Automatic development rebuilds
+
+Run `python management.py runserver` with `DEBUG=True`. Saved `.html`, `.vel`,
+`.ts`, `.tsx`, `.js`, `.jsx`, `.css`, and `.json` changes inside registered application
+and module UI folders are detected by the development browser every two seconds.
+Flaxon rebuilds the UI once and refreshes open pages after a successful build.
+Compilation failures show a notice linking to the debugger; another saved edit retries.
+
+This is automatic rebuilding and full-page reload, not state-preserving component HMR.
+Unsaved editor changes are not visible; enable your editor's Auto Save if desired.
+Python changes still use the development server's Python reload. Imported files outside
+registered UI roots are not watched. Production registers no reload endpoint or client.
+
+## Optional first-party modules
+
+Configure these in `app.use_teloce(plugins={...})`:
+
+```python
+app.use_teloce(ui_dir="ui", plugins={
+    "forms": True,
+    "i18n": {"locale": "en", "messages": {"en": {"welcome": "Welcome"}}},
+    "accessibility": True,
+    "head": {"title": "Tasks", "pages": {"/projects": {"title": "Projects"}}},
+    "pwa": {"name": "Tasks", "scope": "/", "icons": [
+        {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+        {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    ]},
+})
+```
+
+Serve the icon files yourself. Browser APIs become available through `globalThis.telocePlugins`:
+`forms.createForm`, `i18n.t`, `accessibility.openDialog`, `head.set` and the asynchronous
+`pwa` registration result. Use `False` or `{"enabled": False}` to disable a module.
+Only enabled assets are emitted. The matching new Teloce version is required.
+
+Forms offer touched/errors/submission state and map server field errors; validation and
+CSRF/authentication remain server responsibilities. Subscriptions must be cleaned up.
+Translations use named placeholders and Intl plural/number/date formatting.
+Accessibility uses native dialogs, focus restoration and navigation announcements.
+Head defaults appear in server HTML; `request.compile(meta=...)` overrides them.
+SPA navigation uses `head.pages`, or call `head.set` for dynamic pages.
+
+PWA registration is disabled in debug mode. In production, Flaxon serves `/teloce-sw.js`
+with the configured allowed scope and injects the manifest link. HTTPS or localhost and
+valid icons are needed for browser installation eligibility. The worker caches only generated
+JS/CSS plus a generic offline fallback. It does not cache API, Admin or private user responses,
+and it does not implement offline editing. PWA registration failures never block mounting.
+Listen for `teloce:pwa-update` and `teloce:pwa-error`; activate updates only after the user
+has saved their work. Configuration is sent to the browser: never put secrets in plugin options.
+
+The full API and framework-neutral setup are documented in Teloce's
+`docs/first-party-plugins.md`. These are optional modules inside `teloce-py`, not separate pip packages.

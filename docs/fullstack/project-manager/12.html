@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>12 | Staff Admin</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/fullstack/project-manager/12.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/12.md" download>Markdown</a></p><h1 id="12-staff-admin">12 | Staff Admin</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/12.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/12.md" download>Markdown</a></p><h1 id="12-staff-admin">12 | Staff Admin</h1>
 <h2 id="goal">Goal</h2>
 <p>Create staff credentials and manage existing domain records with explicit permissions.</p>
 <h2 id="what-you-are-building">What you are building</h2>
@@ -51,6 +51,8 @@
 <p>Create the parent directories, then save this complete file.</p>
 <div class="highlight"><pre><span></span><code><span class="sd">"""Staff model adapters reuse the domain database; CMS owns only editorial content."""</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span><span class="p">,</span> <span class="n">Task</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdminDashboard</span><span class="p">,</span> <span class="n">AdminConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.admin.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
@@ -60,6 +62,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">configure_backoffice</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">admin_path</span><span class="p">,</span> <span class="n">uploads_path</span><span class="p">):</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">admin</span> <span class="o">=</span> <span class="n">AdminDashboard</span><span class="p">(</span>
         <span class="n">app</span><span class="p">,</span>
         <span class="n">registry</span><span class="o">=</span><span class="n">Registry</span><span class="p">(),</span>
@@ -249,6 +252,5 @@ python<span class="w"> </span>management.py<span class="w"> </span>runserver
 <h2 id="save-your-checkpoint">Save your checkpoint</h2>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
 git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 12: Staff Admin"</span>
-</code></pre></div>
-<p><a href="11.html">Previous</a> | <a href="index.html">Course contents</a> | <a href="13.html">Next</a></p></article>
+</code></pre></div></article>
 </main></div><div id="footer"></div></body></html>
