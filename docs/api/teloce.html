@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Teloce full-stack integration: API reference</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/api/teloce.md">Framework source</a> · <a href="../../content/framework/docs/api/teloce.md" download>Markdown</a></p><h1 id="teloce-full-stack-integration-api-reference">Teloce full-stack integration: API reference</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/api/teloce.md">Framework source</a> · <a href="../../content/framework/docs/api/teloce.md" download>Markdown</a></p><h1 id="teloce-full-stack-integration-api-reference">Teloce full-stack integration: API reference</h1>
 <p>Flaxon owns HTTP, APIs and WebSockets. Teloce compiles UI components and handles
 browser state and navigation. MinifyJS optimizes generated production JavaScript;
 it does not execute requests or replace Teloce's compiler.</p>
@@ -277,5 +277,58 @@ and <code>twitter:card</code>; values are escaped and resource URLs are validate
 <code>ssr_fallback</code> defaults to <code>"error"</code>; <code>"client"</code> explicitly allows render-error
 fallback. <code>ssr_cache_size</code> enables bounded rendering cache; default is zero.
 Read <a href="../guides/teloce-ssr-debugging.html">SSR and browser debugging</a> for the
-supported syntax, public-data rules, diagnostics, and production boundaries.</p></article>
+supported syntax, public-data rules, diagnostics, and production boundaries.</p>
+<h2 id="build-the-generated-starter-for-production">Build the generated starter for production</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>management.py<span class="w"> </span>build
+</code></pre></div>
+<p>This command forces a production Teloce build with MinifyJS bundling and
+minification, extracted scoped CSS, hashed assets, and no development source
+maps or debugger client. It includes the UI contributed by mounted modules.
+Compilation errors exit unsuccessfully so deployment stops.</p>
+<p>In <code>app.py</code>, call <code>app.use_teloce(...)</code> after mounting modules and before the
+<code>if app.is_management: return app</code> guard. Keep database connections and Admin
+store initialization after that guard. <code>build</code> does not run startup hooks or
+apply migrations. Backend-only projects do not need this command.</p>
+<h2 id="automatic-development-rebuilds">Automatic development rebuilds</h2>
+<p>Run <code>python management.py runserver</code> with <code>DEBUG=True</code>. Saved <code>.html</code>, <code>.vel</code>,
+<code>.ts</code>, <code>.tsx</code>, <code>.js</code>, <code>.jsx</code>, <code>.css</code>, and <code>.json</code> changes inside registered application
+and module UI folders are detected by the development browser every two seconds.
+Flaxon rebuilds the UI once and refreshes open pages after a successful build.
+Compilation failures show a notice linking to the debugger; another saved edit retries.</p>
+<p>This is automatic rebuilding and full-page reload, not state-preserving component HMR.
+Unsaved editor changes are not visible; enable your editor's Auto Save if desired.
+Python changes still use the development server's Python reload. Imported files outside
+registered UI roots are not watched. Production registers no reload endpoint or client.</p>
+<h2 id="optional-first-party-modules">Optional first-party modules</h2>
+<p>Configure these in <code>app.use_teloce(plugins={...})</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span><span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span> <span class="n">plugins</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">"forms"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"i18n"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"locale"</span><span class="p">:</span> <span class="s2">"en"</span><span class="p">,</span> <span class="s2">"messages"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"en"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"welcome"</span><span class="p">:</span> <span class="s2">"Welcome"</span><span class="p">}}},</span>
+    <span class="s2">"accessibility"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"head"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Tasks"</span><span class="p">,</span> <span class="s2">"pages"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"/projects"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Projects"</span><span class="p">}}},</span>
+    <span class="s2">"pwa"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Tasks"</span><span class="p">,</span> <span class="s2">"scope"</span><span class="p">:</span> <span class="s2">"/"</span><span class="p">,</span> <span class="s2">"icons"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/icon-192.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"192x192"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/static/icon-512.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"512x512"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">},</span>
+    <span class="p">]},</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Serve the icon files yourself. Browser APIs become available through <code>globalThis.telocePlugins</code>:
+<code>forms.createForm</code>, <code>i18n.t</code>, <code>accessibility.openDialog</code>, <code>head.set</code> and the asynchronous
+<code>pwa</code> registration result. Use <code>False</code> or <code>{"enabled": False}</code> to disable a module.
+Only enabled assets are emitted. The matching new Teloce version is required.</p>
+<p>Forms offer touched/errors/submission state and map server field errors; validation and
+CSRF/authentication remain server responsibilities. Subscriptions must be cleaned up.
+Translations use named placeholders and Intl plural/number/date formatting.
+Accessibility uses native dialogs, focus restoration and navigation announcements.
+Head defaults appear in server HTML; <code>request.compile(meta=...)</code> overrides them.
+SPA navigation uses <code>head.pages</code>, or call <code>head.set</code> for dynamic pages.</p>
+<p>PWA registration is disabled in debug mode. In production, Flaxon serves <code>/teloce-sw.js</code>
+with the configured allowed scope and injects the manifest link. HTTPS or localhost and
+valid icons are needed for browser installation eligibility. The worker caches only generated
+JS/CSS plus a generic offline fallback. It does not cache API, Admin or private user responses,
+and it does not implement offline editing. PWA registration failures never block mounting.
+Listen for <code>teloce:pwa-update</code> and <code>teloce:pwa-error</code>; activate updates only after the user
+has saved their work. Configuration is sent to the browser: never put secrets in plugin options.</p>
+<p>The full API and framework-neutral setup are documented in Teloce's
+<code>docs/first-party-plugins.md</code>. These are optional modules inside <code>teloce-py</code>, not separate pip packages.</p></article>
 </main></div><div id="footer"></div></body></html>

@@ -12,7 +12,15 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Changelog</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/CHANGELOG.md">Framework source</a> · <a href="../content/framework/CHANGELOG.md" download>Markdown</a></p><h1 id="changelog">Changelog</h1>
+<h3 id="production-starter-build">Production starter build</h3>
+<ul>
+<li>Add <code>python management.py build</code> for production Teloce/MinifyJS assets, including mounted module UI, without database or Admin initialization. Build failures stop deployment.</li>
+</ul>
+<h3 id="security-declared-pydantic-responses">Security: declared Pydantic responses</h3>
+<ul>
+<li>Validate and filter annotated Pydantic HTTP responses, including returned dictionaries, subclass instances, nested models, and model containers. Explicit responses bypass filtering. Invalid output returns 500.</li>
+</ul>
 <h2 id="unreleased">Unreleased</h2>
 <h3 id="added">Added</h3>
 <ul>

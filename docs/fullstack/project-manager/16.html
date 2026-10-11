@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="16 | PWA: installation, offline fallback and updates — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>16 | PWA: installation, offline fallback and updates — Flaxon Docs</title>
+<link rel="icon" href="../../../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../../../assets/css/style.css"><link rel="stylesheet" href="../../../assets/css/docs.css">
+<script src="../../../assets/js/dark-mode.js"></script>
+<script defer src="../../../assets/js/site-shell.js"></script>
+<script defer src="../../../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>16 | PWA: installation, offline fallback and updates</span></nav>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/16.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/16.md" download>Markdown</a></p><h1 id="16-pwa-installation-offline-fallback-and-updates">16 | PWA: installation, offline fallback and updates</h1>
+<h2 id="goal">Goal</h2>
+<p>Turn the completed SPA into an optional installable application without caching private data.</p>
+<h2 id="what-you-are-building">What you are building</h2>
+<p>Enable Teloce's first-party PWA plugin through Flaxon. Mount generated icons, add a scoped status component and rebuild production assets. The browser receives a manifest and a same-origin service worker. It caches emitted JS/CSS and a generic offline page, not API or Admin responses. Offline means the app can explain a lost connection; it does not save tasks offline. Registration is disabled in development, so check a production build over localhost or HTTPS. This is an optional final lesson, after the existing deployment chapter.</p>
+<h2 id="build-this-chapter">Build this chapter</h2>
+<p>Stop the server. Work in project_manager. Follow each CREATE, whole-file replacement, or marked-block edit below in order.</p>
+<h2 id="step-1-create-make-parent-folders-then-create-this-file-scriptscreate_pwa_iconspy">Step 1: CREATE - make parent folders, then create this file - scripts/create_pwa_icons.py</h2>
+<p>Create the icon generator. It writes two PNG files using the standard library. Run it before the development server; production builds invoke it automatically.</p>
+<p>Create the parent directories, then save this complete file.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Generate portable course icons using only Python's standard library."""</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">chunk</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">checksum</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">crc32</span><span class="p">(</span><span class="n">kind</span> <span class="o">+</span> <span class="n">data</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+    <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"&gt;I"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">+</span> <span class="n">kind</span> <span class="o">+</span> <span class="n">data</span> <span class="o">+</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"&gt;I"</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">icon</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># PNG filter: none.</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">px</span><span class="p">,</span> <span class="n">py</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">size</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">58</span><span class="p">)</span>
+            <span class="c1"># A folder and a check mark, with generous maskable-icon padding.</span>
+            <span class="k">if</span> <span class="mf">0.20</span> <span class="o">&lt;=</span> <span class="n">px</span> <span class="o">&lt;=</span> <span class="mf">0.80</span> <span class="ow">and</span> <span class="mf">0.34</span> <span class="o">&lt;=</span> <span class="n">py</span> <span class="o">&lt;=</span> <span class="mf">0.72</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">219</span><span class="p">,</span> <span class="mi">234</span><span class="p">,</span> <span class="mi">254</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mf">0.20</span> <span class="o">&lt;=</span> <span class="n">px</span> <span class="o">&lt;=</span> <span class="mf">0.45</span> <span class="ow">and</span> <span class="mf">0.27</span> <span class="o">&lt;=</span> <span class="n">py</span> <span class="o">&lt;=</span> <span class="mf">0.35</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">219</span><span class="p">,</span> <span class="mi">234</span><span class="p">,</span> <span class="mi">254</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mf">0.37</span> <span class="o">&lt;=</span> <span class="n">px</span> <span class="o">&lt;=</span> <span class="mf">0.51</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">py</span> <span class="o">-</span> <span class="p">(</span><span class="n">px</span> <span class="o">+</span> <span class="mf">0.13</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.035</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">170</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mf">0.49</span> <span class="o">&lt;=</span> <span class="n">px</span> <span class="o">&lt;=</span> <span class="mf">0.68</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">py</span> <span class="o">-</span> <span class="p">(</span><span class="o">-</span><span class="n">px</span> <span class="o">+</span> <span class="mf">1.13</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.035</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">170</span><span class="p">)</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">"&gt;IIBBBBB"</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\r\n\x1a\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">chunk</span><span class="p">(</span><span class="sa">b</span><span class="s2">"IHDR"</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span> <span class="o">+</span> <span class="n">chunk</span><span class="p">(</span><span class="sa">b</span><span class="s2">"IDAT"</span><span class="p">,</span> <span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">rows</span><span class="p">)))</span> <span class="o">+</span> <span class="n">chunk</span><span class="p">(</span><span class="sa">b</span><span class="s2">"IEND"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">""</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">public</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"public"</span>
+    <span class="n">public</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">512</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">public</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"pwa-icon-</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">.png"</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">icon</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ROOT</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Say:</strong> "Create the icon generator. It writes two PNG files using the standard library. Run it before the development server; production builds invoke it automatically."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/create_pwa_icons.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-2-create-make-parent-folders-then-create-this-file-uicomponentspwastatushtml">Step 2: CREATE - make parent folders, then create this file - ui/components/PwaStatus.html</h2>
+<p>Create the optional PWA status component with scoped CSS. Explain online/offline events, the waiting worker and cleanup before wiring the update button.</p>
+<p>Create the parent directories, then save this complete file.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">aside</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"offline || updateAvailable || message"</span> <span class="na">class</span><span class="o">=</span><span class="s">"pwa-status"</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">"Application status"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"offline"</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>You are offline. Reconnect before saving changes.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"updateAvailable"</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>A new version is ready.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"updateAvailable"</span> <span class="na">type</span><span class="o">=</span><span class="s">"button"</span> <span class="na">:disabled</span><span class="o">=</span><span class="s">"!applyUpdate"</span> <span class="err">@</span><span class="na">click</span><span class="o">=</span><span class="s">"applyUpdate()"</span><span class="p">&gt;</span>Update and reload<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">v-if</span><span class="o">=</span><span class="s">"message"</span> <span class="na">role</span><span class="o">=</span><span class="s">"status"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">aside</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">data</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">offline</span><span class="o">:</span><span class="w"> </span><span class="o">!</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">onLine</span><span class="p">,</span><span class="w"> </span><span class="nx">updateAvailable</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">cleanup</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">applyUpdate</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">mounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">reloadListener</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">networkChanged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">offline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">onLine</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">updateReady</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">updateAvailable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">registrationFailed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Offline support could not start. You can still use the online app."</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"online"</span><span class="p">,</span><span class="w"> </span><span class="nx">networkChanged</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"offline"</span><span class="p">,</span><span class="w"> </span><span class="nx">networkChanged</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"teloce:pwa-update"</span><span class="p">,</span><span class="w"> </span><span class="nx">updateReady</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"teloce:pwa-error"</span><span class="p">,</span><span class="w"> </span><span class="nx">registrationFailed</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nb">globalThis</span><span class="p">.</span><span class="nx">telocePlugins</span><span class="o">?</span><span class="p">.</span><span class="nx">pwa</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">controller</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">active</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">controller</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">updateAvailable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">controller</span><span class="p">.</span><span class="nx">updateAvailable</span><span class="p">;</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">applyUpdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">confirm</span><span class="p">(</span><span class="s2">"Save unfinished work first. Reload the application now?"</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">        </span><span class="nx">reloadListener</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">reload</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">navigator</span><span class="p">.</span><span class="nx">serviceWorker</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"controllerchange"</span><span class="p">,</span><span class="w"> </span><span class="nx">reloadListener</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">once</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
+<span class="w">        </span><span class="nx">controller</span><span class="p">.</span><span class="nx">activateUpdate</span><span class="p">();</span>
+<span class="w">      </span><span class="p">};</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">cleanup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">      </span><span class="nb">window</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s2">"online"</span><span class="p">,</span><span class="w"> </span><span class="nx">networkChanged</span><span class="p">);</span>
+<span class="w">      </span><span class="nb">window</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s2">"offline"</span><span class="p">,</span><span class="w"> </span><span class="nx">networkChanged</span><span class="p">);</span>
+<span class="w">      </span><span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s2">"teloce:pwa-update"</span><span class="p">,</span><span class="w"> </span><span class="nx">updateReady</span><span class="p">);</span>
+<span class="w">      </span><span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s2">"teloce:pwa-error"</span><span class="p">,</span><span class="w"> </span><span class="nx">registrationFailed</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">reloadListener</span><span class="p">)</span><span class="w"> </span><span class="nx">navigator</span><span class="p">.</span><span class="nx">serviceWorker</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s2">"controllerchange"</span><span class="p">,</span><span class="w"> </span><span class="nx">reloadListener</span><span class="p">);</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">unmounted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">cleanup</span><span class="o">?</span><span class="p">.();</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="p">.</span><span class="nc">pwa-status</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#dbeafe</span><span class="p">;</span><span class="w"> </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#17243a</span><span class="p">;</span><span class="w"> </span><span class="k">border-bottom</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#93c5fd</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="nt">p</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="nt">button</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">margin-top</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.6</span><span class="kt">rem</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span><span class="w"> </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#1464aa</span><span class="p">;</span><span class="w"> </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span><span class="w"> </span><span class="k">cursor</span><span class="p">:</span><span class="w"> </span><span class="kc">pointer</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="nt">button</span><span class="p">:</span><span class="nd">focus-visible</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">outline</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#f59e0b</span><span class="p">;</span><span class="w"> </span><span class="k">outline-offset</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">px</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div>
+<p><strong>Say:</strong> "Create the optional PWA status component with scoped CSS. Explain online/offline events, the waiting worker and cleanup before wiring the update button."</p>
+<p><strong>Type:</strong> Follow the action above in <code>ui/components/PwaStatus.html</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-3-edit-replace-the-marked-blocks-apppy">Step 3: EDIT - replace the marked blocks - app.py</h2>
+<p>The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact.</p>
+<h3 id="edit-1-find-this-exact-block">Edit 1: find this exact block</h3>
+<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code>        <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
+        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"minifier"</span><span class="p">:</span> <span class="s2">"minifyjs"</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="replace-that-block-with">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code>        <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/course-assets"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">),</span> <span class="n">cache_control</span><span class="o">=</span><span class="s2">"no-cache"</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
+        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"minifier"</span><span class="p">:</span> <span class="s2">"minifyjs"</span><span class="p">},</span>
+        <span class="n">plugins</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"pwa"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Flaxon Project Manager"</span><span class="p">,</span>
+                <span class="s2">"short_name"</span><span class="p">:</span> <span class="s2">"Projects"</span><span class="p">,</span>
+                <span class="s2">"start_url"</span><span class="p">:</span> <span class="s2">"/projects"</span><span class="p">,</span>
+                <span class="s2">"scope"</span><span class="p">:</span> <span class="s2">"/"</span><span class="p">,</span>
+                <span class="s2">"theme_color"</span><span class="p">:</span> <span class="s2">"#17243a"</span><span class="p">,</span>
+                <span class="s2">"icons"</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/course-assets/pwa-icon-192.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"192x192"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">,</span> <span class="s2">"purpose"</span><span class="p">:</span> <span class="s2">"any maskable"</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">"src"</span><span class="p">:</span> <span class="s2">"/course-assets/pwa-icon-512.png"</span><span class="p">,</span> <span class="s2">"sizes"</span><span class="p">:</span> <span class="s2">"512x512"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image/png"</span><span class="p">,</span> <span class="s2">"purpose"</span><span class="p">:</span> <span class="s2">"any maskable"</span><span class="p">},</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+</code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>
+<p><strong>Type:</strong> Follow the action above in <code>app.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-4-edit-replace-the-marked-blocks-uiapphtml">Step 4: EDIT - replace the marked blocks - ui/app.html</h2>
+<p>This is the SPA shell. Its internal anchors and router view cooperate with each module's page mappings.</p>
+<h3 id="edit-1-find-this-exact-block_1">Edit 1: find this exact block</h3>
+<p>Open <code>ui/app.html</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code>        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/login"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Account<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">main</span> <span class="na">id</span><span class="o">=</span><span class="s">"router-view"</span> <span class="na">data-teloce-router-view</span><span class="p">&gt;&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>Built with Flaxon and Teloce. <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/admin/"</span><span class="p">&gt;</span>Staff Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="c">/* Only the document reset is global: body is outside this component. */</span>
+</code></pre></div>
+<h3 id="replace-that-block-with_1">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code>        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/login"</span> <span class="na">data-teloce-link</span><span class="p">&gt;</span>Account<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">PwaStatus</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">main</span> <span class="na">id</span><span class="o">=</span><span class="s">"router-view"</span> <span class="na">data-teloce-router-view</span><span class="p">&gt;&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>Built with Flaxon and Teloce. <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/admin/"</span><span class="p">&gt;</span>Staff Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">lang</span><span class="o">=</span><span class="s">"ts"</span><span class="p">&gt;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">PwaStatus</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"./components/PwaStatus.html"</span><span class="p">;</span>
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">components</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PwaStatus</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">scoped</span><span class="p">&gt;</span>
+<span class="c">/* Only the document reset is global: body is outside this component. */</span>
+</code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "This is the SPA shell. Its internal anchors and router view cooperate with each module's page mappings."</p>
+<p><strong>Type:</strong> Follow the action above in <code>ui/app.html</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-5-edit-replace-the-marked-blocks-scriptsbuild_uipy">Step 5: EDIT - replace the marked blocks - scripts/build_ui.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<h3 id="edit-1-find-this-exact-block_2">Edit 1: find this exact block</h3>
+<p>Open <code>scripts/build_ui.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"DATA_DIR"</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_data</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_DEBUG"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"0"</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">,</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">teloce</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="replace-that-block-with_2">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"DATA_DIR"</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_data</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FLAXON_DEBUG"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"0"</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">,</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">48</span><span class="p">))</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">create_pwa_icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">create_icons</span>
+
+    <span class="n">create_icons</span><span class="p">()</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">teloce</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/build_ui.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-6-edit-replace-the-marked-blocks-scriptsbrowser_smokepy">Step 6: EDIT - replace the marked blocks - scripts/browser_smoke.py</h2>
+<p>This file owns the feature named by its module or component. Read the route/form flow before continuing.</p>
+<h3 id="edit-1-find-this-exact-block_3">Edit 1: find this exact block</h3>
+<p>Open <code>scripts/browser_smoke.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="n">production</span> <span class="o">=</span> <span class="s2">"--production"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="p">{</span>
+</code></pre></div>
+<h3 id="replace-that-block-with_3">Replace that block with</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">create_pwa_icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">create_icons</span>
+    <span class="n">create_icons</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="n">production</span> <span class="o">=</span> <span class="s2">"--production"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="p">{</span>
+</code></pre></div>
+<p>Leave the rest of the file unchanged.</p>
+<p><strong>Say:</strong> "This file owns the feature named by its module or component. Read the route/form flow before continuing."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/browser_smoke.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-7-create-make-parent-folders-then-create-this-file-teststest_pwapy">Step 7: CREATE - make parent folders, then create this file - tests/test_pwa.py</h2>
+<p>Verify the manifest, actual PNG responses, worker scope and development registration policy before recording installation.</p>
+<p>Create the parent directories, then save this complete file.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Verify the course's optional PWA assets and production configuration."""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">runpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flaxon.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_course_pwa_assets</span><span class="p">(</span><span class="n">application</span><span class="p">):</span>
+    <span class="n">runpy</span><span class="o">.</span><span class="n">run_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"scripts/create_pwa_icons.py"</span><span class="p">),</span> <span class="n">run_name</span><span class="o">=</span><span class="s2">"__main__"</span><span class="p">)</span>
+    <span class="n">integration</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">teloce</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">integration</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s2">"plugins"</span><span class="p">][</span><span class="s2">"enabled"</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"pwa"</span><span class="p">]</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+    <span class="n">shell</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">shell</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="s1">'rel="manifest"'</span> <span class="ow">in</span> <span class="n">shell</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/_flaxon/teloce-plugins/manifest.webmanifest"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">"start_url"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"/projects"</span>
+    <span class="k">assert</span> <span class="p">{</span><span class="n">icon</span><span class="p">[</span><span class="s2">"sizes"</span><span class="p">]</span> <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">"icons"</span><span class="p">]}</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"192x192"</span><span class="p">,</span> <span class="s2">"512x512"</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">"icons"</span><span class="p">]:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s2">"src"</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\r\n\x1a\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">worker</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/teloce-sw.js"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">worker</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">"service-worker-allowed"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"/"</span>
+    <span class="k">assert</span> <span class="s2">"application/javascript"</span> <span class="ow">in</span> <span class="n">worker</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">"content-type"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">"/api/"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">worker</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="s2">"/admin/"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">worker</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">plugin</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/_flaxon/teloce-plugins/index.js"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="s1">'"enabled": false'</span> <span class="ow">in</span> <span class="n">plugin</span>  <span class="c1"># Debug builds do not register a worker.</span>
+</code></pre></div>
+<p><strong>Say:</strong> "Verify the manifest, actual PNG responses, worker scope and development registration policy before recording installation."</p>
+<p><strong>Type:</strong> Follow the action above in <code>tests/test_pwa.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="step-8-create-make-parent-folders-then-create-this-file-scriptspwa_smokepy">Step 8: CREATE - make parent folders, then create this file - scripts/pwa_smoke.py</h2>
+<p>Create the disposable production browser check. It uses a temporary database, verifies cache exclusions, goes offline and reconnects.</p>
+<p>Create the parent directories, then save this complete file.</p>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Check production PWA registration and offline fallback using disposable data."""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.sync_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">sync_playwright</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">create_pwa_icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">create_icons</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">BASE</span> <span class="o">=</span> <span class="s2">"http://127.0.0.1:8124"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">create_icons</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"course-pwa-"</span><span class="p">)</span> <span class="k">as</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="n">environment</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
+            <span class="s2">"DATA_DIR"</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span>
+            <span class="s2">"FLAXON_DEBUG"</span><span class="p">:</span> <span class="s2">"0"</span><span class="p">,</span>
+            <span class="s2">"FLAXON_SECRET_KEY"</span><span class="p">:</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">48</span><span class="p">),</span>
+            <span class="s2">"PUBLIC_ORIGIN"</span><span class="p">:</span> <span class="n">BASE</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"management.py"</span><span class="p">,</span> <span class="s2">"migrate"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"server.log"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">log</span><span class="p">:</span>
+            <span class="n">server</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"uvicorn"</span><span class="p">,</span> <span class="s2">"app:app"</span><span class="p">,</span> <span class="s2">"--port"</span><span class="p">,</span> <span class="s2">"8124"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">150</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/login"</span><span class="p">,</span> <span class="n">trust_env</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">ConnectError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"server.log"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+                <span class="k">with</span> <span class="n">sync_playwright</span><span class="p">()</span> <span class="k">as</span> <span class="n">playwright</span><span class="p">:</span>
+                    <span class="n">browser</span> <span class="o">=</span> <span class="n">playwright</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="n">service_workers</span><span class="o">=</span><span class="s2">"allow"</span><span class="p">)</span>
+                    <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/login"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"async () =&gt; { await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) =&gt; setTimeout(() =&gt; reject(new Error('Service worker did not become ready')), 15000))]); }"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">wait_for_function</span><span class="p">(</span><span class="s2">"navigator.serviceWorker.controller !== null"</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">locator</span><span class="p">(</span><span class="s1">'link[rel="manifest"]'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">cached</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">"async () =&gt; { const names = await caches.keys(); const urls = []; for (const name of names) { for (const request of await (await caches.open(name)).keys()) urls.push(new URL(request.url).pathname); } return urls; }"</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">cached</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"offline.html"</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">cached</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"/api/"</span><span class="p">,</span> <span class="s2">"/admin"</span><span class="p">))</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">cached</span><span class="p">)</span>
+                    <span class="c1"># Browser offline emulation can leave worker fetches online.</span>
+                    <span class="c1"># Stop the server so this checks an actual network failure.</span>
+                    <span class="n">server</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                    <span class="n">server</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">set_offline</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/projects"</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"heading"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"You are offline"</span><span class="p">)</span><span class="o">.</span><span class="n">is_visible</span><span class="p">()</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">set_offline</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">server</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"uvicorn"</span><span class="p">,</span> <span class="s2">"app:app"</span><span class="p">,</span> <span class="s2">"--port"</span><span class="p">,</span> <span class="s2">"8124"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">150</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/login"</span><span class="p">,</span> <span class="n">trust_env</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                                <span class="k">break</span>
+                        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">ConnectError</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Server did not restart after the offline check"</span><span class="p">)</span>
+                    <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s2">"/login"</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Email"</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">is_visible</span><span class="p">()</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">"PWA registration, private-cache exclusion, offline fallback and reconnect passed."</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">server</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">server</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+                    <span class="n">server</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                    <span class="n">server</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Say:</strong> "Create the disposable production browser check. It uses a temporary database, verifies cache exclusions, goes offline and reconnects."</p>
+<p><strong>Type:</strong> Follow the action above in <code>scripts/pwa_smoke.py</code>; explain each new function or binding as you add it.</p>
+<p><strong>Viewers should see:</strong> The saved file matches this step. After all steps, run the chapter checks below and show the expected result.</p>
+<h2 id="run-and-check">Run and check</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/create_pwa_icons.py
+python<span class="w"> </span>scripts/build_ui.py
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>tests/test_pwa.py
+python<span class="w"> </span>scripts/pwa_smoke.py
+</code></pre></div>
+<h2 id="expected-result">Expected result</h2>
+<p>The manifest has two valid icons and starts at /projects. The production browser registers /teloce-sw.js. An offline navigation displays You are offline; reconnect restores the login page. A waiting update shows a button, and reload happens only after the user confirms.</p>
+<h2 id="common-errors">Common errors</h2>
+<p>Use the refreshed preview wheels: older Teloce builds do not implement this plugin. HTTPS or localhost is required. Generate icons before starting the app. Debug mode intentionally registers no worker. Browser installation eligibility varies. The service worker does not provide offline writes. Check DevTools Application and use Unregister/Clear storage when switching between production and development; do not clear real user data without their consent.</p>
+<h2 id="short-exercise">Short exercise</h2>
+<p>Deploy a second version to a disposable HTTPS site. Leave the first version open, request an update in DevTools, and show that the confirmation protects unfinished work.</p>
+<h2 id="what-to-say-and-show">What to say and show</h2>
+<p>Say: "Turn the completed SPA into an optional installable application without caching private data. The server remains responsible for persistence and authorization; the browser presents the result."</p>
+<p>Show the expected result above, then point to the file responsible for it. Run the chapter check before the next lesson.</p>
+<h2 id="save-your-checkpoint">Save your checkpoint</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Complete chapter 16: PWA: installation, offline fallback and updates"</span>
+</code></pre></div></article>
+</main></div><div id="footer"></div></body></html>

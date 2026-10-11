@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Pydantic Integration</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/054f12804d53fff08320c7ed7638365c0ab30612/docs/guides/pydantic.md">Framework source</a> · <a href="../../content/framework/docs/guides/pydantic.md" download>Markdown</a></p><h1 id="pydantic-integration">Pydantic Integration</h1>
+<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/guides/pydantic.md">Framework source</a> · <a href="../../content/framework/docs/guides/pydantic.md" download>Markdown</a></p><h1 id="pydantic-integration">Pydantic Integration</h1>
 <p>Pydantic support is optional. Flaxon keeps its core validation system
 independent, while the integration lets endpoints accept Pydantic <code>BaseModel</code>
 parameters and return model instances.</p>
@@ -99,5 +99,27 @@ service or repository rather than in the Pydantic model or route handler.</p>
 authorization and privileged operations on the server; components call those
 endpoints and present their results. Follow the <a href="../fullstack/index.html">full-stack lessons</a>
 and <a href="../api/teloce.html">Teloce integration reference</a> to connect this capability
-to pages, components and application modules.</p></article>
+to pages, components and application modules.</p>
+<h2 id="filter-response-data">Filter response data</h2>
+<p>A resolved Pydantic return annotation validates and filters ordinary HTTP return
+values before JSON serialization. This also applies to containers such as
+<code>list[UserOut]</code> and nested output models.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UserOut</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/me"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">me</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UserOut</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ada"</span><span class="p">,</span> <span class="s2">"password_hash"</span><span class="p">:</span> <span class="s2">"not public"</span><span class="p">}</span>
+</code></pre></div>
+<p>The response contains only <code>id</code> and <code>name</code>. Subclass instances are revalidated
+rather than accepted unchanged. Invalid output is a server error (500), while
+invalid input remains a client validation error (422).</p>
+<p>Define output models with public fields only. Model configurations that allow
+extra fields and custom serializers explicitly control what can be emitted.
+Returning an explicit <code>Response</code> bypasses filtering; its contents are your
+responsibility. Unannotated routes and unresolved forward references do not
+filter output. Keep output model classes at module scope so annotations resolve.</p></article>
 </main></div><div id="footer"></div></body></html>

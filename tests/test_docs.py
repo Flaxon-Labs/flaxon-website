@@ -35,7 +35,7 @@ class DocumentationTests(unittest.TestCase):
             self.assertIn("../guides/teloce-ssr-debugging.html", links)
 
     def test_recording_course_and_admin_password_guidance(self):
-        for number in range(1, 16):
+        for number in range(1, 17):
             page = self.html[ROOT / f"docs/fullstack/project-manager/{number:02d}.html"]
             self.assertIn("What to say", page.get_text(" ", strip=True))
         edit = self.html[ROOT / "docs/fullstack/project-manager/05.html"].get_text(" ", strip=True)
@@ -47,6 +47,16 @@ class DocumentationTests(unittest.TestCase):
         self.assertNotIn('"password": "change-me"', admin)
         release = self.html[ROOT / "docs/fullstack/project-manager/01.html"].get_text(" ", strip=True)
         self.assertIn("after Flaxon 3.0.0 is published", release)
+
+    def test_pwa_course_and_plugin_guide_are_discoverable(self):
+        urls = {entry["url"] for entry in self.search}
+        self.assertIn("/docs/fullstack/project-manager/16.html", urls)
+        self.assertIn("/docs/guides/teloce-first-party-plugins.html", urls)
+        lesson = self.html[ROOT / "docs/fullstack/project-manager/16.html"].get_text(" ", strip=True)
+        for text in ("scripts/create_pwa_icons.py", "PwaStatus.html", "scripts/pwa_smoke.py", "does not save tasks offline"):
+            self.assertIn(text, lesson)
+        pdf = ROOT / "downloads/flaxon-project-manager-course.pdf"
+        self.assertTrue(pdf.read_bytes().startswith(b"%PDF-"))
 
     def test_all_synced_markdown_has_a_published_page(self):
         for entry in self.source["pages"]:
@@ -93,8 +103,8 @@ class DocumentationTests(unittest.TestCase):
             for e in self.manifest["pages"]
             if e["section"] == "Full-stack course"
         ]
-        self.assertEqual(len(paths), 30)
-        for number in range(1, 16):
+        self.assertEqual(len(paths), 31)
+        for number in range(1, 17):
             self.assertIn(f"docs/fullstack/project-manager/{number:02d}.html", paths)
         self.assertIn("docs/fullstack/11-guessing-game.html", paths)
         for number in range(1, 11):
