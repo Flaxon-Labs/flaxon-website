@@ -18,7 +18,7 @@ The server stores the secret number, hashes the access token, and calculates eve
 
 ## 1. Set up locally
 
-Use Python 3.11 or newer and Git. Extract the download into `guessing-game/`, then open a terminal there:
+Use Python 3.11 or newer. Extract the download into `guessing-game/`, then open a terminal there:
 
 ```bash
 python -m venv .venv
@@ -49,7 +49,7 @@ Enter your own Admin username, email, and strong password when prompted. Passwor
 
 The `.python-version` file selects Python 3.12 on Render and allows its latest available security patch. Keep your local Python installation updated as well.
 
-The requirements pin the exact Flaxon and Teloce-Py Git commits used to verify this tutorial, rather than assuming that a PyPI package with the same version number contains these APIs. Upgrade the pin deliberately after running the tests.
+The requirements install Flaxon 0.3.0 and Teloce-Py 0.3.0 from PyPI. No preview Git checkout is required. Upgrade the pins deliberately after running the tests.
 
 ## 2. Understand the SPA and API
 
@@ -150,3 +150,11 @@ Official references: [Render persistent disks](https://render.com/docs/disks), [
 You now have a complete SPA with a protected administration interface and a reproducible deployment. Continue improving it with reusable Teloce components, account-based history, accessibility tests, or a shared production database when those features fit your application.
 
 [Next lesson: Teloce and Flaxon API guide](12-teloce-flaxon-apis.html) · [Course contents](index.html)
+
+## Type checking with Flaxon 0.3.0
+
+```bash
+python management.py typecheck
+```
+
+This example has a custom management script for its SQLite store. Its `typecheck` command checks both root and module UI sources using Teloce's project adapter. During development, `flaxon run app:app --reload` also starts the automatic checker because the app enables debug mode. Errors do not stop the server. Production disables debug mode and the watcher; use the manual check before deployment. The checker uses `tsconfig.json` when present and strict defaults otherwise. See the [complete checking guide](../guides/typecheck.html).

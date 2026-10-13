@@ -21,18 +21,36 @@ class DocumentationTests(unittest.TestCase):
             p: BeautifulSoup(p.read_text(), "html.parser") for p in ROOT.rglob("*.html") if "templates" not in p.relative_to(ROOT).parts and not p.is_relative_to(ROOT / "examples/guessing-game")
         }
 
-    def test_ssr_preview_is_discoverable_and_installation_is_coordinated(self):
+    def test_ssr_release_is_discoverable_and_installation_is_coordinated(self):
         expected = {"/docs/guides/teloce-ssr-debugging.html", "/docs/guides/teloce-ssr-reference.html", "/docs/projects/teloce-ssr/index.html"}
         self.assertTrue(expected.issubset({entry["url"] for entry in self.search}))
         guide = self.html[ROOT / "docs/guides/teloce-ssr-debugging.html"]
-        self.assertIn("awaits a coordinated package release", guide.get_text(" ", strip=True))
+        self.assertIn("Available in Flaxon 0.3.0", guide.get_text(" ", strip=True))
         self.assertIn("teloce-ssr-reference.html", {a["href"] for a in guide.select("a[href]")})
         install = self.html[ROOT / "docs/guides/latest-upgrade.html"].get_text(" ", strip=True)
-        for commit in ("94df54e72ba4bf0df127ff87018e8490d6dd7a78", "8316545dd85698c2c3960b1b801171935dd6ca0d"):
+        for commit in ("flaxon[standard,admin]==0.3.0", "teloce-py==0.3.0"):
             self.assertIn(commit, install)
         for page in ("12-teloce-flaxon-apis", "13-html-spa-routing"):
             links = {a["href"] for a in self.html[ROOT / f"docs/fullstack/{page}.html"].select("a[href]")}
             self.assertIn("../guides/teloce-ssr-debugging.html", links)
+
+    def test_release_examples_and_course_overrides(self):
+        import zipfile
+        requirements = (ROOT / "examples/guessing-game/requirements.txt").read_text()
+        self.assertIn("flaxon[standard,admin]==0.3.0", requirements)
+        self.assertIn("teloce-py==0.3.0", requirements)
+        self.assertNotIn("git+", requirements)
+        with zipfile.ZipFile(ROOT / "downloads/flaxon-guessing-game.zip") as archive:
+            for path in ("requirements.txt", "management.py", "modules/game/ui/client.ts"):
+                self.assertEqual(archive.read(path), (ROOT / "examples/guessing-game" / path).read_bytes())
+        for number in range(1, 17):
+            page = self.html[ROOT / f"docs/fullstack/project-manager/{number:02d}.html"]
+            self.assertNotIn("3.0.0", page.get_text())
+        checking = self.html[ROOT / "docs/fullstack/project-manager/14.html"].get_text()
+        self.assertIn("not yet type-clean", checking)
+        guide = self.html[ROOT / "docs/guides/typecheck.html"].get_text()
+        self.assertIn("tsconfig.json", guide)
+        self.assertIn("typecheck=False", guide)
 
     def test_recording_course_and_admin_password_guidance(self):
         for number in range(1, 17):
@@ -46,7 +64,7 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("still creates the account", admin)
         self.assertNotIn('"password": "change-me"', admin)
         release = self.html[ROOT / "docs/fullstack/project-manager/01.html"].get_text(" ", strip=True)
-        self.assertIn("after Flaxon 3.0.0 is published", release)
+        self.assertIn("published Flaxon 0.3.0", release)
 
     def test_pwa_course_and_plugin_guide_are_discoverable(self):
         urls = {entry["url"] for entry in self.search}
@@ -180,7 +198,7 @@ class DocumentationTests(unittest.TestCase):
         for entry in self.source["pages"]:
             notices = self.html[ROOT / entry["url"]].select(".doc-version-note")
             self.assertEqual(len(notices), 1)
-            self.assertIn("PyPI releases may lag", notices[0].get_text())
+            self.assertIn("0.3.0 are available on PyPI", notices[0].get_text())
 
     def test_api_directives_are_rendered_from_real_source(self):
         self.assertTrue(self.source["api_symbols"])

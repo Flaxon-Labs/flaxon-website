@@ -1,4 +1,5 @@
-> Preview documentation: these APIs require the coordinated commits in the [installation guide](https://github.com/aldanedev-create/teloce-py/blob/94df54e72ba4bf0df127ff87018e8490d6dd7a78/docs/latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging). This is not a new PyPI release.
+> Release documentation: use Flaxon 0.3.0 and Teloce-Py 0.3.0 from the [installation guide](latest-upgrade.html).
+
 
 # Server rendering and hydration
 

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/aldanedev-create/flaxon",
-  "commit": "3ac6041ee93e759b723f05b7e639b7349978c0a4",
+  "commit": "d1b811fa604fb91aa3bddbef11b0513008022e00",
   "pages": [
     {
       "source": "CHANGELOG.md",
@@ -407,7 +407,7 @@
     {
       "source": "docs/fullstack/project-manager/01.md",
       "url": "docs/fullstack/project-manager/01.html",
-      "title": "01 | Preview and CLI setup",
+      "title": "01 | Installation and CLI setup",
       "section": "Full-stack course"
     },
     {
@@ -693,6 +693,12 @@
       "section": "Core concepts"
     },
     {
+      "source": "docs/guides/typecheck.md",
+      "url": "docs/guides/typecheck.html",
+      "title": "Type-check Teloce interfaces",
+      "section": "Feature guides"
+    },
+    {
       "source": "docs/guides/validation.md",
       "url": "docs/core-concepts/validation.html",
       "title": "Validation",
@@ -799,6 +805,12 @@
       "url": "docs/philosophy.html",
       "title": "Philosophy",
       "section": "Getting started"
+    },
+    {
+      "source": "docs/publishing.md",
+      "url": "docs/publishing.html",
+      "title": "Publishing flaxon",
+      "section": "Operations and reference"
     },
     {
       "source": "docs/quality-audit.md",

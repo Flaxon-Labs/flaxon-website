@@ -1,7 +1,19 @@
 // Shared browser helpers. Python still owns all rules and authorization.
+interface StoredRound {
+    id: string;
+    token: string;
+    outcome: string;
+}
+
+interface RequestOptions {
+    method?: string;
+    body?: unknown;
+    token?: string;
+}
+
 const STORAGE_KEY = "guessing-game.rounds";
 
-export function loadRounds() {
+export function loadRounds(): StoredRound[] {
     try {
         const rounds = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
         return Array.isArray(rounds) ? rounds : [];
@@ -10,7 +22,7 @@ export function loadRounds() {
     }
 }
 
-export function saveRound(round) {
+export function saveRound(round: StoredRound) {
     const previousRounds = loadRounds().filter((item) => item.id !== round.id);
     // Keep one unfinished round and up to 50 recent rounds in this tab.
     const rounds = [round, ...previousRounds].filter(
@@ -24,7 +36,7 @@ export function saveRound(round) {
     }
 }
 
-export function removeRound(gameId) {
+export function removeRound(gameId: string) {
     const rounds = loadRounds().filter((round) => round.id !== gameId);
     try {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(rounds));
@@ -33,8 +45,8 @@ export function removeRound(gameId) {
     }
 }
 
-export async function requestJson(path, { method = "GET", body, token } = {}) {
-    const headers = { "X-Game-Client": "flaxon-spa" };
+export async function requestJson(path: string, { method = "GET", body, token }: RequestOptions = {}) {
+    const headers: Record<string, string> = { "X-Game-Client": "flaxon-spa" };
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (token) headers["X-Game-Token"] = token;
 
@@ -57,11 +69,11 @@ export function startRound() {
     return requestJson("/api/games/", { method: "POST" });
 }
 
-export function readRound(round) {
+export function readRound(round: StoredRound) {
     return requestJson(`/api/games/${round.id}`, { token: round.token });
 }
 
-export function sendGuess(round, value) {
+export function sendGuess(round: StoredRound, value: number) {
     return requestJson(`/api/games/${round.id}/guesses`, {
         method: "POST",
         body: { value },
@@ -69,6 +81,6 @@ export function sendGuess(round, value) {
     });
 }
 
-export function readResult(round) {
+export function readResult(round: StoredRound) {
     return requestJson(`/api/results/${round.id}`, { token: round.token });
 }

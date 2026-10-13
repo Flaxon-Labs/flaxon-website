@@ -248,4 +248,16 @@ The [guessing-game capstone](docs/fullstack/11-guessing-game.html) includes the 
 
 The game uses module-owned Teloce pages and `data-teloce-link`. [Lesson 12](docs/fullstack/12-teloce-flaxon-apis.html) maps Teloce component, router, signal, compiler, data, runtime, and Flaxon server APIs to practical uses.
 
-The documentation now tracks framework revision `f4ab3cd440234750f6220ee2fc107dde58b93132`. The [upgrade guide](docs/guides/latest-upgrade.html) distinguishes current-source behavior from published PyPI packages and covers JSON/authentication migration.
+The documentation targets published **Flaxon 0.3.0** and **Teloce-Py 0.3.0**. The upstream snapshot commit is recorded in `content/framework/manifest.json`. Release corrections live in `content/overrides/`, which takes precedence when rebuilding and keeps a subsequent source sync from restoring old preview instructions. Historical benchmarks and release posts retain their measured versions.
+
+### Course PDF and runnable example checks
+
+```bash
+python -m pip install reportlab==4.4.10
+python scripts/build_course_pdf.py
+python -m pip install -r examples/guessing-game/requirements.txt pytest httpx
+python -m pytest examples/guessing-game/test_game.py -q
+python examples/guessing-game/management.py typecheck
+```
+
+The PDF is generated from the same sixteen course chapters and release overrides as the website. Its printed code wraps; copy code from the HTML or Markdown pages. The guessing-game ZIP is rebuilt from its checked source files. The course's advanced components still expose 0.3.0 adapter limitations documented in chapter 14; successful runtime tests do not imply a clean type check.

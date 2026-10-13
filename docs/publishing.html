@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Publishing flaxon — Flaxon, the Python full-stack framework with Teloce, Jinax, Admin and CMS.">
+<meta name="theme-color" content="#ffffff"><title>Publishing flaxon — Flaxon Docs</title>
+<link rel="icon" href="../assets/images/logo/flaxon.png">
+<link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/docs.css">
+<script src="../assets/js/dark-mode.js"></script>
+<script defer src="../assets/js/site-shell.js"></script>
+<script defer src="../assets/js/docs.js"></script>
+</head><body class="docs-page">
+<a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
+<div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
+<nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Publishing flaxon</span></nav>
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/publishing.md">Framework source</a> · <a href="../content/framework/docs/publishing.md" download>Markdown</a></p><h1 id="publishing-flaxon">Publishing flaxon</h1>
+<p>Use Python 3.11+ for the combined Flaxon/Teloce release workflow. From this repository, install the publishing tools:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>build<span class="w"> </span>twine
+</code></pre></div>
+<p>Before publishing, merge the intended changes, run the project's tests, choose a new unused version in <code>src/flaxon/version.py</code>, and update the changelog. The script uses the current version; it does not bump versions, create Git tags, or run the test suite.</p>
+<p>Build and validate without uploading:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/publish.py<span class="w"> </span>--build-only
+</code></pre></div>
+<p>Build, validate, and upload to TestPyPI:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/publish.py<span class="w"> </span>--repository<span class="w"> </span>testpypi
+</code></pre></div>
+<p>Publish to PyPI:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/publish.py
+</code></pre></div>
+<p>Twine can prompt for your API token, or use its keyring, <code>.pypirc</code>, or <code>TWINE_PASSWORD</code> configuration. Use <code>TWINE_USERNAME=__token__</code> for token authentication with older Twine versions. PyPI and TestPyPI use separate tokens. Keep credentials outside the repository. <code>--non-interactive</code> fails instead of prompting when authentication is unavailable.</p>
+<p>Each invocation builds one wheel and one source distribution in a new <code>dist/publish-*</code> folder, then runs <code>twine check --strict</code>. Upload uses only those freshly checked files; older files in <code>dist</code> are ignored. The selected repository is passed as an explicit HTTPS URL. Failed builds/checks stop before upload, and artifacts are retained for inspection. Upload failures return a nonzero exit status; inspect PyPI before retrying if one artifact may already have uploaded.</p>
+<p>These packages do not build native PyTSCheck or MinifyJS binaries. Their Python dependencies supply those binaries in their own distributions.</p>
+<h2 id="release-order">Release order</h2>
+<p>Publish Teloce first. Then set Flaxon's <code>teloce-py</code> minimum dependency to that released version and publish Flaxon. This ensures new Flaxon installs receive the adapter required for automatic checks, project inheritance, and child-prop validation. A TestPyPI release does not satisfy a dependency downloaded from normal PyPI.</p>
+<p>PyTSCheck is already a required Flaxon dependency. The existing <code>scripts/release.py</code> additionally handles version/changelog and Git operations; <code>scripts/publish.py</code> provides the simpler build/check/upload workflow.</p></article>
+</main></div><div id="footer"></div></body></html>

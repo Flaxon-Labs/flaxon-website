@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>12 | Staff Admin</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/12.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/12.md" download>Markdown</a></p><h1 id="12-staff-admin">12 | Staff Admin</h1>
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/fullstack/project-manager/12.md">Framework source</a> · <a href="../../../content/overrides/docs/fullstack/project-manager/12.md" download>Markdown</a></p><h1 id="12-staff-admin">12 | Staff Admin</h1>
 <h2 id="goal">Goal</h2>
 <p>Create staff credentials and manage existing domain records with explicit permissions.</p>
 <h2 id="what-you-are-building">What you are building</h2>
@@ -210,13 +210,11 @@
 </code></pre></div>
 <p>Leave the rest of the file unchanged.</p>
 <h3 id="edit-2-find-this-exact-block">Edit 2: find this exact block</h3>
-<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
+<p>Open <code>app.py</code>. Locate the management guard after <code>app.use_teloce()</code>:</p>
 <div class="highlight"><pre><span></span><code>    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">app</span>
 
-    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
-        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
-        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="replace-that-block-with_1">Replace that block with</h3>
 <div class="highlight"><pre><span></span><code>    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
@@ -227,9 +225,8 @@
         <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
         <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
-        <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
-        <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
 </code></pre></div>
 <p>Leave the rest of the file unchanged.</p>
 <p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>

@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>15 | Production build and Render</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/15.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/15.md" download>Markdown</a></p><h1 id="15-production-build-and-render">15 | Production build and Render</h1>
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/fullstack/project-manager/15.md">Framework source</a> · <a href="../../../content/overrides/docs/fullstack/project-manager/15.md" download>Markdown</a></p><h1 id="15-production-build-and-render">15 | Production build and Render</h1>
 <h2 id="goal">Goal</h2>
 <p>Build optimized assets and deploy one persistent application instance.</p>
 <h2 id="what-you-are-building">What you are building</h2>
@@ -65,7 +65,7 @@ FLAXON_SECRET_KEY=
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flaxon-project-manager</span>
 <span class="w">    </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
 <span class="w">    </span><span class="nt">plan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">starter</span>
-<span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python scripts/verify_vendor.py &amp;&amp; pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
+<span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
 <span class="w">    </span><span class="nt">startCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python management.py migrate &amp;&amp; python -m uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1</span>
 <span class="w">    </span><span class="nt">healthCheckPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/health/course</span>
 <span class="w">    </span><span class="nt">disk</span><span class="p">:</span>
@@ -91,18 +91,10 @@ FLAXON_SECRET_KEY=
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/build_ui.py
 python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>check
 </code></pre></div>
-<h2 id="release-only-edit-render-installation">Release-only edit: Render installation</h2>
-<p>If you chose the published Flaxon 3.0.0 path, use <code>requirements-release.txt</code> as your project's <code>requirements.txt</code>. In <code>render.yaml</code>, find:</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python scripts/verify_vendor.py &amp;&amp; pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
-</code></pre></div>
-<p>Replace only that line with:</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">buildCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt &amp;&amp; python scripts/build_ui.py</span>
-</code></pre></div>
-<p>Leave the rest of the Blueprint unchanged. The preview path keeps wheel verification and includes <code>vendor/</code>. The release path installs the pinned published packages and does not need preview wheels. This release branch must pass the clean course rehearsal after publication before you record it.</p>
 <h2 id="deploy-the-completed-project">Deploy the completed project</h2>
 <ol>
 <li>Stop the local server. Run all tests and both browser checks from chapter 14. Run the production build above.</li>
-<li>Commit your Python migrations, application files, vendor wheels and requirements. Keep .env, data, cookie jars and local virtual environments out of Git. Push the project to your GitHub repository.</li>
+<li>Commit your Python migrations, application files and requirements. Keep .env, data, cookie jars and local virtual environments out of Git. Push the project to your GitHub repository.</li>
 <li>In Render, choose New &gt; Blueprint, connect your repository and select the branch containing render.yaml. Review the paid service and persistent disk before deploying.</li>
 <li>Supply PUBLIC_ORIGIN as the exact https://SERVICE.onrender.com address (or your configured HTTPS domain). Keep FLAXON_DEBUG=0, DATA_DIR=/var/data and the generated persistent secret. Python is pinned by the Blueprint.</li>
 <li>Deploy and inspect logs: migrations must complete before Uvicorn listens. Do not move SQLite migrations to a pre-deploy command; that process cannot access the attached disk.</li>

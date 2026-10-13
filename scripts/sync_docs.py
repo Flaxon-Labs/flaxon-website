@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content/framework"
-REPO = "https://github.com/aldanedev-create/flaxon"
+REPO = "https://github.com/Flaxon-Labs/flaxon"
 ALIASES = {
     "docs/index.md": "docs/getting-started/index.html",
     "docs/installation.md": "docs/getting-started/installation.html",
@@ -387,7 +387,7 @@ def page_shell(entry, body, manifest=None):
     if manifest:
         path = entry["source"]
         source_url = f"{manifest['repository']}/blob/{manifest['commit']}/{quote(path)}"
-        source_note = f'<p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="{r("docs/guides/latest-upgrade.html")}">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="{source_url}">Framework source</a> · <a href="{r("content/framework/" + path)}" download>Markdown</a></p>'
+        source_note = f'<p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="{r("docs/guides/latest-upgrade.html")}">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="{source_url}">Framework source</a> · <a href="{r(("content/overrides/" if (ROOT / "content/overrides" / path).exists() else "content/framework/") + path)}" download>Markdown</a></p>'
     output = f'''<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -410,6 +410,12 @@ def page_shell(entry, body, manifest=None):
 def build():
     manifest = json.loads((CONTENT / "manifest.json").read_text())
     pages = manifest["pages"]
+    for entry in pages:
+        override = ROOT / "content/overrides" / entry["source"]
+        if override.exists():
+            heading = re.search(r"^#\s+(.+)$", override.read_text(), re.M)
+            if heading:
+                entry["title"] = heading.group(1).strip()
     mapping = {e["source"]: e["url"] for e in pages}
     imported = {e["url"] for e in pages}
     build_game_guide(ROOT)
@@ -463,7 +469,8 @@ def build():
             }
         )
     for entry in pages:
-        text = (CONTENT / entry["source"]).read_text()
+        override = ROOT / "content/overrides" / entry["source"]
+        text = (override if override.exists() else CONTENT / entry["source"]).read_text()
         text = re.sub(
             r"^:::\s+(\S+)\s*$(?:\n[ \t]+[^\n]*)*",
             lambda m: manifest["api_symbols"][m.group(1)],
@@ -493,9 +500,9 @@ def build():
             link["href"] = relative("docs/guides/teloce-ssr-reference.html", entry["url"])
         if entry["source"] in {"docs/guides/teloce-ssr-debugging.md", "examples/teloce_ssr/README.md"}:
             notice = soup.new_tag("p", attrs={"class": "doc-preview-note"})
-            notice.append("Preview: this integration is merged in source and awaits a coordinated package release. ")
-            link = soup.new_tag("a", href=relative("docs/guides/latest-upgrade.html", entry["url"]) + "#preview-teloce-ssr-hydration-and-browser-debugging")
-            link.string = "Install matching tested commits"
+            notice.append("Available in Flaxon 0.3.0 with Teloce-Py 0.3.0. ")
+            link = soup.new_tag("a", href=relative("docs/guides/latest-upgrade.html", entry["url"]) + "#teloce-ssr-hydration-and-browser-debugging")
+            link.string = "Install the published packages"
             notice.append(link)
             soup.insert(0, notice)
 
