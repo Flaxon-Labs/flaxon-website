@@ -1,2 +1,6 @@
 # Preserve upstream Markdown hard breaks and source-file endings verbatim.
 content/framework/** whitespace=-blank-at-eol,-blank-at-eof
+
+*.pdf binary
+*.zip binary
+*.png binary

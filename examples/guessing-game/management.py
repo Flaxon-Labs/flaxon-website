@@ -9,10 +9,20 @@ from modules.game import storage as database
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["migrate", "createsuperuser", "backup"])
+    parser.add_argument("command", choices=["migrate", "createsuperuser", "backup", "typecheck"])
     parser.add_argument("--destination", default="backups")
     args = parser.parse_args()
-    if args.command == "migrate":
+    if args.command == "typecheck":
+        from teloce.typecheck import check_project
+
+        root = Path(__file__).resolve().parent
+        roots = [root / "ui", *sorted((root / "modules").glob("*/ui"))]
+        result = check_project(roots, project_root=root)
+        for finding in result.findings:
+            print(f"{finding.file}:{finding.line}:{finding.column}: TS{finding.code}: {finding.message}")
+        print("Type check passed." if result.ok else "Type check failed.")
+        raise SystemExit(0 if result.ok else 1)
+    elif args.command == "migrate":
         database.migrate()
         print("Game schema ready. Admin initializes its own store on startup.")
     elif args.command == "createsuperuser":

@@ -2,7 +2,7 @@
 
 This lesson is a practical map of the public APIs used to build full-stack applications. Start with the [complete guessing game](11-guessing-game.html), then use the tables below to choose the API for your next feature. Each group links to its detailed reference.
 
-The examples target the exact Flaxon and Teloce-Py commits pinned by the guessing-game project. Teloce's npm runtime, standalone runtime, compiler, and generated Flaxon router are different entry points. Use the APIs for the entry point your application actually loads.
+The examples target the Flaxon 0.3.0 and Teloce-Py 0.3.0 versions pinned by the guessing-game project. Teloce's npm runtime, standalone runtime, compiler, and generated Flaxon router are different entry points. Use the APIs for the entry point your application actually loads.
 
 ## 1. Know where each API runs
 
@@ -362,6 +362,6 @@ This reference includes all 102 Markdown documents under `docs/` at the pinned T
 
 ## Optional SSR and integrated debugging
 
-The client-rendered workflow above remains supported. To render the initial `.html` entry on the server, follow the [Flaxon SSR and debugger guide](../guides/teloce-ssr-debugging.html) and [Teloce SSR reference](../guides/teloce-ssr-reference.html). Use explicit public props, SSR-compatible templates, and matching packages from the [preview installation guide](../guides/latest-upgrade.html#preview-teloce-ssr-hydration-and-browser-debugging).
+The client-rendered workflow above remains supported. To render the initial `.html` entry on the server, follow the [Flaxon SSR and debugger guide](../guides/teloce-ssr-debugging.html) and [Teloce SSR reference](../guides/teloce-ssr-reference.html). Use explicit public props, SSR-compatible templates, and matching packages from the [release installation guide](../guides/latest-upgrade.html#teloce-ssr-hydration-and-browser-debugging).
 
 `data-teloce-link` still handles subsequent browser navigation. With `debug=True`, runtime errors, hydration diagnostics, and failed same-origin API requests appear in the overlay and `/__debug__`, with request IDs connecting API failures to Python errors. Production disables this development client and reporting endpoint.

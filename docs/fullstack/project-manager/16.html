@@ -12,7 +12,7 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>16 | PWA: installation, offline fallback and updates</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/fullstack/project-manager/16.md">Framework source</a> · <a href="../../../content/framework/docs/fullstack/project-manager/16.md" download>Markdown</a></p><h1 id="16-pwa-installation-offline-fallback-and-updates">16 | PWA: installation, offline fallback and updates</h1>
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="../../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/fullstack/project-manager/16.md">Framework source</a> · <a href="../../../content/overrides/docs/fullstack/project-manager/16.md" download>Markdown</a></p><h1 id="16-pwa-installation-offline-fallback-and-updates">16 | PWA: installation, offline fallback and updates</h1>
 <h2 id="goal">Goal</h2>
 <p>Turn the completed SPA into an optional installable application without caching private data.</p>
 <h2 id="what-you-are-building">What you are building</h2>
@@ -135,25 +135,18 @@
 <h2 id="step-3-edit-replace-the-marked-blocks-apppy">Step 3: EDIT - replace the marked blocks - app.py</h2>
 <p>The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact.</p>
 <h3 id="edit-1-find-this-exact-block">Edit 1: find this exact block</h3>
-<p>Open <code>app.py</code>. Locate this block once. The unchanged surrounding lines identify its position; do not use line numbers from another revision.</p>
-<div class="highlight"><pre><span></span><code>        <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+<p>Open <code>app.py</code>. Keep Teloce registration before the management guard so the manual checker can discover the UI.</p>
+<div class="highlight"><pre><span></span><code>    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
         <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
         <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
         <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">"minifier"</span><span class="p">:</span> <span class="s2">"minifyjs"</span><span class="p">},</span>
     <span class="p">)</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
 </code></pre></div>
 <h3 id="replace-that-block-with">Replace that block with</h3>
-<div class="highlight"><pre><span></span><code>        <span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">,</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">admin_path</span> <span class="ow">or</span> <span class="n">ADMIN_DATABASE_PATH</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"uploads"</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/course-assets"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">),</span> <span class="n">cache_control</span><span class="o">=</span><span class="s2">"no-cache"</span><span class="p">)</span>
-    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code>    <span class="n">app</span><span class="o">.</span><span class="n">use_teloce</span><span class="p">(</span>
         <span class="n">project_root</span><span class="o">=</span><span class="n">ROOT</span><span class="p">,</span>
         <span class="n">ui_dir</span><span class="o">=</span><span class="s2">"ui"</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">"Project Manager"</span><span class="p">,</span>
@@ -172,8 +165,9 @@
             <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">)</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health/course"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">is_management</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mount_static</span><span class="p">(</span><span class="s2">"/course-assets"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"public"</span><span class="p">),</span> <span class="n">cache_control</span><span class="o">=</span><span class="s2">"no-cache"</span><span class="p">)</span>
 </code></pre></div>
 <p>Leave the rest of the file unchanged.</p>
 <p><strong>Say:</strong> "The application factory mounts only the features already introduced. Follow the action label: a marked-block edit keeps the surrounding factory intact."</p>
@@ -404,7 +398,7 @@ python<span class="w"> </span>scripts/pwa_smoke.py
 <h2 id="expected-result">Expected result</h2>
 <p>The manifest has two valid icons and starts at /projects. The production browser registers /teloce-sw.js. An offline navigation displays You are offline; reconnect restores the login page. A waiting update shows a button, and reload happens only after the user confirms.</p>
 <h2 id="common-errors">Common errors</h2>
-<p>Use the refreshed preview wheels: older Teloce builds do not implement this plugin. HTTPS or localhost is required. Generate icons before starting the app. Debug mode intentionally registers no worker. Browser installation eligibility varies. The service worker does not provide offline writes. Check DevTools Application and use Unregister/Clear storage when switching between production and development; do not clear real user data without their consent.</p>
+<p>Use Teloce-Py 0.3.0: older builds may not implement this plugin. HTTPS or localhost is required. Generate icons before starting the app. Debug mode intentionally registers no worker. Browser installation eligibility varies. The service worker does not provide offline writes. Check DevTools Application and use Unregister/Clear storage when switching between production and development; do not clear real user data without their consent.</p>
 <h2 id="short-exercise">Short exercise</h2>
 <p>Deploy a second version to a disposable HTTPS site. Leave the first version open, request an update in DevTools, and show that the confirmation protects unfinished work.</p>
 <h2 id="what-to-say-and-show">What to say and show</h2>

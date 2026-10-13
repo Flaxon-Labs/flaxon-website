@@ -12,14 +12,14 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Models, settings, and management commands</span></nav>
-<article class="doc-content"><p class="doc-version-note">These docs track current framework source. PyPI releases may lag behind this snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/3ac6041ee93e759b723f05b7e639b7349978c0a4/docs/guides/orm.md">Framework source</a> · <a href="../../content/framework/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
-<p>Flaxon 0.2.7 integrates Tortoise ORM 1.1.7. <code>flaxon.db</code> exports its models, fields,
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/guides/orm.md">Framework source</a> · <a href="../../content/overrides/docs/guides/orm.md" download>Markdown</a></p><h1 id="models-settings-and-management-commands">Models, settings, and management commands</h1>
+<p>Flaxon 0.3.0 integrates Tortoise ORM 1.1.7. <code>flaxon.db</code> exports its models, fields,
 and transaction helpers. Existing <code>flaxon.database</code> adapters and JSON migration
 runners remain available for existing applications; new full-stack starters use
 Python migrations.</p>
 <h2 id="start-a-project">Start a project</h2>
-<p>Install this release from the repository until it is published to PyPI:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[standard,admin]"</span>
+<p>Install the published release:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard,admin]==0.3.0"</span>
 flaxon<span class="w"> </span>new<span class="w"> </span>project_manager
 <span class="nb">cd</span><span class="w"> </span>project_manager
 python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
@@ -277,5 +277,5 @@ use a legacy database object implementing both <code>execute()</code> and <code>
 Choose <code>ADMIN_STORE_BACKEND = "orm"</code> explicitly to store metadata through the ORM.
 Do not pass the lifecycle object as <code>database=</code> to AdminDashboard or CMS.</p>
 <h2 id="learn-the-orm-by-building-an-application">Learn the ORM by building an application</h2>
-<p>The <a href="../fullstack/project-manager/03.html">project manager models chapter</a> supplies complete models and exact migration commands, then explains <code>flaxon.db.Model</code>, <code>fields</code>, async ownership-scoped queries and <code>in_transaction</code>. Continue through authentication, projects, tasks and staff registration. The <a href="../fullstack/project-manager/index.html">course contents</a> distinguishes the planned Flaxon 3.0.0 release install from the bundled preview.</p></article>
+<p>The <a href="../fullstack/project-manager/03.html">project manager models chapter</a> supplies complete models and exact migration commands, then explains <code>flaxon.db.Model</code>, <code>fields</code>, async ownership-scoped queries and <code>in_transaction</code>. Continue through authentication, projects, tasks and staff registration. The <a href="../fullstack/project-manager/index.html">course contents</a> uses the published Flaxon 0.3.0 installation.</p></article>
 </main></div><div id="footer"></div></body></html>

@@ -18,7 +18,7 @@ The server stores the secret number, hashes the access token, and calculates eve
 
 ## 1. Set up locally
 
-Use Python 3.11 or newer and Git. Extract the download into `guessing-game/`, then open a terminal there:
+Use Python 3.11 or newer. Extract the download into `guessing-game/`, then open a terminal there:
 
 ```bash
 python -m venv .venv
@@ -49,7 +49,7 @@ Enter your own Admin username, email, and strong password when prompted. Passwor
 
 The `.python-version` file selects Python 3.12 on Render and allows its latest available security patch. Keep your local Python installation updated as well.
 
-The requirements pin the exact Flaxon and Teloce-Py Git commits used to verify this tutorial, rather than assuming that a PyPI package with the same version number contains these APIs. Upgrade the pin deliberately after running the tests.
+The requirements install Flaxon 0.3.0 and Teloce-Py 0.3.0 from PyPI. No preview Git checkout is required. Upgrade the pins deliberately after running the tests.
 
 ## 2. Understand the SPA and API
 
@@ -172,10 +172,20 @@ from modules.game import storage as database
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["migrate", "createsuperuser", "backup"])
+    parser.add_argument("command", choices=["migrate", "createsuperuser", "backup", "typecheck"])
     parser.add_argument("--destination", default="backups")
     args = parser.parse_args()
-    if args.command == "migrate":
+    if args.command == "typecheck":
+        from teloce.typecheck import check_project
+
+        root = Path(__file__).resolve().parent
+        roots = [root / "ui", *sorted((root / "modules").glob("*/ui"))]
+        result = check_project(roots, project_root=root)
+        for finding in result.findings:
+            print(f"{finding.file}:{finding.line}:{finding.column}: TS{finding.code}: {finding.message}")
+        print("Type check passed." if result.ok else "Type check failed.")
+        raise SystemExit(0 if result.ok else 1)
+    elif args.command == "migrate":
         database.migrate()
         print("Game schema ready. Admin initializes its own store on startup.")
     elif args.command == "createsuperuser":
@@ -430,9 +440,21 @@ def guess(game_id, token, value):
 
 ```typescript
 // Shared browser helpers. Python still owns all rules and authorization.
+interface StoredRound {
+    id: string;
+    token: string;
+    outcome: string;
+}
+
+interface RequestOptions {
+    method?: string;
+    body?: unknown;
+    token?: string;
+}
+
 const STORAGE_KEY = "guessing-game.rounds";
 
-export function loadRounds() {
+export function loadRounds(): StoredRound[] {
     try {
         const rounds = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
         return Array.isArray(rounds) ? rounds : [];
@@ -441,7 +463,7 @@ export function loadRounds() {
     }
 }
 
-export function saveRound(round) {
+export function saveRound(round: StoredRound) {
     const previousRounds = loadRounds().filter((item) => item.id !== round.id);
     // Keep one unfinished round and up to 50 recent rounds in this tab.
     const rounds = [round, ...previousRounds].filter(
@@ -455,7 +477,7 @@ export function saveRound(round) {
     }
 }
 
-export function removeRound(gameId) {
+export function removeRound(gameId: string) {
     const rounds = loadRounds().filter((round) => round.id !== gameId);
     try {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(rounds));
@@ -464,8 +486,8 @@ export function removeRound(gameId) {
     }
 }
 
-export async function requestJson(path, { method = "GET", body, token } = {}) {
-    const headers = { "X-Game-Client": "flaxon-spa" };
+export async function requestJson(path: string, { method = "GET", body, token }: RequestOptions = {}) {
+    const headers: Record<string, string> = { "X-Game-Client": "flaxon-spa" };
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (token) headers["X-Game-Token"] = token;
 
@@ -488,11 +510,11 @@ export function startRound() {
     return requestJson("/api/games/", { method: "POST" });
 }
 
-export function readRound(round) {
+export function readRound(round: StoredRound) {
     return requestJson(`/api/games/${round.id}`, { token: round.token });
 }
 
-export function sendGuess(round, value) {
+export function sendGuess(round: StoredRound, value: number) {
     return requestJson(`/api/games/${round.id}/guesses`, {
         method: "POST",
         body: { value },
@@ -500,7 +522,7 @@ export function sendGuess(round, value) {
     });
 }
 
-export function readResult(round) {
+export function readResult(round: StoredRound) {
     return requestJson(`/api/results/${round.id}`, { token: round.token });
 }
 ```
@@ -845,8 +867,8 @@ services:
 ### `requirements.txt`
 
 ```text
-flaxon[standard] @ git+https://github.com/Flaxon-Labs/flaxon.git@403d571eb6e35ac7a24fb9972fb2d3e3ccb19e62
-teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@10f786b9ce99cf62cb2e154a913843b027b20ee7
+flaxon[standard,admin]==0.3.0
+teloce-py==0.3.0
 minifyjs==0.1.3
 ```
 
@@ -1186,3 +1208,11 @@ Official references: [Render persistent disks](https://render.com/docs/disks), [
 You now have a complete SPA with a protected administration interface and a reproducible deployment. Continue improving it with reusable Teloce components, account-based history, accessibility tests, or a shared production database when those features fit your application.
 
 [Next lesson: Teloce and Flaxon API guide](12-teloce-flaxon-apis.html) · [Course contents](index.html)
+
+## Type checking with Flaxon 0.3.0
+
+```bash
+python management.py typecheck
+```
+
+This example has a custom management script for its SQLite store. Its `typecheck` command checks both root and module UI sources using Teloce's project adapter. During development, `flaxon run app:app --reload` also starts the automatic checker because the app enables debug mode. Errors do not stop the server. Production disables debug mode and the watcher; use the manual check before deployment. The checker uses `tsconfig.json` when present and strict defaults otherwise. See the [complete checking guide](../guides/typecheck.html).

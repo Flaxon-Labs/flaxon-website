@@ -1,27 +1,15 @@
 # Upgrade to the latest Flaxon workflow
 
-This website tracks the current Flaxon source. A published PyPI version can lag
-behind these pages. Check the [changelog](../changelog.html) before upgrading;
-the recent JSON and authentication changes require client migration.
+Use **Flaxon 0.3.0** with **Teloce-Py 0.3.0**, both published on PyPI. The version is 0.3.0, not 3.0.0. Review the [changelog](../changelog.html) and test your application's JSON and authentication consumers before upgrading.
 
-## Choose your installation
-
-For the published package:
+## Install the published packages
 
 ```bash
-python -m pip install --upgrade "flaxon[standard,admin]"
+python -m pip install --upgrade "flaxon[standard,admin]==0.3.0" "teloce-py==0.3.0"
+python -m pip check
 ```
 
-To try the exact framework revision used for these docs in a separate environment:
-
-```bash
-python -m venv .venv
-# Activate .venv using your platform's command, then:
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
-```
-
-Pin a tested version or commit in production. Do not treat a source installation
-as a new PyPI release. Keep backups and exercise your application before rollout.
+Use a virtual environment and commit your project's dependency pins. Backend-only and Jinax applications remain supported.
 
 ## Start with the generated project
 
@@ -108,21 +96,30 @@ release tooling. It records 913 passing tests and 24 skips in the audited
 configuration. Passing tests and an advisory dependency scan do not certify every
 deployment or third-party integration.
 
-## Preview: Teloce SSR, hydration, and browser debugging
+<span id="preview-teloce-ssr-hydration-and-browser-debugging"></span>
 
-These features are implemented in [Flaxon PR #18](https://github.com/aldanedev-create/flaxon/pull/18) and [Teloce PR #6](https://github.com/aldanedev-create/teloce-py/pull/6). They are merged in source and await a coordinated package release; the published packages may not include them. For this preview, install both tested commits in a separate environment:
+## Teloce SSR, hydration, and browser debugging
 
-```bash
-python -m pip install "teloce-py @ git+https://github.com/aldanedev-create/teloce-py.git@94df54e72ba4bf0df127ff87018e8490d6dd7a78"
-python -m pip install "flaxon[standard,admin] @ git+https://github.com/aldanedev-create/flaxon.git@8316545dd85698c2c3960b1b801171935dd6ca0d"
-```
+These integrations are included in the published 0.3.0 packages. Use the installation above; preview Git commits are no longer needed.
 
 Follow the [Flaxon SSR and debugger guide](teloce-ssr-debugging.html) for a complete scoped-CSS component, explicit public props, metadata, and error policies. Read the [Teloce renderer reference](teloce-ssr-reference.html) for supported expressions, hydration, slots, prerendering, and limits.
 
 SSR renders the initial entry. Later `data-teloce-link` navigation uses the browser router; an outlet page is not automatically a second server-rendered entry. Existing backend-only and client-rendered lessons continue to work. Detailed overlays and the browser reporting endpoint are development-only.
 
-## Project manager course and planned Flaxon 3.0.0
+## TypeScript and component checking
 
-The [recording ebook](../fullstack/project-manager/index.html) teaches the complete CLI-to-production project manager with exact incremental edits, scoped CSS, modules, ORM models and Python migrations. Its planned recording target is `flaxon[standard,admin]==3.0.0`. That release path is explicitly for use after publication and verification; preview wheels remain the tested rehearsal option. This website does not claim 3.0.0 is currently published.
+```bash
+python management.py typecheck
+python management.py typecheck --json
+python management.py runserver
+```
+
+The generated project's manual command checks registered application and module UI files. With `DEBUG = True`, the server also checks on startup and after saved UI/TypeScript/configuration edits. Errors appear in the terminal and development debugger while the server keeps running. Disable the watcher with `app.use_teloce(typecheck=False)`. Production never starts the development watcher; run the manual command in CI.
+
+PyTSCheck is included with Flaxon. The checker inherits the project's `tsconfig.json` for strictness, JSX and aliases; without one, it uses strict ES2022/bundler defaults. Imported npm packages still need their installed declarations. Supported statically imported TypeScript child components validate required props and prop types. Dynamic components, some import forms and heuristic template positions remain limitations. See the [checking guide](typecheck.html).
+
+## Project manager course for Flaxon 0.3.0
+
+The [recording ebook](../fullstack/project-manager/index.html) uses published 0.3.0 dependencies and teaches incremental edits, modules, scoped CSS, ORM models, migrations, Admin/CMS, PWA and deployment. Its companion PDF follows the same release instructions. Start with chapter 1; do not install old vendored preview wheels from a historical course checkout.
 
 Admin setup now accepts your chosen nonempty password up to 128 characters. In development it does not warn about strength; in production it recommends a stronger password without blocking creation. Confirmation must match. This applies to `setup-admin` and `createsuperuser`; web password validation remains separate. See [Admin setup](admin-cms.html#generated-project-admin-setup).
