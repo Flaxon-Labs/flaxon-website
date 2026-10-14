@@ -32,6 +32,48 @@ You can build a Teloce full-stack app, a Jinax server-rendered app, or use
 Flaxon as a [backend-only API](backend-only.html). Existing lessons for those
 choices remain available.
 
+## Updated starter workflow (next release)
+
+The changes in [Flaxon PR #34](https://github.com/aldanedev-create/flaxon/pull/34) require a release containing that PR. They are not included in the published 0.3.0 package. Both the full-stack and basic starters generate `requirements.txt` instead of `pyproject.toml`.
+
+After creating the project, use its interpreter directly; activation is optional:
+
+```bash
+cd my-project
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python management.py check
+.venv/bin/python management.py runserver
+```
+
+On Windows PowerShell:
+
+```powershell
+Set-Location -LiteralPath my-project
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe management.py check
+.\.venv\Scripts\python.exe management.py runserver
+```
+
+Run the migrations and administrator setup from the main walkthrough before using the database or Admin. The basic template uses `python -m flaxon run app:app --reload` instead of `management.py`.
+
+### Slow or interrupted creation
+
+Files appear before setup finishes. Wait for the completion message: Python still needs to create `.venv` and install its bundled pip. The updated CLI shows these as separate phases, with elapsed progress and a 120-second timeout per phase. Application dependencies download only when you run `pip install -r requirements.txt`. Disk speed and antivirus scanning may affect environment setup; the CLI cannot guarantee an instant finish.
+
+If setup times out or you cancel it, keep your project files and retry from the parent directory:
+
+```bash
+python -m flaxon new my-project --resume-venv --venv-timeout 300
+```
+
+Recovery preserves edited sources, also supports older projects containing `pyproject.toml`, and prints the appropriate install command. Ctrl+C stops the setup process tree. For a new project using an environment you manage yourself:
+
+```bash
+flaxon new my-project --no-venv
+```
+
+The updated starter disables automatic background type checking; run `python management.py typecheck` explicitly when needed.
+
 ## Review JSON consumers
 
 The modern response path uses `orjson`. Decimal values and integers beyond
