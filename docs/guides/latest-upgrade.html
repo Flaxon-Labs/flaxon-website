@@ -35,6 +35,30 @@ does not silently update tables. See the <a href="../getting-started/project-set
 <p>You can build a Teloce full-stack app, a Jinax server-rendered app, or use
 Flaxon as a <a href="backend-only.html">backend-only API</a>. Existing lessons for those
 choices remain available.</p>
+<h2 id="updated-starter-workflow-next-release">Updated starter workflow (next release)</h2>
+<p>The changes in <a href="https://github.com/aldanedev-create/flaxon/pull/34">Flaxon PR #34</a> require a release containing that PR. They are not included in the published 0.3.0 package. Both the full-stack and basic starters generate <code>requirements.txt</code> instead of <code>pyproject.toml</code>.</p>
+<p>After creating the project, use its interpreter directly; activation is optional:</p>
+<pre><code class="language-bash">cd my-project
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python management.py check
+.venv/bin/python management.py runserver
+</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">Set-Location -LiteralPath my-project
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe management.py check
+.\.venv\Scripts\python.exe management.py runserver
+</code></pre>
+<p>Run the migrations and administrator setup from the main walkthrough before using the database or Admin. The basic template uses <code>python -m flaxon run app:app --reload</code> instead of <code>management.py</code>.</p>
+<h3 id="slow-or-interrupted-creation">Slow or interrupted creation</h3>
+<p>Files appear before setup finishes. Wait for the completion message: Python still needs to create <code>.venv</code> and install its bundled pip. The updated CLI shows these as separate phases, with elapsed progress and a 120-second timeout per phase. Application dependencies download only when you run <code>pip install -r requirements.txt</code>. Disk speed and antivirus scanning may affect environment setup; the CLI cannot guarantee an instant finish.</p>
+<p>If setup times out or you cancel it, keep your project files and retry from the parent directory:</p>
+<pre><code class="language-bash">python -m flaxon new my-project --resume-venv --venv-timeout 300
+</code></pre>
+<p>Recovery preserves edited sources, also supports older projects containing <code>pyproject.toml</code>, and prints the appropriate install command. Ctrl+C stops the setup process tree. For a new project using an environment you manage yourself:</p>
+<pre><code class="language-bash">flaxon new my-project --no-venv
+</code></pre>
+<p>The updated starter disables automatic background type checking; run <code>python management.py typecheck</code> explicitly when needed.</p>
 <h2 id="review-json-consumers">Review JSON consumers</h2>
 <p>The modern response path uses <code>orjson</code>. Decimal values and integers beyond
 JavaScript's safe range become strings. Aware datetimes use UTC ISO 8601;

@@ -261,3 +261,5 @@ python examples/guessing-game/management.py typecheck
 ```
 
 The PDF is generated from the same sixteen course chapters and release overrides as the website. Its printed code wraps; copy code from the HTML or Markdown pages. The guessing-game ZIP is rebuilt from its checked source files. The course's advanced components still expose 0.3.0 adapter limitations documented in chapter 14; successful runtime tests do not imply a clean type check.
+
+Starter setup documentation also covers the upcoming PR #34 workflow: requirements.txt, visible environment phases, optional activation, and source-preserving recovery. It is explicitly separated from published 0.3.0 instructions.

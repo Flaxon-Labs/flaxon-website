@@ -12,12 +12,36 @@
 <a class="skip-link" href="#doc-main">Skip to content</a><div id="header"></div>
 <div class="docs-layout"><div id="docs-sidebar"></div><main id="doc-main" tabindex="-1">
 <nav class="doc-breadcrumb" aria-label="Breadcrumb"><a href="../../docs.html">Documentation</a><span aria-hidden="true"> / </span><span>Full-stack quick start</span></nav>
-<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/quickstart.md">Framework source</a> · <a href="../../content/framework/docs/quickstart.md" download>Markdown</a></p><h1 id="full-stack-quick-start">Full-stack quick start</h1>
+<article class="doc-content"><p class="doc-version-note">Flaxon 0.3.0 and Teloce-Py 0.3.0 are available on PyPI. Release instructions are maintained on this site; source links identify the framework snapshot. <a href="../guides/latest-upgrade.html">Check version and upgrade guidance</a>.</p><p class="doc-source"><a href="https://github.com/aldanedev-create/flaxon/blob/d1b811fa604fb91aa3bddbef11b0513008022e00/docs/quickstart.md">Framework source</a> · <a href="../../content/overrides/docs/quickstart.md" download>Markdown</a></p><h1 id="full-stack-quick-start">Full-stack quick start</h1>
 <p>For generated projects, use the shared <code>settings.py</code>, <code>Flaxon.from_settings()</code>,
 explicit mounts in <code>app.py</code>, and <code>management.py</code> workflow. See <a href="../guides/orm.html">ORM and project management</a>
 for Python migrations, model registration, permission hooks, relationship editing,
 and Admin/CMS metadata storage. Backend-only and legacy adapter examples remain supported.</p>
-<h2 id="start-from-the-project-cli">Start from the project CLI</h2>
+<h2 id="updated-starter-workflow-next-release">Updated starter workflow (next release)</h2>
+<p>The changes in <a href="https://github.com/aldanedev-create/flaxon/pull/34">Flaxon PR #34</a> require a release containing that PR. They are not included in the published 0.3.0 package. Both the full-stack and basic starters generate <code>requirements.txt</code> instead of <code>pyproject.toml</code>.</p>
+<p>After creating the project, use its interpreter directly; activation is optional:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>my-project
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+.venv/bin/python<span class="w"> </span>management.py<span class="w"> </span>check
+.venv/bin/python<span class="w"> </span>management.py<span class="w"> </span>runserver
+</code></pre></div>
+<p>On Windows PowerShell:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">Set-Location</span> <span class="n">-LiteralPath</span> <span class="n">my-project</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">management</span><span class="p">.</span><span class="n">py</span> <span class="n">check</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">management</span><span class="p">.</span><span class="n">py</span> <span class="n">runserver</span>
+</code></pre></div>
+<p>Run the migrations and administrator setup from the main walkthrough before using the database or Admin. The basic template uses <code>python -m flaxon run app:app --reload</code> instead of <code>management.py</code>.</p>
+<h3 id="slow-or-interrupted-creation">Slow or interrupted creation</h3>
+<p>Files appear before setup finishes. Wait for the completion message: Python still needs to create <code>.venv</code> and install its bundled pip. The updated CLI shows these as separate phases, with elapsed progress and a 120-second timeout per phase. Application dependencies download only when you run <code>pip install -r requirements.txt</code>. Disk speed and antivirus scanning may affect environment setup; the CLI cannot guarantee an instant finish.</p>
+<p>If setup times out or you cancel it, keep your project files and retry from the parent directory:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>flaxon<span class="w"> </span>new<span class="w"> </span>my-project<span class="w"> </span>--resume-venv<span class="w"> </span>--venv-timeout<span class="w"> </span><span class="m">300</span>
+</code></pre></div>
+<p>Recovery preserves edited sources, also supports older projects containing <code>pyproject.toml</code>, and prints the appropriate install command. Ctrl+C stops the setup process tree. For a new project using an environment you manage yourself:</p>
+<div class="highlight"><pre><span></span><code>flaxon<span class="w"> </span>new<span class="w"> </span>my-project<span class="w"> </span>--no-venv
+</code></pre></div>
+<p>The updated starter disables automatic background type checking; run <code>python management.py typecheck</code> explicitly when needed.</p>
+<h2 id="start-from-the-published-030-project-cli">Start from the published 0.3.0 project CLI</h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"flaxon[standard,admin]"</span>
 flaxon<span class="w"> </span>new<span class="w"> </span>project_manager
 <span class="nb">cd</span><span class="w"> </span>project_manager
